@@ -8,8 +8,7 @@ import { BarList, ColumnChart, SERIES, StatTile } from '../../components/charts'
 import { ErrorAlert } from '../../components/ErrorAlert';
 import { PageHeader } from '../../components/PageHeader';
 import { Spinner } from '../../components/Spinner';
-import { visibleNav } from '../../layouts/navigation';
-import { formatDateTime, formatPeso, humanize } from '../../utils/format';
+import { formatPeso } from '../../utils/format';
 import { fromCents, toCents } from '../../utils/money';
 
 const MONTH = new Intl.DateTimeFormat('en-PH', { month: 'short', timeZone: 'UTC' });
@@ -33,18 +32,17 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 
 /** Each user's own view: only the sections their permissions allow, computed by the server from posted records. */
 export function DashboardPage() {
-  const { user, hasPermission, sessionExpiresAt } = useAuth();
+  const { user } = useAuth();
   const q = useQuery({ queryKey: ['dashboard'], queryFn: dashboardApi.mine, enabled: !!user });
   if (!user) return null;
   const d = q.data;
-  const shortcuts = visibleNav(hasPermission).filter((i) => i.to !== '/');
   return (
     <>
       <PageHeader title={`Welcome, ${user.displayName}`} />
       <ErrorAlert error={q.error} />
       {q.isPending && <Spinner />}
       {d && (
-        <div className="mb-6 space-y-6">
+        <div className="space-y-6">
           {d.workQueue.length > 0 && (
             <Section title="Waiting for you">
               <ul className="grid gap-2 sm:grid-cols-2">
@@ -130,33 +128,6 @@ export function DashboardPage() {
           {d.notes.map((n) => <p key={n} className="text-xs text-slate-500">{n}</p>)}
         </div>
       )}
-
-      <div className="grid gap-6 md:grid-cols-2">
-        <section className="rounded-xl border border-slate-200/80 bg-white shadow-xs p-5" aria-labelledby="acct">
-          <h2 id="acct" className="mb-3 font-semibold">Your account</h2>
-          <dl className="grid grid-cols-3 gap-2 text-sm">
-            <dt className="text-slate-500">Username</dt><dd className="col-span-2">{user.username}</dd>
-            <dt className="text-slate-500">Last sign-in</dt><dd className="col-span-2">{formatDateTime(user.lastLoginAt)}</dd>
-            <dt className="text-slate-500">Session ends</dt><dd className="col-span-2">{formatDateTime(sessionExpiresAt)}</dd>
-            <dt className="text-slate-500">MFA</dt>
-            <dd className="col-span-2"><Badge tone={user.mfaEnrolled ? 'green' : 'amber'}>{user.mfaEnrolled ? 'Enrolled' : 'Not enrolled'}</Badge></dd>
-          </dl>
-          <Link to="/change-password" className="mt-4 inline-block text-sm text-brand-700 hover:underline">Change password</Link>
-        </section>
-        <section className="rounded-xl border border-slate-200/80 bg-white shadow-xs p-5" aria-labelledby="access">
-          <h2 id="access" className="mb-3 font-semibold">Your access</h2>
-          <div className="mb-3 flex flex-wrap gap-2">
-            {user.roles.length === 0 ? <span className="text-sm text-slate-500">No roles assigned.</span>
-              : user.roles.map((r) => <Badge key={r} tone="blue">{humanize(r)}</Badge>)}
-          </div>
-          <p className="text-sm text-slate-600">{user.permissions.length} effective permission(s).</p>
-          {shortcuts.length > 0 && (
-            <ul className="mt-3 space-y-1 text-sm">
-              {shortcuts.map((s) => <li key={s.to}><Link className="text-brand-700 hover:underline" to={s.to}>{s.label}</Link></li>)}
-            </ul>
-          )}
-        </section>
-      </div>
     </>
   );
 }

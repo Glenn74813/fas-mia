@@ -76,6 +76,7 @@ import { LoginPage } from '../features/auth/LoginPage';
 import { MfaPage } from '../features/auth/MfaPage';
 import { ResetPasswordPage } from '../features/auth/ResetPasswordPage';
 import { DashboardPage } from '../features/dashboard/DashboardPage';
+import { ProfilePage } from '../features/profile/ProfilePage';
 import { PortalHomePage } from '../features/portal/PortalHomePage';
 import { InquiriesPage } from '../features/receivables/InquiriesPage';
 import { InternalLayout } from '../layouts/InternalLayout';
@@ -92,6 +93,7 @@ export const routes: RouteObject[] = [
     element: <RequireAuth><InternalLayout /></RequireAuth>,
     children: [
       { index: true, element: <DashboardPage /> },
+      { path: 'profile', element: <ProfilePage /> },
       { path: 'admin/users', element: <RequireAuth anyOf={['USER_VIEW']}><UsersPage /></RequireAuth> },
       { path: 'admin/users/new', element: <RequireAuth anyOf={['USER_ADMINISTER']}><CreateUserPage /></RequireAuth> },
       { path: 'admin/users/:id', element: <RequireAuth anyOf={['USER_VIEW']}><UserDetailPage /></RequireAuth> },
@@ -182,6 +184,7 @@ export const routes: RouteObject[] = [
     element: <RequireAuth portal><PortalLayout /></RequireAuth>,
     children: [
       { index: true, element: <PortalHomePage /> },
+      { path: 'profile', element: <ProfilePage portal /> },
       { path: 'billings/:id', element: <PortalBillingPage /> },
     ],
   },
