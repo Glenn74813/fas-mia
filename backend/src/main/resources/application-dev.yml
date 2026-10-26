@@ -25,6 +25,13 @@ cas:
   # Everyone else, including the browser tests and the performance kit's users, still uses two-step verification.
   mfa:
     dev-bypass-users: admin.dev
+  # DEMONSTRATION ONLY: one account with every internal permission (DemoSuperAdministrator). Created when the
+  # username is set and does not exist yet; it still needs its authenticator code.
+  demo:
+    superadmin:
+      username: ${CAS_DEMO_SUPERADMIN_USERNAME:}
+      email: ${CAS_DEMO_SUPERADMIN_EMAIL:}
+      password: ${CAS_DEMO_SUPERADMIN_PASSWORD:}
   session:
     cookie-secure: ${CAS_COOKIE_SECURE:false}
 logging:
