@@ -19,13 +19,13 @@ export function UserMenu() {
         <span aria-hidden className="flex h-8 w-8 items-center justify-center rounded-full bg-brand-100 text-xs font-semibold text-brand-800">
           {initials(user?.displayName)}
         </span>
-        <span className="hidden leading-tight sm:block">
+        <span className="hidden leading-tight lg:block">
           <span className="block text-sm font-medium text-slate-900">{user?.displayName}</span>
           {role && <span className="block text-xs text-slate-500">{humanize(role)}{user!.roles.length > 1 ? ` +${user!.roles.length - 1}` : ''}</span>}
         </span>
       </div>
       <button type="button" onClick={async () => { await logout(); navigate('/login', { replace: true }); }}
-        className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-sm font-medium text-slate-700 shadow-xs transition hover:bg-slate-50 hover:text-slate-900">
+        className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-sm font-medium text-slate-700 shadow-xs transition hover:bg-slate-50 hover:text-slate-900">
         <LogOut aria-hidden className="h-4 w-4" strokeWidth={1.75} />
         Sign out
       </button>

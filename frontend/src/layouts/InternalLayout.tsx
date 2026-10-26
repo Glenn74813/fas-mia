@@ -63,7 +63,7 @@ export function InternalLayout() {
       </aside>
       <div className="flex min-w-0 flex-1 flex-col">
         <header data-shell className="sticky top-0 z-10 flex h-16 items-center justify-end gap-4 border-b border-slate-200/80 bg-white/90 px-6 backdrop-blur lg:px-8">
-          <span className="hidden items-center gap-1.5 rounded-full bg-slate-100 px-3 py-1 text-xs text-slate-600 sm:inline-flex">
+          <span className="hidden items-center gap-1.5 whitespace-nowrap rounded-full bg-slate-100 px-3 py-1 text-xs text-slate-600 xl:inline-flex">
             <Clock aria-hidden className="h-3.5 w-3.5" strokeWidth={1.75} />Session ends {formatDateTime(sessionExpiresAt)}
           </span>
           <NotificationBell />
