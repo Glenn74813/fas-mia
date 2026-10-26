@@ -129,6 +129,10 @@ cas:
     min-length: 12
     max-length: 128
     reset-token-ttl: PT30M
+  # Edge proxy (Cloudflare Worker in front, backend behind a tunnel): when set, /api requires this secret in
+  # X-CAS-Proxy-Secret and takes the client address from X-CAS-Client-IP. Empty disables it (docs/21).
+  proxy:
+    shared-secret: ${CAS_PROXY_SHARED_SECRET:}
   rate-limit:
     enabled: true
     auth-requests-per-minute: 20

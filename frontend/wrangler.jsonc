@@ -1,0 +1,21 @@
+// Cloudflare Workers deployment of the CAS web application: the built SPA (./dist) plus a small Worker that adds
+// security headers and forwards /api/* to the backend. Build first with `npm ci && npm run build`; Cloudflare's Git
+// integration runs that as the build command. The backend (Spring Boot + PostgreSQL) does not run on Cloudflare:
+// set BACKEND_ORIGIN and the PROXY_SHARED_SECRET secret as described in docs/21-cloudflare-deployment.md.
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "fas-mia",
+  "main": "worker/index.ts",
+  "compatibility_date": "2026-10-01",
+  "assets": {
+    "directory": "./dist",
+    "binding": "ASSETS",
+    // Client-side routes such as /journal-vouchers/123 return index.html instead of 404.
+    "not_found_handling": "single-page-application",
+    // The Worker handles /api/* (proxy) and every page response (headers); static files are still served by assets.
+    "run_worker_first": true
+  },
+  // BACKEND_ORIGIN (variable) and PROXY_SHARED_SECRET (secret) are set in the Cloudflare dashboard, not here; deploy
+  // with `npx wrangler deploy --keep-vars` so a deploy never clears them.
+  "observability": { "enabled": true }
+}

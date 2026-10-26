@@ -9,3 +9,7 @@ frontend/test-results/
 .idea/
 .vscode/
 .devdata/
+
+# Cloudflare Wrangler local state and dev secrets
+frontend/.wrangler/
+frontend/.dev.vars
