@@ -120,7 +120,7 @@ jobs:
         uses: gitleaks/gitleaks-action@v2
         env: { GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}' }
       - name: Dependency and filesystem vulnerability scan
-        uses: aquasecurity/trivy-action@0.28.0
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
         with: { scan-type: fs, scan-ref: ., severity: 'HIGH,CRITICAL', exit-code: '1', ignore-unfixed: true }
 
   images:
@@ -131,10 +131,10 @@ jobs:
       - run: docker build -t cas-backend:${{ github.sha }} backend
       - run: docker build -t cas-frontend:${{ github.sha }} frontend
       - name: Scan backend image
-        uses: aquasecurity/trivy-action@0.28.0
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
         with: { image-ref: 'cas-backend:${{ github.sha }}', severity: 'HIGH,CRITICAL', exit-code: '1', ignore-unfixed: true }
       - name: Scan frontend image
-        uses: aquasecurity/trivy-action@0.28.0
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
         with: { image-ref: 'cas-frontend:${{ github.sha }}', severity: 'HIGH,CRITICAL', exit-code: '1', ignore-unfixed: true }
       # Deployment to staging/production is a separate, approval-gated workflow (Phase 5),
       # pushing signed images to the approved PH-resident registry.
