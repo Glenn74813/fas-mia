@@ -59,7 +59,10 @@ export function InternalLayout() {
             );
           })}
         </nav>
-        {import.meta.env.DEV && <p className="hidden border-t border-white/5 px-5 py-3 text-[11px] text-slate-500 md:block">Development build</p>}
+        <div className="hidden border-t border-white/5 p-3 md:block">
+          {import.meta.env.DEV && <p className="px-2 pb-2 text-[11px] text-slate-500">Development build</p>}
+          <UserMenu variant="sidebar" />
+        </div>
       </aside>
       <div className="flex min-w-0 flex-1 flex-col">
         <header data-shell className="sticky top-0 z-10 flex h-16 items-center justify-end gap-4 border-b border-slate-200/80 bg-white/90 px-6 backdrop-blur lg:px-8">
@@ -67,8 +70,11 @@ export function InternalLayout() {
             <Clock aria-hidden className="h-3.5 w-3.5" strokeWidth={1.75} />Session ends {formatDateTime(sessionExpiresAt)}
           </span>
           <NotificationBell />
-          <span className="h-6 w-px bg-slate-200" aria-hidden />
-          <UserMenu />
+          {/* On small screens the sidebar collapses to a top bar, so the account menu moves up here. */}
+          <div className="flex items-center gap-4 md:hidden">
+            <span className="h-6 w-px bg-slate-200" aria-hidden />
+            <UserMenu />
+          </div>
         </header>
         <PlaceholderBanner />
         <main id="main" className="mx-auto w-full max-w-7xl flex-1 px-6 py-8 lg:px-8">

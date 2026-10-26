@@ -53,7 +53,8 @@ test('administrator onboards a user who enrols MFA and sets a password', async (
   await page.getByRole('button', { name: 'Create user' }).click();
   await expect(page.getByText('PASSWORD CHANGE PENDING')).toBeVisible();
 
-  await page.getByRole('button', { name: 'Sign out' }).click();
+  await page.getByRole('button', { name: 'Account menu' }).click();
+  await page.getByRole('menuitem', { name: 'Sign out' }).click();
   await expect(page).toHaveURL(/\/login$/);
 
   // The new user must enrol an authenticator, then replace the temporary password.
@@ -79,7 +80,8 @@ test('administrator onboards a user who enrols MFA and sets a password', async (
   await page.goto('/');
   await page.reload();
   await expect(page.getByRole('heading', { name: 'Welcome, E2E Accountant' })).toBeVisible();
-  await page.getByRole('button', { name: 'Sign out' }).click();
+  await page.getByRole('button', { name: 'Account menu' }).click();
+  await page.getByRole('menuitem', { name: 'Sign out' }).click();
   await expect(page).toHaveURL(/\/login$/);
   await page.goto('/');
   await expect(page).toHaveURL(/\/login$/);
