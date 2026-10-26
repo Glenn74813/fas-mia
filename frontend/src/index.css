@@ -1,0 +1,113 @@
+@import "tailwindcss";
+@import "@fontsource-variable/inter";
+
+/*
+ * Design tokens. Pages use the brand scale for links and primary actions, ink for the navigation shell, and
+ * Tailwind's slate for text and borders. Changing a value here restyles every screen.
+ */
+@theme {
+  --font-sans: "Inter Variable", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+
+  --color-brand-50: #eef4ff;
+  --color-brand-100: #dce7fe;
+  --color-brand-200: #c0d4fd;
+  --color-brand-300: #94b5fb;
+  --color-brand-400: #628ef6;
+  --color-brand-500: #3d6cf0;
+  --color-brand-600: #2a52e0;
+  --color-brand-700: #2141c4;
+  --color-brand-800: #20379d;
+  --color-brand-900: #1f337c;
+  --color-brand-950: #16204a;
+
+  /* Navigation shell */
+  --color-ink-700: #24324d;
+  --color-ink-800: #172238;
+  --color-ink-900: #0f1829;
+  --color-ink-950: #0a1120;
+
+  --color-canvas: #f4f6fa;
+}
+
+@layer base {
+  html {
+    font-feature-settings: "cv11", "ss01";
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body {
+    background-color: var(--color-canvas);
+    color: var(--color-slate-900);
+  }
+
+  h1, h2, h3 {
+    letter-spacing: -0.011em;
+  }
+
+  /* Amounts and dates line up in columns. */
+  table, .tabular {
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Tables: quiet headers, generous rows, a hover cue. Utility classes on a table still win. */
+  table {
+    border-collapse: collapse;
+  }
+  thead th {
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  tbody tr {
+    transition: background-color 120ms ease;
+  }
+  tbody tr:hover {
+    background-color: color-mix(in srgb, var(--color-slate-100) 55%, transparent);
+  }
+
+  /* Form controls: one border colour, a soft focus ring instead of the browser outline. */
+  input:not([type="checkbox"]):not([type="radio"]):not([type="file"]),
+  select,
+  textarea {
+    border-color: var(--color-slate-300);
+    background-color: white;
+    transition: border-color 120ms ease, box-shadow 120ms ease;
+  }
+  input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):focus,
+  select:focus,
+  textarea:focus {
+    outline: none;
+    border-color: var(--color-brand-500);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-brand-500) 18%, transparent);
+  }
+  input:disabled, select:disabled, textarea:disabled {
+    background-color: var(--color-slate-50);
+    color: var(--color-slate-500);
+  }
+  input[type="checkbox"], input[type="radio"] {
+    accent-color: var(--color-brand-600);
+  }
+
+  ::selection {
+    background-color: var(--color-brand-100);
+  }
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-brand-500);
+  outline-offset: 2px;
+}
+
+/* Thin, unobtrusive scrollbars in the navigation. */
+.scrollbar-thin {
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, white 18%, transparent) transparent;
+}
+
+@media print {
+  aside, header[data-shell], .print\:hidden {
+    display: none !important;
+  }
+  body {
+    background: white;
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "cas-backend",
+      "runtimeExecutable": "bash",
+      "runtimeArgs": [
+        "/home/glenn/Documents/FAS-MIA/scripts/run-backend-dev.sh"
+      ],
+      "port": 8080
+    },
+    {
+      "name": "cas-frontend",
+      "runtimeExecutable": "bash",
+      "runtimeArgs": [
+        "-c",
+        "cd /home/glenn/Documents/FAS-MIA/frontend && npm run dev -- --port 5174 --strictPort"
+      ],
+      "port": 5174
+    }
+  ]
+}

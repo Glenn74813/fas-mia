@@ -1,0 +1,2 @@
+# ADR-001 — Modular monolith with independently deployed SPA
+Status: Accepted (Phase 1). Context: 20–100 concurrent users initially, small team, strong transactional consistency across GL and sub-ledgers. Decision: one Spring Boot deployable with package-per-module boundaries; React SPA deployed separately behind NGINX. Consequences: single DB transaction for posting + audit; modules can be extracted later along their application-service interfaces; module boundaries must be policed in review (ArchUnit rules planned for Phase 2).

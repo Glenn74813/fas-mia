@@ -1,0 +1,2 @@
+# ADR-005 — Integration test database
+Status: Accepted. Decision: integration tests run against real PostgreSQL. Default: Testcontainers (postgres:17-alpine). If CAS_TEST_JDBC_URL (+ CAS_TEST_DB_USER / CAS_TEST_DB_PASSWORD) is set, tests use that database instead (for hosts without Docker); the schema is cleaned by Flyway before the suite. Never point CAS_TEST_JDBC_URL at a shared or production database.

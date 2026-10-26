@@ -1,0 +1,18 @@
+# Production / staging profile: fail fast on missing secrets, JSON logs, internal management port.
+cas:
+  jwt:
+    allow-ephemeral-keys: false
+  session:
+    cookie-secure: true
+springdoc:
+  api-docs:
+    enabled: ${CAS_OPENAPI_ENABLED:false}
+  swagger-ui:
+    enabled: ${CAS_OPENAPI_ENABLED:false}
+management:
+  server:
+    port: ${CAS_MANAGEMENT_PORT:8081}
+logging:
+  structured:
+    format:
+      console: ecs

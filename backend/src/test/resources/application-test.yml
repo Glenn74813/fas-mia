@@ -1,0 +1,18 @@
+cas:
+  access:
+    # Most tests create users with financial roles directly; GrantApprovalIT switches the maker-checker on.
+    financial-grant-approval: false
+  budget:
+    enforcement: "OFF"
+  accounting:
+    allow-placeholder-accounts: true
+    recurring-enabled: false
+  jwt:
+    allow-ephemeral-keys: true
+  rate-limit:
+    enabled: false
+  outbox:
+    dispatch-enabled: false
+spring:
+  flyway:
+    clean-disabled: false

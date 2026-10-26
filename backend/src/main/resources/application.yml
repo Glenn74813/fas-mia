@@ -1,0 +1,154 @@
+spring:
+  application:
+    name: cas-backend
+  mail:
+    # SMTP relay for the notification outbox; used only when cas.mail.smtp-enabled is true (the provider is C-16).
+    host: ${CAS_SMTP_HOST:localhost}
+    port: ${CAS_SMTP_PORT:587}
+    username: ${CAS_SMTP_USERNAME:}
+    password: ${CAS_SMTP_PASSWORD:}
+    properties:
+      mail.smtp.auth: ${CAS_SMTP_AUTH:true}
+      mail.smtp.starttls.enable: true
+      mail.smtp.starttls.required: true
+      mail.smtp.ssl.checkserveridentity: true
+      mail.smtp.connectiontimeout: 10000
+      mail.smtp.timeout: 10000
+      mail.smtp.writetimeout: 10000
+  profiles:
+    default: dev
+  datasource:
+    url: ${CAS_DB_URL:jdbc:postgresql://localhost:5432/cas}
+    username: ${CAS_DB_USER:cas_app}
+    password: ${CAS_DB_PASSWORD:}
+    hikari:
+      maximum-pool-size: ${CAS_DB_POOL_SIZE:20}
+      minimum-idle: 2
+      connection-timeout: 10000
+      max-lifetime: 1500000
+      pool-name: cas-pool
+  flyway:
+    enabled: true
+    # Migrations may run with a privileged owner role distinct from the runtime role (deploy/db/roles.sql).
+    user: ${CAS_FLYWAY_USER:${spring.datasource.username}}
+    password: ${CAS_FLYWAY_PASSWORD:${spring.datasource.password}}
+    clean-disabled: true
+    validate-on-migrate: true
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: UTC
+  jackson:
+    default-property-inclusion: always
+    serialization:
+      write-dates-as-timestamps: false
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+  mvc:
+    problemdetails:
+      enabled: true
+
+server:
+  port: ${CAS_PORT:8080}
+  forward-headers-strategy: native
+  shutdown: graceful
+  error:
+    include-stacktrace: never
+    include-message: never
+  tomcat:
+    max-swallow-size: 2MB
+    max-http-form-post-size: 1MB
+
+management:
+  health:
+    mail:
+      # Only meaningful when SMTP delivery is on; otherwise the unused relay would mark the application down.
+      enabled: ${CAS_SMTP_ENABLED:false}
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+  endpoint:
+    health:
+      probes:
+        enabled: true
+      show-details: never
+  tracing:
+    sampling:
+      probability: ${CAS_TRACE_SAMPLING:0.1}
+
+logging:
+  structured:
+    json:
+      # Masks secrets and personal data in structured (ECS JSON) logs; plain-text logs are masked by logback-spring.xml.
+      customizer: com.miaa.cas.common.logging.MaskingJsonMembersCustomizer
+
+springdoc:
+  api-docs:
+    enabled: ${CAS_OPENAPI_ENABLED:true}
+  swagger-ui:
+    path: /swagger-ui.html
+  default-produces-media-type: application/json
+
+cas:
+  frontend-base-url: ${CAS_FRONTEND_BASE_URL:http://localhost:5173}
+  access:
+    # Maker-checker for roles carrying financial permissions (C-19). Cannot be switched off in production.
+    financial-grant-approval: ${CAS_FINANCIAL_GRANT_APPROVAL:true}
+  mail:
+    smtp-enabled: ${CAS_SMTP_ENABLED:false}
+    from: ${CAS_MAIL_FROM:}
+  data-encryption-key: ${CAS_DATA_ENCRYPTION_KEY:}
+  cors-allowed-origins: ${CAS_CORS_ALLOWED_ORIGINS:}
+  jwt:
+    issuer: ${CAS_JWT_ISSUER:https://cas.miaa.gov.ph}
+    access-token-ttl: PT10M
+    mfa-token-ttl: PT5M
+    private-key-path: ${CAS_JWT_PRIVATE_KEY_PATH:}
+    public-key-path: ${CAS_JWT_PUBLIC_KEY_PATH:}
+    previous-public-key-path: ${CAS_JWT_PREVIOUS_PUBLIC_KEY_PATH:}
+    allow-ephemeral-keys: false
+  session:
+    absolute-ttl: PT8H
+    # A just-rotated refresh token may be presented once more within this window (e.g. a reload that
+    # aborted the previous refresh response). Keep short; outside it, reuse revokes the session.
+    refresh-reuse-grace: PT10S
+    refresh-cookie-name: CAS_REFRESH
+    refresh-cookie-path: /api/v1/auth
+    cookie-secure: true
+  lockout:
+    max-failures: 5
+    duration: PT15M
+  password:
+    min-length: 12
+    max-length: 128
+    reset-token-ttl: PT30M
+  rate-limit:
+    enabled: true
+    auth-requests-per-minute: 20
+    # Per signed-in user (or per client address when unauthenticated), across all instances.
+    api-requests-per-minute: ${CAS_API_REQUESTS_PER_MINUTE:600}
+    anonymous-requests-per-minute: ${CAS_ANONYMOUS_REQUESTS_PER_MINUTE:120}
+  mfa:
+    issuer-label: MIAA CAS
+  outbox:
+    dispatch-enabled: true
+    max-attempts: 8
+  budget:
+    # BLOCK refuses expenditure beyond the available allotment (C-10); WARN only records an audit warning.
+    enforcement: ${CAS_BUDGET_ENFORCEMENT:BLOCK}
+  accounting:
+    # Never true in production: placeholder accounts are not MIAA-approved (docs/03 C-07).
+    allow-placeholder-accounts: false
+    recurring-enabled: true
+    recurring-cron: "0 0 1 * * *"
+  bootstrap:
+    admin-username: ${CAS_BOOTSTRAP_ADMIN_USERNAME:}
+    admin-email: ${CAS_BOOTSTRAP_ADMIN_EMAIL:}
+    admin-password: ${CAS_BOOTSTRAP_ADMIN_PASSWORD:}

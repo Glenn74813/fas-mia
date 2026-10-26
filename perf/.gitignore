@@ -1,0 +1,3 @@
+# Seeded test users (dev credentials) and run output stay local.
+.state/
+results/

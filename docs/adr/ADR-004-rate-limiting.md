@@ -1,0 +1,2 @@
+# ADR-004 — Rate limiting
+Status: Accepted for Phase 1. Decision: Bucket4j in-memory buckets keyed by client IP on /api/v1/auth/** (per instance) plus DB-backed per-account lockout which is cluster-wide. With N instances the effective IP limit is N x configured. Upgrade path: bucket4j-postgresql (or Redis) proxy manager when more than 2 instances run or the gateway/WAF rate limiting is unavailable.

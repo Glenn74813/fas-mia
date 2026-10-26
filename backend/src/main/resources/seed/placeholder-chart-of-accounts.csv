@@ -1,0 +1,63 @@
+# PLACEHOLDER CHART OF ACCOUNTS - NOT MIAA-APPROVED, NOT A COA/GAM ACCOUNT LIST.
+# Generic five-class structure used only to exercise the accounting engine in development and testing.
+# Replace with the MIAA-approved Chart of Accounts (clarification C-07) before UAT. Codes deliberately use the PLC- prefix.
+code,name,type,normalBalance,parentCode,postable,fsLineCode,requiresCostCenter,subsidiaryType,budgetControlled
+PLC-1,[PLACEHOLDER] Assets,ASSET,DEBIT,,false,,false,,false
+PLC-11,[PLACEHOLDER] Cash and cash equivalents,ASSET,DEBIT,PLC-1,false,PLC-SFP-CASH,false,,false
+PLC-1101,[PLACEHOLDER] Cash on hand - collecting officer,ASSET,DEBIT,PLC-11,true,PLC-SFP-CASH,false,,false
+PLC-1102,[PLACEHOLDER] Cash in bank - current account,ASSET,DEBIT,PLC-11,true,PLC-SFP-CASH,false,,false
+PLC-1103,[PLACEHOLDER] Cash in bank - savings account,ASSET,DEBIT,PLC-11,true,PLC-SFP-CASH,false,,false
+PLC-12,[PLACEHOLDER] Receivables,ASSET,DEBIT,PLC-1,false,PLC-SFP-REC,false,,false
+PLC-1201,[PLACEHOLDER] Accounts receivable - concessionaires,ASSET,DEBIT,PLC-12,true,PLC-SFP-REC,false,CUSTOMER,false
+PLC-1202,[PLACEHOLDER] Advances to officers and employees,ASSET,DEBIT,PLC-12,true,PLC-SFP-REC,false,EMPLOYEE,false
+PLC-1203,[PLACEHOLDER] Other receivables,ASSET,DEBIT,PLC-12,true,PLC-SFP-REC,false,OTHER,false
+PLC-1204,[PLACEHOLDER] Input VAT,ASSET,DEBIT,PLC-12,true,PLC-SFP-REC,false,,false
+PLC-1205,[PLACEHOLDER] Creditable withholding tax,ASSET,DEBIT,PLC-12,true,PLC-SFP-REC,false,,false
+PLC-1206,[PLACEHOLDER] Advances to suppliers and contractors,ASSET,DEBIT,PLC-12,true,PLC-SFP-REC,false,SUPPLIER,false
+PLC-13,[PLACEHOLDER] Inventories,ASSET,DEBIT,PLC-1,false,PLC-SFP-INV,false,,false
+PLC-1301,[PLACEHOLDER] Office supplies inventory,ASSET,DEBIT,PLC-13,true,PLC-SFP-INV,false,,false
+PLC-1302,[PLACEHOLDER] Spare parts inventory,ASSET,DEBIT,PLC-13,true,PLC-SFP-INV,false,,false
+PLC-14,[PLACEHOLDER] Property plant and equipment,ASSET,DEBIT,PLC-1,false,PLC-SFP-PPE,false,,false
+PLC-1401,[PLACEHOLDER] Buildings and other structures,ASSET,DEBIT,PLC-14,true,PLC-SFP-PPE,false,,false
+PLC-1402,[PLACEHOLDER] Machinery and equipment,ASSET,DEBIT,PLC-14,true,PLC-SFP-PPE,false,,false
+PLC-1409,[PLACEHOLDER] Accumulated depreciation,ASSET,CREDIT,PLC-14,true,PLC-SFP-PPE,false,,false
+PLC-1410,[PLACEHOLDER] Construction in progress,ASSET,DEBIT,PLC-14,true,PLC-SFP-PPE,false,OTHER,false
+PLC-2,[PLACEHOLDER] Liabilities,LIABILITY,CREDIT,,false,,false,,false
+PLC-21,[PLACEHOLDER] Payables,LIABILITY,CREDIT,PLC-2,false,PLC-SFP-PAY,false,,false
+PLC-2101,[PLACEHOLDER] Accounts payable - suppliers,LIABILITY,CREDIT,PLC-21,true,PLC-SFP-PAY,false,SUPPLIER,false
+PLC-2102,[PLACEHOLDER] Due to officers and employees,LIABILITY,CREDIT,PLC-21,true,PLC-SFP-PAY,false,EMPLOYEE,false
+PLC-2103,[PLACEHOLDER] Accrued expenses,LIABILITY,CREDIT,PLC-21,true,PLC-SFP-PAY,false,,false
+PLC-2104,[PLACEHOLDER] Goods received not yet invoiced (GR/IR),LIABILITY,CREDIT,PLC-21,true,PLC-SFP-PAY,false,,false
+PLC-22,[PLACEHOLDER] Taxes payable,LIABILITY,CREDIT,PLC-2,false,PLC-SFP-TAX,false,,false
+PLC-2201,[PLACEHOLDER] Withholding taxes payable,LIABILITY,CREDIT,PLC-22,true,PLC-SFP-TAX,false,,false
+PLC-2202,[PLACEHOLDER] Output VAT payable,LIABILITY,CREDIT,PLC-22,true,PLC-SFP-TAX,false,,false
+PLC-23,[PLACEHOLDER] Deposits and deferred credits,LIABILITY,CREDIT,PLC-2,false,PLC-SFP-DEF,false,,false
+PLC-2301,[PLACEHOLDER] Security deposits - concessionaires,LIABILITY,CREDIT,PLC-23,true,PLC-SFP-DEF,false,CUSTOMER,false
+PLC-2302,[PLACEHOLDER] Unearned revenue,LIABILITY,CREDIT,PLC-23,true,PLC-SFP-DEF,false,,false
+PLC-2303,[PLACEHOLDER] Unapplied collections,LIABILITY,CREDIT,PLC-23,true,PLC-SFP-DEF,false,CUSTOMER,false
+PLC-3,[PLACEHOLDER] Equity,EQUITY,CREDIT,,false,,false,,false
+PLC-3101,[PLACEHOLDER] Government equity,EQUITY,CREDIT,PLC-3,true,PLC-SFP-EQ,false,,false
+PLC-3102,[PLACEHOLDER] Accumulated surplus (deficit),EQUITY,CREDIT,PLC-3,true,PLC-SFP-EQ,false,,false
+PLC-4,[PLACEHOLDER] Revenue,REVENUE,CREDIT,,false,,false,,false
+PLC-41,[PLACEHOLDER] Aeronautical revenue,REVENUE,CREDIT,PLC-4,false,PLC-SFPERF-REV,false,,false
+PLC-4101,[PLACEHOLDER] Landing and take-off fees,REVENUE,CREDIT,PLC-41,true,PLC-SFPERF-REV,false,,false
+PLC-4102,[PLACEHOLDER] Parking fees - aircraft,REVENUE,CREDIT,PLC-41,true,PLC-SFPERF-REV,false,,false
+PLC-4103,[PLACEHOLDER] Passenger service charges,REVENUE,CREDIT,PLC-41,true,PLC-SFPERF-REV,false,,false
+PLC-42,[PLACEHOLDER] Non-aeronautical revenue,REVENUE,CREDIT,PLC-4,false,PLC-SFPERF-REV,false,,false
+PLC-4201,[PLACEHOLDER] Rental income - concessions,REVENUE,CREDIT,PLC-42,true,PLC-SFPERF-REV,false,CUSTOMER,false
+PLC-4202,[PLACEHOLDER] Interest income,REVENUE,CREDIT,PLC-42,true,PLC-SFPERF-REV,false,,false
+PLC-4203,[PLACEHOLDER] Miscellaneous income,REVENUE,CREDIT,PLC-42,true,PLC-SFPERF-REV,false,,false
+PLC-4204,[PLACEHOLDER] Gain on disposal of assets,REVENUE,CREDIT,PLC-42,true,PLC-SFPERF-REV,false,,false
+PLC-5,[PLACEHOLDER] Expenses,EXPENSE,DEBIT,,false,,false,,false
+PLC-51,[PLACEHOLDER] Personnel services,EXPENSE,DEBIT,PLC-5,false,PLC-SFPERF-EXP,false,,false
+PLC-5101,[PLACEHOLDER] Salaries and wages,EXPENSE,DEBIT,PLC-51,true,PLC-SFPERF-EXP,true,,true
+PLC-5102,[PLACEHOLDER] Allowances and benefits,EXPENSE,DEBIT,PLC-51,true,PLC-SFPERF-EXP,true,,true
+PLC-52,[PLACEHOLDER] Maintenance and other operating expenses,EXPENSE,DEBIT,PLC-5,false,PLC-SFPERF-EXP,false,,false
+PLC-5201,[PLACEHOLDER] Utilities,EXPENSE,DEBIT,PLC-52,true,PLC-SFPERF-EXP,true,,true
+PLC-5202,[PLACEHOLDER] Repairs and maintenance,EXPENSE,DEBIT,PLC-52,true,PLC-SFPERF-EXP,true,,true
+PLC-5203,[PLACEHOLDER] Professional services,EXPENSE,DEBIT,PLC-52,true,PLC-SFPERF-EXP,true,,true
+PLC-5204,[PLACEHOLDER] Supplies expense,EXPENSE,DEBIT,PLC-52,true,PLC-SFPERF-EXP,true,,true
+PLC-53,[PLACEHOLDER] Non-cash expenses,EXPENSE,DEBIT,PLC-5,false,PLC-SFPERF-EXP,false,,false
+PLC-5301,[PLACEHOLDER] Depreciation expense,EXPENSE,DEBIT,PLC-53,true,PLC-SFPERF-EXP,false,,false
+PLC-5302,[PLACEHOLDER] Loss on disposal of assets,EXPENSE,DEBIT,PLC-53,true,PLC-SFPERF-EXP,false,,false
+PLC-5303,[PLACEHOLDER] Inventory count adjustments,EXPENSE,DEBIT,PLC-53,true,PLC-SFPERF-EXP,false,,false

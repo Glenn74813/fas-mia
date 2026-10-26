@@ -1,0 +1,32 @@
+# Developer workstation profile. Never use in shared or production environments.
+cas:
+  access:
+    # Developer workstation only: end-to-end runs create users with financial roles in one step. Set
+    # CAS_FINANCIAL_GRANT_APPROVAL=true to try the maker-checker locally. Production refuses to start without it.
+    financial-grant-approval: ${CAS_FINANCIAL_GRANT_APPROVAL:false}
+  # Developer workstation only: end-to-end runs onboard several users from one IP.
+  rate-limit:
+    auth-requests-per-minute: 120
+  accounting:
+    allow-placeholder-accounts: true
+  budget:
+    # No budget is seeded in development, so spending is only flagged in the audit trail.
+    enforcement: WARN
+  integrations:
+    bir-eis:
+      # Development only: deliveries are simulated and marked SIMULATED; refused with the prod profile.
+      mode: LOOPBACK
+  jwt:
+    allow-ephemeral-keys: true
+  # Server-side response times for the performance kit (perf/); buffers responses, so never in production.
+  observability:
+    server-timing: true
+  # DEVELOPMENT ONLY: these users sign in without the authenticator code (refused outside the dev profile).
+  # Everyone else, including the browser tests and the performance kit's users, still uses two-step verification.
+  mfa:
+    dev-bypass-users: admin.dev
+  session:
+    cookie-secure: ${CAS_COOKIE_SECURE:false}
+logging:
+  level:
+    com.miaa.cas: DEBUG

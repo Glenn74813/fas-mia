@@ -1,0 +1,93 @@
+import { expect, test, type Page } from '@playwright/test';
+import { totp } from './totp';
+
+const admin = {
+  username: process.env.E2E_ADMIN_USERNAME ?? '',
+  password: process.env.E2E_ADMIN_PASSWORD ?? '',
+  totpSecret: process.env.E2E_ADMIN_TOTP_SECRET ?? '',
+};
+
+test.skip(!admin.username || !admin.password || !admin.totpSecret,
+  'Set E2E_ADMIN_USERNAME, E2E_ADMIN_PASSWORD and E2E_ADMIN_TOTP_SECRET for an enrolled test administrator');
+
+async function signIn(page: Page, username: string, password: string) {
+  await page.goto('/login');
+  await page.getByLabel('Username or e-mail').fill(username);
+  await page.getByLabel('Password').fill(password);
+  await page.getByRole('button', { name: 'Continue' }).click();
+}
+
+async function waitForFreshStep() {
+  // A TOTP step can be used once; wait for the next 30-second window when re-using an authenticator.
+  await new Promise((r) => setTimeout(r, 30_000 - (Date.now() % 30_000) + 500));
+}
+
+test('administrator onboards a user who enrols MFA and sets a password', async ({ page }) => {
+  const username = `e2e.${Date.now()}`;
+  const temporary = 'Temp-E2E-Passw0rd!';
+  const final = 'Final-E2E-Passw0rd!';
+
+  await signIn(page, admin.username, admin.password);
+  // The dev profile may skip the administrator's second factor (cas.mfa.dev-bypass-users); everywhere else it is asked.
+  const mfa = page.getByRole('heading', { name: 'Two-step verification' });
+  const welcome = page.getByRole('heading', { name: /Welcome/ });
+  await expect(mfa.or(welcome)).toBeVisible();
+  if (await mfa.isVisible()) {
+    await page.getByLabel('6-digit code').fill(totp(admin.totpSecret));
+    await page.getByRole('button', { name: 'Verify' }).click();
+  }
+  await expect(welcome).toBeVisible();
+
+  // Segregation of duties is enforced by the API and explained in the form.
+  await page.goto('/admin/users/new');
+  await page.getByLabel('Username').fill(username);
+  await page.getByLabel('E-mail').fill(`${username}@miaa.local`);
+  await page.getByLabel('Display name').fill('E2E Accountant');
+  await page.getByLabel('Temporary password').fill(temporary);
+  await page.getByRole('checkbox', { name: 'Accountant', exact: true }).check();
+  await page.getByRole('checkbox', { name: 'Chief Accountant' }).check();
+  await page.getByRole('button', { name: 'Create user' }).click();
+  await expect(page.getByRole('alert')).toContainText('JOURNAL_CREATE + JOURNAL_POST');
+
+  await page.getByRole('checkbox', { name: 'Chief Accountant' }).uncheck();
+  await page.getByRole('button', { name: 'Create user' }).click();
+  await expect(page.getByText('PASSWORD CHANGE PENDING')).toBeVisible();
+
+  await page.getByRole('button', { name: 'Sign out' }).click();
+  await expect(page).toHaveURL(/\/login$/);
+
+  // The new user must enrol an authenticator, then replace the temporary password.
+  await signIn(page, username, temporary);
+  await expect(page.getByRole('heading', { name: 'Set up your authenticator' })).toBeVisible();
+  const manual = await page.getByText(/Manual key:/).textContent();
+  const secret = manual!.replace('Manual key:', '').trim();
+  await page.getByLabel('6-digit code').fill(totp(secret));
+  await page.getByRole('button', { name: 'Verify' }).click();
+  await expect(page.getByRole('heading', { name: 'Choose a new password' })).toBeVisible();
+  await page.getByLabel('Current password').fill(temporary);
+  await page.getByLabel('New password', { exact: true }).fill(final);
+  await page.getByLabel('Confirm new password').fill(final);
+  await page.getByRole('button', { name: 'Save password' }).click();
+  await expect(page.getByRole('heading', { name: 'Welcome, E2E Accountant' })).toBeVisible();
+
+  // An accountant has no administration screens.
+  await expect(page.getByRole('link', { name: 'Users' })).toHaveCount(0);
+  await page.goto('/admin/users');
+  await expect(page.getByRole('alert')).toContainText('Access restricted');
+
+  // The session survives a reload via the HttpOnly refresh cookie, then sign-out ends it.
+  await page.goto('/');
+  await page.reload();
+  await expect(page.getByRole('heading', { name: 'Welcome, E2E Accountant' })).toBeVisible();
+  await page.getByRole('button', { name: 'Sign out' }).click();
+  await expect(page).toHaveURL(/\/login$/);
+  await page.goto('/');
+  await expect(page).toHaveURL(/\/login$/);
+
+  // Sign in again with the final password and a fresh code.
+  await waitForFreshStep();
+  await signIn(page, username, final);
+  await page.getByLabel('6-digit code').fill(totp(secret));
+  await page.getByRole('button', { name: 'Verify' }).click();
+  await expect(page.getByRole('heading', { name: 'Welcome, E2E Accountant' })).toBeVisible();
+});

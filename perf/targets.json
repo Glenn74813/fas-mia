@@ -1,0 +1,21 @@
+{
+  "source": "Master specification §17 (TOR benchmarks) and §3.3 / §18 concurrency figures; measurement definition proposed in clarification C-02 / C-17.",
+  "measurement": "Server-side time from the first filter to the end of request processing (authentication, authorisation, business logic and database commit included; network and client excluded), read from the Server-Timing header. Client-side time is reported alongside. External services are not called by any scenario.",
+  "percentile": "p95",
+  "targets": {
+    "entry": { "maxMs": 5000, "basis": "§17 Individual financial entry processing: within 5 seconds" },
+    "read": { "maxMs": 5000, "basis": "PROPOSED (C-02): §17 sets no figure for inquiries and portal pages; the 5-second entry target is applied" },
+    "report": { "maxMs": 60000, "basis": "§17 Standard financial report generation: within 60 seconds (request to ready, for report jobs)" },
+    "batch": { "maxMs": 60000, "basis": "§17 Batch financial processing: within 60 seconds for the agreed test workload (workload not yet agreed; the kit's workload is stated in each report)" }
+  },
+  "concurrency": {
+    "internal": { "users": 20, "basis": "§17 Initial internal concurrency: 20 simultaneous users" },
+    "portal": { "users": 60, "accounts": 100, "basis": "§17 External portal capacity: 100 accounts, with 60 simultaneous-user testing" }
+  },
+  "errors": {
+    "maxServerErrors": 0,
+    "maxErrorRate": 0.01,
+    "basis": "PROPOSED (C-02): §17 asks for error-rate thresholds but sets none. No 5xx responses at all, and at most 1% unexpected responses per target kind."
+  },
+  "subSecondGoal": { "p50Ms": 1000, "operations": ["jev.create", "jev.post"], "basis": "§17 / Annex A: sub-second is an optimisation goal, not an acceptance criterion" }
+}
