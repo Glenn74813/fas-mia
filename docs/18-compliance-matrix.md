@@ -108,7 +108,7 @@ Only as already described in this repository; official requirements await MIAA, 
 | Automated unit and integration tests | 172 backend tests on PostgreSQL; 32 frontend unit tests | `mvn verify`, Vitest | Met | |
 | End-to-end tests of critical flows | 16 Playwright spec files (20 tests) | `frontend/e2e` | Met | 20/20 in a single full run on 2026-10-26 (docs/20 §3) |
 | Security tests | Injection, XSS, sensitive logs, auth abuse cases | `SqlInjectionIT`, `XssIT`, `SensitiveLogIT`, `AuthFlowIT` | Met | |
-| CI pipeline with scans | Build, test, lint, SpotBugs, e2e, npm audit, Trivy, gitleaks | `.github/workflows/ci.yml` | Partly met | Never executed (no repository) |
+| CI pipeline with scans | Build, test, lint, SpotBugs, architecture rules, e2e, npm audit, Trivy, gitleaks; versioned, signed releases with SBOMs (`release.yml`); every action pinned to a commit | `.github/workflows/ci.yml`, `.github/workflows/release.yml` | Partly met | Never executed: GitHub refuses Actions jobs while the account is locked over billing |
 | Release and rollback procedure | [19-deployment-and-rollback.md](19-deployment-and-rollback.md); change control in tickets | `TicketsIT` | Partly met | Not exercised in a production-like environment |
 | UAT with ≥ 95 % pass and no critical defects | 58 scripts, coverage and pass-rate checker | `docs/uat/`, `scripts/uat/coverage.mjs` | MIAA activity | Tooling ready |
 | Parallel run with no unexplained differences | Comparison and sign-off pages | `ParallelRunIT`, Playwright `parallel-run.spec.ts` | MIAA activity | Needs legacy data (C-12) |

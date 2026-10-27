@@ -26,7 +26,7 @@ is current.
 | 4 | Scope | 14 of 26 items complete, 11 partly, 1 blocked (C-07) | Controlling, revaluation/impairment/transfers, inventory price changes, archival (organisation administration added in §3f) |
 | 5 | Accounting controls | Complies | Close schedule and day/month/quarter/year-end checklists built (§3h); the real close calendar is C-33; JEV print form pending C-23; FX pending C-21 |
 | 6 | Database | Rules comply; entity list partly | About 20 named entities have no equivalent (§3 below); retention and archival not built (C-05, C-13). Data dictionary and ERD now cover V1–V41 (docs/04, generated) |
-| 7 | Backend architecture | Partly | Layering not enforced; one controller with SQL; no domain events or mappers; consistency of payment allocation not documented |
+| 7 | Backend architecture | Mostly complies | Layering enforced by architecture tests and the controller with SQL fixed (gap 20, §3r). Open: no domain events or mappers; consistency of payment allocation not documented |
 | 8 | API | Mostly complies | Paging, idempotency keys and a deprecation policy added (§3c, docs/17). Remaining arrays are bounded by design and listed in docs/17 §3 |
 | 9 | Security | Mostly complies | Gap 6 added log masking, file encryption, general rate limiting and an SMTP sender (§3d). Still open: malware engine (C-25), access reviews, key rotation |
 | 10 | Audit | Mostly complies | Actor roles and security alerting added (§3d). WORM export and retention not built (C-05, C-13) |
@@ -37,7 +37,7 @@ is current.
 | 15–16 | Infrastructure, backup and DR | Design and dev kit only | Production backups, encryption, monitoring, failover runbooks (C-04) |
 | 17 | Performance | Kit complies; acceptance pending | Workstation results only; volumes (C-12) and thresholds (C-02) to be agreed |
 | 18 | Testing | Mostly complies | Gap 12 added the e2e, injection, XSS and log tests (§3j). Open: the penetration test (MIAA) |
-| 19 | DevOps | Partly | Deployment and rollback guide written (docs/19). Open: CI never executed; no CD pipeline or release versioning |
+| 19 | DevOps | Partly | Deployment and rollback guide written (docs/19); versioned, signed releases by a hand-started workflow (gap 20, §3r). Open: CI has never run (the GitHub account is locked over billing); deployment to an environment awaits C-04 |
 | 20 | Regulatory | Partly | Compliance matrix expanded to 65 rows (docs/18). PPSAS, DBM/GCG reporting await C-07; ISO mapping is high-level |
 | 21–25 | Governance, SLA, training, IP, budget | Mostly process/contract | Manuals and SBOM written (docs/manuals, docs/sbom). Open: exit/export mechanism, cost model, training material |
 | 26 | Clarification register | Complies | — |
@@ -144,7 +144,7 @@ Second round (27 Oct 2026), from the "still open" notes above and the demonstrat
 19. **Column sorting** (§12): sortable columns on the main list pages, using the paging API's existing `sort`.
     **Built** (§3q).
 20. **Engineering checks** (§2, §7, §19): architecture tests that enforce the module layering, and a release
-    workflow that versions and builds the images when started by hand.
+    workflow that versions and builds the images when started by hand. **Built** (§3r).
 
 ## 3a. Gaps 1–3: what was built
 
@@ -363,6 +363,16 @@ message.
 
 Limit: on the other lists PostgreSQL places empty values first when sorting descending (for example draft vouchers,
 which have no number yet, when sorting by number); Hibernate's criteria queries cannot change this.
+
+## 3r. Gap 20: architecture tests and releases
+
+| Part | Built | Verified by |
+|---|---|---|
+| Architecture rules | ArchUnit, checked on the compiled production classes in every build: controllers never query the database (JdbcTemplate, EntityManager, repositories); nothing calls a controller; every endpoint declares `@PreAuthorize` except the public sign-in endpoints that `SecurityConfig` opens; shared code (`common`) and entities (`domain`) do not depend on business modules or services; development seeders are profile-guarded and never referenced by production code; money is never built from `double`; constructor injection only; no `System.out` or java.util.logging. A deliberately bad class (outside the scanned packages) proves the rules catch violations | `LayeringArchitectureTest` (9 tests) |
+| Fixed | The SLA summary query moved from `TicketsController` into `SlaPolicyService` (the "one controller with SQL" in §1) | `TicketsIT`, `LayeringArchitectureTest` |
+| Releases | `.github/workflows/release.yml`, started by hand with a semantic version from `main`: the CI pipeline runs as the gate (`ci.yml` is now callable); images labelled with version and commit, Trivy-gated, a CycloneDX SBOM each, pushed to GitHub Container Registry, cosign-signed (keyless), tag `v<version>` and a GitHub release listing the signed digests. Existing tags are never overwritten. Every action in both workflows is pinned to a commit | YAML parsed; action commits resolved. **Not run**: GitHub refuses all Actions jobs while the account is locked over billing |
+
+The application version stays `0.1.0-SNAPSHOT` in the build files; a release's version is its tag and image labels.
 
 ## 4. Blocked on MIAA decisions
 

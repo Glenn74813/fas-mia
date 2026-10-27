@@ -19,7 +19,6 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import java.io.IOException;
-import java.sql.Date;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
@@ -27,7 +26,6 @@ import java.util.UUID;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -52,12 +50,10 @@ public class TicketsController {
 
     private final TicketService tickets;
     private final SlaPolicyService policies;
-    private final JdbcTemplate jdbc;
 
-    public TicketsController(TicketService tickets, SlaPolicyService policies, JdbcTemplate jdbc) {
+    public TicketsController(TicketService tickets, SlaPolicyService policies) {
         this.tickets = tickets;
         this.policies = policies;
-        this.jdbc = jdbc;
     }
 
     @GetMapping("/tickets")
@@ -119,16 +115,7 @@ public class TicketsController {
     @PreAuthorize("hasAnyAuthority('PERM_TICKET_VIEW_ALL', 'PERM_TICKET_WORK')")
     public List<Map<String, Object>> slaSummary(@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to) {
-        return jdbc.queryForList("""
-                SELECT ticket_type AS "ticketType", priority, count(*) AS total,
-                       count(*) FILTER (WHERE sla_policy_id IS NULL) AS "noSla",
-                       count(*) FILTER (WHERE first_response_at IS NOT NULL AND NOT response_breached) AS "respondedInTime",
-                       count(*) FILTER (WHERE response_breached) AS "responseBreached",
-                       count(*) FILTER (WHERE status IN ('RESOLVED', 'CLOSED') AND NOT resolution_breached) AS "resolvedInTime",
-                       count(*) FILTER (WHERE resolution_breached) AS "resolutionBreached",
-                       count(*) FILTER (WHERE status NOT IN ('RESOLVED', 'CLOSED', 'REJECTED', 'CANCELLED')) AS "open"
-                FROM tickets WHERE created_at >= ? AND created_at < ? GROUP BY ticket_type, priority ORDER BY ticket_type, priority""",
-                Date.valueOf(from), Date.valueOf(to.plusDays(1)));
+        return policies.slaSummary(from, to);
     }
 
     @GetMapping("/sla-policies")

@@ -91,6 +91,21 @@ public class SlaPolicyService {
         return new BusinessClock(zone, start, end, workdays, holidays::contains);
     }
 
+
+    /** SLA compliance by type and priority for tickets created between the two dates (inclusive). */
+    @Transactional(readOnly = true)
+    public List<Map<String, Object>> slaSummary(LocalDate from, LocalDate to) {
+        return jdbc.queryForList("""
+                SELECT ticket_type AS "ticketType", priority, count(*) AS total,
+                       count(*) FILTER (WHERE sla_policy_id IS NULL) AS "noSla",
+                       count(*) FILTER (WHERE first_response_at IS NOT NULL AND NOT response_breached) AS "respondedInTime",
+                       count(*) FILTER (WHERE response_breached) AS "responseBreached",
+                       count(*) FILTER (WHERE status IN ('RESOLVED', 'CLOSED') AND NOT resolution_breached) AS "resolvedInTime",
+                       count(*) FILTER (WHERE resolution_breached) AS "resolutionBreached",
+                       count(*) FILTER (WHERE status NOT IN ('RESOLVED', 'CLOSED', 'REJECTED', 'CANCELLED')) AS "open"
+                FROM tickets WHERE created_at >= ? AND created_at < ? GROUP BY ticket_type, priority ORDER BY ticket_type, priority""",
+                Date.valueOf(from), Date.valueOf(to.plusDays(1)));
+    }
     @Transactional(readOnly = true)
     public List<PolicyView> policies() {
         return jdbc.query("SELECT * FROM sla_policies ORDER BY status, contract_phase, ticket_type, priority", (rs, i) -> new PolicyView(

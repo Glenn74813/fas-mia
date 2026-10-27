@@ -60,6 +60,11 @@ may call another module only through its public application service (never its
 repositories). Every financial sub-ledger posts to the GL **only** through the journal
 posting service, which is the single writer of `journal_entries` / `journal_entry_lines`.
 
+Since gap 20 the parts of this rule that can be checked mechanically are tests (`LayeringArchitectureTest`, ArchUnit,
+run in every build): controllers never query the database and every endpoint declares its access check; nothing calls a
+controller; `common` and `domain` packages stay independent of business modules and services; development seeders stay
+out of production code; money is never built from `double`. A rule break fails the build.
+
 ## 3. Key architecture decisions
 
 | ADR | Decision |

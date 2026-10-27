@@ -93,12 +93,12 @@ validation is by the requester or an approver, never the assignee; and release n
 
 | # | Step | Who | Evidence |
 |---|---|---|---|
-| 1 | CI green on the release commit: backend `verify` (tests and SpotBugs), frontend, e2e, Trivy scans | Developer | CI run |
+| 1 | Cut the release: **Actions → Release → Run workflow** with the version (`.github/workflows/release.yml`). It runs the whole CI pipeline on the commit as its gate, then builds both images labelled with the version and commit, refuses them on HIGH/CRITICAL findings, attaches a CycloneDX SBOM per image, pushes `ghcr.io/<owner>/cas-backend:<version>` and `cas-frontend:<version>`, signs them with cosign (keyless), and publishes the tag `v<version>` as a GitHub release with the image digests. Versions are semantic; a tag is never reused. Give the `release` environment required reviewers for a two-person release | Developer (and release approver) | GitHub release, signed digests |
 | 2 | Change request raised with impact and rollback plan; approved | Requester, approver | Ticket |
 | 3 | Deploy to staging with the release images; run the smoke checks and the affected UAT scripts (`docs/uat/`) | Support | Staging validation recorded on the ticket |
 | 4 | Check migrations are expand-only (§7.2); plan the post-migrate grants | Developer | Release notes |
 | 5 | Pre-deployment backup: pgBackRest full or differential backup, plus a named restore point (`SELECT pg_create_restore_point('release-<version>')`) | DBA | Backup log |
-| 6 | Deploy the backend: one instance first (it migrates), then the rest rolling; then the frontend | Support | Deployment log |
+| 6 | Deploy the backend by **digest** from the release notes (verify first: `cosign verify --certificate-identity-regexp 'https://github.com/<owner>/fas-mia/.github/workflows/release.yml@refs/heads/main' --certificate-oidc-issuer https://token.actions.githubusercontent.com <image>@<digest>`): one instance first (it migrates), then the rest rolling; then the frontend | Support | Deployment log |
 | 7 | Run `post-migrate-grants.sql`; run the smoke checks of §6 | DBA, support | Checklist |
 | 8 | Resolve the ticket with the release notes and reference; the requester confirms closure | Support, requester | Ticket |
 
