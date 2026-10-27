@@ -42,6 +42,47 @@ item stays open in the progress tracker. None of these are resolved silently in 
 | C-33 | §5.4 | The close calendar: which day-end, month-end, quarter-end and year-end tasks MIAA performs, who owns each (role), and how many days after the day, month, quarter or year each is due; whether public holidays shift day-end tasks. | Close checklists and the closing schedule. | Four [PLACEHOLDER] tasks are seeded; the calendar is maintained in the application (Close tasks), so the real one is entered, not coded. Automatic checks are fixed. | Chief Accountant | Before UAT |
 | C-34 | §11.11, §22 | Ticket severity levels and categories: MIAA's definitions of S1–S4 (business impact) and its service catalogue of ticket categories, and whether severity should influence the SLA as well as priority. | Ticket classification and reporting. | Severity S1–S4 with [PLACEHOLDER] wording and six [PLACEHOLDER] categories, maintained in the application; only priority drives the SLA. | MISD + Chief Accountant | Before UAT |
 | C-37 | TOR §4.6.2, Annex D | Field layouts, file formats and transfer method of the payroll, FMIS and asset-system files CAS imports (T9). | Import mappings and validation rules. | CAS accepts CSV, JSON and XML with proposed field names ([manual](manuals/admin-manual.md) §8.2); replace them with each system's layout and account mapping. | HR/Payroll, Budget Division (FMIS), Property and Supply | Before interface testing |
+| C-38 | Whole TOR (AR, billing, FMIS) | Since 14 September 2024 New NAIA Infra Corp. (NNIC) operates NAIA under a concession; MIAA stays as regulator and receives ₱30 billion upfront, ₱2 billion a year and 82.16% of gross revenues covered by the revenue share (sources differ on whether passenger service charges are excluded). | Who bills airlines and concessionaires now; whether CAS billing, concessionaire portal and FMIS interfaces are still MIAA's; how the revenue share and fixed payments are billed, received and accounted for. | Confirm whether the TOR was written before or after the concession and restate the AR, billing, portal and FMIS scope; model the concession receipts (upfront, annual fixed, revenue share) as their own billing and receivable type. See *Public sources checked* below. | Chief Accountant + MIAA management + PMO | Before UAT scripts are finalised |
+
+## Public sources checked (27 October 2026)
+
+Public sources were searched for the open items below, to settle what can be settled without MIAA and to narrow
+the questions that remain. Nothing in the system was changed by these findings. Some sources are secondary
+(law firms, consultancies, vendors) and are marked so; confirm them against the official text before relying on
+them.
+
+| Item | What the public record shows | What MIAA still has to supply |
+|---|---|---|
+| C-07 framework, chart and statement formats | MIAA's 2023 COA Annual Audit Report states that its financial statements are prepared "in accordance with Philippine Financial Reporting Standards (PFRS)", so MIAA reports as a government business enterprise under COA Circular 2015-003 (amended by 2022-003), not under PPSAS. Its statements are the Statements of Financial Position, Comprehensive Income, Changes in Equity and Cash Flows, with notes. Their headings follow COA's government chart of accounts: Business and Service Income; Shares, Donations and Grants; Gains; Personnel Services; Maintenance and Other Operating Expenses; Financial Expenses; Non-Cash Expenses; Income Tax Expense; Subsidy to Other Funds; Government Equity; Retained Earnings; Inter-Agency Payables; Trust Liabilities. The current COA circular issuing the chart for government corporations was not confirmed (the 2008 Revised Philippine Government Chart of Accounts covered GOCCs). | MIAA's detailed account codes and the statement templates COA expects (lapsing schedules, notes). The statement templates in CAS can be set to these headings now. |
+| C-10 budget definitions and allocation keys | GOCC corporate operating budgets (COB) follow DBM Corporate Budget Circular No. 24 (4 November 2022) under EO 518 (1979): prepared before the fiscal year, approved by the governing board, submitted to DBM by 31 March with DBM's forms. | The meaning of reservation, commitment and obligation in MIAA's practice, its COB line structure, and the overhead allocation keys (internal; not published). |
+| C-05, C-13 retention and lawful purge | Disposal of public records is governed by RA 9470 (2007) and the National Archives' General Records Disposition Schedule for records common to all agencies (NAP General Circulars 1 and 2, 20 January 2009); a newer NAP circular (General Circular No. 5, 2023) is listed on the NAP site, and whether it replaces the 2009 schedule was not confirmed. The retention periods for accounting records were not extracted from the schedule. | The Records Officer to read the current schedule, adopt the periods per record class, and set the disposal procedure (NAP authority to dispose) that a purge in CAS would follow. |
+| C-37 payroll, FMIS and asset-system layouts | "FMIS" is MIAA's own Financial Management Information System, contracted in July 2018 and in use since 2020 for aeronautical data and billing (landing, parking, tacking) and, since July 2021, concessionaires' point-of-sale sales (TSMS); COA reported recurring problems with it in 2023 (downtime, delayed billing, POS reports not used for concession billing). | The FMIS developer or MISD to provide FMIS export layouts; HR to provide the payroll summary layout; Property to provide the asset system's. See also C-38: some FMIS billing may now be the concessionaire's. |
+| C-11 bank formats | Government payments by ADA use the List of Due and Demandable Accounts Payable – Advice to Debit Account (LDDAP-ADA) with the Summary of LDDAP-ADAs Issued and Invalidated ADA Entries (SLIIE). MIAA keeps cash in government depository banks (2023 report: ₱16.4 billion local and ₱0.9 billion foreign currency in banks). | Each depository bank's electronic file layout (for example Landbank's LinkBiz upload format) from the bank's government service desk. |
+| C-06 BIR registration | RMC 5-2021 removed the Permit to Use for a computerized accounting system; registration with the Revenue District Office gives an Acknowledgement Certificate (sworn statement, sample printouts, audit trail, systems description). E-invoicing by CAS users is due by 31 December 2026 under RR 11-2025 as extended by RR 26-2025, with EIS certification and a Permit to Transmit (secondary sources: PwC, KPMG, Grant Thornton; a vendor guide describes signed JSON invoices sent within three days, not checked against BIR's text). | MIAA's registration filing; confirmation from BIR of the EIS technical specification and dates. |
+| C-04 hosting | DICT's Cloud First Policy (Department Circular 2017-002, amended by Department Circular No. 10, s. 2020) covers GOCCs; government data in the cloud remains governed by Philippine law wherever stored, and data is classified in tiers (the tier rules were not confirmed in full). | MIAA's choice of hosting (own facility, GovCloud or an accredited provider) and its data classification. |
+| C-38 NAIA concession | See C-38 above (sources: GMA News, The Post). | Scope restatement as described in C-38. |
+
+Sources:
+[MIAA 2023 Annual Audit Report](https://www.miaa.gov.ph/images/stories/TransparencySeal2019/II/MIAA-AAR-2023.pdf);
+[COA Circular 2015-003](https://elibrary.judiciary.gov.ph/thebookshelf/showdocs/10/69741);
+[COA Circular 2022-003](https://www.coa.gov.ph/wpfd_file/coa-circular-no-2022-003-january-24-2022/);
+[Revised Philippine Government Chart of Accounts (summary)](https://jur.ph/law/summary/revised-philippine-government-chart-of-accounts);
+[DBM Corporate Budget Circular No. 24](https://www.dbm.gov.ph/wp-content/uploads/Issuances/2022/Corporate-Budget-Circular/CORPORATE-BUDGET-CIRCULAR-NO-24.pdf);
+[DBM corporate budget circulars](https://www.dbm.gov.ph/index.php/dbm-issuances/corporate-budget-circulars);
+[RA 9470](https://www.lawphil.net/statutes/repacts/ra2007/ra_9470_2007.html);
+[NAP General Circulars 1 and 2 and GRDS](https://nationalarchives.gov.ph/downloads/nap-general-circular-1-2-and-grds/);
+[NAP circulars](https://nationalarchives.gov.ph/downloads/nap-circulars/);
+[DPWH memorandum on LDDAP-ADA](https://www.dpwh.gov.ph/DPWH/sites/default/files/issuances/DMC_03_s2019.pdf);
+[Grant Thornton on CAS registration](https://www.grantthornton.com.ph/insights/articles-and-updates1/from-where-we-sit/streamlined-process-on-the-application-for-registration-of-computerized-accounting-systemcomputerized-books-of-accounts/);
+[BusinessWorld on CAS registration](https://www.bworldonline.com/?p=340334);
+[PwC Tax Alert No. 29 (RR 26-2025)](https://www.pwc.com/ph/en/tax/tax-publications/tax-alerts/2025/tax-alert-29.html);
+[KPMG Special InTax, October 2025](https://kpmg.com/ph/en/insights/2025/10/special-intax-october-2025-issue-1-volume-2.html);
+[ClearTax on EIS certification](https://www.cleartax.com/ph/how-to-get-eis-certificate-philippines);
+[W.Media on the Cloud First Policy](https://w.media/philippine-government-pushes-cloud-first-policy/);
+[GMA News on the NAIA turnover](https://www.gmanetwork.com/news/money/companies/905378/naia-turnover-september/story/);
+[GMA News on NNIC remittances](https://www.gmanetwork.com/news/money/companies/1000097/naia-operator-nnic-says-it-has-remitted-p78-billion-to-gov-t/story/);
+[The Post on NAIA fees](https://thepost.ph/lifestyle/current-events/naia-service-fee-hikes-explainer/);
+[GCG profile of MIAA](https://icrs.gcg.gov.ph/profiles/miaa/).
 
 ## Clarification questions for the kickoff workshop
 
@@ -53,3 +94,4 @@ item stays open in the progress tracker. None of these are resolved silently in 
 6. Which e-mail / SMS gateways are approved for OTP and notifications (C-16)?
 7. Is an on-premises DR site available in-country if no cloud provider offers two PH regions (C-04)?
 8. Are concessionaire statements of account considered official BIR documents (C-06)?
+9. Since the NAIA concession (September 2024), which billing, receivables and FMIS functions remain MIAA's (C-38)?

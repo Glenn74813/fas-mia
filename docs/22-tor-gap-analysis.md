@@ -107,14 +107,15 @@ CAS is single-company and PHP-only; FX is C-21).
 |---|---|---|
 | BIR CAS registration, PTU, e-receipts/e-invoices, EIS transmission (RR 9-2009, 8-2022, 11-2025), 2307 | §2.2.1, §3.10, A, B.10 | C-06: EIS schema and Permit to Transmit; registration with BIR. The sandbox adapter and transmission log are ready |
 | BIR monthly VAT, withholding and income tax reports; quarterly COA, annual DBM, GCG reports | §4.5, A, B.5 | C-06, C-07: official formats |
-| Official chart of accounts; PPSAS vs PFRS | §2.2.1 | C-22, C-07 |
+| Official chart of accounts and account codes | §2.2.1 | C-22, C-07. The framework is settled: MIAA reports under PFRS (2023 COA audit report); its statement headings are public (§8) |
 | PPE lapsing schedule format; revaluation and impairment | A, B.2 | C-07, C-30 |
 | Bank file formats and payment channels | B.3, D | C-11 |
 | Legacy data, volumes and migration plan | §3.7, F | C-12 |
 | Hosting provider with two Philippine regions | §3.4, §4.1 | C-04 |
 | SMS gateway | §4.2 | C-16 |
 | Anti-malware engine | §4 (security testing) | C-25 |
-| Overhead keys, budget definitions, forecasting method | B.7, B.8 | C-10 |
+| Overhead keys, budget definitions, forecasting method | B.7, B.8 | C-10 (COB rules are public: DBM CBC No. 24; the keys are internal) |
+| Billing, receivables, portal and FMIS scope after the NAIA concession (September 2024) | A (Billing), §4.6.2 | C-38 |
 | Response-time target (1 s vs 5 s), laptop count | §8.1 vs A; §5.3 vs D | C-02, C-01 |
 
 **Not applicable as written:** Annex B.8 asks for work-in-progress calculations and settlement of *production* cost
@@ -144,3 +145,28 @@ assessment report.
 2. ~~T2, T3~~ (built 27 Oct 2026) (anomaly alerts, cash-flow forecast): explicit TOR objectives with clear value for audit and treasury.
 3. ~~T11, T14, T10~~ (built and drafted 27 Oct 2026; T10 without purge) (full export, PIA draft, retention and archive): data-ownership and privacy obligations.
 4. ~~T8, T9~~ (built 27 Oct 2026) (API clients, webhooks, interfaces), then ~~T6, T7, T12, T13~~ (built 27 Oct 2026).
+
+## 8. Public sources checked (27 October 2026)
+
+The open items in §5 were searched in public sources; the findings and sources are recorded in the
+[clarification register](03-clarification-register.md#public-sources-checked-27-october-2026). In short:
+
+* **Framework (C-07): settled.** MIAA's 2023 COA Annual Audit Report states its statements follow PFRS; it reports as
+  a government business enterprise (COA Circulars 2015-003 and 2022-003), not under PPSAS. Its statements are the
+  Statements of Financial Position, Comprehensive Income, Changes in Equity and Cash Flows, with headings from
+  COA's government chart of accounts (Business and Service Income, Personnel Services, Maintenance and Other
+  Operating Expenses, Non-Cash Expenses, Subsidy to Other Funds and so on). The detailed account codes are still
+  needed. The lower-of-cost-and-NRV review (T12) matches PFRS.
+* **NAIA concession (new C-38).** Since 14 September 2024 New NAIA Infra Corp. operates NAIA; MIAA is the regulator
+  and receives an upfront payment, a fixed annual payment and 82.16% of covered gross revenues. If the TOR predates
+  this, the billing, receivables, concessionaire portal and FMIS interface scope should be restated, and the
+  concession receipts modelled.
+* **FMIS (C-37).** "FMIS" is MIAA's own system (contracted 2018, live 2020) for aeronautical and concession billing,
+  with COA findings in 2023; its layouts come from its developer or MISD.
+* **Budgets (C-10).** COB rules are public (DBM Corporate Budget Circular No. 24, EO 518); allocation keys are internal.
+* **Retention (C-05, C-13).** RA 9470 and the National Archives' General Records Disposition Schedule (2009; a
+  2023 circular also exists) govern disposal; MIAA's Records Officer must adopt the periods per record class.
+* **Banks (C-11).** Government ADA payments use the LDDAP-ADA and SLIIE; each bank's electronic layout is not public.
+* **BIR (C-06).** No Permit to Use since RMC 5-2021 (Acknowledgement Certificate instead); e-invoicing by CAS users
+  due 31 December 2026 (RR 11-2025 as extended by RR 26-2025), to be confirmed against BIR's text.
+* **Hosting (C-04).** DICT's Cloud First Policy (2017, amended 2020) applies to GOCCs; the choice is MIAA's.
