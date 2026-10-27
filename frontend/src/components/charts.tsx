@@ -83,6 +83,76 @@ export function ColumnChart({ title, points, color = SERIES[0], valueName }: { t
   );
 }
 
+/** A nice range and 5 ticks spanning a minimum and maximum that may be negative; zero is always included. */
+function signedTicks(min: number, max: number): number[] {
+  const lo = Math.min(0, min);
+  const hi = Math.max(0, max);
+  if (hi === lo) return [0, 1];
+  const step0 = (hi - lo) / 4;
+  const mag = 10 ** Math.floor(Math.log10(step0));
+  const step = [1, 2, 2.5, 5, 10].map((m) => m * mag).find((s) => s >= step0) ?? 10 * mag;
+  const out: number[] = [];
+  for (let v = Math.floor(lo / step) * step; v <= hi + step / 2; v += step) out.push(v);
+  const last = out[out.length - 1] ?? 0;
+  if (last < hi) out.push(last + step);
+  return out;
+}
+
+/**
+ * One balance over time as a line with markers (one series, one axis), which may go below zero; the zero line is drawn
+ * darker. Hover or focus a point for its exact amount.
+ */
+export function BalanceLine({ title, points, color = SERIES[0], valueName, headers }: { title: string; points: Point[]; color?: string;
+  valueName: string; headers?: [string, string] }) {
+  const [hover, setHover] = useState<number | null>(null);
+  const id = useId();
+  const t = signedTicks(Math.min(...points.map((p) => p.value)), Math.max(...points.map((p) => p.value)));
+  const lo = t[0] ?? 0;
+  const hi = t[t.length - 1] ?? 1;
+  const W = 960;
+  const H = 260;
+  const pad = { l: 60, r: 12, t: 12, b: 28 };
+  const plotW = W - pad.l - pad.r;
+  const plotH = H - pad.t - pad.b;
+  const band = plotW / Math.max(points.length, 1);
+  const x = (i: number) => pad.l + band * i + band / 2;
+  const y = (v: number) => pad.t + plotH - ((v - lo) / (hi - lo || 1)) * plotH;
+  const every = Math.ceil(points.length / 8);
+  return (
+    <figure className="m-0" aria-labelledby={`${id}-t`}>
+      <figcaption id={`${id}-t`} className="mb-1 text-sm font-medium text-slate-800">{title}</figcaption>
+      <div className="relative">
+        <svg viewBox={`0 0 ${W} ${H}`} className="h-auto w-full" role="img" aria-label={`${title}: ${points.map((p) => `${p.label} ${p.display ?? p.value}`).join(', ')}`}>
+          {t.map((v) => (
+            <g key={v}>
+              <line x1={pad.l} x2={W - pad.r} y1={y(v)} y2={y(v)} stroke={v === 0 ? '#94a3b8' : '#e2e8f0'} strokeWidth={1} />
+              <text x={pad.l - 6} y={y(v)} textAnchor="end" dominantBaseline="middle" fontSize={11} fill="#64748b">{compactPeso(v)}</text>
+            </g>
+          ))}
+          <polyline fill="none" stroke={color} strokeWidth={2} strokeLinejoin="round" points={points.map((p, i) => `${x(i)},${y(p.value)}`).join(' ')} />
+          {points.map((p, i) => (
+            <g key={p.label} onMouseEnter={() => setHover(i)} onMouseLeave={() => setHover(null)} onFocus={() => setHover(i)}
+              onBlur={() => setHover(null)} tabIndex={0} role="graphics-symbol" aria-label={`${p.label}: ${p.display ?? p.value}`}>
+              <rect x={pad.l + band * i} y={pad.t} width={band} height={plotH} fill="transparent" />
+              {hover === i && <line x1={x(i)} x2={x(i)} y1={pad.t} y2={pad.t + plotH} stroke="#cbd5e1" strokeWidth={1} />}
+              <circle cx={x(i)} cy={y(p.value)} r={hover === i ? 5 : 4} fill={color} stroke="#fff" strokeWidth={2} />
+              {i % every === 0 && <text x={x(i)} y={H - 8} textAnchor="middle" fontSize={11} fill="#64748b">{p.label}</text>}
+            </g>
+          ))}
+        </svg>
+        {hover !== null && points[hover] && (
+          <div role="status" className="pointer-events-none absolute rounded border border-slate-200 bg-white px-2 py-1 text-xs text-slate-800 shadow"
+            style={{ left: `${(x(hover) / W) * 100}%`, top: 0, transform: 'translateX(-50%)' }}>
+            <span className="mr-1 inline-block h-2 w-2 rounded-sm" style={{ background: color }} />
+            {points[hover].label}: <strong>{points[hover].display ?? points[hover].value}</strong> {valueName}
+          </div>
+        )}
+      </div>
+      <TableView caption={title} rows={points.map((p) => [p.label, p.display ?? String(p.value)])} headers={headers ?? ['Period', valueName]} />
+    </figure>
+  );
+}
+
 export interface Bar { label: string; value: number; display: string; note?: string }
 
 /**

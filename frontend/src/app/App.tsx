@@ -45,6 +45,7 @@ import { NewReceiptPage, ReceiptsPage } from '../features/receivables/ReceiptsPa
 import { ReceivablesReportsPage } from '../features/receivables/ReceivablesReportsPage';
 import { PortalBillingPage } from '../features/portal/PortalBillingPage';
 import { BankStatementsPage } from '../features/treasury/BankStatementsPage';
+import { CashForecastPage } from '../features/treasury/CashForecastPage';
 import { CashPositionPage } from '../features/treasury/CashPositionPage';
 import { CollectionReportPage } from '../features/treasury/CollectionReportPage';
 import { DepositDetailPage } from '../features/treasury/DepositDetailPage';
@@ -145,6 +146,7 @@ export const routes: RouteObject[] = [
       { path: 'treasury/statements', element: <RequireAuth anyOf={['TREASURY_VIEW']}><BankStatementsPage /></RequireAuth> },
       { path: 'treasury/reconciliations/:id', element: <RequireAuth anyOf={['TREASURY_VIEW']}><ReconciliationPage /></RequireAuth> },
       { path: 'treasury/cash-position', element: <RequireAuth anyOf={['TREASURY_VIEW']}><CashPositionPage /></RequireAuth> },
+      { path: 'treasury/cash-forecast', element: <RequireAuth anyOf={['TREASURY_VIEW']}><CashForecastPage /></RequireAuth> },
       { path: 'fixed-assets', element: <RequireAuth anyOf={['FA_VIEW']}><AssetRegisterPage /></RequireAuth> },
       { path: 'fixed-assets/new', element: <RequireAuth anyOf={['FA_MANAGE']}><AssetFormPage /></RequireAuth> },
       { path: 'fixed-assets/setup', element: <RequireAuth anyOf={['FA_VIEW']}><AssetSetupPage /></RequireAuth> },

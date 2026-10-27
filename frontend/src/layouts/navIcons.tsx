@@ -2,7 +2,7 @@ import {
   BadgeCheck, Banknote, BookOpen, BookText, Boxes, Building2, CalendarCheck, CalendarDays, ChartColumn, ChartPie, ClipboardCheck,
   FileSpreadsheet, FileText, Gauge, GitCompare, HandCoins, Inbox, KeyRound, Landmark, LayoutDashboard, LifeBuoy, Link2, ListTree,
   MessageSquare, Network, PackageOpen, PiggyBank, Plug, Receipt, Repeat, Scale, ScrollText, Send, Settings2, ShieldAlert, ShieldCheck,
-  SlidersHorizontal, TrendingDown, Truck, UserCheck, Users, Wallet, type LucideIcon,
+  SlidersHorizontal, TrendingDown, TrendingUp, Truck, UserCheck, Users, Wallet, type LucideIcon,
 } from 'lucide-react';
 
 /** Icon per navigation route; decorative only (the link text is the accessible name). */
@@ -26,6 +26,7 @@ export const NAV_ICONS: Record<string, LucideIcon> = {
   '/treasury/statements': FileSpreadsheet,
   '/treasury/payment-files': Send,
   '/treasury/cash-position': Wallet,
+  '/treasury/cash-forecast': TrendingUp,
   '/fixed-assets': Landmark,
   '/fixed-assets/depreciation': TrendingDown,
   '/fixed-assets/setup': Settings2,

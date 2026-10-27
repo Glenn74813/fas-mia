@@ -27,6 +27,7 @@ export const NAV_ITEMS: NavItem[] = [
   { label: 'Bank statements', to: '/treasury/statements', anyOf: ['TREASURY_VIEW'], section: 'Treasury' },
   { label: 'Payment files', to: '/treasury/payment-files', anyOf: ['PAYMENT_RELEASE', 'TREASURY_VIEW'], section: 'Treasury' },
   { label: 'Cash position', to: '/treasury/cash-position', anyOf: ['TREASURY_VIEW'], section: 'Treasury' },
+  { label: 'Cash-flow forecast', to: '/treasury/cash-forecast', anyOf: ['TREASURY_VIEW'], section: 'Treasury' },
   { label: 'Asset register', to: '/fixed-assets', anyOf: ['FA_VIEW'], section: 'Fixed assets' },
   { label: 'Depreciation', to: '/fixed-assets/depreciation', anyOf: ['FA_VIEW'], section: 'Fixed assets' },
   { label: 'Asset setup', to: '/fixed-assets/setup', anyOf: ['FA_VIEW'], section: 'Fixed assets' },

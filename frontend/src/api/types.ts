@@ -1287,3 +1287,19 @@ export interface AnomalySummary {
   openMedium: number;
   openLow: number;
 }
+
+export interface CashForecastBucket {
+  start: string; end: string; opening: string; receivables: string; vouchers: string; payables: string; budget: string;
+  net: string; closing: string;
+}
+
+export interface CashForecastItem {
+  source: 'RECEIVABLE' | 'VOUCHER' | 'PAYABLE'; id: string; reference: string | null; party: string; date: string; amount: string;
+  bucket: number; overdue: boolean;
+}
+
+export interface CashForecast {
+  from: string; to: string; granularity: 'WEEK' | 'MONTH'; includeBudget: boolean; openingBalance: string; position: CashPosition;
+  overdueReceivables: string; overduePayables: string; buckets: CashForecastBucket[]; items: CashForecastItem[];
+  itemsTruncated: boolean; lowestClosing: string; lowestClosingOn: string; notes: string[];
+}

@@ -6,6 +6,7 @@ import com.miaa.cas.common.idempotency.IdempotencyService;
 import com.miaa.cas.common.web.PageResponse;
 import com.miaa.cas.documents.DocumentService;
 import com.miaa.cas.treasury.BankReconciliationService;
+import com.miaa.cas.treasury.CashForecastService;
 import com.miaa.cas.treasury.DepositService;
 import com.miaa.cas.treasury.StatementImportService;
 import com.miaa.cas.treasury.TreasuryDtos.ActionRequest;
@@ -62,6 +63,7 @@ public class TreasuryController {
     private final DocumentService documents;
     private final com.miaa.cas.treasury.PaymentFileService paymentFiles;
     private final IdempotencyService idempotency;
+    private final CashForecastService forecasts;
 
     public record PaymentFileRequest(@jakarta.validation.constraints.NotNull UUID bankAccountId,
             @jakarta.validation.constraints.NotNull LocalDate paymentDate,
@@ -70,7 +72,8 @@ public class TreasuryController {
 
     public TreasuryController(DepositService deposits, TreasuryReportService reports, StatementImportService statements,
             BankReconciliationService reconciliations, DocumentService documents, com.miaa.cas.treasury.PaymentFileService paymentFiles,
-            IdempotencyService idempotency) {
+            IdempotencyService idempotency, CashForecastService forecasts) {
+        this.forecasts = forecasts;
         this.paymentFiles = paymentFiles;
         this.idempotency = idempotency;
         this.deposits = deposits;
@@ -139,6 +142,16 @@ public class TreasuryController {
     @PreAuthorize("hasAuthority('PERM_TREASURY_VIEW')")
     public CashPosition cashPosition(@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate asOf) {
         return reports.cashPosition(asOf);
+    }
+
+    @GetMapping("/treasury/cash-forecast")
+    @PreAuthorize("hasAuthority('PERM_TREASURY_VIEW')")
+    @Operation(summary = "Cash-flow and expenditure forecast by week or month, opening at the current cash position")
+    public CashForecastService.Forecast cashForecast(
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
+            @RequestParam(defaultValue = "WEEK") CashForecastService.Granularity granularity,
+            @RequestParam(defaultValue = "13") int periods, @RequestParam(defaultValue = "true") boolean includeBudget) {
+        return forecasts.forecast(from, granularity, periods, includeBudget);
     }
 
     @GetMapping("/treasury/checks")

@@ -295,6 +295,13 @@ reference is information for the cashier; it is not a receipt.
 * **Payment files**: **Create payment file** for a **Payment date** builds an ADA batch from released payments to
   verified supplier accounts. The layout is pending the bank format (C-11).
 * **Cash position**: book balance per bank account and the cheque register by **Check status**.
+* **Cash-flow forecast** (`TREASURY_VIEW`): the expected balance by week or month, starting from today's cash in banks
+  and on hand. Collections come from posted billings still unpaid, on their due dates; payments from approved DVs not
+  yet posted as paid (on their payment date) and from posted supplier invoices not yet on a DV, on their due dates.
+  Anything already overdue is counted in the first period and shown in the **Overdue** tiles. **Include budgeted
+  spending not yet committed** adds the approved budget not yet used or reserved, spread evenly over the rest of the
+  fiscal year; it is an estimate and includes non-cash items such as depreciation if they are budgeted. Choose a
+  period to list the documents expected in it.
 
 ## 7. Fixed assets
 

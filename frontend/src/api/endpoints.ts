@@ -10,7 +10,7 @@ import type {
   InvoiceView, Supplier, TaxCode,
   ArAgingRow, BillingInput, BillingSummary, BillingView, Contract, ControlReconciliation, Customer, CustomerInput, OpenItem,
   PortalAccount, PortalBilling, PortalUser, ReceiptInput, ReceiptSummary, ReceiptView, Statement,
-  CashPosition, CheckRow, DailyCollectionReport, DepositSummary, DepositView, ReconciliationView, StatementLine,
+  CashForecast, CashPosition, CheckRow, DailyCollectionReport, DepositSummary, DepositView, ReconciliationView, StatementLine,
   StatementSummary, UndepositedReceipt,
   AssetCategory, AssetInput, AssetSummary, AssetView, AucProject, DepreciationRun, DepreciationRunSummary, DisposalView, PpeRow,
   ReportJob, StatementResult, StatementTemplate, PortalLinkRequest, Dashboard, Inbox, AppNotification, RoleGrant, AssetTransfer, Organization, OfficeAssignment, AccessReviewCycle, AccessReviewCycleDetail, AccessReviewItem, ApprovalLimit, PortalInquiry, ReportSchedule, ParallelRunDetail, ParallelRunSummary, MigrationBatchDetail, MigrationBatchSummary, MigrationKind, BusinessCalendar, SlaPolicy, TicketSummary, TicketView, EligibleDv, IntegrationChannel, PaymentBatch, SupplierBankAccount, Transmission,
@@ -388,6 +388,8 @@ export const treasuryApi = {
   uploadDeposit: (id: string, file: File) => api.upload<DocumentInfo>(`/deposits/${id}/documents`, file),
   dcr: (date: string, collector?: string) => api.get<DailyCollectionReport>(`/treasury/daily-collection-report${qs({ date, collector })}`),
   cashPosition: (asOf: string) => api.get<CashPosition>(`/treasury/cash-position?asOf=${asOf}`),
+  cashForecast: (q: { from?: string; granularity: 'WEEK' | 'MONTH'; periods: number; includeBudget: boolean }) =>
+    api.get<CashForecast>(`/treasury/cash-forecast${qs({ ...q, includeBudget: String(q.includeBudget) })}`),
   checks: (q: { bankAccountId?: string; status?: string; asOf: string }) => api.get<CheckRow[]>(`/treasury/checks${qs({ ...q })}`),
 };
 
