@@ -282,6 +282,7 @@ Trust boundaries:
 * No secret reaches the logs at DEBUG (`SensitiveLogIT`).
 * The assignee of a change cannot validate it on staging (`TicketsIT`).
 * A full data export needs a second holder of `DATA_EXPORT` to approve it, only the requester can download it, and sign-in secrets are never in it (`DataExportIT`). This is the one way a system administrator can obtain a copy of financial data; the two-person rule, the stated purpose and the audit trail are the controls on it.
+* A fiscal-year archive follows the same two-person export path, and its SHA-256 is written to the hash-chained audit trail (`RecordsRetentionIT`).
 * Someone involved in a flagged document cannot review its anomaly finding, and an external auditor can see findings but not review them (`AnomalyDetectionIT`).
 
 ### 6.5 Open risks needing a decision or an environment

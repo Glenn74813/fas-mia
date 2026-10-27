@@ -1305,9 +1305,22 @@ export interface CashForecast {
 }
 
 export interface DataExport {
-  id: string; kind: 'FULL'; purpose: string;
+  id: string; kind: 'FULL' | 'ARCHIVE'; fiscalYear: number | null; purpose: string;
   status: 'REQUESTED' | 'APPROVED' | 'RUNNING' | 'DONE' | 'FAILED' | 'REJECTED' | 'EXPIRED';
   requestedBy: string; requestedAt: string; decidedBy: string | null; decidedAt: string | null; decisionNote: string | null;
   startedAt: string | null; finishedAt: string | null; fileName: string | null; sizeBytes: number | null; sha256: string | null;
   error: string | null; expiresAt: string | null; version: number;
 }
+
+export interface LegalHold {
+  id: string; fiscalYearId: string | null; fiscalYear: number | null; reason: string; reference: string | null; placedBy: string;
+  placedAt: string; releasedBy: string | null; releasedAt: string | null; releaseNote: string | null; version: number;
+}
+
+export interface YearRetention {
+  fiscalYearId: string; fiscalYear: number; start: string; end: string; status: 'OPEN' | 'CLOSED'; closedAt: string | null;
+  retainUntil: string; retentionElapsed: boolean; onHold: boolean;
+  archives: { exportId: string; status: string; fileName: string; sha256: string; finishedAt: string; requestedBy: string; approvedBy: string }[];
+}
+
+export interface RetentionSchedule { retentionYears: number; disposal: string; years: YearRetention[]; holds: LegalHold[] }

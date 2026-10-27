@@ -29,7 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "Data export", description = "Full exports of the system's data for MIAA (TOR §3.6), requested and approved by two people")
 public class DataExportController {
 
-    public record ExportRequest(@NotBlank @Size(max = 500) String purpose) {
+    public record ExportRequest(@NotBlank @Size(max = 500) String purpose, UUID fiscalYearId) {
     }
 
     public record DecisionRequest(@NotNull Boolean approve, @Size(max = 500) String note, long version) {
@@ -51,9 +51,9 @@ public class DataExportController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     @PreAuthorize("hasAuthority('PERM_DATA_EXPORT')")
-    @Operation(summary = "Ask for a full export, with its purpose; another holder of DATA_EXPORT must approve it")
+    @Operation(summary = "Ask for a full export, or the archive of a closed fiscal year, with its purpose; another holder of DATA_EXPORT must approve it")
     public DataExportService.ExportView request(@Valid @RequestBody ExportRequest request) {
-        return exports.request(request.purpose());
+        return exports.request(request.purpose(), request.fiscalYearId());
     }
 
     @PostMapping("/{id}/decision")

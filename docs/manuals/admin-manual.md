@@ -2,7 +2,7 @@
 
 For system administrators (users, roles, organisation, integrations, tickets) and finance administrators
 (chief accountant and finance manager: chart of accounts, settings, close and approval configuration). Version for
-schema V50, October 2026. Installation and releases are in [19-deployment-and-rollback.md](../19-deployment-and-rollback.md).
+schema V51, October 2026. Installation and releases are in [19-deployment-and-rollback.md](../19-deployment-and-rollback.md).
 
 **Separation of duties applies to administrators too.**
 * System administrators hold no financial permissions. Rules block combining `USER_ADMINISTER` or
@@ -184,7 +184,32 @@ challenges, the request replay cache, and generated report and bank files (they 
 encrypted at rest under `cas.exports.dir` (set it to a protected volume in production) and decrypted as it is
 downloaded. Every request, decision, generation, download and expiry is in the audit trail.
 
-## 11. Background work and operations
+## 11. Records retention
+
+**Administration → Records retention** (viewing: `RECORDS_RETENTION_MANAGE`, `DATA_EXPORT` or `AUDIT_LOG_VIEW`)
+lists every fiscal year with:
+
+* **Keep until**: the end of the year plus `cas.records.retention-years` (10, TOR §4.5);
+* **Hold**: whether a legal hold covers it;
+* **Archives**: the archives made of it, each with its SHA-256.
+
+**Archiving a closed year** (`DATA_EXPORT`): choose **Archive** on a closed year and state the purpose. As with a
+full export (§10), another holder approves it and the requester downloads it from **Data export**. The archive
+holds the year's journals and entries, payables, disbursements and checks, billings, receipts and deposits, bank
+statements and reconciliations, budgets, depreciation, asset and inventory documents, their lines, approval
+decisions and supporting documents, the year's audit trail, and the reference data needed to read them (accounts,
+cost centres, suppliers, customers, users without sign-in secrets). Supplier bank numbers keep only their last
+four digits. When it is built, its SHA-256 is written to the audit trail as `FISCAL_YEAR_ARCHIVED`, so any copy
+can later be checked against the chain. Keep archives on write-once storage **[MIAA infrastructure]**.
+
+**Legal holds** (`RECORDS_RETENTION_MANAGE`, the chief accountant): place a hold on one fiscal year or on every
+year with a reason and an optional reference (for example an audit observation memo), and release it with a note.
+Both are audited.
+
+**Disposal**: there is no purge. Posted records and the audit trail are kept until MIAA decides how lawful disposal
+works (C-05, C-13).
+
+## 12. Background work and operations
 
 * Report jobs run in the background. Users see their own under **My reports**; files are kept encrypted and
   expire.

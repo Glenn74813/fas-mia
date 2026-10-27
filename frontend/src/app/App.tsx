@@ -10,6 +10,7 @@ import { UserDetailPage } from '../features/admin/UserDetailPage';
 import { UsersPage } from '../features/admin/UsersPage';
 import { ChartOfAccountsPage } from '../features/accounts/ChartOfAccountsPage';
 import { DataExportsPage } from '../features/admin/DataExportsPage';
+import { RecordsRetentionPage } from '../features/admin/RecordsRetentionPage';
 import { AnomaliesPage } from '../features/audit/AnomaliesPage';
 import { AuditPage } from '../features/audit/AuditPage';
 import { AccountLedgerPage } from '../features/general-ledger/AccountLedgerPage';
@@ -104,6 +105,7 @@ export const routes: RouteObject[] = [
       { path: 'admin/access-grants', element: <RequireAuth anyOf={['ACCESS_GRANT_APPROVE', 'USER_ADMINISTER', 'AUDIT_LOG_VIEW']}><AccessGrantsPage /></RequireAuth> },
       { path: 'admin/access-reviews', element: <RequireAuth anyOf={['ACCESS_REVIEW_MANAGE', 'ACCESS_REVIEW_PERFORM', 'USER_ADMINISTER']}><AccessReviewsPage /></RequireAuth> },
       { path: 'admin/data-exports', element: <RequireAuth anyOf={['DATA_EXPORT']}><DataExportsPage /></RequireAuth> },
+      { path: 'admin/records-retention', element: <RequireAuth anyOf={['RECORDS_RETENTION_MANAGE', 'DATA_EXPORT', 'AUDIT_LOG_VIEW']}><RecordsRetentionPage /></RequireAuth> },
       { path: 'admin/access-reviews/:id', element: <RequireAuth anyOf={['ACCESS_REVIEW_MANAGE', 'ACCESS_REVIEW_PERFORM', 'USER_ADMINISTER']}><AccessReviewCyclePage /></RequireAuth> },
       { path: 'admin/approval-limits', element: <RequireAuth anyOf={['APPROVAL_LIMIT_MANAGE', 'AUDIT_LOG_VIEW', 'ROLE_VIEW']}><ApprovalLimitsPage /></RequireAuth> },
       { path: 'admin/roles', element: <RequireAuth anyOf={['ROLE_VIEW']}><RolesPage /></RequireAuth> },

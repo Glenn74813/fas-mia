@@ -112,7 +112,7 @@ DOMAINS = OrderedDict([
     ('Reporting', r'^report_'),
     ('Integrations and notifications', r'^(integration|notification|alert_throttle)'),
     ('Tickets', r'^(ticket|sla_|business_holidays)'),
-    ('Audit', r'^(audit_events|security_events|anomaly_findings|data_exports)'),
+    ('Audit', r'^(audit_events|security_events|anomaly_findings|data_exports|legal_holds)'),
     ('Migration and parallel run', r'^(migration|parallel_run|supplier_advances)'),
 ])
 dom_of = {}

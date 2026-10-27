@@ -90,7 +90,7 @@ public class DataExportService {
     static final String EXCLUDED_COLUMNS_REASON = "Sign-in secrets, encrypted values (bank account numbers are exported decrypted in "
             + "supplier_bank_account_numbers.csv) and generated report or bank files, which can be produced again.";
 
-    public record ExportView(UUID id, String kind, String purpose, String status, String requestedBy, Instant requestedAt,
+    public record ExportView(UUID id, String kind, Integer fiscalYear, String purpose, String status, String requestedBy, Instant requestedAt,
             String decidedBy, Instant decidedAt, String decisionNote, Instant startedAt, Instant finishedAt, String fileName,
             Long sizeBytes, String sha256, String error, Instant expiresAt, long version) {
     }
@@ -108,11 +108,13 @@ public class DataExportService {
     private final Clock clock;
     private final Path dir;
     private final Duration retention;
+    private final int retentionYears;
 
     public DataExportService(JdbcTemplate jdbc, DataSource dataSource, PlatformTransactionManager txManager, AuditService audit,
             EventStore events, NotificationService notifications, DocumentStorage documents, AesGcmEncryptor encryptor, ObjectMapper json,
             Clock clock, @Value("${cas.exports.dir:${java.io.tmpdir}/cas-exports}") String dir,
-            @Value("${cas.exports.retention:P7D}") Duration retention) {
+            @Value("${cas.exports.retention:P7D}") Duration retention, @Value("${cas.records.retention-years:10}") int retentionYears) {
+        this.retentionYears = retentionYears;
         this.jdbc = jdbc;
         this.dataSource = dataSource;
         this.tx = new TransactionTemplate(txManager);
@@ -132,23 +134,35 @@ public class DataExportService {
 
     // ---------------------------------------------------------------- requests and decisions
 
+    /** A full export, or with {@code fiscalYearId} the archive of that closed fiscal year (TOR §4.5). */
     @Transactional
-    public ExportView request(String purpose) {
+    public ExportView request(String purpose, UUID fiscalYearId) {
         CurrentActor.requirePermission(PERMISSION);
         String p = purpose == null ? "" : purpose.trim();
         if (p.length() < 10) {
             throw new ApiException(ErrorCode.VALIDATION_FAILED, "State the purpose of the export in at least 10 characters.");
         }
+        String kind = fiscalYearId == null ? "FULL" : "ARCHIVE";
+        if (fiscalYearId != null) {
+            List<String> status = jdbc.queryForList("SELECT status FROM fiscal_years WHERE id = ?", String.class, fiscalYearId);
+            if (status.isEmpty()) {
+                throw ApiException.notFound("Fiscal year");
+            }
+            if (!"CLOSED".equals(status.get(0))) {
+                throw new ApiException(ErrorCode.INVALID_STATE, "Only a closed fiscal year can be archived.");
+            }
+        }
         UUID id = UUID.randomUUID();
-        jdbc.update("INSERT INTO data_exports (id, kind, purpose, status, requested_by_id, requested_by, requested_at) "
-                + "VALUES (?, 'FULL', ?, 'REQUESTED', ?, ?, ?)", id, p, CurrentActor.userId(), CurrentActor.username(),
+        jdbc.update("INSERT INTO data_exports (id, kind, fiscal_year_id, purpose, status, requested_by_id, requested_by, requested_at) "
+                + "VALUES (?, ?, ?, ?, 'REQUESTED', ?, ?, ?)", id, kind, fiscalYearId, p, CurrentActor.userId(), CurrentActor.username(),
                 Timestamp.from(Instant.now(clock)));
-        audit.record("DATA_EXPORT_REQUESTED", "DATA_EXPORT", id, Map.of("kind", "FULL", "purpose", p));
+        audit.record("DATA_EXPORT_REQUESTED", "DATA_EXPORT", id, fiscalYearId == null ? Map.of("kind", kind, "purpose", p)
+                : Map.of("kind", kind, "purpose", p, "fiscalYearId", fiscalYearId.toString()));
         for (UUID holder : jdbc.queryForList("""
                 SELECT DISTINCT u.id FROM users u JOIN user_roles ur ON ur.user_id = u.id JOIN role_permissions rp ON rp.role_id = ur.role_id
                 WHERE rp.permission_code = ? AND u.status = 'ACTIVE' AND u.id <> ?""", UUID.class, PERMISSION, CurrentActor.userId())) {
-            notifications.notify(holder, "DATA_EXPORT", "A full data export needs approval",
-                    CurrentActor.username() + " asked for a full export: " + p, "/admin/data-exports");
+            notifications.notify(holder, "DATA_EXPORT", fiscalYearId == null ? "A full data export needs approval"
+                    : "A fiscal-year archive needs approval", CurrentActor.username() + " asked for an export: " + p, "/admin/data-exports");
         }
         return view(id);
     }
@@ -184,7 +198,7 @@ public class DataExportService {
     @Transactional(readOnly = true)
     public PageResponse<ExportView> list(int page, int size) {
         CurrentActor.requirePermission(PERMISSION);
-        return JdbcPaging.query(jdbc, "SELECT * FROM data_exports ORDER BY requested_at DESC, id", (rs, i) -> map(rs), page, size);
+        return JdbcPaging.query(jdbc, SELECT + " ORDER BY e.requested_at DESC, e.id", (rs, i) -> map(rs), page, size);
     }
 
     // ---------------------------------------------------------------- download
@@ -295,7 +309,8 @@ public class DataExportService {
             }
             Files.move(partial, target, java.nio.file.StandardCopyOption.REPLACE_EXISTING, java.nio.file.StandardCopyOption.ATOMIC_MOVE);
             String sha = HexFormat.of().formatHex(zipDigest.digest());
-            String fileName = "miaa-cas-export-" + Instant.now(clock).toString().substring(0, 10) + "-" + id.toString().substring(0, 8) + ".zip";
+            String fileName = (manifest.get("fiscalYear") != null ? "miaa-cas-archive-FY" + manifest.get("fiscalYear")
+                    : "miaa-cas-export-" + Instant.now(clock).toString().substring(0, 10)) + "-" + id.toString().substring(0, 8) + ".zip";
             Instant done = Instant.now(clock);
             tx.executeWithoutResult(s -> {
                 jdbc.update("UPDATE data_exports SET status = 'DONE', finished_at = ?, file_name = ?, size_bytes = ?, sha256 = ?, "
@@ -303,6 +318,11 @@ public class DataExportService {
                         Timestamp.from(done.plus(retention)), id);
                 audit.record(Actor.SYSTEM, "DATA_EXPORT_GENERATED", "DATA_EXPORT", id, Map.of("file", fileName, "sha256", sha,
                         "bytes", size[0], "tables", ((List<?>) manifest.get("tables")).size(), "documents", manifest.get("documents")));
+                if (job.get("fiscal_year_id") != null) {
+                    // The archive's checksum enters the hash-chained audit trail, so a copy can later be proven unaltered.
+                    audit.record(Actor.SYSTEM, "FISCAL_YEAR_ARCHIVED", "FISCAL_YEAR", job.get("fiscal_year_id"), Map.of("exportId",
+                            id.toString(), "fiscalYear", manifest.get("fiscalYear"), "sha256", sha, "file", fileName));
+                }
                 notifications.notify((UUID) job.get("requested_by_id"), "DATA_EXPORT", "Your data export is ready",
                         "Download it within " + retention.toDays() + " days.", "/admin/data-exports");
             });
@@ -328,6 +348,16 @@ public class DataExportService {
         Connection con = DataSourceUtils.getConnection(dataSource);
         var copy = con.unwrap(PGConnection.class).getCopyAPI();
 
+        UUID fiscalYearId = (UUID) job.get("fiscal_year_id");
+        Map<String, String> scope = null;
+        if (fiscalYearId != null) {
+            Map<String, Object> fy = jdbc.queryForMap("SELECT fiscal_year, start_date, end_date FROM fiscal_years WHERE id = ?", fiscalYearId);
+            scope = ArchiveScope.filters(fiscalYearId, ((java.sql.Date) fy.get("start_date")).toLocalDate(),
+                    ((java.sql.Date) fy.get("end_date")).toLocalDate());
+            manifest.put("fiscalYear", fy.get("fiscal_year"));
+            manifest.put("periodCovered", fy.get("start_date") + " to " + fy.get("end_date"));
+            manifest.put("retainUntil", ((java.sql.Date) fy.get("end_date")).toLocalDate().plusYears(retentionYears).toString());
+        }
         List<Map<String, Object>> tables = new ArrayList<>();
         List<Map<String, String>> excluded = new ArrayList<>();
         Map<String, Object> dictionary = new LinkedHashMap<>();
@@ -346,6 +376,10 @@ public class DataExportService {
                 excluded.add(Map.of("table", table, "reason", EXCLUDED_TABLES.get(table)));
                 continue;
             }
+            String where = scope == null ? "TRUE" : scope.get(table);
+            if (where == null) {
+                continue;
+            }
             Set<String> skip = EXCLUDED_COLUMNS.getOrDefault(table, Set.of());
             List<String> select = new ArrayList<>();
             for (Map<String, Object> c : cols) {
@@ -356,9 +390,9 @@ public class DataExportService {
                 }
             }
             String path = "tables/" + table + ".csv";
-            long rows = jdbc.queryForObject("SELECT count(*) FROM " + quote(table), Long.class);
+            long rows = jdbc.queryForObject("SELECT count(*) FROM " + quote(table) + " WHERE " + where, Long.class);
             sums.put(path, entry(zip, path, out -> copy.copyOut("COPY (SELECT " + String.join(", ", select) + " FROM " + quote(table)
-                    + ") TO STDOUT WITH (FORMAT csv, HEADER true)", out)));
+                    + " WHERE " + where + ") TO STDOUT WITH (FORMAT csv, HEADER true)", out)));
             Map<String, Object> m = new LinkedHashMap<>();
             m.put("table", table);
             m.put("file", path);
@@ -370,24 +404,27 @@ public class DataExportService {
             tables.add(m);
         }
 
-        // Supplier bank account numbers, decrypted.
+        // Supplier bank account numbers, decrypted (full exports only; an archive keeps the last four digits).
         String banks = "tables/supplier_bank_account_numbers.csv";
-        sums.put(banks, entry(zip, banks, out -> {
-            out.write("supplier_bank_account_id,account_number\n".getBytes(StandardCharsets.UTF_8));
-            jdbc.query("SELECT id, account_number_enc FROM supplier_bank_accounts ORDER BY id", (ResultSet rs) -> {
-                UUID bid = rs.getObject(1, UUID.class);
-                String number = new String(encryptor.decrypt(rs.getBytes(2), "supplier-bank-account:" + bid), StandardCharsets.UTF_8);
-                try {
-                    out.write((bid + "," + csv(number) + "\n").getBytes(StandardCharsets.UTF_8));
-                } catch (IOException e) {
-                    throw new IllegalStateException(e);
-                }
-            });
-        }));
+        if (scope == null) {
+            sums.put(banks, entry(zip, banks, out -> {
+                out.write("supplier_bank_account_id,account_number\n".getBytes(StandardCharsets.UTF_8));
+                jdbc.query("SELECT id, account_number_enc FROM supplier_bank_accounts ORDER BY id", (ResultSet rs) -> {
+                    UUID bid = rs.getObject(1, UUID.class);
+                    String number = new String(encryptor.decrypt(rs.getBytes(2), "supplier-bank-account:" + bid), StandardCharsets.UTF_8);
+                    try {
+                        out.write((bid + "," + csv(number) + "\n").getBytes(StandardCharsets.UTF_8));
+                    } catch (IOException e) {
+                        throw new IllegalStateException(e);
+                    }
+                });
+            }));
+        }
 
         // Supporting documents.
         int docs = 0;
-        for (Map<String, Object> d : jdbc.queryForList("SELECT id, storage_key, file_name FROM supporting_documents ORDER BY uploaded_at, id")) {
+        for (Map<String, Object> d : jdbc.queryForList("SELECT id, storage_key, file_name FROM supporting_documents WHERE "
+                + (scope == null ? "TRUE" : scope.get("supporting_documents")) + " ORDER BY uploaded_at, id")) {
             String path = "documents/" + d.get("id") + "/" + safeName((String) d.get("file_name"));
             byte[] content = documents.get((String) d.get("storage_key"));
             sums.put(path, entry(zip, path, out -> out.write(content)));
@@ -397,7 +434,7 @@ public class DataExportService {
         sums.put("dictionary.json", entry(zip, "dictionary.json", out -> json.writeValue(nonClosing(out), dictionary)));
 
         manifest.put("exportId", job.get("id"));
-        manifest.put("kind", "FULL");
+        manifest.put("kind", scope == null ? "FULL" : "ARCHIVE");
         manifest.put("purpose", job.get("purpose"));
         manifest.put("requestedBy", job.get("requested_by"));
         manifest.put("approvedBy", job.get("decided_by"));
@@ -489,13 +526,17 @@ public class DataExportService {
         return rows.get(0);
     }
 
+    private static final String SELECT = "SELECT e.*, fy.fiscal_year FROM data_exports e LEFT JOIN fiscal_years fy ON fy.id = e.fiscal_year_id";
+
     private ExportView view(UUID id) {
-        return jdbc.queryForObject("SELECT * FROM data_exports WHERE id = ?", (rs, i) -> map(rs), id);
+        return jdbc.queryForObject(SELECT + " WHERE e.id = ?", (rs, i) -> map(rs), id);
     }
 
     private static ExportView map(ResultSet rs) throws SQLException {
         long size = rs.getLong("size_bytes");
-        return new ExportView(rs.getObject("id", UUID.class), rs.getString("kind"), rs.getString("purpose"), rs.getString("status"),
+        int year = rs.getInt("fiscal_year");
+        Integer fiscalYear = rs.wasNull() ? null : year;
+        return new ExportView(rs.getObject("id", UUID.class), rs.getString("kind"), fiscalYear, rs.getString("purpose"), rs.getString("status"),
                 rs.getString("requested_by"), ts(rs, "requested_at"), rs.getString("decided_by"), ts(rs, "decided_at"),
                 rs.getString("decision_note"), ts(rs, "started_at"), ts(rs, "finished_at"), rs.getString("file_name"),
                 rs.wasNull() ? null : size, rs.getString("sha256"), rs.getString("error"), ts(rs, "expires_at"), rs.getLong("version"));

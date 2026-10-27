@@ -56,7 +56,7 @@ certification or legal advice.
 |---|---|---|---|---|
 | Every business action and security event recorded | `audit_events`, `security_events` with actor, roles, address, correlation id | Module ITs, `AuthFlowIT` | Met | |
 | Tamper evidence | Append-only triggers, INSERT/SELECT-only runtime grants, SHA-256 hash chain, verification endpoint | `AuditIntegrityIT`, `SecurityAlertsIT` | Met | |
-| Tamper proofing and retention | Sealed WORM exports, 10-year retention, archival | — | Blocked (C-05, C-13) | |
+| Tamper proofing and retention | 10-year retention schedule per fiscal year; archive of a closed year with checksums, its SHA-256 sealed in the audit chain; legal holds | `RecordsRetentionIT` | Partly met | Write-once (WORM) storage of archives is MIAA's infrastructure; lawful purge awaits C-05, C-13 |
 | Search and export of audit records | Audit trail page; CSV/XLSX/PDF export job | `ManagementReportsIT` (audit export) | Met | |
 | Immutable posted records | Triggers on ledger, decisions, movements, events | `PostingInvariantsIT` | Met | |
 | Alerts on high-severity events and dead integrations | `AlertService`, throttled | `SecurityAlertsIT`, `IntegrationsIT` | Met | Central monitoring C-04 |

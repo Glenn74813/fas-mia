@@ -3,7 +3,7 @@ import type {
   TicketCategory,
   Clearing, ClearingProposal, CloseCalendarChecklist, CloseFrequency, CloseScheduleItem, CloseTask, GlOpenItem, OpenItemAccount,
   AccountLedger, ChainVerification, ChartSummary, CloseChecklist, CostCenter, CurrentUser, DocumentInfo, EntryDetail,
-  AnomalyFinding, AnomalySummary, DataExport, EventRecord, FiscalYear, LineInput, LoginResponse, Page, Period, PeriodChange, Permission, RecurringJournal, Role,
+  AnomalyFinding, AnomalySummary, DataExport, LegalHold, RetentionSchedule, EventRecord, FiscalYear, LineInput, LoginResponse, Page, Period, PeriodChange, Permission, RecurringJournal, Role,
   RoleAssignmentResult, RoleChangeResult, SodConflict, SubsidiaryAccount, TokenResponse, TotpEnrollment, TrialBalance,
   UserDetail, UserSummary, VoucherDetail, VoucherInput, VoucherSummary,
   AccountMapping, AgingRow, BankAccount, BudgetAdjustment, BudgetView, DvSummary, DvView, InvoiceInput, InvoiceSummary,
@@ -125,10 +125,16 @@ export const anomalyApi = {
 
 export const dataExportApi = {
   list: (page = 0) => api.get<Page<DataExport>>(`/data-exports?page=${page}&size=25`),
-  request: (purpose: string) => api.post<DataExport>('/data-exports', { purpose }),
+  request: (purpose: string, fiscalYearId?: string) => api.post<DataExport>('/data-exports', { purpose, fiscalYearId }),
   decide: (id: string, body: { approve: boolean; note?: string; version: number }) =>
     api.post<DataExport>(`/data-exports/${id}/decision`, body),
   download: (e: DataExport) => downloadFile(`/data-exports/${e.id}/download`, e.fileName ?? 'miaa-cas-export.zip'),
+};
+
+export const retentionApi = {
+  schedule: () => api.get<RetentionSchedule>('/records-retention'),
+  hold: (body: { fiscalYearId?: string; reason: string; reference?: string }) => api.post<LegalHold>('/records-retention/holds', body),
+  release: (id: string, body: { note: string; version: number }) => api.post<LegalHold>(`/records-retention/holds/${id}/release`, body),
 };
 
 export const accountApi = {
