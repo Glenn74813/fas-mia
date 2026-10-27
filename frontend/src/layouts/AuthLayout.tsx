@@ -14,8 +14,8 @@ export function AuthLayout({ title, children }: { title: string; children: React
       <section aria-hidden className="relative hidden w-[44%] max-w-xl flex-col justify-between overflow-hidden bg-ink-900 p-12 text-white lg:flex">
         <div className="pointer-events-none absolute -right-32 -top-32 h-96 w-96 rounded-full bg-brand-600/25 blur-3xl" />
         <div className="pointer-events-none absolute -bottom-40 -left-20 h-96 w-96 rounded-full bg-brand-400/10 blur-3xl" />
-        <div className="relative flex items-center gap-3">
-          <BrandMark />
+        <div className="relative flex items-center gap-4">
+          <BrandMark className="h-16 w-16" />
           <div className="leading-tight">
             <p className="text-sm font-semibold">Manila International Airport Authority</p>
             <p className="text-xs text-slate-400">Finance and Accounting</p>
@@ -39,7 +39,7 @@ export function AuthLayout({ title, children }: { title: string; children: React
       </section>
       <div className="flex flex-1 items-center justify-center bg-canvas px-4 py-12 lg:bg-white">
         <main className="w-full max-w-sm rounded-2xl bg-white p-8 shadow-xl ring-1 ring-slate-200 lg:p-0 lg:shadow-none lg:ring-0">
-          <div className="mb-8 flex items-center gap-3 lg:hidden"><BrandMark />
+          <div className="mb-8 flex items-center gap-3 lg:hidden"><BrandMark className="h-12 w-12" />
             <p className="text-sm font-semibold text-slate-900">MIAA Computerized Accounting System</p></div>
           <p className="text-xs font-semibold uppercase tracking-[0.08em] text-brand-700">Manila International Airport Authority</p>
           <h1 className="mb-7 mt-1.5 text-2xl font-semibold tracking-tight text-slate-900">{title}</h1>

@@ -2,6 +2,7 @@ import { Circle, Clock, Menu, X } from 'lucide-react';
 import { useState } from 'react';
 import { NavLink, Outlet } from 'react-router';
 import { useAuth } from '../auth/AuthContext';
+import miaaLogo from '../assets/miaa-logo.png';
 import { NotificationBell } from '../components/NotificationBell';
 import { PlaceholderBanner } from '../components/PlaceholderBanner';
 import { formatDateTime } from '../utils/format';
@@ -9,11 +10,15 @@ import { NAV_ICONS } from './navIcons';
 import { visibleNav } from './navigation';
 import { UserMenu } from './UserMenu';
 
-/** The brand mark: a neutral monogram (not an official MIAA logo). */
-export function BrandMark({ className = '' }: { className?: string }) {
+/**
+ * The MIAA logo (docs/logo.png, resized). It sits on a white tile so its dark blue and black stay visible on the dark
+ * sidebar. Decorative: the organisation's name is always written next to it.
+ */
+export function BrandMark({ className = 'h-10 w-10' }: { className?: string }) {
   return (
-    <span aria-hidden className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-brand-400 to-brand-700
-      text-[13px] font-bold tracking-tight text-white shadow-sm ring-1 ring-white/15 ${className}`}>CAS</span>
+    <span aria-hidden className={`flex shrink-0 items-center justify-center rounded-xl bg-white p-0.5 shadow-sm ring-1 ring-black/5 ${className}`}>
+      <img src={miaaLogo} alt="" className="h-full w-full object-contain" draggable={false} />
+    </span>
   );
 }
 
