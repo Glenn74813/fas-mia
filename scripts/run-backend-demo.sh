@@ -13,4 +13,10 @@ fi
 export CAS_JWT_PRIVATE_KEY_PATH="$PWD/.secrets/jwt_private.pem" CAS_JWT_PUBLIC_KEY_PATH="$PWD/.secrets/jwt_public.pem"
 export SPRING_PROFILES_ACTIVE=prod CAS_OPENAPI_ENABLED=false
 export SERVER_ADDRESS=127.0.0.1 MANAGEMENT_SERVER_ADDRESS=127.0.0.1
-exec java -jar backend/target/cas-backend-0.1.0-SNAPSHOT.jar
+# Run from a copy, so rebuilding backend/target while the demo is up cannot pull the jar from under it.
+mkdir -p .devdata
+# Copy then rename: a demo still shutting down keeps reading the old file instead of a half-written one.
+cp backend/target/cas-backend-0.1.0-SNAPSHOT.jar .devdata/cas-backend-demo.jar.new
+mv -f .devdata/cas-backend-demo.jar.new .devdata/cas-backend-demo.jar
+# TLS 1.3 minimum for every outbound connection, the database driver included (TlsPolicy checks it).
+exec java -Djdk.tls.client.protocols=TLSv1.3 -jar .devdata/cas-backend-demo.jar

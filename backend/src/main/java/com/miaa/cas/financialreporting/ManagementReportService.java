@@ -54,12 +54,14 @@ public class ManagementReportService {
     private final InventorySetupService inventory;
     private final EventStore events;
     private final int auditRowLimit;
+    private final VarianceReportService variance;
     private final OperationalReportService operational;
 
     public ManagementReportService(JdbcTemplate jdbc, BudgetControl budget, ApReportService ap, ArReportService ar, FaReportService fa,
             InventorySetupService inventory, EventStore events, @Value("${cas.reports.audit-row-limit:100000}") int auditRowLimit,
-            OperationalReportService operational) {
+            OperationalReportService operational, VarianceReportService variance) {
         this.operational = operational;
+        this.variance = variance;
         this.jdbc = jdbc;
         this.budget = budget;
         this.ap = ap;
@@ -73,7 +75,7 @@ public class ManagementReportService {
     /** The permission needed to request and download each report type. */
     public static String permissionFor(String reportType, Map<String, String> parameters) {
         return switch (reportType) {
-            case "BUDGET_VS_ACTUAL" -> "BUDGET_VIEW";
+            case "BUDGET_VS_ACTUAL", VarianceReportService.TYPE -> "BUDGET_VIEW";
             case "AP_AGING" -> "AP_VIEW";
             case "AR_AGING" -> "AR_VIEW";
             case "PPE_SCHEDULE" -> "FA_VIEW";
@@ -92,6 +94,7 @@ public class ManagementReportService {
                     throw new ApiException(ErrorCode.VALIDATION_FAILED, "There is no budget for that fiscal year.");
                 }
             }
+            case VarianceReportService.TYPE -> variance.validate(p);
             case "AP_AGING", "AR_AGING" -> {
                 date(p, "asOf");
                 for (String key : List.of("customerId", "supplierId")) {
@@ -121,6 +124,7 @@ public class ManagementReportService {
     public Rendered render(String reportType, Map<String, String> p, String by, String at) {
         return switch (reportType) {
             case "BUDGET_VS_ACTUAL" -> budgetVsActual(uuid(p, "fiscalYearId"), by, at);
+            case VarianceReportService.TYPE -> variance.render(p, by, at);
             case "AP_AGING" -> apAging(date(p, "asOf"), blank(p.get("supplierId")) ? null : uuid(p, "supplierId"), by, at);
             case "AR_AGING" -> arAging(date(p, "asOf"), blank(p.get("customerId")) ? null : uuid(p, "customerId"), by, at);
             case "PPE_SCHEDULE" -> ppe(date(p, "from"), date(p, "to"), by, at);

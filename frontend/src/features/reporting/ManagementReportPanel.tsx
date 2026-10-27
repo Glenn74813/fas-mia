@@ -9,7 +9,7 @@ import { SearchSelect } from '../../components/SearchSelect';
 import { postableAccounts, useChart, useCostCenters, useFiscalYears } from '../../hooks/useAccounting';
 
 type Param = 'asOf' | 'range' | 'date' | 'quarter' | 'fiscalYear' | 'audit' | 'account' | 'costCenter' | 'subsidiary' | 'customer' | 'supplier'
-  | 'reconciliation';
+  | 'reconciliation' | 'variance';
 
 interface Def { type: string; label: string; permission: string; params: Param[] }
 
@@ -17,6 +17,7 @@ const REPORTS: Def[] = [
   { type: 'GENERAL_LEDGER', label: 'General ledger', permission: 'LEDGER_VIEW', params: ['range', 'account', 'costCenter'] },
   { type: 'SUBSIDIARY_LEDGER', label: 'Subsidiary ledger', permission: 'LEDGER_VIEW', params: ['range', 'subsidiary'] },
   { type: 'BUDGET_VS_ACTUAL', label: 'Budget vs actual', permission: 'BUDGET_VIEW', params: ['fiscalYear'] },
+  { type: 'VARIANCE_ANALYSIS', label: 'Variance analysis', permission: 'BUDGET_VIEW', params: ['fiscalYear', 'variance', 'costCenter'] },
   { type: 'AP_AGING', label: 'Accounts payable aging', permission: 'AP_VIEW', params: ['asOf', 'supplier'] },
   { type: 'CASH_DISBURSEMENT_JOURNAL', label: 'Cash Disbursement Journal', permission: 'AP_VIEW', params: ['range'] },
   { type: 'WITHHOLDING_SCHEDULE', label: 'Expanded withholding schedule', permission: 'AP_VIEW', params: ['quarter'] },
@@ -46,8 +47,10 @@ export function ManagementReportPanel({ onQueued }: { onQueued: () => void }) {
   const [format, setFormat] = useState('XLSX');
   const [p, setP] = useState({ asOf: today, from: `${today.slice(0, 4)}-01-01`, to: today, date: today, year: today.slice(0, 4),
     quarter: String(Math.floor(new Date().getMonth() / 3) + 1), fiscalYearId: '', table: 'AUDIT', action: '', actor: '', accountId: '',
-    costCenterId: '', slType: 'CUSTOMER', subsidiaryAccountId: '', customerId: '', supplierId: '', reconciliationId: '' });
-  const [schedule, setSchedule] = useState({ on: false, name: '', frequency: 'MONTHLY', runHour: '7', dayOfWeek: '1', dayOfMonth: '1', relative: 'prevMonth' });
+    costCenterId: '', slType: 'CUSTOMER', subsidiaryAccountId: '', customerId: '', supplierId: '', reconciliationId: '',
+    throughPeriod: String(new Date().getMonth() + 1), thresholdPercent: '10' });
+  const [schedule, setSchedule] = useState({ on: false, name: '', frequency: 'MONTHLY', runHour: '7', dayOfWeek: '1', dayOfMonth: '1', relative: 'prevMonth',
+    email: true });
   const def = allowed.find((r) => r.type === type) ?? allowed[0];
   const has = (x: Param) => !!def?.params.includes(x);
   const chart = useChart(has('account'));
@@ -67,6 +70,7 @@ export function ManagementReportPanel({ onQueued }: { onQueued: () => void }) {
     if (has('subsidiary')) Object.assign(out, p.subsidiaryAccountId ? { subsidiaryAccountId: p.subsidiaryAccountId } : { slType: p.slType });
     if (has('customer') && p.customerId) out.customerId = p.customerId;
     if (has('supplier') && p.supplierId) out.supplierId = p.supplierId;
+    if (has('variance')) Object.assign(out, { throughPeriod: p.throughPeriod, thresholdPercent: p.thresholdPercent || '10' });
     if (has('reconciliation')) out.reconciliationId = p.reconciliationId || recs.data?.items[0]?.id || '';
     if (has('audit')) {
       out.table = hasPermission('AUDIT_LOG_VIEW') ? p.table : 'SECURITY';
@@ -81,7 +85,7 @@ export function ManagementReportPanel({ onQueued }: { onQueued: () => void }) {
       return reportingApi.createSchedule({ name: schedule.name.trim() || def!.label, reportType: def!.type, format, parameters: parameters(),
         frequency: schedule.frequency, runHour: Number(schedule.runHour),
         dayOfWeek: schedule.frequency === 'WEEKLY' ? Number(schedule.dayOfWeek) : undefined,
-        dayOfMonth: schedule.frequency === 'MONTHLY' ? Number(schedule.dayOfMonth) : undefined });
+        dayOfMonth: schedule.frequency === 'MONTHLY' ? Number(schedule.dayOfMonth) : undefined, emailWhenReady: schedule.email });
     },
     onSuccess: onQueued,
   });
@@ -106,6 +110,12 @@ export function ManagementReportPanel({ onQueued }: { onQueued: () => void }) {
           <label>Fiscal year <select value={p.fiscalYearId || years.data?.[0]?.id || ''} onChange={(e) => setP({ ...p, fiscalYearId: e.target.value })}
             className={select}>{(years.data ?? []).map((y) => <option key={y.id} value={y.id}>{y.fiscalYear}</option>)}</select></label>
         )}
+        {has('variance') && <>
+          <label>Through period <select value={p.throughPeriod} onChange={(e) => setP({ ...p, throughPeriod: e.target.value })} className={select}>
+            {Array.from({ length: 13 }, (_, i) => String(i + 1)).map((n) => <option key={n} value={n}>{n === '13' ? '13 (adjustment)' : n}</option>)}
+          </select></label>
+          <div className="w-28"><Field label="Threshold %" inputMode="decimal" value={p.thresholdPercent}
+            onChange={(e) => setP({ ...p, thresholdPercent: e.target.value.replace(/[^\d.]/g, '') })} /></div></>}
         {has('account') && <label>Account <select value={p.accountId} onChange={(e) => setP({ ...p, accountId: e.target.value })} className={select}>
           <option value="">All accounts</option>{postableAccounts(chart.data?.accounts).map((a) => <option key={a.id} value={a.id}>{a.code} {a.name}</option>)}</select></label>}
         {has('costCenter') && <label>Cost centre <select value={p.costCenterId} onChange={(e) => setP({ ...p, costCenterId: e.target.value })} className={select}>
@@ -135,7 +145,7 @@ export function ManagementReportPanel({ onQueued }: { onQueued: () => void }) {
           {['XLSX', 'PDF', 'CSV'].map((f) => <option key={f}>{f}</option>)}</select></label>
       </div>
 
-      {relativeAllowed && !has('reconciliation') && (
+      {relativeAllowed && !has('reconciliation') && !has('variance') && (
         <div className="space-y-2 rounded-md bg-slate-50 p-3">
           <label className="font-medium"><input type="checkbox" className="mr-2" checked={schedule.on} onChange={(e) => setSchedule({ ...schedule, on: e.target.checked })} />
             Repeat on a schedule</label>
@@ -150,16 +160,21 @@ export function ManagementReportPanel({ onQueued }: { onQueued: () => void }) {
                 {Array.from({ length: 28 }, (_, i) => String(i + 1)).map((d) => <option key={d}>{d}</option>)}</select></label>}
               <label>At <select value={schedule.runHour} onChange={(e) => setSchedule({ ...schedule, runHour: e.target.value })} className={select}>
                 {Array.from({ length: 24 }, (_, i) => String(i)).map((h) => <option key={h} value={h}>{h.padStart(2, '0')}:00</option>)}</select></label>
+              <label className="self-center"><input type="checkbox" className="mr-2" checked={schedule.email}
+                onChange={(e) => setSchedule({ ...schedule, email: e.target.checked })} />E-mail me when it is ready</label>
               {has('range') && <label>Covering <select value={schedule.relative} onChange={(e) => setSchedule({ ...schedule, relative: e.target.value })} className={select}>
                 {Object.entries(RELATIVE).map(([k, v]) => <option key={k} value={k}>{v.label}</option>)}</select></label>}
             </div>
           )}
           {schedule.on && <p className="text-xs text-slate-500">Times are Manila time. {has('asOf') && 'Aging is as of the run date. '}
             {has('date') && 'The daily collection report covers the previous day. '}{has('quarter') && 'The schedule covers the previous quarter. '}
-            The schedule stops by itself if you lose access to the report.</p>}
+            The schedule stops by itself if you lose access to the report. The e-mail links to My reports; the report itself is never attached.</p>}
         </div>
       )}
       <Button variant="secondary" busy={queue.isPending} onClick={() => queue.mutate()}>{schedule.on ? 'Save schedule' : 'Queue report'}</Button>
+      {def.type === 'VARIANCE_ANALYSIS' && <p className="text-xs text-slate-500">Budget to date is the allotment spread evenly over 12
+        periods, against posted actuals to the end of the chosen period. A positive variance is favourable. The layout is proposed until MIAA
+        confirms its budget definitions.</p>}
       {def.type === 'AUDIT_TRAIL' && <p className="text-xs text-slate-500">Each exported event carries its row hash, and the export records whether the
         whole hash chain verified intact. The export request is itself recorded in the audit trail.</p>}
       <ErrorAlert error={queue.error} />

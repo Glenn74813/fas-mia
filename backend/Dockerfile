@@ -15,7 +15,7 @@ WORKDIR /app
 COPY --from=build /app.jar /app/cas-backend.jar
 USER cas
 ENV SPRING_PROFILES_ACTIVE=prod \
-    JAVA_TOOL_OPTIONS="-XX:MaxRAMPercentage=75 -XX:+ExitOnOutOfMemoryError -Djava.security.egd=file:/dev/urandom"
+    JAVA_TOOL_OPTIONS="-XX:MaxRAMPercentage=75 -XX:+ExitOnOutOfMemoryError -Djava.security.egd=file:/dev/urandom -Djdk.tls.client.protocols=TLSv1.3"
 # Liveness/readiness: orchestrator probes on /actuator/health/liveness and /actuator/health/readiness
 # (management port 8081 in the prod profile).
 EXPOSE 8080 8081

@@ -106,6 +106,8 @@ every new migration; edit only this introduction by hand.
 | V41 | `V41__ticket_classification_and_change_control.sql` | Support tickets (MS §11.11, §22): severity and category, attachments (supporting_documents, owner TICKET), requester closure confirmation with auto-close of unconfirmed resolutions, and change control on change requests and enhancements: a rollback plan before approval, staging validation and release notes before release. |
 | V42 | `V42__movement_statements.sql` | Statement engine (MS §11.8, gap 14): movement-based lines, so a cash flow statement (SCF, direct method) and a statement of changes in equity (SCE) can be configured. Formats stay templates until MIAA's framework is approved (C-07). |
 | V43 | `V43__mfa_recovery_codes.sql` | One-time recovery codes for the authenticator (MS §9.2): shown once when an authenticator is enrolled, stored only as Argon2 hashes. A code is spent (used_at) when it replaces an authenticator code at sign-in, and every unused code is withdrawn (revoked_at) when a new set is issued or an administrator resets the user's MFA. |
+| V44 | `V44__variance_analysis_report.sql` | Variance analysis (budget to date against actual to a chosen period) runs as an ordinary report job. |
+| V45 | `V45__scheduled_report_email.sql` | Report delivery (MS §11.8): a job queued by a schedule records it, and the schedule's owner may be e-mailed when the job finishes or fails. The e-mail carries a link to My reports, never the report itself. |
 
 ## 3. Entity-relationship diagrams by domain
 
@@ -786,6 +788,7 @@ erDiagram
     report_jobs {
         uuid id PK
         uuid requested_by_id FK
+        uuid schedule_id FK
     }
     report_schedules {
         uuid id PK
@@ -800,6 +803,7 @@ erDiagram
         uuid id PK
         uuid created_by_id FK
     }
+    report_schedules |o--o{ report_jobs : "schedule_id"
     report_jobs |o--o{ report_schedules : "last_job_id"
     report_templates ||--o{ report_template_lines : "template_id"
 ```
@@ -2770,8 +2774,9 @@ Created in `V19__financial_reporting.sql`. Background report jobs with their par
 | sha256 | char(64) | Y |  |  |
 | expires_at | timestamptz | Y |  | When expires |
 | content_encryption | varchar(12) | N | 'NONE'::character varying | Encryption scheme of the stored bytes ('NONE' or the AES-256-GCM scheme of V35) (added in V35) |
+| schedule_id | uuid | Y |  | References `report_schedules` (added in V45) |
 
-Rules: `report_jobs_content_encryption_check`: CHECK content_encryption IN (NONE, AES-256-GCM); `report_jobs_format_check`: CHECK format IN (CSV, XLSX, PDF); `report_jobs_report_type_check`: CHECK report_type IN (FINANCIAL_STATEMENT, TRIAL_BALANCE, BUDGET_VS_ACTUAL, AP_AGING, AR_AGING, PPE_SCHEDULE, INVENTORY_STOCK, AUDIT_TRAIL, CASH_DISBURSEMENT_JOURNAL, COLLECTION_SUMMARY, GENERAL_LEDGER, SUBSIDIARY_LEDGER, DAILY_COLLECTION_REPORT, BANK_RECONCILIATION_STATEMENT, WITHHOLDING_SCHEDULE); `report_jobs_status_check`: CHECK status IN (QUEUED, RUNNING, DONE, FAILED, EXPIRED); `ix_report_jobs_queue`: INDEX btree (status, requested_at) WHERE ((status) = 'QUEUED').
+Rules: `report_jobs_content_encryption_check`: CHECK content_encryption IN (NONE, AES-256-GCM); `report_jobs_format_check`: CHECK format IN (CSV, XLSX, PDF); `report_jobs_report_type_check`: CHECK report_type IN (FINANCIAL_STATEMENT, TRIAL_BALANCE, BUDGET_VS_ACTUAL, AP_AGING, AR_AGING, PPE_SCHEDULE, INVENTORY_STOCK, AUDIT_TRAIL, CASH_DISBURSEMENT_JOURNAL, COLLECTION_SUMMARY, GENERAL_LEDGER, SUBSIDIARY_LEDGER, DAILY_COLLECTION_REPORT, BANK_RECONCILIATION_STATEMENT, WITHHOLDING_SCHEDULE, VARIANCE_ANALYSIS); `report_jobs_status_check`: CHECK status IN (QUEUED, RUNNING, DONE, FAILED, EXPIRED); `ix_report_jobs_queue`: INDEX btree (status, requested_at) WHERE ((status) = 'QUEUED').
 
 #### `report_schedules`
 
@@ -2797,6 +2802,7 @@ Created in `V30__report_schedules.sql`. Recurring report runs that queue ordinar
 | last_job_id | uuid | Y |  | References `report_jobs` |
 | created_at | timestamptz | N |  | When the row was created |
 | version | bigint | N | 0 | Optimistic-lock version, incremented on every update |
+| email_when_ready | bool | N | true | (added in V45) |
 
 Rules: `ck_rs_monthly`: CHECK ((((frequency) <> 'MONTHLY') OR (day_of_month IS NOT NULL))); `ck_rs_weekly`: CHECK ((((frequency) <> 'WEEKLY') OR (day_of_week IS NOT NULL))); `report_schedules_day_of_month_check`: CHECK (((day_of_month >= 1) AND (day_of_month <= 28))); `report_schedules_day_of_week_check`: CHECK (((day_of_week >= 1) AND (day_of_week <= 7))); `report_schedules_format_check`: CHECK format IN (CSV, XLSX, PDF); `report_schedules_frequency_check`: CHECK frequency IN (DAILY, WEEKLY, MONTHLY); `report_schedules_run_hour_check`: CHECK (((run_hour >= 0) AND (run_hour <= 23))); `report_schedules_status_check`: CHECK status IN (ACTIVE, SUSPENDED, DELETED); `ix_report_schedules_due`: INDEX btree (next_run_at) WHERE ((status) = 'ACTIVE').
 

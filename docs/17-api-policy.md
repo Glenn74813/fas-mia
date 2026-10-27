@@ -59,6 +59,20 @@ government channels (C-11, C-16) will consume it later. This policy is what thos
   * Results come from the database page by page (LIMIT/OFFSET on a deterministic order ending in the row id),
     never by loading everything and slicing.
   * `totalItems` is exact.
+* Lists that can be sorted take `sort`: a key, or `-key` for descending. Only the keys a list publishes are accepted;
+  any other value is a 400 naming the allowed keys, so the value never reaches SQL. Rows with equal values are
+  ordered by id, so pages neither repeat nor skip rows. Users who never signed in sort last by last sign-in.
+
+  | List | Keys (default first) |
+  |---|---|
+  | `/users` | `username`, `displayName`, `createdAt`, `lastLoginAt` |
+  | `/journal-vouchers` | `-updatedAt`, `accountingDate`, `voucherNumber`, `total` |
+  | `/accounts-payable/invoices` | `-updatedAt`, `invoiceDate`, `dueDate`, `amount` |
+  | `/disbursement-vouchers` | `-updatedAt`, `dvNumber`, `amount` |
+  | `/accounts-receivable/billings` | `-updatedAt`, `documentDate`, `dueDate`, `amount` |
+  | `/receipts` | `-updatedAt`, `receiptDate`, `amount` |
+  | `/customers`, `/suppliers` | `name` (case-insensitive), `code`, `status` |
+
 * Searchable master data takes `q`, a case-insensitive "contains" search in which `%` and `_` are literal. This applies
   to customers, suppliers, inventory items, subsidiary accounts and fixed assets. Forms choose these records through a
   search picker, never a full list.

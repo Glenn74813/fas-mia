@@ -4,7 +4,9 @@ import jakarta.persistence.LockModeType;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
@@ -41,6 +43,20 @@ public interface UserRepository extends JpaRepository<User, UUID>, JpaSpecificat
                     cb.like(root.get("username"), pattern, '\\'),
                     cb.like(cb.lower(root.get("displayName")), pattern, '\\'),
                     cb.like(cb.lower(root.get("email")), pattern, '\\')));
+        }
+        // Users who never signed in go last in either direction. Criteria queries cannot say NULLS LAST, so this sort is
+        // applied here and the page request is passed on unsorted (Spring Data then keeps this order).
+        Sort.Order login = pageable.getSort().getOrderFor("lastLoginAt");
+        if (login != null) {
+            boolean desc = login.isDescending();
+            spec = spec.and((root, query, cb) -> {
+                if (!Long.class.equals(query.getResultType()) && !long.class.equals(query.getResultType())) {
+                    query.orderBy(cb.asc(cb.<Integer>selectCase().when(cb.isNull(root.get("lastLoginAt")), 1).otherwise(0)),
+                            desc ? cb.desc(root.get("lastLoginAt")) : cb.asc(root.get("lastLoginAt")), cb.asc(root.get("id")));
+                }
+                return cb.conjunction();
+            });
+            pageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize());
         }
         return findAll(spec, pageable);
     }

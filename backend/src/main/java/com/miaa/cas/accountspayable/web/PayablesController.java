@@ -79,8 +79,9 @@ public class PayablesController {
     // ---------------------------------------------------------------- suppliers
     @GetMapping("/suppliers")
     @PreAuthorize("hasAnyAuthority('PERM_AP_VIEW', 'PERM_INVENTORY_MANAGE')")
-    public PageResponse<SupplierView> suppliers(@RequestParam(required = false) String q, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "25") int size) {
-        return suppliers.list(q, page, size);
+    public PageResponse<SupplierView> suppliers(@RequestParam(required = false) String q, @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "25") int size, @RequestParam(required = false) String sort) {
+        return suppliers.list(q, page, size, sort);
     }
 
     @GetMapping("/suppliers/{id}")

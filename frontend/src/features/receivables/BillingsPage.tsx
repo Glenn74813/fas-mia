@@ -9,6 +9,7 @@ import { Field } from '../../components/Field';
 import { Money } from '../../components/Money';
 import { PageHeader } from '../../components/PageHeader';
 import { Pagination } from '../../components/Pagination';
+import { SortHeader } from '../../components/SortHeader';
 import { Spinner } from '../../components/Spinner';
 import { StatusBadge } from '../../components/StatusBadge';
 
@@ -20,8 +21,10 @@ export function BillingsPage() {
   const [status, setStatus] = useState('');
   const [q, setQ] = useState('');
   const [page, setPage] = useState(0);
-  const list = useQuery({ queryKey: ['billings', kind, status, q, page], placeholderData: keepPreviousData,
-    queryFn: () => billingApi.list({ kind, status, q, page, size: 25 }) });
+  const [sort, setSort] = useState('');
+  const onSort = (next: string) => { setSort(next); setPage(0); };
+  const list = useQuery({ queryKey: ['billings', kind, status, q, page, sort], placeholderData: keepPreviousData,
+    queryFn: () => billingApi.list({ kind, status, q, page, size: 25, sort: sort || undefined }) });
   const prepare = hasPermission('AR_BILLING_PREPARE');
   return (
     <>
@@ -48,8 +51,8 @@ export function BillingsPage() {
           <table className="min-w-full text-sm">
             <thead className="border-b border-slate-200 bg-slate-50/80 text-left text-[11px] font-semibold uppercase tracking-wider text-slate-500">
               <tr><th className="px-3 py-2">Number</th><th className="px-3 py-2">Kind</th><th className="px-3 py-2">Customer</th>
-                <th className="px-3 py-2">Date</th><th className="px-3 py-2">Due</th><th className="px-3 py-2">Status</th>
-                <th className="px-3 py-2 text-right">Amount</th><th className="px-3 py-2 text-right">Open</th></tr>
+                <SortHeader label="Date" field="documentDate" sort={sort} onSort={onSort} descFirst /><SortHeader label="Due" field="dueDate" sort={sort} onSort={onSort} /><th className="px-3 py-2">Status</th>
+                <SortHeader label="Amount" field="amount" sort={sort} onSort={onSort} descFirst align="right" /><th className="px-3 py-2 text-right">Open</th></tr>
             </thead>
             <tbody>
               {list.data.items.map((b) => (

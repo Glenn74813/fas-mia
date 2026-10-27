@@ -27,6 +27,7 @@ Browser ──HTTPS──► Cloudflare Worker "fas-mia"
 | Machines on your network reaching the backend | `run-backend-demo.sh` binds the API and management ports to `127.0.0.1`; only the tunnel connects |
 | API documentation exposed | Off in demo mode (`CAS_OPENAPI_ENABLED=false`) |
 | Rate limits and audit trail seeing only the tunnel | The backend takes the real visitor address from the Worker, and only when the secret matches |
+| Connections below TLS 1.3 (DICT DC No. 007, s. 2020) | Cloudflare cannot raise the minimum TLS version on a `workers.dev` address, so the Worker checks every request's TLS version and answers older ones with 426 and a short "update your browser" page. With MIAA's own domain, also set **SSL/TLS → Edge Certificates → Minimum TLS Version: TLS 1.3** on the zone. The tunnel to the PC uses TLS 1.3 (QUIC), and the backend starts with `-Djdk.tls.client.protocols=TLSv1.3` |
 | Missing browser security headers | The Worker adds CSP, HSTS, `X-Frame-Options: DENY`, nosniff, a referrer policy and a permissions policy, as NGINX did |
 | Cookies across sites | One origin (the Worker) for pages and API, so the `SameSite=Strict` refresh cookie and CSRF protection work unchanged |
 

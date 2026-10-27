@@ -12,6 +12,8 @@ spring:
       mail.smtp.starttls.enable: true
       mail.smtp.starttls.required: true
       mail.smtp.ssl.checkserveridentity: true
+      # TLS 1.3 minimum (DICT DC No. 007, s. 2020): the same list as cas.tls.protocols, space-separated.
+      mail.smtp.ssl.protocols: ${CAS_TLS_PROTOCOLS:TLSv1.3}
       mail.smtp.connectiontimeout: 10000
       mail.smtp.timeout: 10000
       mail.smtp.writetimeout: 10000
@@ -97,6 +99,11 @@ springdoc:
   default-produces-media-type: application/json
 
 cas:
+  # Outbound TLS (TlsPolicy): TLSv1.3 only. TLSv1.2 may be added ("TLSv1.3 TLSv1.2") only for a listed legacy
+  # integration, with the reason in CAS_TLS_LEGACY_JUSTIFICATION; the prod profile refuses it otherwise.
+  tls:
+    protocols: ${CAS_TLS_PROTOCOLS:TLSv1.3}
+    legacy-justification: ${CAS_TLS_LEGACY_JUSTIFICATION:}
   frontend-base-url: ${CAS_FRONTEND_BASE_URL:http://localhost:5173}
   access:
     # Maker-checker for roles carrying financial permissions (C-19). Cannot be switched off in production.

@@ -90,8 +90,9 @@ public class ReceivablesController {
     // ---------------------------------------------------------------- customers
     @GetMapping("/customers")
     @PreAuthorize("hasAnyAuthority('PERM_AR_VIEW', 'PERM_COLLECTION_RECORD')")
-    public PageResponse<CustomerView> customers(@RequestParam(required = false) String q, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "25") int size) {
-        return customers.list(q, page, size);
+    public PageResponse<CustomerView> customers(@RequestParam(required = false) String q, @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "25") int size, @RequestParam(required = false) String sort) {
+        return customers.list(q, page, size, sort);
     }
 
     @GetMapping("/customers/{id}")

@@ -33,3 +33,17 @@ export function formatPeso(amount: string | null | undefined): string {
 export function humanize(code: string): string {
   return code.toLowerCase().split('_').map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
 }
+
+const MANILA_DATE = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Manila', year: 'numeric', month: '2-digit', day: '2-digit' });
+
+/** The instant at which access chosen "until" a date ends: 23:59:59 that day, Philippine time. */
+export function endOfManilaDay(date: string): string {
+  return new Date(`${date}T23:59:59+08:00`).toISOString();
+}
+
+/** The Philippine calendar date (YYYY-MM-DD) of an instant, for date inputs; '' when there is none. */
+export function manilaDate(iso: string | null | undefined): string {
+  if (!iso) return '';
+  const d = new Date(iso);
+  return Number.isNaN(d.getTime()) ? '' : MANILA_DATE.format(d);
+}

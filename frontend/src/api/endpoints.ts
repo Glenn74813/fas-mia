@@ -206,14 +206,14 @@ export const recurringApi = {
 type Act = 'submit' | 'approve' | 'return' | 'reject' | 'cancel' | 'post';
 
 export const supplierApi = {
-  list: (q?: string, page = 0, size = 25) => api.get<Page<Supplier>>(`/suppliers${qs({ q: q || undefined, page, size })}`),
+  list: (q?: string, page = 0, size = 25, sort?: string) => api.get<Page<Supplier>>(`/suppliers${qs({ q: q || undefined, page, size, sort })}`),
   get: (id: string) => api.get<Supplier>(`/suppliers/${id}`),
   create: (body: { code: string; name: string; tin: string | null; address: string | null; vatRegistered: boolean;
     defaultEwtCodeId: string | null }) => api.post<Supplier>('/suppliers', body),
 };
 
 export const invoiceApi = {
-  list: (q: { status?: string; q?: string; supplierId?: string; page: number; size: number }) =>
+  list: (q: { status?: string; q?: string; supplierId?: string; page: number; size: number; sort?: string }) =>
     api.get<Page<InvoiceSummary>>(`/accounts-payable/invoices${qs({ ...q })}`),
   get: (id: string) => api.get<InvoiceView>(`/accounts-payable/invoices/${id}`),
   create: (body: InvoiceInput) => api.post<InvoiceView>('/accounts-payable/invoices', body),
@@ -225,7 +225,7 @@ export const invoiceApi = {
 };
 
 export const dvApi = {
-  list: (q: { status?: string; page: number; size: number }) => api.get<Page<DvSummary>>(`/disbursement-vouchers${qs({ ...q })}`),
+  list: (q: { status?: string; page: number; size: number; sort?: string }) => api.get<Page<DvSummary>>(`/disbursement-vouchers${qs({ ...q })}`),
   get: (id: string) => api.get<DvView>(`/disbursement-vouchers/${id}`),
   create: (body: { supplierId: string; particulars: string; allocations: { invoiceId: string; amount: string }[] }) =>
     api.post<DvView>('/disbursement-vouchers', body),
@@ -282,7 +282,7 @@ export const settingsApi = {
 // ---------------------------------------------------------------- Phase 3b
 
 export const customerApi = {
-  list: (q?: string, page = 0, size = 25) => api.get<Page<Customer>>(`/customers${qs({ q: q || undefined, page, size })}`),
+  list: (q?: string, page = 0, size = 25, sort?: string) => api.get<Page<Customer>>(`/customers${qs({ q: q || undefined, page, size, sort })}`),
   get: (id: string) => api.get<Customer>(`/customers/${id}`),
   create: (body: CustomerInput) => api.post<Customer>('/customers', body),
   update: (id: string, body: Omit<CustomerInput, 'code'> & { version: number; status: string }) =>
@@ -300,7 +300,7 @@ export const customerApi = {
 };
 
 export const billingApi = {
-  list: (q: { kind?: string; status?: string; customerId?: string; q?: string; page: number; size: number }) =>
+  list: (q: { kind?: string; status?: string; customerId?: string; q?: string; page: number; size: number; sort?: string }) =>
     api.get<Page<BillingSummary>>(`/accounts-receivable/billings${qs({ ...q })}`),
   get: (id: string) => api.get<BillingView>(`/accounts-receivable/billings/${id}`),
   create: (body: BillingInput) => api.post<BillingView>('/accounts-receivable/billings', body),
@@ -314,7 +314,7 @@ export const billingApi = {
 };
 
 export const receiptApi = {
-  list: (q: { status?: string; customerId?: string; page: number; size: number }) =>
+  list: (q: { status?: string; customerId?: string; page: number; size: number; sort?: string }) =>
     api.get<Page<ReceiptSummary>>(`/receipts${qs({ ...q })}`),
   get: (id: string) => api.get<ReceiptView>(`/receipts/${id}`),
   record: (body: ReceiptInput, idempotencyKey: string) => api.post<ReceiptView>('/receipts', body, { headers: { 'Idempotency-Key': idempotencyKey } }),
@@ -462,7 +462,9 @@ export const reportingApi = {
   download: (job: ReportJob) => downloadFile(`/report-jobs/${job.id}/file`, job.fileName ?? 'report'),
   schedules: () => api.get<ReportSchedule[]>('/report-schedules'),
   createSchedule: (body: { name: string; reportType: string; format: string; parameters: Record<string, string>; frequency: string;
-    runHour: number; dayOfWeek?: number; dayOfMonth?: number }) => api.post<ReportSchedule>('/report-schedules', body),
+    runHour: number; dayOfWeek?: number; dayOfMonth?: number; emailWhenReady?: boolean }) => api.post<ReportSchedule>('/report-schedules', body),
+  setScheduleEmail: (s: ReportSchedule, emailWhenReady: boolean) =>
+    api.put<ReportSchedule>(`/report-schedules/${s.id}/email`, { emailWhenReady, version: s.version }),
   deleteSchedule: (id: string) => api.delete<ReportSchedule>(`/report-schedules/${id}`),
 };
 

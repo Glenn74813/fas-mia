@@ -117,3 +117,40 @@ test('administrator onboards a user who enrols MFA and sets a password', async (
   await page.getByRole('button', { name: 'Continue' }).click();
   await expect(page.getByRole('heading', { name: 'Welcome, E2E Accountant' })).toBeVisible();
 });
+
+test('an external auditor is created with an access expiry, which the administrator can extend', async ({ page }) => {
+  const username = `e2e.coa.${Date.now()}`;
+  const day = (offset: number) => new Date(Date.now() + offset * 86_400_000).toISOString().slice(0, 10);
+
+  await waitForFreshStep();
+  await signIn(page, admin.username, admin.password);
+  const mfa = page.getByRole('heading', { name: 'Two-step verification' });
+  const welcome = page.getByRole('heading', { name: /Welcome/ });
+  await expect(mfa.or(welcome)).toBeVisible();
+  if (await mfa.isVisible()) {
+    await page.getByLabel('6-digit code').fill(totp(admin.totpSecret));
+    await page.getByRole('button', { name: 'Verify' }).click();
+  }
+  await expect(welcome).toBeVisible();
+
+  await page.goto('/admin/users/new');
+  await page.getByLabel('Username').fill(username);
+  await page.getByLabel('E-mail').fill(`${username}@auditor.test`);
+  await page.getByLabel('Display name').fill('E2E COA Auditor');
+  await page.getByLabel('User type').selectOption('EXTERNAL_AUDITOR');
+  await expect(page.getByLabel('Access expires')).toHaveAttribute('required', '');
+  await page.getByLabel('Access expires').fill(day(30));
+  await page.getByLabel('Temporary password').fill('Temp-E2E-Passw0rd!');
+  await page.getByRole('checkbox', { name: 'External Auditor' }).check();
+  await page.getByRole('button', { name: 'Create user' }).click();
+  await expect(page.getByRole('heading', { name: 'E2E COA Auditor' })).toBeVisible();
+  await expect(page.getByText('23:59:59').first()).toBeVisible();
+
+  // Extending the expiry from the Profile section.
+  const profile = page.getByRole('form', { name: 'Profile' });
+  await expect(profile.getByLabel('Access expires')).toHaveValue(day(30));
+  await profile.getByLabel('Access expires').fill(day(60));
+  await profile.getByRole('button', { name: 'Save profile' }).click();
+  await expect(page.getByRole('status')).toContainText('Profile saved.');
+  await expect(profile.getByLabel('Access expires')).toHaveValue(day(60));
+});

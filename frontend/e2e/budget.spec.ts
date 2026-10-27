@@ -99,4 +99,23 @@ test('a budget is validated, approved by a second person, and realignments may o
   await expect(fits.getByText('APPROVED')).toBeVisible();
   await expect(page.getByRole('row', { name: /PLC-5201.*45,000\.00/ }).first()).toBeVisible();
   await expect(page.getByRole('row', { name: /PLC-5202.*35,000\.00/ }).first()).toBeVisible();
+
+  // Variance analysis of the same budget: nothing is spent yet in this future year, so the full budget to date is favourable.
+  await nav(page, 'My reports');
+  const panel = page.locator('section').filter({ has: page.getByRole('heading', { name: 'Request a report' }) });
+  await panel.getByLabel('Report').selectOption({ label: 'Variance analysis' });
+  await panel.getByLabel('Fiscal year').selectOption({ label: String(fy.fiscalYear) });
+  await panel.getByLabel('Through period').selectOption('6');
+  await panel.getByLabel('Format').selectOption('CSV');
+  await panel.getByRole('button', { name: 'Queue report' }).click();
+  await expect(page.getByRole('status')).toContainText('Queued');
+  const row = page.getByRole('row').filter({ hasText: 'Variance analysis' }).first();
+  await expect(row).toContainText('DONE', { timeout: 30_000 });
+  const download = page.waitForEvent('download');
+  await row.getByRole('button', { name: 'Download' }).click();
+  const file = await download;
+  expect(file.suggestedFilename()).toBe(`variance_analysis_${fy.fiscalYear}_p06.csv`);
+  const text = (await import('node:fs')).readFileSync((await file.path())!, 'utf8');
+  expect(text).toContain('Variance analysis: budget against actual');
+  expect(text).toMatch(/PLC-5201[^\n]*,45000\.00,22500\.00,0\.00,22500\.00,100\.0,45000\.00,"Favourable"/);
 });

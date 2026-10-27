@@ -47,9 +47,16 @@ public class SupplierService {
 
     @Transactional(readOnly = true)
     public PageResponse<SupplierView> list(String q, int page, int size) {
+        return list(q, page, size, null);
+    }
+
+    private static final Map<String, String> SORTS = Map.of("code", "code", "name", "lower(name)", "status", "status");
+
+    @Transactional(readOnly = true)
+    public PageResponse<SupplierView> list(String q, int page, int size, String sort) {
         String like = JdbcPaging.like(q);
         return JdbcPaging.ids(jdbc, "SELECT id FROM suppliers WHERE (?::text IS NULL OR lower(code || ' ' || name || ' ' || coalesce(tin, '')) "
-                + "LIKE ?::text) ORDER BY name, id", page, size, like, like).map(id -> view(suppliers.findById(id).orElseThrow()));
+                + "LIKE ?::text) ORDER BY " + JdbcPaging.orderBy(sort, SORTS, "name"), page, size, like, like).map(id -> view(suppliers.findById(id).orElseThrow()));
     }
 
     @Transactional(readOnly = true)

@@ -106,6 +106,7 @@ public class UserAdminService {
             throw new ApiException(ErrorCode.DUPLICATE_RESOURCE, "E-mail address is already in use.");
         }
         passwordPolicy.enforce(req.temporaryPassword(), req.username(), req.email());
+        checkExpiry(type, null, req.accessExpiresAt(), now);
         List<Role> roleList = resolveRoles(req.roleCodes());
         List<SodPolicy.Conflict> conflicts = checkSod(permissionsOf(roleList));
         Set<String> requested = codes(roleList);
@@ -123,12 +124,28 @@ public class UserAdminService {
         return new RoleAssignmentResult(detail(user), conflicts, pending);
     }
 
+    /**
+     * Time-limited access (MS §9.3): an external auditor always has an expiry, and a new or changed expiry lies in the
+     * future (to end access now, deactivate the user). An unchanged past expiry may stay, so an expired account's other
+     * details can still be corrected.
+     */
+    private static void checkExpiry(UserType type, Instant current, Instant requested, Instant now) {
+        if (type == UserType.EXTERNAL_AUDITOR && requested == null) {
+            throw new ApiException(ErrorCode.VALIDATION_FAILED, "An external auditor's access must have an expiry date.");
+        }
+        if (requested != null && !requested.equals(current) && !requested.isAfter(now)) {
+            throw new ApiException(ErrorCode.VALIDATION_FAILED,
+                    "The access expiry must be in the future. To end access now, deactivate the user.");
+        }
+    }
+
     @Transactional
     public UserDetail update(UUID id, UpdateUserRequest req) {
         User user = loadVersioned(id, req.version());
         if (!user.getEmail().equalsIgnoreCase(req.email()) && users.existsByEmailIgnoreCase(req.email())) {
             throw new ApiException(ErrorCode.DUPLICATE_RESOURCE, "E-mail address is already in use.");
         }
+        checkExpiry(user.getUserType(), user.getAccessExpiresAt(), req.accessExpiresAt(), Instant.now(clock));
         Map<String, Object> before = Map.of("email", user.getEmail(), "displayName", user.getDisplayName(),
                 "accessExpiresAt", String.valueOf(user.getAccessExpiresAt()));
         user.updateProfile(req.email().trim(), req.displayName().trim(), req.accessExpiresAt(), Instant.now(clock),

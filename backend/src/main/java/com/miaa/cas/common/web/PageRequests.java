@@ -31,6 +31,9 @@ public final class PageRequests {
             throw new ApiException(ErrorCode.VALIDATION_FAILED, "Unsupported sort key '" + key + "'. Allowed: "
                     + String.join(", ", allowedSorts.keySet()));
         }
-        return PageRequest.of(page, size, Sort.by(direction, property));
+        // The id breaks ties, so rows with equal sort values keep their order from page to page. (Null placement follows
+        // PostgreSQL: last ascending, first descending; criteria queries cannot override it.)
+        Sort order = Sort.by(direction, property);
+        return PageRequest.of(page, size, "id".equals(property) ? order : order.and(Sort.by(Sort.Direction.ASC, "id")));
     }
 }

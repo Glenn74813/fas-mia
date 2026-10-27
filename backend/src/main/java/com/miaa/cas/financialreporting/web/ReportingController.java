@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -127,6 +128,13 @@ public class ReportingController {
     public ReportScheduleService.ScheduleView createSchedule(
             @Valid @RequestBody ReportScheduleService.ScheduleRequest request) {
         return schedules.create(request);
+    }
+
+    @PutMapping("/report-schedules/{id}/email")
+    @PreAuthorize("isAuthenticated()")
+    public ReportScheduleService.ScheduleView setScheduleEmail(@PathVariable UUID id,
+            @Valid @RequestBody ReportScheduleService.EmailSettingRequest request) {
+        return schedules.setEmail(id, request);
     }
 
     @DeleteMapping("/report-schedules/{id}")

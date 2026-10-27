@@ -7,20 +7,17 @@ import { Badge } from '../../components/Badge';
 import { ErrorAlert } from '../../components/ErrorAlert';
 import { PageHeader } from '../../components/PageHeader';
 import { Pagination } from '../../components/Pagination';
+import { SortHeader } from '../../components/SortHeader';
 import { Spinner } from '../../components/Spinner';
 import { formatDateTime } from '../../utils/format';
 
-const SORTS = [
-  { value: 'username', label: 'Username (A–Z)' },
-  { value: '-lastLoginAt', label: 'Last sign-in (newest)' },
-  { value: '-createdAt', label: 'Created (newest)' },
-];
 
 export function UsersPage() {
   const { hasPermission } = useAuth();
   const [q, setQ] = useState('');
   const [status, setStatus] = useState('');
   const [sort, setSort] = useState('username');
+  const onSort = (next: string) => { setSort(next); setPage(0); };
   const [page, setPage] = useState(0);
   const query = useQuery({
     queryKey: ['users', q, status, sort, page],
@@ -42,18 +39,14 @@ export function UsersPage() {
           className="rounded-lg border border-slate-300 px-3 py-2 shadow-xs text-sm">
           <option value="">All statuses</option><option value="ACTIVE">Active</option><option value="INACTIVE">Inactive</option>
         </select>
-        <select aria-label="Sort" value={sort} onChange={(e) => setSort(e.target.value)}
-          className="rounded-lg border border-slate-300 px-3 py-2 shadow-xs text-sm">
-          {SORTS.map((s) => <option key={s.value} value={s.value}>{s.label}</option>)}
-        </select>
       </div>
       <ErrorAlert error={query.error} />
       {query.isPending ? <Spinner /> : query.data && (
         <div className="overflow-x-auto rounded-xl border border-slate-200/80 bg-white shadow-xs">
           <table className="min-w-full text-left text-sm">
             <thead className="border-b border-slate-200 bg-slate-50/80 text-[11px] font-semibold uppercase tracking-wider text-slate-500">
-              <tr><th className="px-4 py-2">Username</th><th className="px-4 py-2">Name</th><th className="px-4 py-2">Type</th>
-                <th className="px-4 py-2">Status</th><th className="px-4 py-2">Last sign-in</th></tr>
+              <tr><SortHeader label="Username" field="username" sort={sort} onSort={onSort} /><SortHeader label="Name" field="displayName" sort={sort} onSort={onSort} /><th className="px-4 py-2">Type</th>
+                <th className="px-4 py-2">Status</th><SortHeader label="Last sign-in" field="lastLoginAt" sort={sort} onSort={onSort} descFirst /></tr>
             </thead>
             <tbody>
               {query.data.items.map((u) => (

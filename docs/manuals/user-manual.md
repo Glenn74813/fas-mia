@@ -85,6 +85,8 @@ Passwords:
 * **Attachments.** PDF, PNG, JPEG, CSV, XLSX and DOCX up to 10 MB. Files are checked against their type; HTML or
   disguised files are refused. Until a scanning engine is chosen (C-25), files show **NOT SCANNED**.
 * **Amounts** are in Philippine pesos with two decimals.
+* **Sorting lists.** On the main lists, a column header with arrows sorts the list by that column: click once
+  (dates and amounts start with the newest or largest), click again to reverse. The arrow shows the current order.
 
 ## 2. Journal vouchers
 
@@ -365,10 +367,25 @@ pending (C-10).
   * the bank reconciliation statement;
   * the expanded withholding schedule;
   * PPE schedule, inventory valuation, budget versus actual;
+  * the variance analysis (see below);
   * the audit trail export (auditors).
 
+  **Variance analysis** (`BUDGET_VIEW`): choose the fiscal year, **Through period**, optionally a cost centre, and a
+  **Threshold %** (default 10). For each budget allocation it shows the annual allotment, the budget to date (the
+  allotment spread evenly over 12 periods; all of it through period 13), the posted actual to date, the variance,
+  its percentage, the allotment left and an assessment:
+  * **Favourable**: spending below budget (or revenue above it) by at least the threshold;
+  * **Unfavourable**: spending above budget (or revenue below it) by at least the threshold;
+  * **Within threshold**: closer to budget than the threshold;
+  * **No allocation**: spending on a budget-controlled account that no allocation covers.
+
+  Rows are grouped by account type with subtotals. The layout is proposed until MIAA confirms its budget
+  definitions (C-10). It is not available as a scheduled report, because the period is chosen when you queue it.
+
   **Scheduled reports** repeat a report on a schedule (for example the previous month, month to date). Each
-  report needs its own view permission.
+  report needs its own view permission. With **E-mail me when it is ready** (on by default) CAS e-mails you when
+  each run finishes or fails, with a link to **My reports**; the report itself is never attached, so you sign in to
+  download it. Switch the e-mail on or off for a schedule in the **E-mail when ready** column.
 
 ## 11. Tickets (support)
 

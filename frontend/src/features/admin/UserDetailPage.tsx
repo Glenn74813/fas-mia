@@ -11,7 +11,7 @@ import { ErrorAlert } from '../../components/ErrorAlert';
 import { Field } from '../../components/Field';
 import { PageHeader } from '../../components/PageHeader';
 import { Spinner } from '../../components/Spinner';
-import { formatDateTime, humanize } from '../../utils/format';
+import { endOfManilaDay, formatDateTime, humanize, manilaDate } from '../../utils/format';
 import { OfficeAssignmentsPanel } from './OrganizationPage';
 import { RolePicker } from './RolePicker';
 
@@ -125,6 +125,8 @@ export function UserDetailPage() {
           </section>
         )}
 
+        {canAdmin && <ProfileEditor key={u.version} user={u} onSaved={(saved) => apply(saved, 'Profile saved.')} />}
+
         {canAdmin && !isSelf && (
           <section className="max-w-md space-y-3 rounded-xl border border-slate-200/80 bg-white shadow-xs p-5" aria-label="Temporary password">
             <h2 className="font-semibold">Issue temporary password</h2>
@@ -155,5 +157,37 @@ export function UserDetailPage() {
         <OfficeAssignmentsPanel userId={u.id} internal={u.userType === 'INTERNAL'} />
       </div>
     </>
+  );
+}
+
+/** E-mail, display name and access expiry. External auditors always keep an expiry; a changed one must lie ahead. */
+function ProfileEditor({ user, onSaved }: { user: UserDetail; onSaved: (u: UserDetail) => void }) {
+  const initial = { email: user.email, displayName: user.displayName, accessUntil: manilaDate(user.accessExpiresAt) };
+  const [form, setForm] = useState(initial);
+  const [error, setError] = useState<unknown>(null);
+  const auditor = user.userType === 'EXTERNAL_AUDITOR';
+  const unchanged = form.email === initial.email && form.displayName === initial.displayName && form.accessUntil === initial.accessUntil;
+  const save = useMutation({
+    // An untouched expiry is sent back exactly as stored, so editing an expired account does not move it.
+    mutationFn: () => userApi.update(user.id, { version: user.version, email: form.email.trim(), displayName: form.displayName.trim(),
+      accessExpiresAt: form.accessUntil === initial.accessUntil ? user.accessExpiresAt : form.accessUntil ? endOfManilaDay(form.accessUntil) : null }),
+    onSuccess: (saved) => { setError(null); onSaved(saved); },
+    onError: setError,
+  });
+  return (
+    <form aria-label="Profile" className="max-w-2xl space-y-3 rounded-xl border border-slate-200/80 bg-white shadow-xs p-5"
+      onSubmit={(e) => { e.preventDefault(); save.mutate(); }}>
+      <h2 className="font-semibold">Profile</h2>
+      <ErrorAlert error={error} />
+      <div className="grid gap-4 sm:grid-cols-3">
+        <Field label="E-mail" type="email" required value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
+        <Field label="Display name" required value={form.displayName} onChange={(e) => setForm({ ...form, displayName: e.target.value })} />
+        <Field label="Access expires" type="date" required={auditor} value={form.accessUntil}
+          onChange={(e) => setForm({ ...form, accessUntil: e.target.value })}
+          hint={auditor ? 'Required for external auditors.' : 'Leave empty for no expiry.'} />
+      </div>
+      <p className="text-xs text-slate-500">Access ends at 23:59 on that day (Philippine time). To end access now, deactivate the user.</p>
+      <Button type="submit" variant="secondary" busy={save.isPending} disabled={unchanged}>Save profile</Button>
+    </form>
   );
 }

@@ -1136,7 +1136,7 @@ export interface Dashboard {
 export interface ReportSchedule {
   id: string; name: string; reportType: string; format: string; parameters: Record<string, string>; frequency: string; runHour: number;
   dayOfWeek: number | null; dayOfMonth: number | null; status: string; statusReason: string | null; nextRunAt: string; lastRunAt: string | null;
-  lastJobId: string | null; version: number;
+  lastJobId: string | null; emailWhenReady: boolean; version: number;
 }
 
 export interface PortalInquiry {

@@ -6,15 +6,20 @@ import { Button } from '../../components/Button';
 import { ErrorAlert } from '../../components/ErrorAlert';
 import { Field } from '../../components/Field';
 import { PageHeader } from '../../components/PageHeader';
+import { endOfManilaDay } from '../../utils/format';
 import { RolePicker } from './RolePicker';
 
 export function CreateUserPage() {
   const navigate = useNavigate();
   const qc = useQueryClient();
-  const [form, setForm] = useState({ username: '', email: '', displayName: '', userType: 'INTERNAL', temporaryPassword: '' });
+  const [form, setForm] = useState({ username: '', email: '', displayName: '', userType: 'INTERNAL', temporaryPassword: '', accessUntil: '' });
+  const auditor = form.userType === 'EXTERNAL_AUDITOR';
   const [roleCodes, setRoleCodes] = useState<string[]>([]);
   const create = useMutation({
-    mutationFn: () => userApi.create({ ...form, roleCodes }),
+    mutationFn: () => {
+      const { accessUntil, ...rest } = form;
+      return userApi.create({ ...rest, roleCodes, accessExpiresAt: accessUntil ? endOfManilaDay(accessUntil) : null });
+    },
     onSuccess: (res) => {
       qc.invalidateQueries({ queryKey: ['users'] });
       navigate(`/admin/users/${res.user.id}`, { state: { warnings: res.warnings, pendingGrant: res.pendingGrant } });
@@ -46,6 +51,10 @@ export function CreateUserPage() {
               <option value="CONCESSIONAIRE">Concessionaire</option>
             </select>
           </div>
+          <Field label="Access expires" type="date" required={auditor} value={form.accessUntil} onChange={set('accessUntil')}
+            min={new Date().toISOString().slice(0, 10)}
+            hint={auditor ? 'Required for external auditors: access ends at 23:59 that day (Philippine time).'
+              : 'Optional, for temporary staff: access ends at 23:59 that day (Philippine time).'} />
         </div>
         <Field label="Temporary password" type="password" autoComplete="new-password" required value={form.temporaryPassword}
           onChange={set('temporaryPassword')} hint="Give it to the user through a separate channel; they must change it at first sign-in." />

@@ -54,12 +54,16 @@ public class ReportScheduleService {
     public record ScheduleRequest(@NotBlank @Size(max = 200) String name, @NotBlank String reportType,
             @NotNull @Pattern(regexp = "CSV|XLSX|PDF") String format, @NotNull Map<String, String> parameters,
             @NotNull @Pattern(regexp = "DAILY|WEEKLY|MONTHLY") String frequency, @NotNull @Min(0) @Max(23) Integer runHour,
-            @Min(1) @Max(7) Integer dayOfWeek, @Min(1) @Max(28) Integer dayOfMonth) {
+            @Min(1) @Max(7) Integer dayOfWeek, @Min(1) @Max(28) Integer dayOfMonth, Boolean emailWhenReady) {
+    }
+
+    /** Turns the e-mail sent when a scheduled run finishes on or off. */
+    public record EmailSettingRequest(@NotNull Boolean emailWhenReady, @NotNull Long version) {
     }
 
     public record ScheduleView(UUID id, String name, String reportType, String format, Map<String, String> parameters, String frequency,
             int runHour, Integer dayOfWeek, Integer dayOfMonth, String status, String statusReason, Instant nextRunAt, Instant lastRunAt,
-            UUID lastJobId, long version) {
+            UUID lastJobId, boolean emailWhenReady, long version) {
     }
 
     private final ReportJobService jobs;
@@ -102,11 +106,24 @@ public class ReportScheduleService {
         Instant now = Instant.now(clock);
         jdbc.update("""
                 INSERT INTO report_schedules (id, owner_id, owner, name, report_type, format, parameters, frequency, run_hour, day_of_week,
-                    day_of_month, status, next_run_at, created_at) VALUES (?, ?, ?, ?, ?, ?, ?::jsonb, ?, ?, ?, ?, 'ACTIVE', ?, ?)""",
+                    day_of_month, status, next_run_at, created_at, email_when_ready)
+                VALUES (?, ?, ?, ?, ?, ?, ?::jsonb, ?, ?, ?, ?, 'ACTIVE', ?, ?, ?)""",
                 id, CurrentActor.userId(), CurrentActor.username(), req.name().trim(), req.reportType(), req.format(), write(req.parameters()),
                 req.frequency(), req.runHour(), req.dayOfWeek(), req.dayOfMonth(),
-                Timestamp.from(nextRun(req.frequency(), req.runHour(), req.dayOfWeek(), req.dayOfMonth(), now)), Timestamp.from(now));
+                Timestamp.from(nextRun(req.frequency(), req.runHour(), req.dayOfWeek(), req.dayOfMonth(), now)), Timestamp.from(now),
+                !Boolean.FALSE.equals(req.emailWhenReady()));
         audit.record("REPORT_SCHEDULE_CREATED", "REPORT_SCHEDULE", id, Map.of("type", req.reportType(), "frequency", req.frequency()));
+        return view(id);
+    }
+
+    @Transactional
+    public ScheduleView setEmail(UUID id, EmailSettingRequest req) {
+        owned(id);
+        if (jdbc.update("UPDATE report_schedules SET email_when_ready = ?, version = version + 1 WHERE id = ? AND version = ?",
+                req.emailWhenReady(), id, req.version()) == 0) {
+            throw new ApiException(ErrorCode.CONCURRENT_MODIFICATION, "The schedule was changed by someone else. Reload and try again.");
+        }
+        audit.record("REPORT_SCHEDULE_EMAIL_SET", "REPORT_SCHEDULE", id, Map.of("emailWhenReady", req.emailWhenReady()));
         return view(id);
     }
 
@@ -163,6 +180,7 @@ public class ReportScheduleService {
             return;
         }
         UUID job = jobs.enqueue(type, (String) s.get("format"), params, owner, (String) s.get("owner"));
+        jdbc.update("UPDATE report_jobs SET schedule_id = ? WHERE id = ?", id, job);
         jdbc.update("UPDATE report_schedules SET last_run_at = ?, last_job_id = ?, next_run_at = ?, version = version + 1 WHERE id = ?",
                 Timestamp.from(now), job, Timestamp.from(next), id);
         audit.record(actor, "REPORT_REQUESTED", "REPORT_JOB", job, Map.of("type", type, "format", s.get("format"), "schedule", id.toString()));
@@ -266,7 +284,7 @@ public class ReportScheduleService {
                 (String) r.get("frequency"), ((Number) r.get("run_hour")).intValue(), intOrNull(r.get("day_of_week")),
                 intOrNull(r.get("day_of_month")), (String) r.get("status"), (String) r.get("status_reason"),
                 ((Timestamp) r.get("next_run_at")).toInstant(), last == null ? null : last.toInstant(), (UUID) r.get("last_job_id"),
-                ((Number) r.get("version")).longValue());
+                Boolean.TRUE.equals(r.get("email_when_ready")), ((Number) r.get("version")).longValue());
     }
 
     private static Integer intOrNull(Object o) {

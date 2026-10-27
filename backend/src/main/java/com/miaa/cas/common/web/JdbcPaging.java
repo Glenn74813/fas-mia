@@ -47,4 +47,20 @@ public final class JdbcPaging {
         }
         return "%" + q.trim().toLowerCase().replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_") + "%";
     }
+
+    /**
+     * An ORDER BY clause for a public sort key ({@code name}, or {@code -name} for descending) from a whitelist of SQL
+     * expressions, with the id as tie-breaker. Unknown keys are refused, so the request never reaches the SQL text.
+     */
+    public static String orderBy(String sort, java.util.Map<String, String> columns, String defaultSort) {
+        String requested = sort == null || sort.isBlank() ? defaultSort : sort.trim();
+        boolean desc = requested.startsWith("-");
+        String key = desc ? requested.substring(1) : requested;
+        String column = columns.get(key);
+        if (column == null) {
+            throw new ApiException(ErrorCode.VALIDATION_FAILED, "Unsupported sort key '" + key + "'. Allowed: "
+                    + String.join(", ", new java.util.TreeSet<>(columns.keySet())));
+        }
+        return column + (desc ? " DESC" : " ASC") + " NULLS LAST, id";
+    }
 }

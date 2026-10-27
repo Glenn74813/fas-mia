@@ -7,6 +7,7 @@ import { ErrorAlert } from '../../components/ErrorAlert';
 import { Money } from '../../components/Money';
 import { PageHeader } from '../../components/PageHeader';
 import { Pagination } from '../../components/Pagination';
+import { SortHeader } from '../../components/SortHeader';
 import { Spinner } from '../../components/Spinner';
 import { StatusBadge } from '../../components/StatusBadge';
 
@@ -15,7 +16,10 @@ export function InvoicesPage() {
   const [status, setStatus] = useState('');
   const [q, setQ] = useState('');
   const [page, setPage] = useState(0);
-  const list = useQuery({ queryKey: ['invoices', status, q, page], queryFn: () => invoiceApi.list({ status, q, page, size: 25 }),
+  const [sort, setSort] = useState('');
+  const onSort = (next: string) => { setSort(next); setPage(0); };
+  const list = useQuery({ queryKey: ['invoices', status, q, page, sort],
+    queryFn: () => invoiceApi.list({ status, q, page, size: 25, sort: sort || undefined }),
     placeholderData: keepPreviousData });
   return (
     <>
@@ -36,8 +40,8 @@ export function InvoicesPage() {
         <div className="overflow-x-auto rounded-xl border border-slate-200/80 bg-white shadow-xs">
           <table className="min-w-full text-sm">
             <thead className="border-b border-slate-200 bg-slate-50/80 text-left text-[11px] font-semibold uppercase tracking-wider text-slate-500">
-              <tr><th className="px-3 py-2">Invoice</th><th className="px-3 py-2">Supplier</th><th className="px-3 py-2">Date</th>
-                <th className="px-3 py-2">Due</th><th className="px-3 py-2">Status</th><th className="px-3 py-2 text-right">Payable</th>
+              <tr><th className="px-3 py-2">Invoice</th><th className="px-3 py-2">Supplier</th><SortHeader label="Date" field="invoiceDate" sort={sort} onSort={onSort} descFirst />
+                <SortHeader label="Due" field="dueDate" sort={sort} onSort={onSort} /><th className="px-3 py-2">Status</th><SortHeader label="Payable" field="amount" sort={sort} onSort={onSort} descFirst align="right" />
                 <th className="px-3 py-2 text-right">Open</th></tr>
             </thead>
             <tbody>

@@ -17,9 +17,11 @@ export function VoucherListPage() {
   const [q, setQ] = useState('');
   const [mine, setMine] = useState(false);
   const [page, setPage] = useState(0);
+  const [sort, setSort] = useState('');
+  const onSort = (next: string) => { setSort(next); setPage(0); };
   const list = useQuery({
-    queryKey: ['vouchers', status, q, mine, page],
-    queryFn: () => voucherApi.list({ status, q, mine, page, size: 25 }),
+    queryKey: ['vouchers', status, q, mine, page, sort],
+    queryFn: () => voucherApi.list({ status, q, mine, page, size: 25, sort: sort || undefined }),
     placeholderData: keepPreviousData,
   });
   return (
@@ -42,7 +44,7 @@ export function VoucherListPage() {
         )}
       </div>
       <ErrorAlert error={list.error} />
-      {list.isPending ? <Spinner /> : list.data && <VoucherTable vouchers={list.data.items} empty="No vouchers match." />}
+      {list.isPending ? <Spinner /> : list.data && <VoucherTable vouchers={list.data.items} empty="No vouchers match." sort={sort} onSort={onSort} />}
       {list.data && <Pagination page={list.data.page} totalPages={list.data.totalPages} totalItems={list.data.totalItems} onPage={setPage} />}
     </>
   );

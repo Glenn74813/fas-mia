@@ -9,6 +9,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.miaa.cas.support.AbstractIntegrationTest;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
@@ -38,6 +41,50 @@ class UserAdminIT extends AbstractIntegrationTest {
         assertThat(created.at("/user/roles/0").asText()).isEqualTo("ACCOUNTANT");
         assertThat(jdbc.queryForObject("SELECT count(*) FROM audit_events WHERE action = 'USER_CREATED' AND resource_id = ?",
                 Long.class, created.at("/user/id").asText())).isEqualTo(1);
+    }
+
+    @Test
+    void externalAuditorAccessIsTimeLimited() throws Exception {
+        String username = unique("extaud");
+        Map<String, Object> req = new HashMap<>(Map.of("username", username, "email", username + "@auditor.test", "displayName", "COA Auditor",
+                "userType", "EXTERNAL_AUDITOR", "temporaryPassword", "Initial-Passw0rd-1", "roleCodes", List.of("EXTERNAL_AUDITOR")));
+        createUser(req).andExpect(status().isBadRequest()).andExpect(jsonPath("$.detail").value(org.hamcrest.Matchers.containsString("expiry")));
+        req.put("accessExpiresAt", Instant.now().minus(1, ChronoUnit.DAYS).toString());
+        createUser(req).andExpect(status().isBadRequest());
+        Instant until = Instant.now().plus(30, ChronoUnit.DAYS).truncatedTo(ChronoUnit.SECONDS);
+        req.put("accessExpiresAt", until.toString());
+        JsonNode created = body(createUser(req).andExpect(status().isCreated()).andReturn()).get("user");
+        assertThat(Instant.parse(created.get("accessExpiresAt").asText())).isEqualTo(until);
+        String id = created.get("id").asText();
+
+        // The expiry cannot be removed, and a new expiry must lie ahead; extending it is audited.
+        update(id, created.get("version").asLong(), null).andExpect(status().isBadRequest());
+        Instant later = until.plus(30, ChronoUnit.DAYS);
+        JsonNode extended = body(update(id, created.get("version").asLong(), later.toString()).andExpect(status().isOk()).andReturn());
+        assertThat(Instant.parse(extended.get("accessExpiresAt").asText())).isEqualTo(later);
+        assertThat(jdbc.queryForObject("SELECT details::text FROM audit_events WHERE action = 'USER_UPDATED' AND resource_id = ?",
+                String.class, id)).contains(until.toString()).contains(later.toString());
+
+        // Once it has passed, sign-in fails; other details can still be corrected without moving the expiry.
+        Instant past = Instant.now().minus(1, ChronoUnit.HOURS).truncatedTo(ChronoUnit.SECONDS);
+        jdbc.update("UPDATE users SET access_expires_at = ?, must_change_password = false WHERE id = ?::uuid",
+                java.sql.Timestamp.from(past), id);
+        mvc.perform(post("/api/v1/auth/login").contentType(MediaType.APPLICATION_JSON)
+                .content(toJson(Map.of("identifier", username, "password", "Initial-Passw0rd-1")))).andExpect(status().isUnauthorized());
+        long version = body(mvc.perform(get("/api/v1/users/" + id).header("Authorization", admin.bearer())).andReturn()).get("version").asLong();
+        update(id, version, past.toString()).andExpect(status().isOk());
+    }
+
+    private org.springframework.test.web.servlet.ResultActions createUser(Map<String, Object> req) throws Exception {
+        return mvc.perform(post("/api/v1/users").header("Authorization", admin.bearer()).contentType(MediaType.APPLICATION_JSON).content(toJson(req)));
+    }
+
+    private org.springframework.test.web.servlet.ResultActions update(String id, long version, String expiry) throws Exception {
+        Map<String, Object> body = new HashMap<>(Map.of("version", version, "email", "coa." + id.substring(0, 8) + "@auditor.test",
+                "displayName", "COA Auditor"));
+        body.put("accessExpiresAt", expiry);
+        return mvc.perform(put("/api/v1/users/" + id).header("Authorization", admin.bearer()).contentType(MediaType.APPLICATION_JSON)
+                .content(toJson(body)));
     }
 
     @Test

@@ -5,6 +5,7 @@ import com.miaa.cas.common.error.ErrorCode;
 import com.miaa.cas.integrations.IntegrationAdapter;
 import java.io.IOException;
 import java.net.URI;
+import com.miaa.cas.common.crypto.TlsPolicy;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
@@ -40,7 +41,7 @@ public class BirEisAdapter implements IntegrationAdapter {
 
     public BirEisAdapter(@Value("${cas.integrations.bir-eis.mode:DISABLED}") Mode mode,
             @Value("${cas.integrations.bir-eis.sandbox-url:}") String sandboxUrl,
-            @Value("${cas.integrations.bir-eis.sandbox-token:}") String sandboxToken, Environment env) {
+            @Value("${cas.integrations.bir-eis.sandbox-token:}") String sandboxToken, Environment env, TlsPolicy tls) {
         this.mode = mode;
         this.sandboxUrl = sandboxUrl;
         this.sandboxToken = sandboxToken;
@@ -48,7 +49,8 @@ public class BirEisAdapter implements IntegrationAdapter {
         if (production && mode == Mode.LOOPBACK) {
             throw new IllegalStateException("cas.integrations.bir-eis.mode=LOOPBACK is not allowed with the prod profile");
         }
-        this.http = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(10)).followRedirects(HttpClient.Redirect.NEVER).build();
+        this.http = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(10)).followRedirects(HttpClient.Redirect.NEVER)
+                .sslParameters(tls.clientParameters()).build();
     }
 
     @Override

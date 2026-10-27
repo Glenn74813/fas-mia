@@ -9,6 +9,7 @@ import { Field } from '../../components/Field';
 import { Money } from '../../components/Money';
 import { PageHeader } from '../../components/PageHeader';
 import { Pagination } from '../../components/Pagination';
+import { SortHeader } from '../../components/SortHeader';
 import { SearchSelect } from '../../components/SearchSelect';
 import { Spinner } from '../../components/Spinner';
 import { StatusBadge } from '../../components/StatusBadge';
@@ -19,8 +20,10 @@ export function ReceiptsPage() {
   const { hasPermission } = useAuth();
   const [status, setStatus] = useState('');
   const [page, setPage] = useState(0);
-  const list = useQuery({ queryKey: ['receipts', status, page], placeholderData: keepPreviousData,
-    queryFn: () => receiptApi.list({ status, page, size: 25 }) });
+  const [sort, setSort] = useState('');
+  const onSort = (next: string) => { setSort(next); setPage(0); };
+  const list = useQuery({ queryKey: ['receipts', status, page, sort], placeholderData: keepPreviousData,
+    queryFn: () => receiptApi.list({ status, page, size: 25, sort: sort || undefined }) });
   return (
     <>
       <PageHeader title="Collections" crumbs={[{ label: 'Receivables' }, { label: 'Collections' }]}
@@ -38,8 +41,8 @@ export function ReceiptsPage() {
         <div className="overflow-x-auto rounded-xl border border-slate-200/80 bg-white shadow-xs">
           <table className="min-w-full text-sm">
             <thead className="border-b border-slate-200 bg-slate-50/80 text-left text-[11px] font-semibold uppercase tracking-wider text-slate-500">
-              <tr><th className="px-3 py-2">Receipt</th><th className="px-3 py-2">Customer</th><th className="px-3 py-2">Date</th>
-                <th className="px-3 py-2">Method</th><th className="px-3 py-2">Status</th><th className="px-3 py-2 text-right">Amount</th>
+              <tr><th className="px-3 py-2">Receipt</th><th className="px-3 py-2">Customer</th><SortHeader label="Date" field="receiptDate" sort={sort} onSort={onSort} descFirst />
+                <th className="px-3 py-2">Method</th><th className="px-3 py-2">Status</th><SortHeader label="Amount" field="amount" sort={sort} onSort={onSort} descFirst align="right" />
                 <th className="px-3 py-2 text-right">Tax withheld</th><th className="px-3 py-2 text-right">Unapplied</th></tr>
             </thead>
             <tbody>

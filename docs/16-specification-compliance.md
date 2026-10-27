@@ -31,7 +31,7 @@ is current.
 | 9 | Security | Mostly complies | Gap 6 added log masking, file encryption, general rate limiting and an SMTP sender (§3d). Still open: malware engine (C-25), access reviews, key rotation |
 | 10 | Audit | Mostly complies | Actor roles and security alerting added (§3d). WORM export and retention not built (C-05, C-13) |
 | 11 | Functional modules | Core complete; many secondary features missing | See §3 below |
-| 12 | Frontend | Mostly complies | Role dashboards and charts added (§3a); approval queue only for vouchers; no printable JEV/DV; sorting on one page only |
+| 12 | Frontend | Mostly complies | Role dashboards and charts added (§3a); approval queue only for vouchers; no printable JEV/DV. Sortable columns on the eight main lists since gap 19 (§3q) |
 | 13 | Migration | Tooling complies; process blocked | Plan, mapping, test migrations and cutover need C-12 |
 | 14 | Integrations | Partly | Only bank files and BIR (sandbox) exist; no service-to-service authentication; no failure alerts |
 | 15–16 | Infrastructure, backup and DR | Design and dev kit only | Production backups, encryption, monitoring, failover runbooks (C-04) |
@@ -136,11 +136,13 @@ Second round (27 Oct 2026), from the "still open" notes above and the demonstrat
 15. **Sign-in recovery** (§9.2): recovery codes for a lost authenticator, and clearer instructions on the
     verification screen. **Built** (§3m).
 16. **Variance analysis report** (§11.4, §11.8): budget against actual by account and cost centre for a chosen
-    period, with amount and percentage variances. The layout is proposed until MIAA reviews it.
+    period, with amount and percentage variances. The layout is proposed until MIAA reviews it. **Built** (§3n).
 17. **Report delivery** (§11.8): e-mail the owner when a scheduled report finishes, with a link to **My reports**
-    (not the file itself).
+    (not the file itself). **Built** (§3o).
 18. **External-auditor access expiry** (§9.3): set and change it on the user screens, not only through the API.
+    **Built** (§3p).
 19. **Column sorting** (§12): sortable columns on the main list pages, using the paging API's existing `sort`.
+    **Built** (§3q).
 20. **Engineering checks** (§2, §7, §19): architecture tests that enforce the module layering, and a release
     workflow that versions and builds the images when started by hand.
 
@@ -153,9 +155,9 @@ Second round (27 Oct 2026), from the "still open" notes above and the demonstrat
 | 3. Portal | PDF of the concessionaire's own posted billing and statement, marked "not an official invoice or receipt" (C-06, C-29). Each download is audited. Inquiries (`INQ-YYYY-NNNNNN`): questions and payment references, with optional proof attached. A payment reference records nothing in the ledger, and the cashier still posts the receipt. Staff holding PORTAL_INQUIRY_RESPOND (Accountant, Cashier) reply on **Receivables → Inquiries**, and the concessionaire is e-mailed. Another customer's billing or inquiry is reported as not found | `PortalSelfServiceIT`; Playwright `receivables.spec.ts` |
 
 Still open from these items:
-* a variance analysis report beyond budget vs actual (its layout needs MIAA input);
+* ~~a variance analysis report beyond budget vs actual~~ built as gap 16 (§3n), with a proposed layout;
 * the KPI definitions (dashboard indicators remain "proposed");
-* e-mailing a finished scheduled report (today it appears in **My reports**);
+* ~~e-mailing a finished scheduled report~~ built as gap 17 (§3o): the owner is e-mailed a link, not the file;
 * online payment through the portal.
 
 ## 3b. Gap 4: approvals inbox and notifications
@@ -286,7 +288,7 @@ supply the real one.
 
 Findings while writing:
 * The RTM had two rows with the id NFR-SEC-08; the gap 12 row is now NFR-SEC-10.
-* The external-auditor access expiry can be set only through the users API, not on the user screens.
+* ~~The external-auditor access expiry can be set only through the users API~~: on the user screens since gap 18 (§3p).
 * `deploy/db/post-migrate-grants.sql` protects only the audit tables at the grant level; the other append-only
   tables rely on triggers (docs/19 §9).
 * ADR-004 predates the cluster-wide API limit; the ADR index now says so.
@@ -318,6 +320,49 @@ Limits:
 | Verification screen | Says where the code comes from, how to add the account in Microsoft Authenticator, and what to do with no codes left | `MfaPage.test.tsx` |
 
 Accounts enrolled before V43 have no codes until they generate a set on their profile.
+
+## 3n. Gap 16: variance analysis
+
+| Part | Built | Verified by |
+|---|---|---|
+| Report | `VARIANCE_ANALYSIS` job (V44), needing `BUDGET_VIEW` to request and download. Parameters: fiscal year, through period (1–13), optional cost centre, threshold % (default 10). Per allocation: annual allotment, budget to date, actual to date, variance, variance %, allotment left, assessment. Grouped by account type with subtotals; CSV, XLSX and PDF | `VarianceReportIT.varianceToAChosenPeriodWithFavourableAndUnfavourableLines` (figures worked by hand), Playwright `budget.spec.ts` |
+| Rules (proposed, C-10) | Budget to date is the allotment spread evenly over 12 periods; through period 13 it is all of it. Actual is posted entries in the account's normal direction to the end of the period, for the allocation's cost centre (or all cost centres for an account-level allocation). A positive variance is favourable: spending below budget or revenue above it. Within the threshold is "Within threshold"; budget-controlled spending no allocation covers is "No allocation" | `VarianceReportServiceTest` (including revenue lines), `VarianceReportIT` |
+| Screen | **My reports → Variance analysis**, with through period, cost centre and threshold; scheduling is not offered for it | Playwright `budget.spec.ts`, `reporting.spec.ts` |
+| Validation | Missing or out-of-range period, threshold outside 0–100, no budget for the year: 400. Without `BUDGET_VIEW`: 403 | `VarianceReportIT.parametersAndPermissionAreChecked` |
+
+Limits: no monthly phasing of the budget is recorded, so budget to date is straight-line; MIAA may want phased
+budgets or a different presentation (C-10). Budgets accept only budget-controlled accounts, which in the
+placeholder chart are spending accounts, so the revenue rule is covered by unit tests only.
+
+## 3o. Gap 17: scheduled report delivery
+
+| Part | Built | Verified by |
+|---|---|---|
+| Link to the schedule | A job queued by a schedule records it (`report_jobs.schedule_id`, V45) | `ScheduledReportEmailIT` |
+| E-mail | When such a job finishes, or fails, the schedule's owner is e-mailed through the outbox, in the same transaction as the result: the schedule name, report type, file name and how long it can be downloaded, or the error, with a link to **My reports**. The report itself is never attached or quoted. Only an active owner with an e-mail address is sent one; each is audited (`REPORT_EMAIL_QUEUED`). Reports requested by hand send no e-mail; the in-app notice is unchanged | `ScheduledReportEmailIT`, `ScheduledReportEmailTemplatesTest` |
+| Setting | **E-mail me when it is ready** on the schedule form (on by default) and an on/off box per schedule in the list (`PUT /report-schedules/{id}/email`, versioned, owner only) | `ScheduledReportEmailIT`, Playwright `reporting.spec.ts` |
+
+Delivery uses the SMTP sender in production, which needs MIAA's mail relay (docs/19); development only logs the
+message.
+
+## 3p. Gap 18: access expiry on the user screens
+
+| Part | Built | Verified by |
+|---|---|---|
+| Rules | An external auditor must have an access expiry, and it cannot be removed. A new or changed expiry must be in the future (ending access now is **Deactivate**); an unchanged past expiry may stay, so an expired account's other details can still be corrected. Other users may have one or none | `UserAdminIT.externalAuditorAccessIsTimeLimited` (also: an expired auditor's sign-in is refused) |
+| New user | **Access expires** date, required when the type is External auditor; it means 23:59 that day, Philippine time | Playwright `admin-onboarding.spec.ts` |
+| User page | **Profile** section: e-mail, display name and access expiry, versioned and audited with before and after values | Playwright `admin-onboarding.spec.ts`, `UserAdminIT` |
+| Dates | Helpers convert a chosen date to 23:59:59 Philippine time and back | `format.test.ts` |
+
+## 3q. Gap 19: sortable columns
+
+| Part | Built | Verified by |
+|---|---|---|
+| Screens | Clickable column headers on journal vouchers (number, date, amount), users (username, name, last sign-in), supplier invoices (date, due, payable), disbursement vouchers (number, amount), billings (date, due, amount), receipts (date, amount), customers and suppliers (code, name, status). A click sorts (dates and amounts newest or largest first), a second click reverses; the direction is shown by an arrow and announced through `aria-sort`; sorting returns to page 1. The users page's sort drop-down is replaced by the headers | `SortHeader.test.tsx`, Playwright `sorting.spec.ts` |
+| API | Customers and suppliers now take `sort` (`code`, `name`, `status`) through a whitelisted ORDER BY; unknown keys are a 400 naming the allowed keys. Every sort ends in the row id, so tied values page consistently. Users who never signed in sort last either way (docs/17 §3) | `ListSortingIT`, `SqlInjectionIT` |
+
+Limit: on the other lists PostgreSQL places empty values first when sorting descending (for example draft vouchers,
+which have no number yet, when sorting by number); Hibernate's criteria queries cannot change this.
 
 ## 4. Blocked on MIAA decisions
 

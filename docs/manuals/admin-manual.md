@@ -23,9 +23,13 @@ schema V41, October 2026. Installation and releases are in [19-deployment-and-ro
    **Display name**, **User type** and a **Temporary password**; choose the roles; **Create user**.
 2. Give the user the temporary password through a separate channel. At the first sign-in they enrol their
    authenticator app and choose their own password.
-3. External auditors: access can end automatically on an expiry date. The user page shows **Access expires**, but
-   neither user screen can set it yet; only the users API accepts `accessExpiresAt` today. Until the screen is
-   added, deactivate external auditors when their engagement ends.
+3. **Access expires**: the last day the user can sign in; access ends at 23:59 that day (Philippine time).
+   * **Required for external auditors**, and it cannot be removed from them.
+   * Optional for other users, for example temporary staff; leave it empty for no expiry.
+   * A new or changed date must be in the future. To end access today, **Deactivate** the user instead.
+   * To extend or shorten it later, open the user and change **Access expires** in the **Profile** section, which
+     also edits the e-mail and display name. Every change is in the audit trail with the old and new values.
+   * Once the date passes, sign-in is refused, and expired users drop out of access reviews and alerts.
 
 **User page actions** (**Account actions**):
 

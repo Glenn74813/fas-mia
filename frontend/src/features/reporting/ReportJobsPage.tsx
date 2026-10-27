@@ -18,7 +18,7 @@ export const REPORT_LABEL: Record<string, string> = {
   AR_AGING: 'AR aging', PPE_SCHEDULE: 'PPE schedule', INVENTORY_STOCK: 'Inventory valuation', AUDIT_TRAIL: 'Audit trail export',
   CASH_DISBURSEMENT_JOURNAL: 'Cash Disbursement Journal', COLLECTION_SUMMARY: 'Collection summary', GENERAL_LEDGER: 'General ledger',
   SUBSIDIARY_LEDGER: 'Subsidiary ledger', DAILY_COLLECTION_REPORT: 'Daily collection report', BANK_RECONCILIATION_STATEMENT: 'Bank reconciliation statement',
-  WITHHOLDING_SCHEDULE: 'Expanded withholding schedule',
+  WITHHOLDING_SCHEDULE: 'Expanded withholding schedule', VARIANCE_ANALYSIS: 'Variance analysis',
 };
 const DAYS = ['', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 const when = (s: ReportSchedule) => `${s.frequency === 'DAILY' ? 'Daily' : s.frequency === 'WEEKLY' ? `Every ${DAYS[s.dayOfWeek ?? 1]}`
@@ -40,6 +40,8 @@ export function ReportJobsPage() {
   const schedules = useQuery({ queryKey: ['report-schedules'], queryFn: reportingApi.schedules });
   const remove = useMutation({ mutationFn: (id: string) => reportingApi.deleteSchedule(id),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['report-schedules'] }) });
+  const email = useMutation({ mutationFn: ({ s, on }: { s: ReportSchedule; on: boolean }) => reportingApi.setScheduleEmail(s, on),
+    onSettled: () => qc.invalidateQueries({ queryKey: ['report-schedules'] }) });
   return (
     <>
       <PageHeader title="My reports" crumbs={[{ label: 'Reports' }, { label: 'My reports' }]} />
@@ -61,12 +63,16 @@ export function ReportJobsPage() {
           <h2 className="px-4 pt-3 text-sm font-semibold">Scheduled reports</h2>
           <table className="min-w-full text-sm">
             <thead className="border-b border-slate-200 text-left text-[11px] font-semibold uppercase tracking-wider text-slate-500"><tr><th className="px-3 py-2">Name</th><th className="px-3 py-2">Report</th>
-              <th className="px-3 py-2">Runs</th><th className="px-3 py-2">Next run</th><th className="px-3 py-2">Status</th><th /></tr></thead>
+              <th className="px-3 py-2">Runs</th><th className="px-3 py-2">Next run</th><th className="px-3 py-2">Status</th>
+              <th className="px-3 py-2">E-mail when ready</th><th /></tr></thead>
             <tbody>{schedules.data!.map((s) => (
               <tr key={s.id} className="border-t border-slate-100"><td className="px-3 py-2">{s.name}</td>
                 <td className="px-3 py-2">{REPORT_LABEL[s.reportType] ?? s.reportType} ({s.format})</td><td className="px-3 py-2">{when(s)}</td>
                 <td className="px-3 py-2">{s.status === 'ACTIVE' ? formatDateTime(s.nextRunAt) : '—'}</td>
                 <td className="px-3 py-2"><StatusBadge status={s.status} />{s.statusReason && <span className="ml-2 text-xs text-amber-800">{s.statusReason}</span>}</td>
+                <td className="px-3 py-2"><label className="inline-flex items-center gap-2">
+                  <input type="checkbox" checked={s.emailWhenReady} disabled={email.isPending} aria-label={`E-mail me when “${s.name}” is ready`}
+                    onChange={(e) => email.mutate({ s, on: e.target.checked })} />{s.emailWhenReady ? 'On' : 'Off'}</label></td>
                 <td className="px-3 py-2 text-right"><button className="text-red-700 hover:underline" disabled={remove.isPending}
                   onClick={() => { if (window.confirm(`Delete the schedule “${s.name}”? Reports already produced are kept.`)) remove.mutate(s.id); }}>Delete</button></td></tr>))}
             </tbody></table>

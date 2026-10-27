@@ -1,6 +1,6 @@
 # 18 — Compliance Matrix: Security, Audit, Privacy and Quality
 
-Date: 2026-10-26 (schema V41). This matrix maps the master specification's security, audit, privacy, quality and
+Date: 2026-10-27 (schema V45). This matrix maps the master specification's security, audit, privacy, quality and
 delivery requirements (MS §) to how CAS meets them and to the evidence. It replaces the six-row skeleton that was
 in the traceability matrix ([02](02-requirements-traceability.md)). Functional requirements are traced in 02, and
 the section verdicts are in [16](16-specification-compliance.md).
@@ -30,7 +30,7 @@ certification or legal advice.
 | Maker-checker on financial access grants | `RoleGrantService` (V37) | `AccessGovernanceIT` | Met | Proposed in C-19 |
 | Approval limits per role | `ApprovalLimitService` | `AccessGovernanceIT` | Partly met | Values pending (C-24) |
 | Periodic access reviews | `AccessReviewService`, Access reviews page | `AccessGovernanceIT` | Met | Frequency to be set by MIAA |
-| Time-bound external-auditor access | `access_expires_at` | `UserAdminIT` | Met | |
+| Time-bound external-auditor access | `access_expires_at`, required for external auditors and set on the user screens | `UserAdminIT`, Playwright `admin-onboarding.spec.ts` | Met | |
 | Auditor read-only | Auditor roles without write permissions; SoD auditor-independence rules | Playwright `auditor-readonly.spec.ts` | Met | |
 | Portal tenant isolation | Portal queries scoped to the linked customer; linking by a second person | `PortalIT`, `PortalSelfServiceIT` | Met | Identity evidence C-18 |
 
@@ -38,7 +38,7 @@ certification or legal advice.
 
 | Requirement | How it is met | Evidence | Status | Notes |
 |---|---|---|---|---|
-| Encryption in transit | TLS at the gateway (`deploy/nginx/gateway.conf`); HSTS | `SecurityBaselineIT` (HSTS header) | Partly met | Certificates and TLS 1.3 enforcement are environment work (C-04) |
+| Encryption in transit | TLS 1.3 minimum (DICT DC No. 007, s. 2020) on every path CAS controls: gateway `ssl_protocols TLSv1.3`; the Cloudflare Worker refuses older connections (426); outbound SMTP and BIR EIS clients and the JVM (database driver included) limited to TLS 1.3; production refuses to start otherwise, or with an unverified database link (`TlsPolicy`); HSTS | `TlsPolicyTest`, `worker/index.test.ts`, `SecurityBaselineIT` (HSTS); production start refused without the setting (verified 2026-10-27) | Partly met | Certificates, the PostgreSQL server's `ssl_min_protocol_version = TLSv1.3` and a Cloudflare zone minimum for a custom domain are environment work (C-04). TLS 1.2 only for a listed legacy integration, with a recorded reason |
 | Encryption at rest, application level | AES-256-GCM for MFA secrets, supplier bank accounts, stored files (V35) | `AesGcmEncryptorTest`, `DocumentsAndRecurringIT`, `PaymentFileIT` | Met | Key rotation not built |
 | Encryption at rest, database and backups | Infrastructure | — | Blocked (C-04) | |
 | No secrets in source control | `.env.example` only; gitleaks in CI | CI workflow | Partly met | CI has not run (no repository) |
@@ -126,7 +126,25 @@ Only as already described in this repository; official requirements await MIAA, 
 | CMP-05 Security standards | Application security controls against ISO/IEC 27001 and OWASP ASVS L2 (as named in the earlier skeleton) | Partly met | Controls in §1–§3 and [05](05-security-design.md) §6; external penetration test pending |
 | CMP-06 Delivery | Procurement records and IP turnover | Not started | Contract matter: source escrow, licence register (the SBOM is an input) |
 
-## 9. Summary
+## 9. Standards and frameworks named by MIAA
+
+The best-practice list supplied by MIAA (27 October 2026). The management-system standards (ISO 9001, ISO/IEC 27001,
+ISO 22301, BS 10012) are certified for an **organisation**, not for a piece of software. For those, CAS supplies the
+controls and the evidence the organisation's management system needs; establishing, operating and certifying the
+system is MIAA's. Statuses use the values above.
+
+| Standard / framework | Requirement | What CAS provides | Evidence | Status | Still needed |
+|---|---|---|---|---|---|
+| ISO 9001 | Quality management system best practices | Documented requirements and traceability ([02](02-requirements-traceability.md)); clarification register for every open decision ([03](03-clarification-register.md)); automated tests at every level (§7); change requests with release notes, staging validation and rollback plan, and incident tickets with SLAs (gap 11); controlled deployment and rollback ([19](19-deployment-and-rollback.md)); UAT scripts with a pass-rate gate | §7 above, `TicketsIT`, `docs/uat/` | Partly met | MIAA's QMS: quality policy and objectives, internal audits, management review, corrective-action records. CI must run (GitHub billing lock) |
+| ISO/IEC 27001 | Information security management system best practices | The technical Annex A controls in §1–§3: access control and SoD, MFA, cryptography (Argon2id, AES-256-GCM, RS256, TLS 1.3), logging and tamper-evident audit, secure development (threat model, SpotBugs/FindSecBugs, injection and XSS tests), supplier inventory (SBOM), vulnerability scans in CI | §1–§3, [05](05-security-design.md) §6 | Partly met | MIAA's ISMS: scope, risk assessment and treatment plan, Statement of Applicability, policies, internal audit; penetration test; key rotation (A02) |
+| ISO 22301 | Business continuity management best practices | Recovery design with RPO ≤ 1 h and RTO ≤ 4 h ([07](07-infrastructure-dr.md)); backup, point-in-time restore and verification scripts; a DR exercise kit with a passed workstation exercise; stateless application tier for fail-over | §6 above, `scripts/dr/` | Partly met | Business impact analysis and continuity plan (MIAA); production DR site and a real exercise (C-04) |
+| BS 10012 | Personal information management best practices | The Data Privacy Act controls in §4: minimal personal data, need-to-know access, access and download logging, masked logs, encrypted bank details; portal users see only their own records | §4 above | Partly met | MIAA's PIMS: privacy impact assessment (CMP-01), records of processing, retention and disposal (C-05, C-13), a documented data-subject request procedure |
+| ISO/IEC 27018 | Cloud privacy (PII in public clouds) best practices | No personal data in tokens, URLs or logs; personal data encrypted where sensitive; processing location chosen by MIAA. In the Cloudflare demo, Cloudflare carries traffic only: the database and files stay on the CAS host | §2, §4, [21](21-cloudflare-deployment.md) | Partly met | Applies once a cloud host is chosen (C-04): the provider's 27018 attestation, a processing agreement, Philippine residency (CMP-04) |
+| ISO/IEC 27017 | Cloud service information security best practices | Cloud-ready design: stateless containers, secrets from the environment, encrypted application data, infrastructure guidance with shared-responsibility split ([07](07-infrastructure-dr.md)); the Cloudflare deployment's edge hardening (TLS 1.3, headers, shared-secret gate) | [07](07-infrastructure-dr.md), [21](21-cloudflare-deployment.md), `ProxyGatewayIT` | Partly met | The chosen provider's 27017 attestation and a responsibility matrix in the hosting contract (C-04) |
+| DICT MC No. 5 (2017) | PNS ISO/IEC 27002 code of practice for GOCCs | The 27002 technological controls are those of the ISO/IEC 27001 row: access rights, authentication, cryptography, logging and monitoring, secure coding and testing, protection against malware (interface pending C-25), backup, capacity (performance kit) | §1–§3, §6 | Partly met | The organisational, people and physical controls are MIAA's; malware engine (C-25) |
+| DICT DC No. 007 (2020) | TLS 1.3 minimum for all government systems | Enforced on every connection CAS controls (row "Encryption in transit" in §2): gateway, Cloudflare Worker, outbound clients, JVM and database driver; production start refused if not | `TlsPolicyTest`, `worker/index.test.ts` | Partly met | Environment settings outside the code: the PostgreSQL server's minimum, certificates, and the edge minimum on MIAA's own domain (C-04). Older browsers without TLS 1.3 are refused by design |
+
+## 10. Summary
 
 | Status | Rows |
 |---|---|

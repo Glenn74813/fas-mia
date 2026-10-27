@@ -85,10 +85,17 @@ test('the chief accountant sees the finance dashboard and schedules a monthly co
   await page.getByLabel('Repeat on a schedule').check();
   const name = `E2E collections ${Date.now().toString(36)}`;
   await page.getByLabel('Schedule name').fill(name);
+  await expect(page.getByLabel('E-mail me when it is ready')).toBeChecked();
   await page.getByRole('button', { name: 'Save schedule' }).click();
   await expect(page.getByRole('status')).toContainText('Schedule saved');
   const row = page.getByRole('region', { name: 'Scheduled reports' }).getByRole('row').filter({ hasText: name });
   await expect(row).toContainText('Monthly on day 1 at 07:00');
+  // The completion e-mail is on by default and can be switched off from the list.
+  const email = row.getByLabel(`E-mail me when “${name}” is ready`);
+  await expect(email).toBeChecked();
+  await email.click(); // saved on the server first, so the box changes when the reply arrives
+  await expect(row).toContainText('Off');
+  await expect(email).not.toBeChecked();
   page.once('dialog', (d) => d.accept());
   await row.getByRole('button', { name: 'Delete' }).click();
   await expect(row).toHaveCount(0);

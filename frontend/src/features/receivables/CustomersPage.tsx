@@ -9,6 +9,7 @@ import { Field } from '../../components/Field';
 import { Money } from '../../components/Money';
 import { PageHeader } from '../../components/PageHeader';
 import { Pagination } from '../../components/Pagination';
+import { SortHeader } from '../../components/SortHeader';
 import { Spinner } from '../../components/Spinner';
 import { StatusBadge } from '../../components/StatusBadge';
 import { isValidAmount } from '../../utils/money';
@@ -25,7 +26,10 @@ export function CustomersPage() {
   const [page, setPage] = useState(0);
   const [search, setSearch] = useState('');
   useEffect(() => { const t = setTimeout(() => { setSearch(q.trim()); setPage(0); }, 300); return () => clearTimeout(t); }, [q]);
-  const list = useQuery({ queryKey: ['customers', search, page], queryFn: () => customerApi.list(search, page), placeholderData: keepPreviousData });
+  const [sort, setSort] = useState('');
+  const onSort = (next: string) => { setSort(next); setPage(0); };
+  const list = useQuery({ queryKey: ['customers', search, page, sort], queryFn: () => customerApi.list(search, page, 25, sort || undefined),
+    placeholderData: keepPreviousData });
   const [form, setForm] = useState(blankForm);
   const create = useMutation({
     mutationFn: () => customerApi.create({ code: form.code, name: form.name, customerType: form.customerType,
@@ -73,8 +77,8 @@ export function CustomersPage() {
         <div className="overflow-x-auto rounded-xl border border-slate-200/80 bg-white shadow-xs">
           <table className="min-w-full text-sm">
             <thead className="border-b border-slate-200 bg-slate-50/80 text-left text-[11px] font-semibold uppercase tracking-wider text-slate-500">
-              <tr><th className="px-3 py-2">Code</th><th className="px-3 py-2">Name</th><th className="px-3 py-2">Type</th>
-                <th className="px-3 py-2">TIN</th><th className="px-3 py-2">Status</th><th className="px-3 py-2 text-right">Open receivables</th>
+              <tr><SortHeader label="Code" field="code" sort={sort} onSort={onSort} /><SortHeader label="Name" field="name" sort={sort} onSort={onSort} /><th className="px-3 py-2">Type</th>
+                <th className="px-3 py-2">TIN</th><SortHeader label="Status" field="status" sort={sort} onSort={onSort} /><th className="px-3 py-2 text-right">Open receivables</th>
                 <th className="px-3 py-2 text-right">Unapplied</th></tr>
             </thead>
             <tbody>

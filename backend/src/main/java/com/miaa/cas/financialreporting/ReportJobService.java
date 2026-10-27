@@ -18,6 +18,7 @@ import com.miaa.cas.generalledger.LedgerInquiryService;
 import com.miaa.cas.generalledger.web.LedgerDtos.TrialBalance;
 import com.miaa.cas.generalledger.web.LedgerDtos.TrialBalanceRow;
 import com.miaa.cas.notifications.NotificationService;
+import com.miaa.cas.notifications.OutboxService;
 import com.miaa.cas.security.CurrentActor;
 import java.security.MessageDigest;
 import java.sql.Timestamp;
@@ -63,6 +64,7 @@ public class ReportJobService {
     private final AuditService audit;
     private final ContentCipher cipher;
     private final NotificationService notifications;
+    private final OutboxService outbox;
     private final JdbcTemplate jdbc;
     private final TransactionTemplate tx;
     private final ObjectMapper json;
@@ -71,7 +73,8 @@ public class ReportJobService {
 
     public ReportJobService(FinancialStatementService statements, ManagementReportService management, StatementTemplateService templates, LedgerInquiryService ledger,
             FiscalCalendarService calendar, AuditService audit, ContentCipher cipher, NotificationService notifications, JdbcTemplate jdbc, TransactionTemplate tx, ObjectMapper json, Clock clock,
-            @Value("${cas.reports.retention:P30D}") Duration retention) {
+            @Value("${cas.reports.retention:P30D}") Duration retention, OutboxService outbox) {
+        this.outbox = outbox;
         this.statements = statements;
         this.management = management;
         this.templates = templates;
@@ -187,7 +190,8 @@ public class ReportJobService {
             List<Map<String, Object>> rows = jdbc.queryForList("""
                     UPDATE report_jobs SET status = 'RUNNING', started_at = ?
                     WHERE id = (SELECT id FROM report_jobs WHERE status = 'QUEUED' ORDER BY requested_at FOR UPDATE SKIP LOCKED LIMIT 1)
-                    RETURNING id, report_type, format, parameters::text AS parameters, requested_by, requested_by_id""", Timestamp.from(Instant.now(clock)));
+                    RETURNING id, report_type, format, parameters::text AS parameters, requested_by, requested_by_id, schedule_id""",
+                    Timestamp.from(Instant.now(clock)));
             return rows.isEmpty() ? null : rows.get(0);
         });
         if (job == null) {
@@ -226,6 +230,7 @@ public class ReportJobService {
                 audit.record(Actor.SYSTEM, "REPORT_GENERATED", "REPORT_JOB", id, Map.of("file", fileName, "sha256", sha, "bytes", content.length));
                 notifications.notify((UUID) job.get("requested_by_id"), "REPORT_READY", "Your report " + fileName + " is ready", null,
                         "/reports/jobs");
+                emailScheduleOwner(job, "scheduled-report-ready", Map.of("fileName", fileName, "retentionDays", retention.toDays()));
             });
         } catch (Exception e) {
             log.warn("Report job {} failed: {}", id, e.toString());
@@ -235,9 +240,35 @@ public class ReportJobService {
                         Timestamp.from(Instant.now(clock)), msg.length() > 1000 ? msg.substring(0, 1000) : msg, id);
                 notifications.notify((UUID) job.get("requested_by_id"), "REPORT_FAILED", "Your " + job.get("report_type").toString()
                         .toLowerCase().replace('_', ' ') + " report could not be generated", msg, "/reports/jobs");
+                emailScheduleOwner(job, "scheduled-report-failed", Map.of("error", msg));
             });
         }
         return true;
+    }
+
+    /**
+     * A job queued by a schedule whose owner asked for it: e-mails the owner (still active, with an address) through the
+     * outbox, in the same transaction as the job's result. The message links to My reports and never carries the report.
+     */
+    private void emailScheduleOwner(Map<String, Object> job, String template, Map<String, Object> extra) {
+        UUID scheduleId = (UUID) job.get("schedule_id");
+        if (scheduleId == null) {
+            return;
+        }
+        List<Map<String, Object>> rows = jdbc.queryForList("""
+                SELECT s.name, s.report_type, u.email FROM report_schedules s JOIN users u ON u.id = s.owner_id
+                WHERE s.id = ? AND s.email_when_ready AND s.status <> 'DELETED' AND u.status = 'ACTIVE'
+                  AND u.email IS NOT NULL AND u.email <> ''""", scheduleId);
+        if (rows.isEmpty()) {
+            return;
+        }
+        Map<String, Object> r = rows.get(0);
+        Map<String, Object> payload = new java.util.HashMap<>(extra);
+        payload.put("scheduleName", r.get("name"));
+        payload.put("reportType", r.get("report_type").toString().toLowerCase().replace('_', ' '));
+        outbox.enqueueEmail((String) r.get("email"), template, payload);
+        audit.record(Actor.SYSTEM, "REPORT_EMAIL_QUEUED", "REPORT_JOB", job.get("id"), Map.of("schedule", scheduleId.toString(),
+                "template", template));
     }
 
     static ReportTable trialBalanceTable(TrialBalance tb, String by, String at) {

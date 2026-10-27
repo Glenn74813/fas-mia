@@ -9,6 +9,7 @@ import { Field } from '../../components/Field';
 import { Money } from '../../components/Money';
 import { PageHeader } from '../../components/PageHeader';
 import { Pagination } from '../../components/Pagination';
+import { SortHeader } from '../../components/SortHeader';
 import { SearchSelect } from '../../components/SearchSelect';
 import { Spinner } from '../../components/Spinner';
 import { StatusBadge } from '../../components/StatusBadge';
@@ -18,7 +19,10 @@ export function DisbursementVouchersPage() {
   const { hasPermission } = useAuth();
   const [status, setStatus] = useState('');
   const [page, setPage] = useState(0);
-  const list = useQuery({ queryKey: ['dvs', status, page], queryFn: () => dvApi.list({ status, page, size: 25 }), placeholderData: keepPreviousData });
+  const [sort, setSort] = useState('');
+  const onSort = (next: string) => { setSort(next); setPage(0); };
+  const list = useQuery({ queryKey: ['dvs', status, page, sort], queryFn: () => dvApi.list({ status, page, size: 25, sort: sort || undefined }),
+    placeholderData: keepPreviousData });
   return (
     <>
       <PageHeader title="Disbursement vouchers" crumbs={[{ label: 'Payables' }, { label: 'Disbursement vouchers' }]}
@@ -35,8 +39,8 @@ export function DisbursementVouchersPage() {
         <div className="overflow-x-auto rounded-xl border border-slate-200/80 bg-white shadow-xs">
           <table className="min-w-full text-sm">
             <thead className="border-b border-slate-200 bg-slate-50/80 text-left text-[11px] font-semibold uppercase tracking-wider text-slate-500">
-              <tr><th className="px-3 py-2">DV</th><th className="px-3 py-2">Payee</th><th className="px-3 py-2">Particulars</th>
-                <th className="px-3 py-2">Status</th><th className="px-3 py-2 text-right">Amount</th></tr>
+              <tr><SortHeader label="DV" field="dvNumber" sort={sort} onSort={onSort} /><th className="px-3 py-2">Payee</th><th className="px-3 py-2">Particulars</th>
+                <th className="px-3 py-2">Status</th><SortHeader label="Amount" field="amount" sort={sort} onSort={onSort} descFirst align="right" /></tr>
             </thead>
             <tbody>
               {list.data.items.map((d) => (

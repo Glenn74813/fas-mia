@@ -32,6 +32,13 @@ public final class EmailTemplates {
             case "ticket-sla-escalation" -> new Rendered("[" + v(m, "priority") + "] Ticket " + v(m, "ticketNumber") + " escalated: " + v(m, "kind"),
                     "Ticket " + v(m, "ticketNumber") + " (" + v(m, "title") + ") has been escalated.\n\n" + v(m, "detail") + "\n\n"
                             + baseUrl + "/tickets" + FOOTER);
+            case "scheduled-report-ready" -> new Rendered("Your scheduled report is ready: " + v(m, "scheduleName"),
+                    "Your scheduled report \"" + v(m, "scheduleName") + "\" (" + v(m, "reportType") + ") has run. The file "
+                            + v(m, "fileName") + " can be downloaded for " + v(m, "retentionDays") + " days.\n\nSign in and open My reports: "
+                            + baseUrl + "/reports/jobs\n\nFor security, the report itself is not attached." + FOOTER);
+            case "scheduled-report-failed" -> new Rendered("Your scheduled report failed: " + v(m, "scheduleName"),
+                    "Your scheduled report \"" + v(m, "scheduleName") + "\" (" + v(m, "reportType") + ") could not be generated:\n\n"
+                            + v(m, "error") + "\n\nDetails are in My reports: " + baseUrl + "/reports/jobs" + FOOTER);
             case AlertService.EMAIL_TEMPLATE -> new Rendered("[MIAA CAS alert] " + v(m, "title"),
                     v(m, "body") + "\n\n" + baseUrl + v(m, "link") + FOOTER);
             default -> throw new IllegalArgumentException("No e-mail template " + template);
