@@ -47,7 +47,7 @@ class LayeringArchitectureTest {
 
     private static final String ROOT = "com.miaa.cas";
     private static final String[] BUSINESS_MODULES = Arrays.stream(new String[] {"accountspayable", "accountsreceivable", "approvals",
-            "budgeting", "closing", "dashboard", "documents", "financialreporting", "fixedassets", "generalledger", "identity",
+            "budgeting", "closing", "dashboard", "dataexport", "documents", "financialreporting", "fixedassets", "generalledger", "identity",
             "integrations", "inventoryaccounting", "journal", "migration", "notifications", "organization", "tax", "tickets", "treasury"})
             .map(m -> ROOT + "." + m + "..").toArray(String[]::new);
 

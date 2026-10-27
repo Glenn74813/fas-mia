@@ -2,7 +2,7 @@
 
 For system administrators (users, roles, organisation, integrations, tickets) and finance administrators
 (chief accountant and finance manager: chart of accounts, settings, close and approval configuration). Version for
-schema V41, October 2026. Installation and releases are in [19-deployment-and-rollback.md](../19-deployment-and-rollback.md).
+schema V50, October 2026. Installation and releases are in [19-deployment-and-rollback.md](../19-deployment-and-rollback.md).
 
 **Separation of duties applies to administrators too.**
 * System administrators hold no financial permissions. Rules block combining `USER_ADMINISTER` or
@@ -157,7 +157,34 @@ holders.
   minute 20 of every hour, Manila time), `cas.anomalies.lookback-days` (90) and `cas.anomalies.round-amount-min`
   (100000). Holidays for the off-hours rule come from the business holidays used by ticket SLAs.
 
-## 10. Background work and operations
+## 10. Data export (`DATA_EXPORT`: system administrators and finance managers)
+
+**Administration → Data export** produces a full copy of the system's data for MIAA (TOR §3.6), for example a
+year-end copy for the Records Office or the hand-back at the end of the contract.
+
+1. Enter the **Purpose** and choose **Request full export**. Other holders of `DATA_EXPORT` are notified.
+2. Another holder (never the requester) chooses **Approve**, or **Reject** with a reason.
+3. The export is built in the background, usually within a minute, and the requester is notified.
+4. The requester chooses **Download**. The file can be downloaded for 7 days (`cas.exports.retention`); then it is
+   deleted.
+
+The ZIP contains:
+
+| Path | Content |
+|---|---|
+| `tables/<table>.csv` | Every table, one consistent snapshot, CSV (UTF-8, header row; empty field = NULL) |
+| `tables/supplier_bank_account_numbers.csv` | Supplier bank account numbers, decrypted |
+| `documents/<id>/<file name>` | Every supporting document, as uploaded |
+| `dictionary.json` | Every table and column with its type and nullability |
+| `manifest.json` | Who asked and approved, the purpose, the schema version, row counts and SHA-256 per file, what was left out and why, and the audit-chain verification |
+| `SHA256SUMS` | The checksum of every file, for `sha256sum -c` |
+
+Left out: password hashes, authenticator secrets, recovery, e-mail and reset codes, session tokens, passkey
+challenges, the request replay cache, and generated report and bank files (they can be produced again). The file is
+encrypted at rest under `cas.exports.dir` (set it to a protected volume in production) and decrypted as it is
+downloaded. Every request, decision, generation, download and expiry is in the audit trail.
+
+## 11. Background work and operations
 
 * Report jobs run in the background. Users see their own under **My reports**; files are kept encrypted and
   expire.

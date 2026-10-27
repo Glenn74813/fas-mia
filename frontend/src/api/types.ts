@@ -1303,3 +1303,11 @@ export interface CashForecast {
   overdueReceivables: string; overduePayables: string; buckets: CashForecastBucket[]; items: CashForecastItem[];
   itemsTruncated: boolean; lowestClosing: string; lowestClosingOn: string; notes: string[];
 }
+
+export interface DataExport {
+  id: string; kind: 'FULL'; purpose: string;
+  status: 'REQUESTED' | 'APPROVED' | 'RUNNING' | 'DONE' | 'FAILED' | 'REJECTED' | 'EXPIRED';
+  requestedBy: string; requestedAt: string; decidedBy: string | null; decidedAt: string | null; decisionNote: string | null;
+  startedAt: string | null; finishedAt: string | null; fileName: string | null; sizeBytes: number | null; sha256: string | null;
+  error: string | null; expiresAt: string | null; version: number;
+}

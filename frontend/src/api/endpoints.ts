@@ -3,7 +3,7 @@ import type {
   TicketCategory,
   Clearing, ClearingProposal, CloseCalendarChecklist, CloseFrequency, CloseScheduleItem, CloseTask, GlOpenItem, OpenItemAccount,
   AccountLedger, ChainVerification, ChartSummary, CloseChecklist, CostCenter, CurrentUser, DocumentInfo, EntryDetail,
-  AnomalyFinding, AnomalySummary, EventRecord, FiscalYear, LineInput, LoginResponse, Page, Period, PeriodChange, Permission, RecurringJournal, Role,
+  AnomalyFinding, AnomalySummary, DataExport, EventRecord, FiscalYear, LineInput, LoginResponse, Page, Period, PeriodChange, Permission, RecurringJournal, Role,
   RoleAssignmentResult, RoleChangeResult, SodConflict, SubsidiaryAccount, TokenResponse, TotpEnrollment, TrialBalance,
   UserDetail, UserSummary, VoucherDetail, VoucherInput, VoucherSummary,
   AccountMapping, AgingRow, BankAccount, BudgetAdjustment, BudgetView, DvSummary, DvView, InvoiceInput, InvoiceSummary,
@@ -121,6 +121,14 @@ export const anomalyApi = {
   run: () => api.post<{ high: number; medium: number; low: number }>('/anomalies/run'),
   review: (id: string, body: { version: number; status: 'EXPLAINED' | 'ESCALATED'; note: string }) =>
     api.post<AnomalyFinding>(`/anomalies/${id}/review`, body),
+};
+
+export const dataExportApi = {
+  list: (page = 0) => api.get<Page<DataExport>>(`/data-exports?page=${page}&size=25`),
+  request: (purpose: string) => api.post<DataExport>('/data-exports', { purpose }),
+  decide: (id: string, body: { approve: boolean; note?: string; version: number }) =>
+    api.post<DataExport>(`/data-exports/${id}/decision`, body),
+  download: (e: DataExport) => downloadFile(`/data-exports/${e.id}/download`, e.fileName ?? 'miaa-cas-export.zip'),
 };
 
 export const accountApi = {

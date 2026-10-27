@@ -56,6 +56,7 @@ export const NAV_ITEMS: NavItem[] = [
   { label: 'Access grants', to: '/admin/access-grants', anyOf: ['ACCESS_GRANT_APPROVE', 'USER_ADMINISTER'], section: 'Administration' },
   { label: 'Access reviews', to: '/admin/access-reviews', anyOf: ['ACCESS_REVIEW_MANAGE', 'ACCESS_REVIEW_PERFORM', 'USER_ADMINISTER'], section: 'Administration' },
   { label: 'Approval limits', to: '/admin/approval-limits', anyOf: ['APPROVAL_LIMIT_MANAGE', 'AUDIT_LOG_VIEW', 'ROLE_VIEW'], section: 'Administration' },
+  { label: 'Data export', to: '/admin/data-exports', anyOf: ['DATA_EXPORT'], section: 'Administration' },
   { label: 'Integrations', to: '/integrations', anyOf: ['INTEGRATION_VIEW'], section: 'Administration' },
   { label: 'Audit trail', to: '/audit', anyOf: ['AUDIT_LOG_VIEW', 'SECURITY_EVENT_VIEW'], section: 'Administration' },
   { label: 'Anomalies', to: '/audit/anomalies', anyOf: ['ANOMALY_VIEW'], section: 'Administration' },

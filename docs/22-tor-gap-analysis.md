@@ -92,10 +92,10 @@ three groups:
 | T8 | §4.6, A.4 | OAuth 2.0 and API key management for third-party access; webhooks | API clients with the client-credentials grant, scoped permissions, key rotation and revocation, per-client rate limits, audit; webhook subscriptions for posting, approval and payment events, signed, with retries and a delivery log |
 | T9 | §4.6.2, D | Pre-configured interfaces for payroll, FMIS, HR and asset systems; XML exchange | Import endpoints for approved payroll summaries, FMIS budget data and asset information that create draft vouchers or records for review (R2R inputs), in CSV, JSON and XML |
 | T10 | §4.5, A.9 | 10-year retention, archive export and authorised purge | A retention policy (10 years), an archive export of a closed fiscal year (data, documents, audit chain and verification proof), and a two-person purge of archived years for authorised roles. Purging audit records needs the C-05 decision |
-| T11 | §3.6 | Full access to MIAA's data; return in a machine-readable format at termination | An administrator-run full export (every table as CSV/JSON with the data dictionary, documents, and checksums) |
+| T11 | §3.6 | Full access to MIAA's data; return in a machine-readable format at termination | **Built** (V50): **Administration → Data export**. One holder of `DATA_EXPORT` (system administrator or finance manager) asks with a purpose and another approves; a worker writes, from one consistent snapshot, every table as CSV with `dictionary.json`, every supporting document, the decrypted supplier bank account numbers, the audit-chain verification and `manifest.json` with row counts and SHA-256 per file (also in `SHA256SUMS`) into one ZIP, encrypted at rest in 1 MiB AES-GCM chunks; only the requester downloads it, for 7 days. Sign-in secrets, the replay cache and generated report and bank files are left out, and the manifest says so. `DataExportIT`, `ChunkedFileCipherTest`, Playwright `data-export.spec.ts` |
 | T12 | B.4 | Lowest inventory value from market prices, coverage and movement rates | Year-end lower-of-cost-or-net-realisable-value review: market prices entered or imported, slow-moving flags from movement rates, proposed write-down JV |
 | T13 | A (Billing) | Abstract of Bills | A report job listing the bills of a period by customer and type with totals (layout to be confirmed by the Billing Section) |
-| T14 | H | Privacy Impact Assessment | A PIA draft from the system: personal-data inventory per table, data-flow diagrams, risks and controls, for MIAA's DPO to complete |
+| T14 | H | Privacy Impact Assessment | **Drafted**: [23-privacy-impact-assessment.md](23-privacy-impact-assessment.md) from the system as built: data subjects, a personal-data inventory (13 categories, with tables, purpose, access, retention and protection), a data-flow diagram, the privacy principles, 11 risks with controls and proposed actions, and the decisions left to MIAA's DPO (lawful basis, retention, TIN masking, breach procedure, hosting). Completion and sign-off are MIAA's |
 
 Smaller items: record **Request for Payment and RIAR references** on invoices and DVs (C-32); SMS as a ticket
 notification channel when a gateway exists (Annex E); **company code and currency** dimensions on reports (B.5:
@@ -142,5 +142,5 @@ assessment report.
 1. ~~T4, T5, T1~~ (built 27 Oct 2026) (e-mail OTP, passkeys): the
    TOR names them directly, and they affect daily use and acceptance testing.
 2. ~~T2, T3~~ (built 27 Oct 2026) (anomaly alerts, cash-flow forecast): explicit TOR objectives with clear value for audit and treasury.
-3. **T10, T11, T14** (retention and archive, full export, PIA draft): data-ownership and privacy obligations.
+3. ~~T11, T14~~ (built and drafted 27 Oct 2026) (full export, PIA draft), **T10** (retention and archive): data-ownership and privacy obligations.
 4. **T8, T9** (API clients, webhooks, interfaces), then **T6, T7, T12, T13**.
