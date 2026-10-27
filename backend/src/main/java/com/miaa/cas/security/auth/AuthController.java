@@ -11,6 +11,10 @@ import com.miaa.cas.security.CasPrincipal;
 import com.miaa.cas.security.auth.AuthDtos.ChangePasswordRequest;
 import com.miaa.cas.security.auth.AuthDtos.CsrfResponse;
 import com.miaa.cas.security.auth.AuthDtos.CurrentUserResponse;
+import com.miaa.cas.security.auth.AuthDtos.EmailCodeRequest;
+import com.miaa.cas.security.auth.AuthDtos.PasskeyRegistrationRequest;
+import com.miaa.cas.security.auth.AuthDtos.PasskeySignInRequest;
+import com.miaa.cas.security.auth.AuthDtos.EmailCodeSent;
 import com.miaa.cas.security.auth.AuthDtos.ForgotPasswordRequest;
 import com.miaa.cas.security.auth.AuthDtos.LoginRequest;
 import com.miaa.cas.security.auth.AuthDtos.LoginResponse;
@@ -22,6 +26,7 @@ import com.miaa.cas.security.auth.AuthDtos.RegenerateRecoveryCodesRequest;
 import com.miaa.cas.security.auth.AuthDtos.ResetPasswordRequest;
 import com.miaa.cas.security.auth.AuthDtos.TokenResponse;
 import com.miaa.cas.security.auth.AuthDtos.TotpEnrollmentResponse;
+import com.miaa.cas.security.mfa.PasskeyService;
 import com.miaa.cas.security.session.SessionService;
 import com.miaa.cas.security.session.SessionService.IssuedTokens;
 import io.swagger.v3.oas.annotations.Operation;
@@ -32,6 +37,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -39,7 +45,9 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.web.bind.annotation.CookieValue;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -89,6 +97,62 @@ public class AuthController {
     public ResponseEntity<TokenResponse> activate(@Valid @RequestBody MfaCodeRequest request, HttpServletRequest http) {
         AuthService.Enrolled enrolled = auth.activateTotp(request.mfaToken(), request.code(), ClientInfo.from(http));
         return tokenResponse(enrolled.tokens(), enrolled.recoveryCodes());
+    }
+
+    @PostMapping("/mfa/email/send")
+    @Operation(summary = "Send a one-time code to the user's e-mail for this sign-in step (when enabled)")
+    public ResponseEntity<EmailCodeSent> sendEmailCode(@Valid @RequestBody EmailCodeRequest request) {
+        return ResponseEntity.ok().header(HttpHeaders.CACHE_CONTROL, "no-store").body(auth.sendEmailCode(request.mfaToken()));
+    }
+
+    @PostMapping("/mfa/email/verify")
+    @Operation(summary = "Second-factor step with the e-mailed code; signs in")
+    public ResponseEntity<TokenResponse> verifyEmailCode(@Valid @RequestBody MfaCodeRequest request, HttpServletRequest http) {
+        return tokenResponse(auth.verifyEmailCode(request.mfaToken(), request.code(), ClientInfo.from(http)));
+    }
+
+    @PostMapping("/mfa/passkey/options")
+    @Operation(summary = "Passkey sign-in options for this sign-in step (users who have a passkey)")
+    public Map<String, Object> passkeyOptions(@Valid @RequestBody EmailCodeRequest request) {
+        return auth.passkeySignInOptions(request.mfaToken());
+    }
+
+    @PostMapping("/mfa/passkey/verify")
+    @Operation(summary = "Second-factor step with a passkey assertion; signs in")
+    public ResponseEntity<TokenResponse> passkeyVerify(@Valid @RequestBody PasskeySignInRequest request, HttpServletRequest http) {
+        return tokenResponse(auth.passkeySignIn(request.mfaToken(), request.credential().toString(), ClientInfo.from(http)));
+    }
+
+    @GetMapping("/passkeys")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Own passkeys")
+    public List<PasskeyService.Passkey> passkeys(@AuthenticationPrincipal CasPrincipal principal) {
+        return auth.passkeys(principal);
+    }
+
+    @PostMapping("/passkeys/options")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Start adding a passkey (needs a current authenticator code)")
+    public Map<String, Object> passkeyRegistrationOptions(@AuthenticationPrincipal CasPrincipal principal,
+            @Valid @RequestBody RegenerateRecoveryCodesRequest request) {
+        return auth.passkeyRegistrationOptions(principal, request.code());
+    }
+
+    @PostMapping("/passkeys")
+    @PreAuthorize("isAuthenticated()")
+    @ResponseStatus(HttpStatus.CREATED)
+    @Operation(summary = "Finish adding a passkey with the browser's attestation response")
+    public PasskeyService.Passkey registerPasskey(@AuthenticationPrincipal CasPrincipal principal,
+            @Valid @RequestBody PasskeyRegistrationRequest request) {
+        return auth.registerPasskey(principal, request.name(), request.credential().toString());
+    }
+
+    @DeleteMapping("/passkeys/{id}")
+    @PreAuthorize("isAuthenticated()")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Operation(summary = "Remove one of your passkeys")
+    public void removePasskey(@AuthenticationPrincipal CasPrincipal principal, @PathVariable UUID id) {
+        auth.removePasskey(principal, id);
     }
 
     @PostMapping("/mfa/recovery")

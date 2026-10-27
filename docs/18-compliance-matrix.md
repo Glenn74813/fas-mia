@@ -22,11 +22,11 @@ certification or legal advice.
 |---|---|---|---|---|
 | Unique named accounts; username or e-mail sign-in | `users` with unique username and case-insensitive e-mail | `AuthFlowIT` | Met | |
 | Strong password policy and hashing | `PasswordPolicy` (12–128, classes, blocked list, history); Argon2id | `PasswordPolicyTest`, `PasswordHashingTest` | Met | Argon2 cost to be tuned on production hardware |
-| MFA for all interactive users | TOTP, mandatory, replay-safe; single-use recovery codes for a lost authenticator, which force a new enrolment | `TotpTest`, `AuthFlowIT`, `MfaRecoveryIT` | Met | E-mail/SMS OTP blocked (C-16); WebAuthn not built |
+| MFA for all interactive users | TOTP, mandatory, replay-safe; single-use recovery codes; e-mail one-time codes as an alternative when enabled (TOR §4.2); passkeys with user verification (biometric or device PIN) | `TotpTest`, `AuthFlowIT`, `MfaRecoveryIT`, `MfaEmailCodeIT`, `PasskeyIT`, Playwright `passkeys.spec.ts` | Met | SMS OTP needs a gateway (C-16); e-mail codes need MIAA's SMTP relay |
 | Lockout and throttling | 5 failures → 15 min lock (database); per-address auth limit; cluster-wide API limit | `AuthFlowIT`, `AuthRateLimitFilterTest`, `ApiRateLimitIT` | Met | |
 | Session security and revocation | Short RS256 access token; rotating refresh token with reuse detection; admin revocation | `AuthFlowIT`, `UserAdminIT` | Met | |
 | Role-based access, deny by default | Permissions per role; `@PreAuthorize` everywhere; `denyAll()` fallback | `SecurityBaselineIT`, `RoleAdminIT` | Met | Role matrix is a proposal (C-08) |
-| Segregation of duties | 136 role-level rules (`SodPolicy`); transaction-level maker-checker in every workflow | `SodPolicyTest`, `UserAdminIT`, `ApprovalInboxIT` | Met | |
+| Segregation of duties | 139 role-level rules (`SodPolicy`); transaction-level maker-checker in every workflow | `SodPolicyTest`, `UserAdminIT`, `ApprovalInboxIT` | Met | |
 | Maker-checker on financial access grants | `RoleGrantService` (V37) | `AccessGovernanceIT` | Met | Proposed in C-19 |
 | Approval limits per role | `ApprovalLimitService` | `AccessGovernanceIT` | Partly met | Values pending (C-24) |
 | Periodic access reviews | `AccessReviewService`, Access reviews page | `AccessGovernanceIT` | Met | Frequency to be set by MIAA |

@@ -32,6 +32,10 @@ public final class EmailTemplates {
             case "ticket-sla-escalation" -> new Rendered("[" + v(m, "priority") + "] Ticket " + v(m, "ticketNumber") + " escalated: " + v(m, "kind"),
                     "Ticket " + v(m, "ticketNumber") + " (" + v(m, "title") + ") has been escalated.\n\n" + v(m, "detail") + "\n\n"
                             + baseUrl + "/tickets" + FOOTER);
+            case "mfa-email-code" -> new Rendered("Your MIAA CAS sign-in code: " + v(m, "code"),
+                    "Your MIAA CAS sign-in code is\n\n    " + v(m, "code") + "\n\nIt works once, for the next " + v(m, "minutes")
+                            + " minutes. Do not share it: MIAA staff will never ask for it.\n\nIf you did not just try to sign in, someone "
+                            + "knows your password: change it now and tell your system administrator." + FOOTER);
             case "scheduled-report-ready" -> new Rendered("Your scheduled report is ready: " + v(m, "scheduleName"),
                     "Your scheduled report \"" + v(m, "scheduleName") + "\" (" + v(m, "reportType") + ") has run. The file "
                             + v(m, "fileName") + " can be downloaded for " + v(m, "retentionDays") + " days.\n\nSign in and open My reports: "

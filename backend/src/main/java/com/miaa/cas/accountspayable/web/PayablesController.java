@@ -206,7 +206,7 @@ public class PayablesController {
     }
 
     @PostMapping("/disbursement-vouchers/{id}/{action:submit|approve|return|reject|cancel|post}")
-    @PreAuthorize("hasAnyAuthority('PERM_DISBURSEMENT_PREPARE', 'PERM_DV_CERTIFY', 'PERM_PAYMENT_APPROVE', 'PERM_JOURNAL_POST')")
+    @PreAuthorize("hasAnyAuthority('PERM_DISBURSEMENT_PREPARE', 'PERM_DV_BUDGET_CERTIFY', 'PERM_DV_CERTIFY', 'PERM_PAYMENT_APPROVE', 'PERM_JOURNAL_POST')")
     public DvView dvAction(@PathVariable UUID id, @PathVariable String action, @Valid @RequestBody ActionRequest request) {
         return switch (action) {
             case "submit" -> disbursements.submit(id, request.version(), request.comment());
@@ -224,6 +224,13 @@ public class PayablesController {
     public Object instruct(@PathVariable UUID id, @Valid @RequestBody PaymentInstructionRequest request, @RequestHeader(name = "Idempotency-Key", required = false) String idempotencyKey) {
         return idempotency.once("AP_PAYMENT_INSTRUCT", idempotencyKey, IdempotencyService.hash("AP_PAYMENT_INSTRUCT", id, request), 200,
                 () -> disbursements.instruct(id, request));
+    }
+
+    @PostMapping("/disbursement-vouchers/{id}/check-approval")
+    @PreAuthorize("hasAuthority('PERM_CHECK_APPROVE')")
+    @Operation(summary = "Approve the prepared check (a second person); it can then be released")
+    public DvView approveCheck(@PathVariable UUID id, @Valid @RequestBody ActionRequest request) {
+        return disbursements.approveCheck(id, request.version());
     }
 
     @PostMapping("/disbursement-vouchers/{id}/payment-void")

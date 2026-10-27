@@ -939,76 +939,6 @@
     },
     {
       "type" : "library",
-      "bom-ref" : "pkg:maven/com.fasterxml.jackson.core/jackson-databind@2.21.4?type=jar",
-      "publisher" : "FasterXML",
-      "group" : "com.fasterxml.jackson.core",
-      "name" : "jackson-databind",
-      "version" : "2.21.4",
-      "description" : "General data-binding functionality for Jackson: works on core streaming API",
-      "scope" : "required",
-      "hashes" : [
-        {
-          "alg" : "MD5",
-          "content" : "99769ad660a66c43caee5d539d19ed96"
-        },
-        {
-          "alg" : "SHA-1",
-          "content" : "09e495680be707d466527d734368ebf36e464da2"
-        },
-        {
-          "alg" : "SHA-256",
-          "content" : "3888e9e69ab66fbacaacc9aea0e9ffbf15368288e4aca468b024dba11c09fbf9"
-        },
-        {
-          "alg" : "SHA-512",
-          "content" : "11df9de9e69c0261b206a6c9add1d995af2e0711f895e2c8521d6bd2bb555671af0c3709931f9fa8abf987df9f37f46b891ea7b86d6edc3f437c43a757db45e7"
-        },
-        {
-          "alg" : "SHA-384",
-          "content" : "fdce9c6a945f19708b6b62134d581640de490ec5da5513548d714601dd676031d082cba8682467620df92fb7ad1da2ec"
-        },
-        {
-          "alg" : "SHA3-384",
-          "content" : "1802ae9db77d09667657e91e127edaaabc7f184173671fae18743974db7365b1862364910c52607f751602982fb82911"
-        },
-        {
-          "alg" : "SHA3-256",
-          "content" : "f4518cc429021650e13029087ac3793d6fb0f6fbd2762dd7dd81124100d55c53"
-        },
-        {
-          "alg" : "SHA3-512",
-          "content" : "3056ee2af42c04c1af119ff4e7bed127e4ed428015b2105f5a618e4c13a740755b90422e7da194425ae501f663716a68738fedbf98fef2b59cbbb5d7cdc57be2"
-        }
-      ],
-      "licenses" : [
-        {
-          "license" : {
-            "id" : "Apache-2.0"
-          }
-        }
-      ],
-      "purl" : "pkg:maven/com.fasterxml.jackson.core/jackson-databind@2.21.4?type=jar",
-      "externalReferences" : [
-        {
-          "type" : "website",
-          "url" : "https://github.com/FasterXML/jackson"
-        },
-        {
-          "type" : "distribution-intake",
-          "url" : "https://central.sonatype.com/api/v1/publisher"
-        },
-        {
-          "type" : "issue-tracker",
-          "url" : "https://github.com/FasterXML/jackson-databind/issues"
-        },
-        {
-          "type" : "vcs",
-          "url" : "https://github.com/FasterXML/jackson-databind"
-        }
-      ]
-    },
-    {
-      "type" : "library",
       "bom-ref" : "pkg:maven/com.fasterxml.jackson.datatype/jackson-datatype-jdk8@2.21.4?type=jar",
       "publisher" : "FasterXML",
       "group" : "com.fasterxml.jackson.datatype",
@@ -10873,6 +10803,274 @@
     },
     {
       "type" : "library",
+      "bom-ref" : "pkg:maven/com.webauthn4j/webauthn4j-core@0.30.3.RELEASE?type=jar",
+      "group" : "com.webauthn4j",
+      "name" : "webauthn4j-core",
+      "version" : "0.30.3.RELEASE",
+      "description" : "WebAuthn4J Core library",
+      "scope" : "required",
+      "hashes" : [
+        {
+          "alg" : "MD5",
+          "content" : "df40aebdafda763e8549e9994044adb1"
+        },
+        {
+          "alg" : "SHA-1",
+          "content" : "1d7044111fbb375e82ff4c75cef0ae0b0f3309ce"
+        },
+        {
+          "alg" : "SHA-256",
+          "content" : "22630b3a6d8d73483461e7eb10cef306f01ae9b8f4360bf77652db4f3c543e99"
+        },
+        {
+          "alg" : "SHA-512",
+          "content" : "cc2ba2f36d74a944a938bcc37d9e76c2212b7003ed7c9eed9d2b4ec8eef5bd06d75b0d745742dbc8d144956b42d42da6f7eea85599b35a269eae91085fbfacc0"
+        },
+        {
+          "alg" : "SHA-384",
+          "content" : "2745f0360885c4b5c99ae645e550f730dc3b94949b7b466ff9c54fbabaf1b456d3ad975bbcaaddc4b0c7c189d52ac1ca"
+        },
+        {
+          "alg" : "SHA3-384",
+          "content" : "b565d12880bbd95839651f182001d5f4103238b0e1bd673e61e04a33944352868b36b20be78018912169e93743c3eb79"
+        },
+        {
+          "alg" : "SHA3-256",
+          "content" : "3c55137cd7b59c2b8ae9d11322724378317aed395a461e6fe1ebf0df8dfb0f84"
+        },
+        {
+          "alg" : "SHA3-512",
+          "content" : "76d39afca402fb39ef3b197e22addee8b9e354d4ce55a03bca567fc47677cebf99bdbc525888728aa2c19a3b810aa412228be750bac500586aa81ef426385207"
+        }
+      ],
+      "licenses" : [
+        {
+          "license" : {
+            "id" : "Apache-2.0"
+          }
+        }
+      ],
+      "purl" : "pkg:maven/com.webauthn4j/webauthn4j-core@0.30.3.RELEASE?type=jar",
+      "externalReferences" : [
+        {
+          "type" : "website",
+          "url" : "https://github.com/webauthn4j/webauthn4j"
+        },
+        {
+          "type" : "vcs",
+          "url" : "https://github.com/webauthn4j/webauthn4j"
+        }
+      ]
+    },
+    {
+      "type" : "library",
+      "bom-ref" : "pkg:maven/com.fasterxml.jackson.core/jackson-databind@2.21.4?type=jar",
+      "publisher" : "FasterXML",
+      "group" : "com.fasterxml.jackson.core",
+      "name" : "jackson-databind",
+      "version" : "2.21.4",
+      "description" : "General data-binding functionality for Jackson: works on core streaming API",
+      "scope" : "required",
+      "hashes" : [
+        {
+          "alg" : "MD5",
+          "content" : "99769ad660a66c43caee5d539d19ed96"
+        },
+        {
+          "alg" : "SHA-1",
+          "content" : "09e495680be707d466527d734368ebf36e464da2"
+        },
+        {
+          "alg" : "SHA-256",
+          "content" : "3888e9e69ab66fbacaacc9aea0e9ffbf15368288e4aca468b024dba11c09fbf9"
+        },
+        {
+          "alg" : "SHA-512",
+          "content" : "11df9de9e69c0261b206a6c9add1d995af2e0711f895e2c8521d6bd2bb555671af0c3709931f9fa8abf987df9f37f46b891ea7b86d6edc3f437c43a757db45e7"
+        },
+        {
+          "alg" : "SHA-384",
+          "content" : "fdce9c6a945f19708b6b62134d581640de490ec5da5513548d714601dd676031d082cba8682467620df92fb7ad1da2ec"
+        },
+        {
+          "alg" : "SHA3-384",
+          "content" : "1802ae9db77d09667657e91e127edaaabc7f184173671fae18743974db7365b1862364910c52607f751602982fb82911"
+        },
+        {
+          "alg" : "SHA3-256",
+          "content" : "f4518cc429021650e13029087ac3793d6fb0f6fbd2762dd7dd81124100d55c53"
+        },
+        {
+          "alg" : "SHA3-512",
+          "content" : "3056ee2af42c04c1af119ff4e7bed127e4ed428015b2105f5a618e4c13a740755b90422e7da194425ae501f663716a68738fedbf98fef2b59cbbb5d7cdc57be2"
+        }
+      ],
+      "licenses" : [
+        {
+          "license" : {
+            "id" : "Apache-2.0"
+          }
+        }
+      ],
+      "purl" : "pkg:maven/com.fasterxml.jackson.core/jackson-databind@2.21.4?type=jar",
+      "externalReferences" : [
+        {
+          "type" : "website",
+          "url" : "https://github.com/FasterXML/jackson"
+        },
+        {
+          "type" : "distribution-intake",
+          "url" : "https://central.sonatype.com/api/v1/publisher"
+        },
+        {
+          "type" : "issue-tracker",
+          "url" : "https://github.com/FasterXML/jackson-databind/issues"
+        },
+        {
+          "type" : "vcs",
+          "url" : "https://github.com/FasterXML/jackson-databind"
+        }
+      ]
+    },
+    {
+      "type" : "library",
+      "bom-ref" : "pkg:maven/com.fasterxml.jackson.dataformat/jackson-dataformat-cbor@2.21.4?type=jar",
+      "publisher" : "FasterXML",
+      "group" : "com.fasterxml.jackson.dataformat",
+      "name" : "jackson-dataformat-cbor",
+      "version" : "2.21.4",
+      "description" : "Support for reading and writing Concise Binary Object Representation ([CBOR](https://www.rfc-editor.org/info/rfc7049) encoded data using Jackson abstractions (streaming API, data binding, tree model)",
+      "scope" : "required",
+      "hashes" : [
+        {
+          "alg" : "MD5",
+          "content" : "3c46562f2fe4e2fe6d6390d071944ab8"
+        },
+        {
+          "alg" : "SHA-1",
+          "content" : "154f7fbed7cc3261786c08ad58ba1fd87444e9b7"
+        },
+        {
+          "alg" : "SHA-256",
+          "content" : "fbde9e27625b5b8af54fbd2e184112b5471cf43216c38c2b9e039205a50bd6a9"
+        },
+        {
+          "alg" : "SHA-512",
+          "content" : "9b7ce96e6cd134e69d6a0915fd86c23704381fdf5bcbc859a2b7dda39734f8f1e9c5ece69f85cc9c96e3d5412784e03f6e8cf8487441ee68547055047e27d2a1"
+        },
+        {
+          "alg" : "SHA-384",
+          "content" : "2d468f20db6817aea6b815908169efa3aae6edfb2dd0a40a938b4398ad6ce474b2d3dc3859b9f87382961a1222d48c85"
+        },
+        {
+          "alg" : "SHA3-384",
+          "content" : "12c11112b97e90fee5911c02fdee033021c2b537102ae4d4092e1f195585316d1db31d12c98e481a7464ac6b356157f4"
+        },
+        {
+          "alg" : "SHA3-256",
+          "content" : "7f5e44efa8b26dcbf0d90bc46e3f53c33f2c8ce7540b802de57091cbee47f2b4"
+        },
+        {
+          "alg" : "SHA3-512",
+          "content" : "a6bcecd0c2f7e6318a107c8a1d636ca297104b808b5b85e11138b23177f16fa8cfe68f35b38b1ffa041a183cefcfcf422305d0cb4f51c3a0601ebdc90d030fdd"
+        }
+      ],
+      "licenses" : [
+        {
+          "license" : {
+            "id" : "Apache-2.0"
+          }
+        }
+      ],
+      "purl" : "pkg:maven/com.fasterxml.jackson.dataformat/jackson-dataformat-cbor@2.21.4?type=jar",
+      "externalReferences" : [
+        {
+          "type" : "website",
+          "url" : "https://github.com/FasterXML/jackson-dataformats-binary"
+        },
+        {
+          "type" : "distribution-intake",
+          "url" : "https://central.sonatype.com/api/v1/publisher"
+        },
+        {
+          "type" : "issue-tracker",
+          "url" : "https://github.com/FasterXML/jackson-dataformats-binary/issues"
+        },
+        {
+          "type" : "vcs",
+          "url" : "https://github.com/FasterXML/jackson-dataformats-binary/jackson-dataformat-cbor"
+        }
+      ]
+    },
+    {
+      "type" : "library",
+      "bom-ref" : "pkg:maven/com.tngtech.archunit/archunit@1.4.2?type=jar",
+      "publisher" : "TNG Technology Consulting GmbH",
+      "group" : "com.tngtech.archunit",
+      "name" : "archunit",
+      "version" : "1.4.2",
+      "description" : "A Java architecture test library, to specify and assert architecture rules in plain Java - Module 'archunit'",
+      "scope" : "required",
+      "hashes" : [
+        {
+          "alg" : "MD5",
+          "content" : "956396ed98260153ffee39be34cb37e1"
+        },
+        {
+          "alg" : "SHA-1",
+          "content" : "41efd6bf14ed4f016b3efbfc4cf73b88b1d4e0a7"
+        },
+        {
+          "alg" : "SHA-256",
+          "content" : "6d8adf69a3f109ebe1b395764feb07f919e9e0e2ab5e2ea141d2e6251ba7d17f"
+        },
+        {
+          "alg" : "SHA-512",
+          "content" : "591e336a7426fc6bc4abb22e590c98ae696d3a6bfa9a2a95f9da9c6bc5ac58fc4c05085072c033d0c00a46111587d789f56f9503b2bbc3001a34ce01ad1ccb8d"
+        },
+        {
+          "alg" : "SHA-384",
+          "content" : "c52023aa464bb4cc4ebe41559a9a469a86e12df838af0b36f237fe321a218a85099cc1a24bd9b358e69c024e3301cef2"
+        },
+        {
+          "alg" : "SHA3-384",
+          "content" : "a362253153db4b18857c8e14437134bed762a15239a8c3e384b4486876d73c00a08d59609a711276cc5079a7430bf663"
+        },
+        {
+          "alg" : "SHA3-256",
+          "content" : "6b206714ada5b37e23217d471ed394c74fab6aa4c5df58deb14f8719ecbfba86"
+        },
+        {
+          "alg" : "SHA3-512",
+          "content" : "ed5a521c0cfa8ae1463830dfe7703b42ce92975f8e0ebd76c2958943055ea3742dcca507a809c90de91b0b20b2420790cbe52b7779d35ec4a69ea28fa3205f7c"
+        }
+      ],
+      "licenses" : [
+        {
+          "license" : {
+            "id" : "Apache-2.0"
+          }
+        },
+        {
+          "license" : {
+            "id" : "BSD-4-Clause"
+          }
+        }
+      ],
+      "purl" : "pkg:maven/com.tngtech.archunit/archunit@1.4.2?type=jar",
+      "externalReferences" : [
+        {
+          "type" : "website",
+          "url" : "https://github.com/TNG/ArchUnit"
+        },
+        {
+          "type" : "vcs",
+          "url" : "https://github.com/TNG/ArchUnit"
+        }
+      ]
+    },
+    {
+      "type" : "library",
       "bom-ref" : "pkg:maven/org.springframework.security/spring-security-test@6.5.11?type=jar",
       "publisher" : "Pivotal Software, Inc.",
       "group" : "org.springframework.security",
@@ -11798,6 +11996,8 @@
         "pkg:maven/io.micrometer/micrometer-registry-prometheus@1.15.12?type=jar",
         "pkg:maven/io.micrometer/micrometer-tracing-bridge-otel@1.5.12?type=jar",
         "pkg:maven/org.springframework.boot/spring-boot-starter-test@3.5.16?type=jar",
+        "pkg:maven/com.webauthn4j/webauthn4j-core@0.30.3.RELEASE?type=jar",
+        "pkg:maven/com.tngtech.archunit/archunit@1.4.2?type=jar",
         "pkg:maven/org.springframework.security/spring-security-test@6.5.11?type=jar",
         "pkg:maven/org.testcontainers/junit-jupiter@1.21.4?type=jar",
         "pkg:maven/org.testcontainers/postgresql@1.21.4?type=jar"
@@ -12876,6 +13076,27 @@
       "ref" : "pkg:maven/org.xmlunit/xmlunit-core@2.10.4?type=jar",
       "dependsOn" : [
         "pkg:maven/jakarta.xml.bind/jakarta.xml.bind-api@4.0.5?type=jar"
+      ]
+    },
+    {
+      "ref" : "pkg:maven/com.webauthn4j/webauthn4j-core@0.30.3.RELEASE?type=jar",
+      "dependsOn" : [
+        "pkg:maven/com.fasterxml.jackson.core/jackson-databind@2.21.4?type=jar",
+        "pkg:maven/com.fasterxml.jackson.dataformat/jackson-dataformat-cbor@2.21.4?type=jar",
+        "pkg:maven/org.slf4j/slf4j-api@2.0.18?type=jar"
+      ]
+    },
+    {
+      "ref" : "pkg:maven/com.fasterxml.jackson.dataformat/jackson-dataformat-cbor@2.21.4?type=jar",
+      "dependsOn" : [
+        "pkg:maven/com.fasterxml.jackson.core/jackson-core@2.21.4?type=jar",
+        "pkg:maven/com.fasterxml.jackson.core/jackson-databind@2.21.4?type=jar"
+      ]
+    },
+    {
+      "ref" : "pkg:maven/com.tngtech.archunit/archunit@1.4.2?type=jar",
+      "dependsOn" : [
+        "pkg:maven/org.slf4j/slf4j-api@2.0.18?type=jar"
       ]
     },
     {

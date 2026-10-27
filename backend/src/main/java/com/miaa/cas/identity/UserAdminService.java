@@ -19,6 +19,7 @@ import com.miaa.cas.identity.web.IdentityDtos.RoleAssignmentResult;
 import com.miaa.cas.identity.web.IdentityDtos.UpdateUserRequest;
 import com.miaa.cas.identity.web.IdentityDtos.UserDetail;
 import com.miaa.cas.identity.web.IdentityDtos.UserSummary;
+import com.miaa.cas.security.mfa.PasskeyService;
 import com.miaa.cas.security.mfa.RecoveryCodeService;
 import com.miaa.cas.security.password.PasswordPolicy;
 import com.miaa.cas.security.session.SessionService;
@@ -59,11 +60,13 @@ public class UserAdminService {
     private final Clock clock;
     private final RoleGrantService grants;
     private final RecoveryCodeService recoveryCodes;
+    private final PasskeyService passkeys;
 
     public UserAdminService(UserRepository users, RoleRepository roles, RoleAssignments assignments,
             PermissionCatalog catalog, MfaMethodRepository mfaMethods, SessionService sessions,
             PasswordPolicy passwordPolicy, PasswordEncoder encoder, AuditService audit, Clock clock, RoleGrantService grants,
-            RecoveryCodeService recoveryCodes) {
+            RecoveryCodeService recoveryCodes, PasskeyService passkeys) {
+        this.passkeys = passkeys;
         this.grants = grants;
         this.recoveryCodes = recoveryCodes;
         this.users = users;
@@ -213,8 +216,9 @@ public class UserAdminService {
         List<MfaMethod> active = mfaMethods.findByUserIdAndStatus(id, MfaMethod.ACTIVE);
         active.forEach(m -> m.revoke(now));
         int codes = recoveryCodes.revokeAll(id, now);
+        int keys = passkeys.revokeAll(id, now);
         int revoked = sessions.revokeAll(id, "MFA_RESET");
-        audit.record("USER_MFA_RESET", "USER", id, Map.of("methodsRevoked", active.size(), "recoveryCodesRevoked", codes,
+        audit.record("USER_MFA_RESET", "USER", id, Map.of("methodsRevoked", active.size(), "recoveryCodesRevoked", codes, "passkeysRevoked", keys,
                 "sessionsRevoked", revoked));
         return detail(user);
     }

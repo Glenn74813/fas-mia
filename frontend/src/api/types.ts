@@ -6,6 +6,8 @@ export type LoginStatus = 'MFA_REQUIRED' | 'MFA_ENROLLMENT_REQUIRED' | 'DEV_MFA_
 export interface LoginResponse {
   status: LoginStatus;
   mfaToken: string;
+  /** Second factors this sign-in step accepts: always TOTP; EMAIL when codes by e-mail are enabled. */
+  methods?: string[];
 }
 
 export interface TotpEnrollment {
@@ -621,10 +623,34 @@ export interface DvView {
   postedEntryId: string | null;
   postedEntryNumber: string | null;
   lines: { invoiceId: string; invoiceNumber: string; dueDate: string; invoicePayable: string; amount: string }[];
+  /** The COB position of each budget line this DV pays (for the Budget Division's certification). */
+  budget: DvBudgetLine[];
+  check: DvCheck | null;
   decisions: Decision[];
   documents: DocumentInfo[];
   availableActions: string[];
   version: number;
+}
+
+export interface DvBudgetLine {
+  accountCode: string;
+  accountName: string;
+  costCenterCode: string | null;
+  charged: string;
+  status: 'ALLOCATED' | 'NO_ALLOCATION' | 'NO_BUDGET';
+  allocation: string | null;
+  allotment: string | null;
+  used: string | null;
+  available: string | null;
+}
+
+export interface DvCheck {
+  bankAccountCode: string;
+  checkNumber: string;
+  status: 'PREPARED' | 'ISSUED' | 'RELEASED' | 'VOIDED' | 'CLEARED';
+  preparedBy: string;
+  approvedBy: string | null;
+  approvedAt: string | null;
 }
 
 export interface AgingRow {

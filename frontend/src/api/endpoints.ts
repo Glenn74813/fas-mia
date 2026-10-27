@@ -26,6 +26,18 @@ export const authApi = {
   activateTotp: (mfaToken: string, code: string) =>
     api.post<TokenResponse>('/auth/mfa/totp/activate', { mfaToken, code }, noAuth),
   verifyTotp: (mfaToken: string, code: string) => api.post<TokenResponse>('/auth/mfa/verify', { mfaToken, code }, noAuth),
+  sendEmailCode: (mfaToken: string) =>
+    api.post<{ sentTo: string; expiresAt: string }>('/auth/mfa/email/send', { mfaToken }, noAuth),
+  verifyEmailCode: (mfaToken: string, code: string) =>
+    api.post<TokenResponse>('/auth/mfa/email/verify', { mfaToken, code }, noAuth),
+  passkeySignInOptions: (mfaToken: string) =>
+    api.post<Record<string, unknown>>('/auth/mfa/passkey/options', { mfaToken }, noAuth),
+  passkeySignIn: (mfaToken: string, credential: Record<string, unknown>) =>
+    api.post<TokenResponse>('/auth/mfa/passkey/verify', { mfaToken, credential }, noAuth),
+  passkeys: () => api.get<{ id: string; name: string; createdAt: string; lastUsedAt: string | null }[]>('/auth/passkeys'),
+  passkeyRegistrationOptions: (code: string) => api.post<Record<string, unknown>>('/auth/passkeys/options', { code }),
+  registerPasskey: (name: string, credential: Record<string, unknown>) => api.post<{ id: string; name: string }>('/auth/passkeys', { name, credential }),
+  removePasskey: (id: string) => api.delete<void>(`/auth/passkeys/${id}`),
   recover: (mfaToken: string, recoveryCode: string) =>
     api.post<LoginResponse>('/auth/mfa/recovery', { mfaToken, recoveryCode }, noAuth),
   regenerateRecoveryCodes: (code: string) => api.post<{ codes: string[] }>('/auth/recovery-codes', { code }),
@@ -237,6 +249,7 @@ export const dvApi = {
     api.post<DvView>(`/disbursement-vouchers/${id}/payment-void`, { version, reason }),
   confirm: (id: string, version: number, releasedOn: string) =>
     api.post<DvView>(`/disbursement-vouchers/${id}/payment-confirmation`, { version, releasedOn }),
+  approveCheck: (id: string, version: number) => api.post<DvView>(`/disbursement-vouchers/${id}/check-approval`, { version }),
   upload: (id: string, file: File) => api.upload<DocumentInfo>(`/disbursement-vouchers/${id}/documents`, file),
 };
 

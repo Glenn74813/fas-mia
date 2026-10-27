@@ -16,11 +16,14 @@ import com.miaa.cas.identity.domain.User;
 import com.miaa.cas.identity.domain.UserRepository;
 import com.miaa.cas.security.CasPrincipal;
 import com.miaa.cas.security.auth.AuthDtos.CurrentUserResponse;
+import com.miaa.cas.security.auth.AuthDtos.EmailCodeSent;
 import com.miaa.cas.security.auth.AuthDtos.LoginResponse;
 import com.miaa.cas.security.auth.AuthDtos.LoginStatus;
 import com.miaa.cas.security.auth.AuthDtos.TotpEnrollmentResponse;
 import com.miaa.cas.security.jwt.TokenService;
 import com.miaa.cas.security.jwt.TokenService.MfaPurpose;
+import com.miaa.cas.security.mfa.EmailOtpService;
+import com.miaa.cas.security.mfa.PasskeyService;
 import com.miaa.cas.security.mfa.RecoveryCodeService;
 import com.miaa.cas.security.mfa.Totp;
 import com.miaa.cas.security.password.PasswordPolicy;
@@ -61,6 +64,8 @@ public class AuthService {
     private final Clock clock;
     private final DevMfaBypass devMfaBypass;
     private final RecoveryCodeService recoveryCodes;
+    private final EmailOtpService emailOtp;
+    private final PasskeyService passkeys;
     private final String dummyHash;
 
     /** A completed enrolment: the session, and the recovery codes to show once. */
@@ -70,8 +75,11 @@ public class AuthService {
     public AuthService(UserRepository users, MfaMethodRepository mfaMethods, RoleAssignments roleAssignments,
             PasswordEncoder passwordEncoder, PasswordPolicy passwordPolicy, TokenService tokens, SessionService sessions,
             SecurityEventService securityEvents, AuditService audit, AesGcmEncryptor encryptor, CasProperties properties,
-            Clock clock, DevMfaBypass devMfaBypass, RecoveryCodeService recoveryCodes) {
+            Clock clock, DevMfaBypass devMfaBypass, RecoveryCodeService recoveryCodes, EmailOtpService emailOtp,
+            PasskeyService passkeys) {
+        this.passkeys = passkeys;
         this.devMfaBypass = devMfaBypass;
+        this.emailOtp = emailOtp;
         this.recoveryCodes = recoveryCodes;
         this.users = users;
         this.mfaMethods = mfaMethods;
@@ -117,11 +125,11 @@ public class AuthService {
         boolean enrolled = activeTotp(user.getId()) != null;
         securityEvents.record(actor, "LOGIN_PASSWORD_VERIFIED", "SUCCESS", Severity.INFO, Map.of());
         if (devMfaBypass.applies(user.getUsername())) {
-            return new LoginResponse(LoginStatus.DEV_MFA_BYPASS, tokens.issueMfaToken(user.getId(), MfaPurpose.VERIFY));
+            return new LoginResponse(LoginStatus.DEV_MFA_BYPASS, tokens.issueMfaToken(user.getId(), MfaPurpose.VERIFY), List.of());
         }
         MfaPurpose purpose = enrolled ? MfaPurpose.VERIFY : MfaPurpose.ENROLL;
         return new LoginResponse(enrolled ? LoginStatus.MFA_REQUIRED : LoginStatus.MFA_ENROLLMENT_REQUIRED,
-                tokens.issueMfaToken(user.getId(), purpose));
+                tokens.issueMfaToken(user.getId(), purpose), enrolled ? verifyMethods(user) : List.of("TOTP"));
     }
 
     @Transactional
@@ -198,7 +206,7 @@ public class AuthService {
         securityEvents.record(actor, "MFA_RECOVERY_CODE_USED", "SUCCESS", Severity.MEDIUM,
                 Map.of("authenticatorsRevoked", active.size(), "sessionsRevoked", revokedSessions, "codesLeft", left));
         audit.record(actor, "MFA_RECOVERED", "USER", userId, Map.of("authenticatorsRevoked", active.size()));
-        return new LoginResponse(LoginStatus.MFA_ENROLLMENT_REQUIRED, tokens.issueMfaToken(userId, MfaPurpose.ENROLL));
+        return new LoginResponse(LoginStatus.MFA_ENROLLMENT_REQUIRED, tokens.issueMfaToken(userId, MfaPurpose.ENROLL), List.of("TOTP"));
     }
 
     /** Replaces the signed-in user's recovery codes; needs a current authenticator code, so a stolen session cannot. */
@@ -207,6 +215,14 @@ public class AuthService {
         User user = users.findByIdForUpdate(principal.userId()).orElseThrow(() -> ApiException.notFound("User"));
         Instant now = Instant.now(clock);
         Actor actor = new Actor(user.getId(), user.getUsername());
+        requireCurrentCode(user, actor, code, now);
+        List<String> codes = recoveryCodes.issue(user.getId(), now);
+        audit.record(actor, "MFA_RECOVERY_CODES_REGENERATED", "USER", user.getId(), Map.of("issued", codes.size()));
+        return codes;
+    }
+
+    /** A current authenticator code from the signed-in user, so a stolen session alone cannot change their factors. */
+    private void requireCurrentCode(User user, Actor actor, String code, Instant now) {
         MfaMethod method = activeTotp(user.getId());
         if (method == null) {
             throw new ApiException(ErrorCode.INVALID_STATE, "Set up an authenticator first.");
@@ -218,9 +234,66 @@ public class AuthService {
             throw new ApiException(ErrorCode.AUTH_MFA_INVALID, "The verification code is not valid.");
         }
         method.markUsed(step.getAsLong());
-        List<String> codes = recoveryCodes.issue(user.getId(), now);
-        audit.record(actor, "MFA_RECOVERY_CODES_REGENERATED", "USER", user.getId(), Map.of("issued", codes.size()));
-        return codes;
+    }
+
+    /** Starts adding a passkey: needs a current authenticator code; returns the options for the browser. */
+    @Transactional(noRollbackFor = ApiException.class)
+    public Map<String, Object> passkeyRegistrationOptions(CasPrincipal principal, String code) {
+        User user = users.findByIdForUpdate(principal.userId()).orElseThrow(() -> ApiException.notFound("User"));
+        Instant now = Instant.now(clock);
+        requireCurrentCode(user, new Actor(user.getId(), user.getUsername()), code, now);
+        return passkeys.registrationOptions(user.getId(), user.getUsername(), user.getDisplayName(), now);
+    }
+
+    @Transactional(noRollbackFor = ApiException.class)
+    public PasskeyService.Passkey registerPasskey(CasPrincipal principal, String name, String responseJson) {
+        User user = users.findByIdForUpdate(principal.userId()).orElseThrow(() -> ApiException.notFound("User"));
+        Instant now = Instant.now(clock);
+        PasskeyService.Passkey p = passkeys.register(user.getId(), name, responseJson, now);
+        Actor actor = new Actor(user.getId(), user.getUsername());
+        audit.record(actor, "PASSKEY_REGISTERED", "USER", user.getId(), Map.of("passkey", p.id().toString(), "name", p.name()));
+        securityEvents.record(actor, "PASSKEY_REGISTERED", "SUCCESS", Severity.MEDIUM, Map.of("name", p.name()));
+        return p;
+    }
+
+    @Transactional(readOnly = true)
+    public List<PasskeyService.Passkey> passkeys(CasPrincipal principal) {
+        return passkeys.list(principal.userId());
+    }
+
+    @Transactional
+    public void removePasskey(CasPrincipal principal, UUID passkeyId) {
+        if (!passkeys.revoke(principal.userId(), passkeyId, Instant.now(clock))) {
+            throw ApiException.notFound("Passkey");
+        }
+        audit.record(new Actor(principal.userId(), principal.username()), "PASSKEY_REMOVED", "USER", principal.userId(),
+                Map.of("passkey", passkeyId.toString()));
+    }
+
+    /** Options for signing in with a passkey at this sign-in step (users who have one). */
+    @Transactional(noRollbackFor = ApiException.class)
+    public Map<String, Object> passkeySignInOptions(String mfaToken) {
+        TokenService.MfaChallenge challenge = tokens.parseMfaToken(mfaToken, MfaPurpose.VERIFY);
+        User user = lockedCandidate(challenge.userId());
+        if (!passkeys.has(user.getId())) {
+            throw new ApiException(ErrorCode.AUTH_TOKEN_INVALID, "The sign-in step is not valid. Start again.");
+        }
+        return passkeys.authenticationOptions(user.getId(), challenge.challengeId(), Instant.now(clock));
+    }
+
+    /** Completes the second step with a passkey; a failed assertion counts towards the lockout. */
+    @Transactional(noRollbackFor = ApiException.class)
+    public IssuedTokens passkeySignIn(String mfaToken, String responseJson, ClientInfo client) {
+        TokenService.MfaChallenge challenge = tokens.parseMfaToken(mfaToken, MfaPurpose.VERIFY);
+        User user = lockedCandidate(challenge.userId());
+        Instant now = Instant.now(clock);
+        Actor actor = new Actor(user.getId(), user.getUsername());
+        if (!passkeys.authenticate(user.getId(), challenge.challengeId(), responseJson, now)) {
+            registerFailure(user, actor, "MFA_FAILED", now);
+            throw new ApiException(ErrorCode.AUTH_MFA_INVALID, "The passkey could not be verified. Try again or use your authenticator app.");
+        }
+        securityEvents.record(actor, "MFA_PASSKEY_USED", "SUCCESS", Severity.INFO, Map.of());
+        return completeSignIn(user, actor, client, now);
     }
 
     /** Development only: completes the sign-in of a user named in cas.mfa.dev-bypass-users without a code. */
@@ -254,6 +327,49 @@ public class AuthService {
         }
         method.markUsed(step.getAsLong());
         return completeSignIn(user, actor, client, now);
+    }
+
+    /**
+     * Sends a one-time code to the user's e-mail for this sign-in step (an enrolled user's alternative to the
+     * authenticator, TOR §4.2). Returns the masked address and when the code expires.
+     */
+    @Transactional(noRollbackFor = ApiException.class)
+    public EmailCodeSent sendEmailCode(String mfaToken) {
+        TokenService.MfaChallenge challenge = tokens.parseMfaToken(mfaToken, MfaPurpose.VERIFY);
+        User user = lockedCandidate(challenge.userId());
+        if (activeTotp(user.getId()) == null) {
+            throw new ApiException(ErrorCode.AUTH_TOKEN_INVALID, "The sign-in step is not valid. Start again.");
+        }
+        Instant now = Instant.now(clock);
+        EmailOtpService.Sent sent = emailOtp.send(user.getId(), challenge.challengeId(), user.getEmail(), challenge.expiresAt(), now);
+        securityEvents.record(new Actor(user.getId(), user.getUsername()), "MFA_EMAIL_CODE_SENT", "SUCCESS", Severity.INFO, Map.of());
+        return new EmailCodeSent(sent.maskedEmail(), sent.expiresAt());
+    }
+
+    /** Completes the second step with the e-mailed code; a wrong code counts towards the lockout. */
+    @Transactional(noRollbackFor = ApiException.class)
+    public IssuedTokens verifyEmailCode(String mfaToken, String code, ClientInfo client) {
+        TokenService.MfaChallenge challenge = tokens.parseMfaToken(mfaToken, MfaPurpose.VERIFY);
+        User user = lockedCandidate(challenge.userId());
+        Instant now = Instant.now(clock);
+        Actor actor = new Actor(user.getId(), user.getUsername());
+        if (!emailOtp.enabled() || !emailOtp.verify(user.getId(), challenge.challengeId(), code, now)) {
+            registerFailure(user, actor, "MFA_FAILED", now);
+            throw new ApiException(ErrorCode.AUTH_MFA_INVALID, "The code is not valid or has expired. Request a new one.");
+        }
+        securityEvents.record(actor, "MFA_EMAIL_CODE_USED", "SUCCESS", Severity.INFO, Map.of());
+        return completeSignIn(user, actor, client, now);
+    }
+
+    private List<String> verifyMethods(User user) {
+        List<String> methods = new java.util.ArrayList<>(List.of("TOTP"));
+        if (emailOtp.enabled() && user.getEmail() != null && !user.getEmail().isBlank()) {
+            methods.add("EMAIL");
+        }
+        if (passkeys.has(user.getId())) {
+            methods.add("PASSKEY");
+        }
+        return methods;
     }
 
     @Transactional(readOnly = true)

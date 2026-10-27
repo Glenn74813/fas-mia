@@ -6,6 +6,7 @@ export type AuthStatus = 'loading' | 'anonymous' | 'authenticated';
 export interface PendingMfa {
   status: LoginResponse['status'];
   mfaToken: string;
+  methods?: string[];
 }
 
 export interface AuthState {
@@ -16,6 +17,11 @@ export interface AuthState {
   passwordStep: (identifier: string, password: string) => Promise<LoginResponse>;
   beginEnrollment: () => Promise<TotpEnrollment>;
   completeMfa: (code: string) => Promise<TokenResponse>;
+  /** E-mail alternative to the authenticator (when the sign-in step offers EMAIL). */
+  sendEmailCode: () => Promise<{ sentTo: string; expiresAt: string }>;
+  completeEmailCode: (code: string) => Promise<TokenResponse>;
+  /** Passkey alternative (when the sign-in step offers PASSKEY): runs the browser prompt and signs in. */
+  completePasskey: () => Promise<TokenResponse>;
   /** Lost authenticator: spends a recovery code; the sign-in continues with a new authenticator enrolment. */
   recoverWithCode: (recoveryCode: string) => Promise<void>;
   /** Recovery codes from a just-completed enrolment; the session starts once the user confirms they saved them. */

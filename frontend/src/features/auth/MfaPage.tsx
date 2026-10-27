@@ -1,8 +1,10 @@
+import { KeyRound } from 'lucide-react';
 import QRCode from 'qrcode';
 import { useEffect, useState, type FormEvent } from 'react';
 import { Navigate, useNavigate } from 'react-router';
 import type { TotpEnrollment } from '../../api/types';
 import { useAuth } from '../../auth/AuthContext';
+import { passkeysSupported } from '../../auth/webauthn';
 import { Button } from '../../components/Button';
 import { ErrorAlert } from '../../components/ErrorAlert';
 import { Field } from '../../components/Field';
@@ -11,7 +13,9 @@ import { Spinner } from '../../components/Spinner';
 import { AuthLayout } from '../../layouts/AuthLayout';
 
 export function MfaPage() {
-  const { pendingMfa, beginEnrollment, completeMfa, recoverWithCode, newRecoveryCodes, acknowledgeRecoveryCodes, status } = useAuth();
+  const { pendingMfa, beginEnrollment, completeMfa, sendEmailCode, completeEmailCode, completePasskey, recoverWithCode, newRecoveryCodes,
+    acknowledgeRecoveryCodes, status } = useAuth();
+  const [emailSentTo, setEmailSentTo] = useState<string | null>(null);
   const navigate = useNavigate();
   const [code, setCode] = useState('');
   const [recoveryCode, setRecoveryCode] = useState('');
@@ -81,6 +85,49 @@ export function MfaPage() {
     }
   };
 
+  const viaEmail = !!emailSentTo;
+  const sendCode = async () => {
+    setBusy(true);
+    setError(null);
+    try {
+      setEmailSentTo((await sendEmailCode()).sentTo);
+      setCode('');
+    } catch (err) {
+      setError(err);
+    } finally {
+      setBusy(false);
+    }
+  };
+  const submitEmail = async (e: FormEvent) => {
+    e.preventDefault();
+    setBusy(true);
+    setError(null);
+    try {
+      const tokens = await completeEmailCode(code);
+      navigate(tokens.user.mustChangePassword ? '/change-password' : '/', { replace: true });
+    } catch (err) {
+      setError(err);
+      setCode('');
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const withPasskey = async () => {
+    setBusy(true);
+    setError(null);
+    try {
+      const tokens = await completePasskey();
+      navigate(tokens.user.mustChangePassword ? '/change-password' : '/', { replace: true });
+    } catch (err) {
+      // The browser reports a cancelled or timed-out prompt as NotAllowedError: say so plainly.
+      setError(err instanceof DOMException && err.name === 'NotAllowedError'
+        ? new Error('The passkey prompt was cancelled or timed out. Try again, or use your authenticator app.') : err);
+    } finally {
+      setBusy(false);
+    }
+  };
+
   const recover = async (e: FormEvent) => {
     e.preventDefault();
     setBusy(true);
@@ -117,7 +164,7 @@ export function MfaPage() {
 
   return (
     <AuthLayout title={enrolling ? 'Set up your authenticator' : 'Two-step verification'}>
-      <form onSubmit={submit} className="space-y-4">
+      <form onSubmit={viaEmail ? submitEmail : submit} className="space-y-4">
         <ErrorAlert error={error} />
         {enrolling ? (
           <div className="space-y-3 text-sm text-slate-700">
@@ -132,6 +179,9 @@ export function MfaPage() {
               <p className="break-all rounded bg-slate-100 p-2 font-mono text-xs">Manual key: {enrollment.secret}</p>
             )}
           </div>
+        ) : viaEmail ? (
+          <p className="text-sm text-slate-700">We sent a 6-digit code to <strong>{emailSentTo}</strong>. It works once, for the
+            next 5 minutes. <button type="button" className="text-brand-700 hover:underline" disabled={busy} onClick={sendCode}>Send a new code</button></p>
         ) : (
           <p className="text-sm text-slate-700">Open your authenticator app and enter the 6-digit code shown for
             <strong> MIAA CAS</strong>. The code changes every 30 seconds.</p>
@@ -141,6 +191,14 @@ export function MfaPage() {
         <Button type="submit" busy={busy} disabled={code.length !== 6} className="w-full">Verify</Button>
         {!enrolling && (
           <div className="space-y-1 border-t border-slate-200 pt-4 text-sm text-slate-600">
+            {pendingMfa.methods?.includes('PASSKEY') && passkeysSupported() && !viaEmail && (
+              <Button variant="secondary" className="mb-2 w-full" busy={busy} onClick={withPasskey}>
+                <KeyRound aria-hidden className="h-4 w-4" />Use a passkey (fingerprint, face or device PIN)</Button>)}
+            {pendingMfa.methods?.includes('EMAIL') && (viaEmail
+              ? <button type="button" className="block font-medium text-brand-700 hover:underline" onClick={() => { setEmailSentTo(null); setCode(''); setError(null); }}>
+                Use my authenticator app instead</button>
+              : <button type="button" className="block font-medium text-brand-700 hover:underline" disabled={busy} onClick={sendCode}>
+                Send a code to my e-mail instead</button>)}
             <button type="button" className="font-medium text-brand-700 hover:underline" onClick={() => { setUseRecovery(true); setError(null); }}>
               Lost your authenticator? Use a recovery code</button>
             <p>No recovery codes either? Ask your system administrator to reset your two-step verification.</p>

@@ -1,7 +1,9 @@
 package com.miaa.cas.security.auth;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.JsonNode;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import java.time.Instant;
@@ -21,7 +23,20 @@ public final class AuthDtos {
     /** DEV_MFA_BYPASS: development only (see {@link DevMfaBypass}); complete the sign-in at /auth/mfa/dev-bypass. */
     public enum LoginStatus { MFA_REQUIRED, MFA_ENROLLMENT_REQUIRED, DEV_MFA_BYPASS }
 
-    public record LoginResponse(LoginStatus status, String mfaToken) {
+    /** methods: the second factors this sign-in step accepts (TOTP, EMAIL), so the screen can offer them. */
+    public record LoginResponse(LoginStatus status, String mfaToken, List<String> methods) {
+    }
+
+    public record EmailCodeRequest(@NotBlank @Size(max = 4096) String mfaToken) {
+    }
+
+    public record PasskeySignInRequest(@NotBlank @Size(max = 4096) String mfaToken, @NotNull JsonNode credential) {
+    }
+
+    public record PasskeyRegistrationRequest(@NotBlank @Size(max = 100) String name, @NotNull JsonNode credential) {
+    }
+
+    public record EmailCodeSent(String sentTo, Instant expiresAt) {
     }
 
     public record MfaTokenRequest(@NotBlank @Size(max = 4096) String mfaToken) {

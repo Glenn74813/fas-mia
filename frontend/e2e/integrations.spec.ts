@@ -34,12 +34,13 @@ test('verified bank details feed an ADA payment file, and posted documents go to
   const dvo = await onboard(token, 'pfdvo', ['DISBURSEMENT_OFFICER']);
   const fm = await onboard(token, 'pffm', ['FINANCE_MANAGER']);
   const cashier = await onboard(token, 'pfcash', ['CASHIER']);
+  const budgetOfficer = await onboard(token, 'pfbgt', ['BUDGET_OFFICER']);
   await nextTotpWindow();
   const tag = Date.now().toString(36).toUpperCase();
   const today = new Date().toISOString().slice(0, 10);
 
   // Setup through the API: a supplier with bank details, and an approved DV paying its invoice.
-  const [a, c, p, d, f] = await Promise.all([client(acct), client(chief), client(poster), client(dvo), client(fm)]);
+  const [a, c, p, d, f, b] = await Promise.all([client(acct), client(chief), client(poster), client(dvo), client(fm), client(budgetOfficer)]);
   const supplier = await call<{ id: string }>(a, 'POST', 'suppliers', { code: `B${tag}`, name: `E2E Electrical ${tag}`, vatRegistered: false });
   await call(a, 'POST', `suppliers/${supplier.id}/bank-accounts`, { bankName: 'E2E Bank', accountName: `E2E Electrical ${tag}`,
     accountNumber: '1234-5678-9012' });
@@ -56,9 +57,10 @@ test('verified bank details feed an ADA payment file, and posted documents go to
     particulars: 'Payment for wiring repairs', allocations: [{ invoiceId: inv.id, amount: inv.payableAmount }] });
   await d.post(`disbursement-vouchers/${dv.id}/documents`, { multipart: { file: PDF } });
   dv = await call(d, 'POST', `disbursement-vouchers/${dv.id}/submit`, { version: dv.version });
+  dv = await call(b, 'POST', `disbursement-vouchers/${dv.id}/approve`, { version: dv.version, comment: 'Within the COB' });
   dv = await call(a, 'POST', `disbursement-vouchers/${dv.id}/approve`, { version: dv.version, comment: 'Documents complete' });
   dv = await call(f, 'POST', `disbursement-vouchers/${dv.id}/approve`, { version: dv.version, comment: 'Approved' });
-  await Promise.all([a, c, p, d, f].map((x) => x.dispose()));
+  await Promise.all([a, c, p, d, f, b].map((x) => x.dispose()));
   await nextTotpWindow();
 
   // Chief accountant: verifies the bank details (not the person who entered them) and queues posted documents for BIR EIS.

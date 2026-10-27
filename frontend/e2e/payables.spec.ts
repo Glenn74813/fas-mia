@@ -21,6 +21,7 @@ test('a supplier invoice is recognised, paid by check and reconciled, each step 
   const dvOfficer = await onboard(token, 'dvo', ['DISBURSEMENT_OFFICER']);
   const manager = await onboard(token, 'fm', ['FINANCE_MANAGER']);
   const cashier = await onboard(token, 'cash', ['CASHIER']);
+  const budgetOfficer = await onboard(token, 'bgt', ['BUDGET_OFFICER']);
   await nextTotpWindow();
   const supplierCode = `E2E${Date.now().toString(36).toUpperCase()}`;
   const today = new Date().toISOString().slice(0, 10);
@@ -84,6 +85,14 @@ test('a supplier invoice is recognised, paid by check and reconciled, each step 
   const dvUrl = page.url();
   await signOut(page);
 
+  // The Budget Division certifies first, against the Corporate Operating Budget.
+  await signIn(page, budgetOfficer);
+  await page.goto(dvUrl);
+  await expect(page.getByText('awaiting budget')).toBeVisible();
+  await act(page, 'Certify budget', 'Approve', 'Within the COB');
+  await expect(page.getByText('awaiting certify')).toBeVisible();
+  await signOut(page);
+
   await signIn(page, certifier);
   await page.goto(dvUrl);
   await act(page, 'Certify', 'Approve', 'Documents complete, funds available');
@@ -95,7 +104,7 @@ test('a supplier invoice is recognised, paid by check and reconciled, each step 
   await expect(page.getByRole('heading', { name: /^DV-\d{4}-\d{6}$/ })).toBeVisible();
   await signOut(page);
 
-  // Cashier issues the check, then confirms its release.
+  // Cashier prepares the check; the finance manager approves it; the cashier then confirms its release.
   await signIn(page, cashier);
   await page.goto(dvUrl);
   await page.getByRole('main').getByRole('button', { name: 'Issue payment' }).click();
@@ -104,6 +113,22 @@ test('a supplier invoice is recognised, paid by check and reconciled, each step 
   await dialog.getByLabel('Check number').fill(`C${Date.now() % 1_000_000}`);
   await dialog.getByRole('button', { name: 'Issue payment', exact: true }).click();
   await expect(dialog).toBeHidden();
+  const check = page.getByRole('region', { name: 'Check' });
+  await expect(check).toContainText('PREPARED');
+  await expect(check).toContainText('Awaiting a second person');
+  await expect(page.getByRole('main').getByRole('button', { name: 'Confirm release' })).toHaveCount(0);
+  await signOut(page);
+
+  await nextTotpWindow(); // the manager signed in moments ago; a code works once
+  await signIn(page, manager);
+  await page.goto(dvUrl);
+  await act(page, 'Approve check', 'Approve check');
+  await expect(page.getByRole('region', { name: 'Check' })).toContainText('ISSUED');
+  await signOut(page);
+
+  await nextTotpWindow();
+  await signIn(page, cashier);
+  await page.goto(dvUrl);
   await act(page, 'Confirm release', 'Confirm release');
   await expect(page.getByRole('main').getByText('PAID', { exact: true })).toBeVisible();
   await signOut(page);

@@ -113,11 +113,13 @@ class OperationalReportsIT extends AbstractReceivablesIT {
         String id = dv.get("id").asText();
         attach(disbursementOfficer, "disbursement-vouchers", id);
         dv = ok(apAction(disbursementOfficer, "disbursement-vouchers", id, "submit", dv.get("version").asLong(), null));
+        dv = budgetCertify(id, dv.get("version").asLong());
         dv = ok(apAction(reviewer, "disbursement-vouchers", id, "approve", dv.get("version").asLong(), "Documents complete"));
         dv = ok(apAction(financeManager, "disbursement-vouchers", id, "approve", dv.get("version").asLong(), "Approved"));
         dv = ok(mvc.perform(post("/api/v1/disbursement-vouchers/" + id + "/payment-instruction").header("Authorization", cashier.bearer()).header("Idempotency-Key", key())
                 .contentType(MediaType.APPLICATION_JSON).content(toJson(Map.of("version", dv.get("version").asLong(), "mode", "CHECK",
                         "bankAccountId", bank(), "reference", "CHK" + System.nanoTime() % 1_000_000, "paymentDate", year + "-04-15")))));
+        dv = approveCheck(id, dv.get("version").asLong());
         dv = ok(mvc.perform(post("/api/v1/disbursement-vouchers/" + id + "/payment-confirmation").header("Authorization", cashier.bearer())
                 .contentType(MediaType.APPLICATION_JSON).content(toJson(Map.of("version", dv.get("version").asLong(), "releasedOn", year + "-04-20")))));
         ok(apAction(poster, "disbursement-vouchers", id, "post", dv.get("version").asLong(), null));

@@ -148,6 +148,9 @@ cas:
     anonymous-requests-per-minute: ${CAS_ANONYMOUS_REQUESTS_PER_MINUTE:120}
   mfa:
     issuer-label: MIAA CAS
+    # Codes by e-mail as an alternative second factor (TOR §4.2). Needs the SMTP relay (cas.mail), so it is off unless set.
+    email-otp:
+      enabled: ${CAS_MFA_EMAIL_OTP_ENABLED:false}
   outbox:
     dispatch-enabled: true
     max-attempts: 8

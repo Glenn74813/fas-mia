@@ -124,6 +124,13 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
+        <!-- Passkeys (WebAuthn) as a second factor (TOR §4.2). The 0.30 line uses Jackson 2, like Spring Boot 3.5;
+             0.31 moved to Jackson 3. Its CBOR support comes from the Jackson version Spring Boot manages. -->
+        <dependency>
+            <groupId>com.webauthn4j</groupId>
+            <artifactId>webauthn4j-core</artifactId>
+            <version>0.30.3.RELEASE</version>
+        </dependency>
         <!-- Architecture rules (LayeringArchitectureTest): layering, access checks, exact money. -->
         <dependency>
             <groupId>com.tngtech.archunit</groupId>

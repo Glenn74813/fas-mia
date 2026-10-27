@@ -107,6 +107,10 @@ class PayablesIT extends AbstractPayablesIT {
 
         attach(disbursementOfficer, "disbursement-vouchers", id);
         dv = ok(apAction(disbursementOfficer, "disbursement-vouchers", id, "submit", dv.get("version").asLong(), null));
+        assertThat(dv.get("currentStep").asText()).isEqualTo("BUDGET");
+        // The Budget Division certifies first; a reviewer cannot take that step.
+        apAction(reviewer, "disbursement-vouchers", id, "approve", dv.get("version").asLong(), null).andExpect(status().isForbidden());
+        dv = budgetCertify(id, dv.get("version").asLong());
         assertThat(dv.get("currentStep").asText()).isEqualTo("CERTIFY");
         dv = ok(apAction(reviewer, "disbursement-vouchers", id, "approve", dv.get("version").asLong(), "Documents complete"));
         assertThat(dv.get("currentStep").asText()).isEqualTo("APPROVE");
@@ -125,6 +129,7 @@ class PayablesIT extends AbstractPayablesIT {
         assertThat(dv.get("status").asText()).isEqualTo("APPROVED");
         instruct(cashier, id, dv.get("version").asLong(), check, year).andExpect(status().isConflict());
         dv = ok(instruct(cashier, id, dv.get("version").asLong(), check + "B", year));
+        dv = approveCheck(id, dv.get("version").asLong());
         dv = ok(mvc.perform(post("/api/v1/disbursement-vouchers/" + id + "/payment-confirmation")
                 .header("Authorization", cashier.bearer()).contentType(MediaType.APPLICATION_JSON)
                 .content(toJson(Map.of("version", dv.get("version").asLong(), "releasedOn", year + "-04-20")))));
@@ -141,7 +146,8 @@ class PayablesIT extends AbstractPayablesIT {
                 .isEqualByComparingTo("4950.00");
         List<String> actions = jdbc.queryForList("SELECT action FROM approval_decisions WHERE document_id = ?::uuid ORDER BY decided_at",
                 String.class, id);
-        assertThat(actions).containsExactly("SUBMIT", "APPROVE", "APPROVE", "INSTRUCT", "VOID", "INSTRUCT", "CONFIRM", "POST");
+        assertThat(actions).containsExactly("SUBMIT", "APPROVE", "APPROVE", "APPROVE", "INSTRUCT", "VOID", "INSTRUCT", "APPROVE_CHECK",
+                "CONFIRM", "POST");
 
         JsonNode recon = body(mvc.perform(get("/api/v1/accounts-payable/reconciliation").header("Authorization", approver.bearer()))
                 .andExpect(status().isOk()).andReturn());

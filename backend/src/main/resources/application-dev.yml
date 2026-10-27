@@ -25,6 +25,9 @@ cas:
   # Everyone else, including the browser tests and the performance kit's users, still uses two-step verification.
   mfa:
     dev-bypass-users: admin.dev
+    # The development e-mail sender writes messages, codes included, to the backend log.
+    email-otp:
+      enabled: true
   # DEMONSTRATION ONLY: one account with every internal permission (DemoSuperAdministrator). Created when the
   # username is set and does not exist yet; it still needs its authenticator code.
   demo:

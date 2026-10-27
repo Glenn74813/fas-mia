@@ -33,6 +33,7 @@ public abstract class AbstractPayablesIT extends AbstractAccountingIT {
     protected Session disbursementOfficer;
     protected Session financeManager;
     protected Session cashier;
+    protected Session budgetOfficer;
 
     @BeforeEach
     void payablesFixture() throws Exception {
@@ -52,6 +53,19 @@ public abstract class AbstractPayablesIT extends AbstractAccountingIT {
         disbursementOfficer = login(createUser("dvprep", "DISBURSEMENT_OFFICER"));
         financeManager = login(createUser("fm", "FINANCE_MANAGER"));
         cashier = login(createUser("cash", "CASHIER"));
+        budgetOfficer = login(createUser("bgtcert", "BUDGET_OFFICER"));
+    }
+
+    /** The Budget Division's first step on a submitted DV (TOR Annex A): certified against the COB. */
+    protected JsonNode budgetCertify(String dvId, long version) throws Exception {
+        return ok(apAction(budgetOfficer, "disbursement-vouchers", dvId, "approve", version, "Covered by the COB"));
+    }
+
+    /** A second person approves the check the cashier prepared, so it can be released. */
+    protected JsonNode approveCheck(String dvId, long version) throws Exception {
+        return ok(mvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post(
+                "/api/v1/disbursement-vouchers/" + dvId + "/check-approval").header("Authorization", financeManager.bearer())
+                .contentType(MediaType.APPLICATION_JSON).content(toJson(java.util.Map.of("version", version)))));
     }
 
     protected UUID taxCode(String code) {

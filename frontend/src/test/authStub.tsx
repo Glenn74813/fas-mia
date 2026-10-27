@@ -14,7 +14,7 @@ export function authState(overrides: Partial<AuthState> = {}): AuthState {
   const u = overrides.user === undefined ? user() : overrides.user;
   return {
     status: 'authenticated', user: u, sessionExpiresAt: null, pendingMfa: null,
-    passwordStep: vi.fn(), beginEnrollment: vi.fn(), completeMfa: vi.fn(), recoverWithCode: vi.fn(),
+    passwordStep: vi.fn(), beginEnrollment: vi.fn(), completeMfa: vi.fn(), sendEmailCode: vi.fn(), completeEmailCode: vi.fn(), completePasskey: vi.fn(), recoverWithCode: vi.fn(),
     newRecoveryCodes: null, acknowledgeRecoveryCodes: vi.fn(), logout: vi.fn(), reloadUser: vi.fn(),
     hasPermission: (p: string) => !!u && u.permissions.includes(p),
     ...overrides,

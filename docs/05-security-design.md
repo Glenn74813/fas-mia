@@ -28,6 +28,19 @@ tokens = 200 {accessToken, expiresIn, user}  +  Set-Cookie: CAS_REFRESH=<opaque>
 * The `mfaToken` is useless against the API (`aud=cas-mfa` is rejected by the resource server).
 * TOTP: RFC 6238, SHA-1, 6 digits, 30 s step, ±1 step skew; the last accepted step is stored
   so a code can never be used twice.
+* E-mail one-time codes (V47, `EmailOtpService`), TOR §4.2: an enrolled user may ask for a six-digit code by e-mail
+  instead of the authenticator code (`POST /auth/mfa/email/send`, then `/auth/mfa/email/verify`). The code is bound to
+  the sign-in step (MFA token id), lives at most 5 minutes and no longer than the step, is stored as an Argon2id hash,
+  allows 5 tries, and can be requested once a minute and 5 times an hour. Wrong codes count towards the lockout.
+  The plain code exists only in the outbox payload until the e-mail is sent, as password-reset links do. E-mail is a
+  weaker channel than an authenticator, so it is off unless `CAS_MFA_EMAIL_OTP_ENABLED=true`.
+* Passkeys (V48, `PasskeyService`, webauthn4j 0.30.3), TOR §4.2 "biometric": WebAuthn credentials with **user
+  verification required** (biometric or device PIN), attestation "none", ES256 or RS256. Adding one needs a current
+  authenticator code, so a stolen session cannot. At sign-in they replace the code (`/auth/mfa/passkey/options` and
+  `/verify`); the challenge is 32 random bytes, single use, 5 minutes, bound to the sign-in step. webauthn4j checks the
+  origin (`CAS_WEBAUTHN_ORIGINS`, default the frontend address) and the RP id hash, so a passkey cannot be used through a
+  look-alike site; the signature counter is stored. Failed assertions count towards the lockout; Reset MFA revokes all
+  passkeys.
 * Recovery codes (V43, `RecoveryCodeService`): ten single-use codes of 10 characters (50 bits each) are returned
   once by `/auth/mfa/totp/activate` and stored only as Argon2id hashes. A recovery code never issues a session by
   itself: it spends the code, revokes the authenticator and all sessions, records `MFA_RECOVERY_CODE_USED`
@@ -122,7 +135,7 @@ shown on Roles & permissions; the summary below is from V41.
 
 ### Segregation-of-duties rules (seeded in V4–V37)
 
-136 rules (`sod_conflict_rules`, enforced by `SodPolicy` on every role assignment and role-permission
+139 rules (`sod_conflict_rules`, enforced by `SodPolicy` on every role assignment and role-permission
 change): 127 `BLOCK` and 9 `WARN`. By family:
 
 | Family | Rules | Example |
@@ -226,7 +239,7 @@ Trust boundaries:
 | API | **I** error leakage | RFC 7807 ProblemDetail without stack traces; correlation id instead of detail (`CorrelationIdFilter`, which echoes only ids matching `[A-Za-z0-9-]{8,64}`) | `SecurityBaselineIT` | Validation runs before method security, so an unauthorised caller sending an invalid body gets 400 with field messages instead of 403. Low impact: it reveals DTO constraints, not data |
 | API | **D** flooding, oversized requests | Cluster-wide per-user and per-address limits (`ApiRateLimiter`, V36); 10 MB body limit in NGINX and Spring; bounded connection pool; paged lists (max 200) | `ApiRateLimitIT`, `ApiConventionsIT` | Network-level DDoS protection belongs to the hosting (C-04) |
 | Authorisation | **E** missing or wrong rule | `@PreAuthorize` on every controller method; filter chain ends in `denyAll()`; object-level scoping in services | `SecurityBaselineIT`, Playwright `auditor-readonly.spec.ts` | Role matrix is a proposal (C-08) |
-| Authorisation | **E** insider collusion or self-approval | 136 SoD rules (`SodPolicy`); transaction-level maker-checker (`DocumentWorkflow.canAct`); maker-checker on financial role grants (`RoleGrantService`); approval limits per role (`ApprovalLimitService`, values C-24); access reviews | `ApprovalInboxIT`, `AccessGovernanceIT`, module ITs | Two colluding people can still act together; detection is through the audit trail and reviews |
+| Authorisation | **E** insider collusion or self-approval | 139 SoD rules (`SodPolicy`); transaction-level maker-checker (`DocumentWorkflow.canAct`); maker-checker on financial role grants (`RoleGrantService`); approval limits per role (`ApprovalLimitService`, values C-24); access reviews | `ApprovalInboxIT`, `AccessGovernanceIT`, module ITs | Two colluding people can still act together; detection is through the audit trail and reviews |
 | Portal | **I/E** one concessionaire seeing another's data | Separate user type; every portal query scoped to the linked customer (`PortalInquiryService`, `PortalAccessService`); linking approved by a second person (V25) | `PortalIT`, `PortalSelfServiceIT` | Identity-evidence rules are C-18 |
 | Ledger and documents | **T** altering posted records | Immutable triggers on entries, lines, decisions, movements, ticket events and batch rows; deferred balance trigger; optimistic locking; corrections only by new documents | `PostingInvariantsIT`, `JournalWorkflowIT`, `PeriodCloseIT` | DB superuser can disable triggers (see audit row) |
 | Ledger | **T** duplicate postings on retry | Idempotency keys (`IdempotencyService`, constant-time hash comparison) on posting, receipts, payment instructions and allocations; one entry per source document (unique) | `ApiConventionsIT` | — |

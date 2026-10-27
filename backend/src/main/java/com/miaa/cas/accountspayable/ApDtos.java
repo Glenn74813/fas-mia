@@ -104,6 +104,19 @@ public final class ApDtos {
             BigDecimal amount) {
     }
 
+    /**
+     * The budget position of what a DV pays, for the Budget Division's certification: each budget line of the paid
+     * invoices, with this DV's share (by the part of each invoice it pays) and the allocation's standing in the COB.
+     */
+    public record DvBudgetLine(String accountCode, String accountName, String costCenterCode, BigDecimal charged, String status,
+            String allocation, BigDecimal allotment, BigDecimal used, BigDecimal available) {
+    }
+
+    /** The check prepared for a DV: PREPARED until a second person approves it (ISSUED), then RELEASED. */
+    public record DvCheck(String bankAccountCode, String checkNumber, String status, String preparedBy, String approvedBy,
+            Instant approvedAt) {
+    }
+
     public record DvSummary(UUID id, String dvNumber, String supplierName, String particulars, String status,
             String currentStep, BigDecimal amount, String preparedBy, Instant updatedAt, long version) {
     }
@@ -112,8 +125,8 @@ public final class ApDtos {
             String particulars, String status, String currentStep, BigDecimal amount, String paymentMode,
             UUID bankAccountId, String bankAccountCode, String paymentReference, LocalDate paymentDate, String instructedBy,
             Instant instructedAt, String confirmedBy, Instant confirmedAt, String preparedBy, UUID postedEntryId,
-            String postedEntryNumber, List<DvLineView> lines, List<Decision> decisions, List<DocumentInfo> documents,
-            List<String> availableActions, long version) {
+            String postedEntryNumber, List<DvLineView> lines, List<DvBudgetLine> budget, DvCheck check, List<Decision> decisions,
+            List<DocumentInfo> documents, List<String> availableActions, long version) {
     }
 
     public record AgingRow(UUID supplierId, String supplierCode, String supplierName, BigDecimal current,

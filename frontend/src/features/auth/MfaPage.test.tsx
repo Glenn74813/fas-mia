@@ -30,6 +30,26 @@ describe('MfaPage', () => {
     expect(recoverWithCode).toHaveBeenCalledWith('abcde-23456');
   });
 
+  it('offers a code by e-mail when the sign-in step allows it', async () => {
+    const sendEmailCode = vi.fn<AuthState['sendEmailCode']>().mockResolvedValue({ sentTo: 'j***@miaa.test', expiresAt: '2026-10-27T05:00:00Z' });
+    const completeEmailCode = vi.fn<AuthState['completeEmailCode']>().mockResolvedValue({
+      accessToken: 'a', tokenType: 'Bearer', expiresIn: 600, sessionExpiresAt: '2026-10-27T13:00:00Z',
+      user: { id: 'u1', username: 'j', displayName: 'J', email: 'j@miaa.test', userType: 'INTERNAL', roles: [], permissions: [],
+        mustChangePassword: false, mfaEnrolled: true, recoveryCodesRemaining: 10, lastLoginAt: null } });
+    setup({ pendingMfa: { status: 'MFA_REQUIRED', mfaToken: 't', methods: ['TOTP', 'EMAIL'] }, sendEmailCode, completeEmailCode });
+    await userEvent.click(screen.getByRole('button', { name: 'Send a code to my e-mail instead' }));
+    expect(await screen.findByText('j***@miaa.test')).toBeInTheDocument();
+    await userEvent.type(screen.getByLabelText('6-digit code'), '123456');
+    await userEvent.click(screen.getByRole('button', { name: 'Verify' }));
+    expect(completeEmailCode).toHaveBeenCalledWith('123456');
+    expect(await screen.findByText('home')).toBeInTheDocument();
+  });
+
+  it('does not offer e-mail when the step does not allow it', () => {
+    setup({ pendingMfa: { status: 'MFA_REQUIRED', mfaToken: 't', methods: ['TOTP'] } });
+    expect(screen.queryByRole('button', { name: /e-mail instead/ })).toBeNull();
+  });
+
   it('shows new recovery codes and continues only once they are saved', async () => {
     const acknowledgeRecoveryCodes = vi.fn();
     const codes = ['ABCDE-23456', 'FGHJK-78923'];

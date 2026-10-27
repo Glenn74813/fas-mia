@@ -99,7 +99,7 @@ for t, name, defn in q("""SELECT c.relname, tg.tgname, pg_get_triggerdef(tg.oid)
 
 # ---------------------------------------------------------------- domains
 DOMAINS = OrderedDict([
-    ('Identity, access and sessions', r'^(users|roles|permissions|role_permissions|user_roles|sod_conflict_rules|user_sessions|refresh_tokens|mfa_methods|mfa_recovery_codes|password_reset_tokens|access_review|role_grant|approval_limit|api_rate)'),
+    ('Identity, access and sessions', r'^(users|roles|permissions|role_permissions|user_roles|sod_conflict_rules|user_sessions|refresh_tokens|mfa_methods|mfa_recovery_codes|mfa_email_codes|webauthn_|password_reset_tokens|access_review|role_grant|approval_limit|api_rate)'),
     ('Organisation', r'^(organizations|offices|departments|user_office)'),
     ('General ledger and journals', r'^(currencies|fiscal_years|accounting_periods|period_status|chart_of_accounts|cost_centers|subsidiary_ledger|numbering|approval_workflow|journal_|approval_decisions|ledger_balances|recurring_journal|gl_clearing|gl_account_mappings|tax_codes|close_task)'),
     ('Documents, workflow and idempotency', r'^(supporting_documents|document_contents|document_workflow|idempotency_keys)'),

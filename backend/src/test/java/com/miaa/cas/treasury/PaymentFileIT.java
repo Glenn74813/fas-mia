@@ -81,6 +81,7 @@ class PaymentFileIT extends AbstractPayablesIT {
         String id = dv.get("id").asText();
         attach(disbursementOfficer, "disbursement-vouchers", id);
         dv = ok(apAction(disbursementOfficer, "disbursement-vouchers", id, "submit", dv.get("version").asLong(), null));
+        dv = budgetCertify(id, dv.get("version").asLong());
         dv = ok(apAction(reviewer, "disbursement-vouchers", id, "approve", dv.get("version").asLong(), "Certified"));
         ok(apAction(financeManager, "disbursement-vouchers", id, "approve", dv.get("version").asLong(), "Approved"));
         return id;

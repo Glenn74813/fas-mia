@@ -22,6 +22,15 @@ Authenticator or Microsoft Authenticator.
 4. CAS then asks you to choose your own password: **Current password**, **New password**,
    **Confirm new password**, **Save password**.
 
+**Other ways past the code screen.**
+* **Send a code to my e-mail instead** (when your administrator has enabled it): a six-digit code arrives by e-mail.
+  It works once, for 5 minutes. You can ask for a new one after a minute.
+* **Use a passkey**: if you added one (below), choose it and confirm with your fingerprint, face or device PIN.
+
+**Passkeys.** **My profile → Passkeys**: give the passkey a name (for example "Office laptop"), enter a current 6-digit
+code and choose **Add a passkey**; your device asks you to confirm. You can add one per device and **Remove** any of
+them. Your password is still needed at every sign-in.
+
 **Lost authenticator.** If you lose your phone or remove MIAA CAS from the app:
 1. Sign in with your password. On the code screen choose **Lost your authenticator? Use a recovery code**.
 2. Enter one of your saved codes (for example `ABCDE-23456`) and choose **Continue**. Each code works once.
@@ -189,7 +198,7 @@ Clearing posts nothing. Items open more than 90 days appear on the month-end che
 | Suppliers and their bank details | Accountant (`SUPPLIER_MANAGE`) |
 | Verify supplier bank details | Chief accountant (`SUPPLIER_BANK_VERIFY`), not the person who entered them |
 | Supplier invoices: prepare, approve, post | Accountant (`AP_INVOICE_PREPARE`); chief accountant (`AP_INVOICE_APPROVE`); poster (`JOURNAL_POST`) |
-| Disbursement vouchers (DVs) | Disbursement officer prepares; accountant certifies (`DV_CERTIFY`); finance manager approves (`PAYMENT_APPROVE`); cashier issues and confirms the payment (`PAYMENT_RELEASE`); chief accountant posts |
+| Disbursement vouchers (DVs) | Disbursement officer prepares; budget officer certifies the budget cover (`DV_BUDGET_CERTIFY`); accountant certifies (`DV_CERTIFY`); finance manager approves (`PAYMENT_APPROVE`); cashier prepares the check and confirms the payment (`PAYMENT_RELEASE`); finance manager approves the check (`CHECK_APPROVE`); chief accountant posts |
 
 **Suppliers.**
 1. **Suppliers** → **New supplier**: **Code**, **Registered name**, **TIN**, **Address**, **VAT-registered** and the
@@ -209,9 +218,19 @@ Submitting reserves budget on budget-controlled accounts.
 **Disbursement vouchers.**
 1. **Disbursement vouchers** → **New**: **Payee (supplier)**, **Particulars** and the invoices to pay.
    **Save draft**, attach, then **Submit**.
-2. The voucher passes **Certify**, then **Approve**.
-3. The cashier chooses **Issue payment** (cheque or bank transfer), then **Confirm release**.
-4. The poster chooses **Post**. **Void payment** cancels an issued payment that was not released.
+2. The voucher passes three steps, each by a different person:
+   * **Certify budget** (Budget Division). The **Budget** panel shows, for each budget line the voucher pays, this
+     voucher's share and the Corporate Operating Budget position: allotment, used (the invoices already reserved
+     their amounts) and available. **Return** with a reason if the voucher must be charged elsewhere.
+   * **Certify** (Accounting): documents complete.
+   * **Approve** (Finance Manager).
+3. The cashier chooses **Issue payment**:
+   * **Check**: the check is recorded as **PREPARED**. A second person (the finance manager, `CHECK_APPROVE`) opens
+     the voucher from **Checks to approve** in the Inbox, compares payee, amount and bank, and chooses **Approve
+     check**. Neither the check's preparer nor the voucher's preparer can approve it. Only then can the cashier
+     choose **Confirm release**.
+   * **ADA / bank transfer**: record the reference, then **Confirm release** after the bank confirms.
+4. The poster chooses **Post**. **Void payment** cancels a prepared or issued payment that was not released.
 
 **Payables reports**: aging, open items and the withholding schedule (choose **Year** and **Quarter**).
 

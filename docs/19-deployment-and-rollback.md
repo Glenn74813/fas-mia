@@ -29,6 +29,9 @@ the secrets manager, never from files in the repository or the image.
 |---|---|---|---|---|
 | `CAS_DB_URL` | JDBC URL of the database. A database on another host must use `sslmode=verify-full` (or `verify-ca`): production refuses to start otherwise | Required | `jdbc:postgresql://localhost:5432/cas` | |
 | `CAS_TLS_PROTOCOLS` | Outbound TLS versions (SMTP, BIR EIS, JVM). Must match the JVM flag `-Djdk.tls.client.protocols`, which the image sets to TLSv1.3 | Optional | `TLSv1.3` | |
+| `CAS_MFA_EMAIL_OTP_ENABLED` | Offer one-time codes by e-mail as an alternative second factor (TOR §4.2). Needs the SMTP relay | Optional | `false` | |
+| `CAS_WEBAUTHN_ORIGINS` | Comma-separated browser origins allowed for passkeys | Optional | `CAS_FRONTEND_BASE_URL` | |
+| `CAS_WEBAUTHN_RP_ID` | Passkey relying-party id (the domain passkeys are tied to; changing it invalidates existing passkeys) | Optional | the host of the first origin | |
 | `CAS_TLS_LEGACY_JUSTIFICATION` | Required reason when `CAS_TLS_PROTOCOLS` adds TLSv1.2 for a listed legacy integration (DICT DC No. 007, s. 2020) | Conditional | none | |
 | `CAS_DB_USER` / `CAS_DB_PASSWORD` | Runtime role (`cas_app`) | Required | `cas_app` / empty | password |
 | `CAS_FLYWAY_USER` / `CAS_FLYWAY_PASSWORD` | Schema owner (`cas_owner`) used only for migrations | Required | the runtime role | password |

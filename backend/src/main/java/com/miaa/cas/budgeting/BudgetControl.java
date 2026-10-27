@@ -134,6 +134,30 @@ public class BudgetControl implements PostingBudgetGuard {
         return needs;
     }
 
+    /**
+     * Where an account and cost centre stand against the approved Corporate Operating Budget, for a reviewer (no locks, no
+     * reservation). Status: NOT_CONTROLLED, NO_BUDGET (no approved budget for the year), NO_ALLOCATION or ALLOCATED.
+     * "Used" is the active reservations plus posted actuals, so it already includes documents that reserved budget.
+     */
+    public record Position(String status, String allocation, BigDecimal allotment, BigDecimal used, BigDecimal available) {
+    }
+
+    public Position position(UUID fiscalYearId, UUID accountId, UUID costCenterId) {
+        if (!isBudgetControlled(accountId)) {
+            return new Position("NOT_CONTROLLED", null, null, null, null);
+        }
+        UUID budgetId = approvedBudget(fiscalYearId);
+        if (budgetId == null) {
+            return new Position("NO_BUDGET", null, null, null, null);
+        }
+        Allocation a = findAllocation(budgetId, accountId, costCenterId);
+        if (a == null) {
+            return new Position("NO_ALLOCATION", null, null, null, null);
+        }
+        BigDecimal available = available(a, fiscalYearId);
+        return new Position("ALLOCATED", a.label(), Money.of(a.amount()), Money.of(a.amount().subtract(available)), available);
+    }
+
     BigDecimal available(Allocation a, UUID fiscalYearId) {
         BigDecimal reserved = jdbc.queryForObject("SELECT coalesce(sum(amount), 0) FROM budget_reservations "
                 + "WHERE allocation_id = ? AND status = 'ACTIVE'", BigDecimal.class, a.id());

@@ -47,7 +47,7 @@ public class TokenService {
 
     public enum MfaPurpose { VERIFY, ENROLL }
 
-    public record MfaChallenge(UUID userId, MfaPurpose purpose, String challengeId) {
+    public record MfaChallenge(UUID userId, MfaPurpose purpose, String challengeId, Instant expiresAt) {
     }
 
     public record AccessToken(String value, Instant expiresAt) {
@@ -116,7 +116,7 @@ public class TokenService {
             if (purpose != expected) {
                 throw new ApiException(ErrorCode.AUTH_TOKEN_INVALID, "The sign-in step is not valid. Start again.");
             }
-            return new MfaChallenge(UUID.fromString(jwt.getSubject()), purpose, jwt.getId());
+            return new MfaChallenge(UUID.fromString(jwt.getSubject()), purpose, jwt.getId(), jwt.getExpiresAt());
         } catch (JwtException | IllegalArgumentException e) {
             throw new ApiException(ErrorCode.AUTH_TOKEN_INVALID, "The sign-in step has expired or is invalid. Start again.");
         }

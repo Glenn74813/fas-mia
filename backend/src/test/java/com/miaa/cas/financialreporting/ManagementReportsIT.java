@@ -58,7 +58,8 @@ class ManagementReportsIT extends AbstractPayablesIT {
         // Each report needs its own module's permission.
         request(disbursementOfficer, "AR_AGING", "CSV", Map.of("asOf", year + "-03-15")).andExpect(status().isForbidden());
         request(preparer, "AUDIT_TRAIL", "CSV", Map.of("from", year + "-01-01", "to", year + "-12-31")).andExpect(status().isForbidden());
-        request(budgetOfficer, "AP_AGING", "CSV", Map.of("asOf", "not-a-date")).andExpect(status().isForbidden());
+        // (Budget officers read payables since TOR T4, to certify DVs; a support agent has no payables access.)
+        request(login(createUser("rsupport", "SUPPORT_AGENT")), "AP_AGING", "CSV", Map.of("asOf", "not-a-date")).andExpect(status().isForbidden());
         request(preparer, "AP_AGING", "CSV", Map.of("asOf", "not-a-date")).andExpect(status().isBadRequest());
     }
 

@@ -108,6 +108,12 @@ public class DisbursementVoucher {
         updatedBy = actor;
     }
 
+    /** Records a change made outside the voucher's own fields (its check approved), so the version moves on. */
+    public void touch(Instant now, String actor) {
+        updatedAt = now;
+        updatedBy = actor;
+    }
+
     public void assignNumber(String number) {
         this.dvNumber = number;
     }

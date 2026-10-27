@@ -192,8 +192,21 @@ public class ApprovalInboxService {
                     SELECT d.id, d.dv_number AS number, d.particulars AS description, s.name AS counterparty, d.amount,
                         CAST(d.created_at AS DATE) AS doc_date, d.status, d.prepared_by_id AS preparer_id, d.prepared_by, d.updated_at AS since
                     FROM disbursement_vouchers d JOIN suppliers s ON s.id = d.supplier_id
-                    WHERE d.status IN ('APPROVED', 'PAYMENT_INSTRUCTED') AND d.prepared_by_id <> ? ORDER BY d.updated_at""",
+                    WHERE d.status IN ('APPROVED', 'PAYMENT_INSTRUCTED') AND d.prepared_by_id <> ?
+                      AND NOT EXISTS (SELECT 1 FROM check_register c WHERE c.dv_id = d.id AND c.status = 'PREPARED')
+                    ORDER BY d.updated_at""",
                     "Payments to issue or confirm", "Release payment", to("/payables/disbursements/")),
+
+            // Check approval (treasury), by someone other than the voucher's and the check's preparers.
+            new Source("CHECK_APPROVE", "DISBURSEMENT_VOUCHER", null, """
+                    SELECT d.id, d.dv_number AS number, 'Check ' || c.check_number || ': ' || d.particulars AS description,
+                        s.name AS counterparty, d.amount, c.issue_date AS doc_date, d.status, d.prepared_by_id AS preparer_id,
+                        d.prepared_by, c.updated_at AS since
+                    FROM disbursement_vouchers d JOIN suppliers s ON s.id = d.supplier_id
+                    JOIN check_register c ON c.dv_id = d.id AND c.status = 'PREPARED'
+                    WHERE d.status = 'PAYMENT_INSTRUCTED' AND d.prepared_by_id <> ? AND c.prepared_by_id IS DISTINCT FROM d.prepared_by_id
+                    ORDER BY c.updated_at""",
+                    "Checks to approve", "Approve check", to("/payables/disbursements/")),
 
             // Posting: accounting posts what someone else prepared.
             new Source("JOURNAL_POST", "AP_INVOICE", null, """

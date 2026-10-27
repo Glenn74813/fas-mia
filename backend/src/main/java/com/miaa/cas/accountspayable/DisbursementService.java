@@ -1,6 +1,8 @@
 package com.miaa.cas.accountspayable;
 
 import com.miaa.cas.accountspayable.ApDtos.AllocationRequest;
+import com.miaa.cas.accountspayable.ApDtos.DvBudgetLine;
+import com.miaa.cas.accountspayable.ApDtos.DvCheck;
 import com.miaa.cas.accountspayable.ApDtos.DvLineView;
 import com.miaa.cas.accountspayable.ApDtos.DvSummary;
 import com.miaa.cas.accountspayable.ApDtos.DvView;
@@ -13,6 +15,7 @@ import com.miaa.cas.accountspayable.domain.SupplierInvoice;
 import com.miaa.cas.accountspayable.domain.SupplierInvoiceRepository;
 import com.miaa.cas.approvals.DocumentWorkflow;
 import com.miaa.cas.audit.AuditService;
+import com.miaa.cas.budgeting.BudgetControl;
 import com.miaa.cas.common.error.ApiException;
 import com.miaa.cas.common.error.ErrorCode;
 import com.miaa.cas.common.money.Money;
@@ -21,6 +24,7 @@ import com.miaa.cas.common.web.PageResponse;
 import com.miaa.cas.documents.DocumentOwnerPolicy;
 import com.miaa.cas.documents.DocumentService;
 import com.miaa.cas.generalledger.AccountMappingService;
+import com.miaa.cas.generalledger.FiscalCalendarService;
 import com.miaa.cas.journal.NumberingService;
 import com.miaa.cas.journal.PostingService;
 import com.miaa.cas.journal.domain.LineData;
@@ -70,11 +74,15 @@ public class DisbursementService implements DocumentOwnerPolicy {
     private final AuditService audit;
     private final JdbcTemplate jdbc;
     private final Clock clock;
+    private final BudgetControl budget;
+    private final FiscalCalendarService calendar;
 
     public DisbursementService(DisbursementVoucherRepository vouchers, SupplierInvoiceRepository invoices,
             SupplierService suppliers, BankAccountService banks, DocumentWorkflow workflow, NumberingService numbering,
             PostingService posting, AccountMappingService mappings, DocumentService documents,
-            AuditService audit, JdbcTemplate jdbc, Clock clock) {
+            AuditService audit, JdbcTemplate jdbc, Clock clock, BudgetControl budget, FiscalCalendarService calendar) {
+        this.budget = budget;
+        this.calendar = calendar;
         this.vouchers = vouchers;
         this.invoices = invoices;
         this.suppliers = suppliers;
@@ -227,10 +235,11 @@ public class DisbursementService implements DocumentOwnerPolicy {
             Supplier s = suppliers.load(dv.getSupplierId());
             jdbc.update("""
                     INSERT INTO check_register (id, bank_account_id, check_number, dv_id, payee, amount, issue_date, status,
-                        created_at, created_by, updated_at, updated_by) VALUES (?, ?, ?, ?, ?, ?, ?, 'ISSUED', ?, ?, ?, ?)""",
+                        prepared_by_id, created_at, created_by, updated_at, updated_by)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, 'PREPARED', ?, ?, ?, ?, ?)""",
                     UUID.randomUUID(), bank.id(), req.reference(), id, s.getName(), dv.getAmount(),
-                    Date.valueOf(req.paymentDate()), Timestamp.from(now), CurrentActor.username(), Timestamp.from(now),
-                    CurrentActor.username());
+                    Date.valueOf(req.paymentDate()), CurrentActor.userId(), Timestamp.from(now), CurrentActor.username(),
+                    Timestamp.from(now), CurrentActor.username());
         }
         dv.instruct(req.mode(), bank.id(), req.reference(), req.paymentDate(), now, CurrentActor.username());
         workflow.record(DOCUMENT, id, "INSTRUCT", req.mode() + " " + req.reference());
@@ -249,12 +258,47 @@ public class DisbursementService implements DocumentOwnerPolicy {
         }
         Instant now = Instant.now(clock);
         jdbc.update("UPDATE check_register SET status = 'VOIDED', void_reason = ?, updated_at = ?, updated_by = ? "
-                + "WHERE dv_id = ? AND status = 'ISSUED'", reason.trim(), Timestamp.from(now), CurrentActor.username(), id);
+                + "WHERE dv_id = ? AND status IN ('PREPARED', 'ISSUED')", reason.trim(), Timestamp.from(now), CurrentActor.username(), id);
         workflow.record(DOCUMENT, id, "VOID", reason.trim());
         dv.clearInstruction(now, CurrentActor.username());
         vouchers.flush();
         audit.record("DV_PAYMENT_VOIDED", DOCUMENT, id, Map.of("reason", reason.trim()));
         return view(dv);
+    }
+
+    /**
+     * Approves the prepared check of a DV (TOR Annex A, Treasury): a second person holding CHECK_APPROVE, neither the
+     * check's preparer nor the DV's preparer. The check becomes ISSUED and may then be released.
+     */
+    @Transactional
+    public DvView approveCheck(UUID id, long version) {
+        CurrentActor.requirePermission("CHECK_APPROVE");
+        DisbursementVoucher dv = lockVersioned(id, version);
+        List<Map<String, Object>> rows = jdbc.queryForList(
+                "SELECT id, check_number, prepared_by_id FROM check_register WHERE dv_id = ? AND status = 'PREPARED' FOR UPDATE", id);
+        if (!"PAYMENT_INSTRUCTED".equals(dv.getStatus()) || rows.isEmpty()) {
+            throw ApInvoiceService.state("There is no prepared check awaiting approval on this voucher.");
+        }
+        Map<String, Object> check = rows.get(0);
+        if (CurrentActor.userId().equals(check.get("prepared_by_id")) || CurrentActor.userId().equals(dv.getPreparedById())) {
+            throw new ApiException(ErrorCode.SEGREGATION_OF_DUTIES,
+                    "You prepared this check or its voucher; another person must approve the check.");
+        }
+        Instant now = Instant.now(clock);
+        jdbc.update("UPDATE check_register SET status = 'ISSUED', approved_by_id = ?, approved_by = ?, approved_at = ?, updated_at = ?, "
+                + "updated_by = ? WHERE id = ?", CurrentActor.userId(), CurrentActor.username(), Timestamp.from(now), Timestamp.from(now),
+                CurrentActor.username(), check.get("id"));
+        workflow.record(DOCUMENT, id, "APPROVE_CHECK", "Check " + check.get("check_number"));
+        dv.touch(now, CurrentActor.username());
+        vouchers.flush();
+        audit.record("DV_CHECK_APPROVED", DOCUMENT, id, Map.of("checkNumber", check.get("check_number")));
+        return view(dv);
+    }
+
+    private String checkStatus(UUID dvId) {
+        List<String> s = jdbc.queryForList("SELECT status FROM check_register WHERE dv_id = ? AND status IN ('PREPARED', 'ISSUED', 'RELEASED')",
+                String.class, dvId);
+        return s.isEmpty() ? null : s.get(0);
     }
 
     /** Confirms the payment was actually released (check handed over / bank confirmation received). */
@@ -266,6 +310,9 @@ public class DisbursementService implements DocumentOwnerPolicy {
             throw ApInvoiceService.state("Only instructed payments can be confirmed.");
         }
         sod(dv, "confirm payment of");
+        if ("PREPARED".equals(checkStatus(id))) {
+            throw ApInvoiceService.state("The check must be approved by a second person before it is released.");
+        }
         Instant now = Instant.now(clock);
         jdbc.update("UPDATE check_register SET status = 'RELEASED', updated_at = ?, updated_by = ? WHERE dv_id = ? "
                 + "AND status = 'ISSUED'", Timestamp.from(now), CurrentActor.username(), id);
@@ -460,13 +507,22 @@ public class DisbursementService implements DocumentOwnerPolicy {
                 ApInvoiceService.toInt(dv.getCurrentStepOrder()), dv.getPreparedById())) {
             actions.addAll(List.of("APPROVE", "RETURN", "REJECT"));
         }
+        DvCheck check = check(dv.getId());
+        boolean awaitingCheckApproval = check != null && "PREPARED".equals(check.status());
         if (!preparer && CurrentActor.hasPermission("PAYMENT_RELEASE")) {
             if ("APPROVED".equals(dv.getStatus())) {
                 actions.add("INSTRUCT");
             }
             if ("PAYMENT_INSTRUCTED".equals(dv.getStatus())) {
-                actions.addAll(List.of("CONFIRM", "VOID"));
+                if (!awaitingCheckApproval) {
+                    actions.add("CONFIRM");
+                }
+                actions.add("VOID");
             }
+        }
+        if (awaitingCheckApproval && "PAYMENT_INSTRUCTED".equals(dv.getStatus()) && !preparer
+                && CurrentActor.hasPermission("CHECK_APPROVE") && !CurrentActor.username().equals(check.preparedBy())) {
+            actions.add("APPROVE_CHECK");
         }
         if ("PAID".equals(dv.getStatus()) && !preparer && CurrentActor.hasPermission("JOURNAL_POST")) {
             actions.add("POST");
@@ -475,8 +531,49 @@ public class DisbursementService implements DocumentOwnerPolicy {
                 workflow.currentStepCode(DOCUMENT, dv.getAmount(), ApInvoiceService.toInt(dv.getCurrentStepOrder())),
                 dv.getAmount(), dv.getPaymentMode(), dv.getBankAccountId(), bankCode, dv.getPaymentReference(),
                 dv.getPaymentDate(), dv.getInstructedBy(), dv.getInstructedAt(), dv.getConfirmedBy(), dv.getConfirmedAt(),
-                dv.getPreparedBy(), dv.getPostedEntryId(), entryNumber, lines, workflow.history(DOCUMENT, dv.getId()),
+                dv.getPreparedBy(), dv.getPostedEntryId(), entryNumber, lines, budgetLines(dv), check, workflow.history(DOCUMENT, dv.getId()),
                 documents.list(DOCUMENT, dv.getId()), actions, dv.getVersion());
+    }
+
+    private DvCheck check(UUID dvId) {
+        List<DvCheck> rows = jdbc.query("""
+                SELECT b.code, c.check_number, c.status, c.created_by, c.approved_by, c.approved_at
+                FROM check_register c JOIN bank_accounts b ON b.id = c.bank_account_id
+                WHERE c.dv_id = ? ORDER BY c.created_at DESC LIMIT 1""", (rs, i) -> new DvCheck(rs.getString(1), rs.getString(2),
+                rs.getString(3), rs.getString(4), rs.getString(5), rs.getTimestamp(6) == null ? null : rs.getTimestamp(6).toInstant()),
+                dvId);
+        return rows.isEmpty() ? null : rows.get(0);
+    }
+
+    /** Each budget line the DV pays: its share of the invoice lines (by the part of each invoice it pays) and the COB position. */
+    private List<DvBudgetLine> budgetLines(DisbursementVoucher dv) {
+        record Key(UUID fiscalYearId, UUID accountId, UUID costCenterId) {
+        }
+        Map<Key, BigDecimal> charged = new java.util.LinkedHashMap<>();
+        for (DisbursementVoucherLine l : dv.getLines()) {
+            SupplierInvoice inv = invoices.findById(l.getInvoiceId()).orElseThrow();
+            if (inv.getPayableAmount().signum() == 0 || inv.getPeriodId() == null) {
+                continue;
+            }
+            BigDecimal share = l.getAmount().divide(inv.getPayableAmount(), 10, java.math.RoundingMode.HALF_EVEN);
+            UUID fy = calendar.period(inv.getPeriodId()).getFiscalYearId();
+            for (var il : inv.getLines()) {
+                charged.merge(new Key(fy, il.getAccountId(), il.getCostCenterId()), il.getNetAmount().multiply(share), BigDecimal::add);
+            }
+        }
+        List<DvBudgetLine> out = new ArrayList<>();
+        for (var e : charged.entrySet()) {
+            BudgetControl.Position p = budget.position(e.getKey().fiscalYearId(), e.getKey().accountId(), e.getKey().costCenterId());
+            if ("NOT_CONTROLLED".equals(p.status())) {
+                continue;
+            }
+            Map<String, Object> a = jdbc.queryForMap("SELECT code, name FROM chart_of_accounts WHERE id = ?", e.getKey().accountId());
+            String cc = e.getKey().costCenterId() == null ? null
+                    : jdbc.queryForObject("SELECT code FROM cost_centers WHERE id = ?", String.class, e.getKey().costCenterId());
+            out.add(new DvBudgetLine((String) a.get("code"), (String) a.get("name"), cc, Money.of(e.getValue()), p.status(),
+                    p.allocation(), p.allotment(), p.used(), p.available()));
+        }
+        return out;
     }
 
     static boolean isLive(String status) {

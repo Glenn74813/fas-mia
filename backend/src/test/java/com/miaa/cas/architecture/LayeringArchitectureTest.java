@@ -53,7 +53,7 @@ class LayeringArchitectureTest {
 
     /** The sign-in endpoints that are public by design; SecurityConfig opens exactly these and denies anything unmatched. */
     private static final Set<String> PUBLIC_AUTH_ENDPOINTS = Set.of("csrf", "login", "enroll", "activate", "recover", "devBypass", "verify",
-            "refresh", "logout", "forgot", "reset");
+            "refresh", "logout", "forgot", "reset", "sendEmailCode", "verifyEmailCode", "passkeyOptions", "passkeyVerify");
 
     private static JavaClasses production;
 

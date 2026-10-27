@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react
 import { logoutRequest, refreshSession, session } from '../api/client';
 import { authApi } from '../api/endpoints';
 import type { CurrentUser, TokenResponse } from '../api/types';
+import { signWithPasskey } from './webauthn';
 import { AuthContext, type AuthState, type AuthStatus, type PendingMfa } from './AuthContext';
 
 /**
@@ -51,7 +52,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       signedIn(await authApi.devBypass(res.mfaToken));
       return res;
     }
-    setPendingMfa({ status: res.status, mfaToken: res.mfaToken });
+    setPendingMfa({ status: res.status, mfaToken: res.mfaToken, methods: res.methods });
     return res;
   }, [signedIn]);
 
@@ -75,10 +76,30 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return tokens;
   }, [pendingMfa, signedIn]);
 
+  const sendEmailCode = useCallback(async () => {
+    if (!pendingMfa) throw new Error('No sign-in in progress');
+    return authApi.sendEmailCode(pendingMfa.mfaToken);
+  }, [pendingMfa]);
+
+  const completeEmailCode = useCallback(async (code: string) => {
+    if (!pendingMfa) throw new Error('No sign-in in progress');
+    const tokens = await authApi.verifyEmailCode(pendingMfa.mfaToken, code);
+    signedIn(tokens);
+    return tokens;
+  }, [pendingMfa, signedIn]);
+
+  const completePasskey = useCallback(async () => {
+    if (!pendingMfa) throw new Error('No sign-in in progress');
+    const options = await authApi.passkeySignInOptions(pendingMfa.mfaToken);
+    const tokens = await authApi.passkeySignIn(pendingMfa.mfaToken, await signWithPasskey(options));
+    signedIn(tokens);
+    return tokens;
+  }, [pendingMfa, signedIn]);
+
   const recoverWithCode = useCallback(async (recoveryCode: string) => {
     if (!pendingMfa) throw new Error('No sign-in in progress');
     const res = await authApi.recover(pendingMfa.mfaToken, recoveryCode);
-    setPendingMfa({ status: res.status, mfaToken: res.mfaToken });
+    setPendingMfa({ status: res.status, mfaToken: res.mfaToken, methods: res.methods });
   }, [pendingMfa]);
 
   const acknowledgeRecoveryCodes = useCallback(() => {
@@ -101,9 +122,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const hasPermission = useCallback((p: string) => !!user && user.permissions.includes(p), [user]);
 
   const value = useMemo<AuthState>(() => ({
-    status, user, sessionExpiresAt, pendingMfa, passwordStep, beginEnrollment, completeMfa, recoverWithCode,
+    status, user, sessionExpiresAt, pendingMfa, passwordStep, beginEnrollment, completeMfa, sendEmailCode, completeEmailCode, completePasskey, recoverWithCode,
     newRecoveryCodes: heldSignIn?.recoveryCodes ?? null, acknowledgeRecoveryCodes, logout, reloadUser, hasPermission,
-  }), [status, user, sessionExpiresAt, pendingMfa, passwordStep, beginEnrollment, completeMfa, recoverWithCode, heldSignIn,
+  }), [status, user, sessionExpiresAt, pendingMfa, passwordStep, beginEnrollment, completeMfa, sendEmailCode, completeEmailCode, completePasskey, recoverWithCode, heldSignIn,
     acknowledgeRecoveryCodes, logout, reloadUser, hasPermission]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

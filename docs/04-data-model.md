@@ -108,6 +108,9 @@ every new migration; edit only this introduction by hand.
 | V43 | `V43__mfa_recovery_codes.sql` | One-time recovery codes for the authenticator (MS §9.2): shown once when an authenticator is enrolled, stored only as Argon2 hashes. A code is spent (used_at) when it replaces an authenticator code at sign-in, and every unused code is withdrawn (revoked_at) when a new set is issued or an administrator resets the user's MFA. |
 | V44 | `V44__variance_analysis_report.sql` | Variance analysis (budget to date against actual to a chosen period) runs as an ordinary report job. |
 | V45 | `V45__scheduled_report_email.sql` | Report delivery (MS §11.8): a job queued by a schedule records it, and the schedule's owner may be e-mailed when the job finishes or fails. The e-mail carries a link to My reports, never the report itself. |
+| V46 | `V46__dv_budget_certification_and_check_approval.sql` | TOR Annex A (Controlling): the Budget Division evaluates and approves in-process disbursement vouchers against the Corporate Operating Budget. TOR Annex A (Cash Flow and Treasury): checks for processed DVs are prepared and approved. |
+| V47 | `V47__mfa_email_codes.sql` | E-mail one-time codes as a second factor (TOR §4.2: "OTP via SMS/email"). A code belongs to one sign-in step (the MFA token's id), lives at most as long as that step, is stored only as a hash, and allows five attempts. |
+| V48 | `V48__webauthn_passkeys.sql` | Passkeys (WebAuthn) as a second factor (TOR §4.2: "biometric authentication (if applicable)"). A user may register several; each keeps its public key (in the attested credential data), signature counter and flags. |
 
 ## 3. Entity-relationship diagrams by domain
 
@@ -133,6 +136,10 @@ erDiagram
     approval_limits {
         varchar role_code PK,FK
         varchar document_type PK
+    }
+    mfa_email_codes {
+        uuid id PK
+        uuid user_id FK
     }
     mfa_methods {
         uuid id PK
@@ -184,10 +191,19 @@ erDiagram
         uuid id PK
         uuid customer_id FK
     }
+    webauthn_challenges {
+        uuid id PK
+        uuid user_id FK
+    }
+    webauthn_credentials {
+        uuid id PK
+        uuid user_id FK
+    }
     access_review_cycles |o--o{ access_reviews : "cycle_id"
     users |o--o{ access_reviews : "reviewer_id"
     users ||--o{ access_reviews : "user_id"
     roles ||--o{ approval_limits : "role_code"
+    users ||--o{ mfa_email_codes : "user_id"
     users ||--o{ mfa_methods : "user_id"
     users ||--o{ mfa_recovery_codes : "user_id"
     users ||--o{ password_reset_tokens : "user_id"
@@ -203,6 +219,8 @@ erDiagram
     roles ||--o{ user_roles : "role_id"
     users ||--o{ user_roles : "user_id"
     users ||--o{ user_sessions : "user_id"
+    users ||--o{ webauthn_challenges : "user_id"
+    users ||--o{ webauthn_credentials : "user_id"
 ```
 
 References to other domains: `users.customer_id` → `customers`.
@@ -466,6 +484,8 @@ erDiagram
         uuid id PK
         uuid bank_account_id FK
         uuid dv_id FK
+        uuid prepared_by_id FK
+        uuid approved_by_id FK
     }
     disbursement_voucher_lines {
         uuid id PK
@@ -527,7 +547,7 @@ erDiagram
     suppliers ||--o{ supplier_invoices : "supplier_id"
 ```
 
-References to other domains: `check_register.bank_account_id` → `bank_accounts`; `disbursement_vouchers.bank_account_id` → `bank_accounts`; `disbursement_vouchers.posted_entry_id` → `journal_entries`; `disbursement_vouchers.prepared_by_id` → `users`; `payment_batches.bank_account_id` → `bank_accounts`; `supplier_bank_accounts.entered_by_id` → `users`; `supplier_invoice_lines.account_id` → `chart_of_accounts`; `supplier_invoice_lines.cost_center_id` → `cost_centers`; `supplier_invoice_lines.ewt_code_id` → `tax_codes`; `supplier_invoices.migration_batch_id` → `migration_batches`; `supplier_invoices.period_id` → `accounting_periods`; `supplier_invoices.posted_entry_id` → `journal_entries`; `supplier_invoices.prepared_by_id` → `users`; `supplier_invoices.vat_code_id` → `tax_codes`; `suppliers.default_ewt_code_id` → `tax_codes`; `suppliers.subsidiary_account_id` → `subsidiary_ledger_accounts`.
+References to other domains: `check_register.approved_by_id` → `users`; `check_register.bank_account_id` → `bank_accounts`; `check_register.prepared_by_id` → `users`; `disbursement_vouchers.bank_account_id` → `bank_accounts`; `disbursement_vouchers.posted_entry_id` → `journal_entries`; `disbursement_vouchers.prepared_by_id` → `users`; `payment_batches.bank_account_id` → `bank_accounts`; `supplier_bank_accounts.entered_by_id` → `users`; `supplier_invoice_lines.account_id` → `chart_of_accounts`; `supplier_invoice_lines.cost_center_id` → `cost_centers`; `supplier_invoice_lines.ewt_code_id` → `tax_codes`; `supplier_invoices.migration_batch_id` → `migration_batches`; `supplier_invoices.period_id` → `accounting_periods`; `supplier_invoices.posted_entry_id` → `journal_entries`; `supplier_invoices.prepared_by_id` → `users`; `supplier_invoices.vat_code_id` → `tax_codes`; `suppliers.default_ewt_code_id` → `tax_codes`; `suppliers.subsidiary_account_id` → `subsidiary_ledger_accounts`.
 
 ### 3.7 Receivables and portal
 
@@ -993,6 +1013,24 @@ Created in `V37__access_governance.sql`. The most a holder of a role may approve
 
 Rules: `approval_limits_max_amount_check`: CHECK ((max_amount >= (0))).
 
+#### `mfa_email_codes`
+
+Created in `V47__mfa_email_codes.sql`. E-mailed one-time sign-in codes, bound to one sign-in step, stored as hashes, with attempts counted.
+
+| Column | Type | Null | Default | Meaning |
+|---|---|---|---|---|
+| id | uuid | N |  | Primary key (UUID generated by the application) |
+| user_id | uuid | N |  | References `users` |
+| challenge_id | varchar(64) | N |  |  |
+| code_hash | varchar(255) | N |  |  |
+| created_at | timestamptz | N |  | When the row was created |
+| expires_at | timestamptz | N |  | When expires |
+| attempts | smallint | N | 0 |  |
+| used_at | timestamptz | Y |  | When used |
+| revoked_at | timestamptz | Y |  | When revoked |
+
+Rules: `mfa_email_codes_attempts_check`: CHECK ((attempts >= 0)).
+
 #### `mfa_methods`
 
 Created in `V2__sessions_and_mfa.sql`. Enrolled second factors (TOTP), with the secret encrypted and the last used time step.
@@ -1193,6 +1231,44 @@ Created in `V1__identity_and_organization.sql`. User accounts (internal staff, c
 
 Rules: `ck_users_customer_link`: CHECK (((customer_id IS NULL) OR ((user_type) = 'CONCESSIONAIRE'))); `users_failed_login_count_check`: CHECK ((failed_login_count >= 0)); `users_status_check`: CHECK status IN (ACTIVE, INACTIVE); `users_user_type_check`: CHECK user_type IN (INTERNAL, CONCESSIONAIRE, EXTERNAL_AUDITOR); `users_username_check`: CHECK (((username) ~ '^[a-z0-9._-]{3,64}$')); `users_username_key`: UNIQUE (username); `ix_users_customer`: INDEX btree (customer_id) WHERE (customer_id IS NOT NULL); `uq_users_email_lower`: UNIQUE INDEX btree (lower((email))).
 
+#### `webauthn_challenges`
+
+Created in `V48__webauthn_passkeys.sql`. Single-use WebAuthn challenges for adding a passkey or signing in with one.
+
+| Column | Type | Null | Default | Meaning |
+|---|---|---|---|---|
+| id | uuid | N |  | Primary key (UUID generated by the application) |
+| user_id | uuid | N |  | References `users` |
+| purpose | varchar(12) | N |  |  |
+| challenge | bytea | N |  |  |
+| bound_to | varchar(64) | Y |  |  |
+| created_at | timestamptz | N |  | When the row was created |
+| expires_at | timestamptz | N |  | When expires |
+| used_at | timestamptz | Y |  | When used |
+
+Rules: `webauthn_challenges_purpose_check`: CHECK purpose IN (REGISTER, AUTHENTICATE).
+
+#### `webauthn_credentials`
+
+Created in `V48__webauthn_passkeys.sql`. Passkeys (WebAuthn credentials): public key, signature counter and flags per registered device.
+
+| Column | Type | Null | Default | Meaning |
+|---|---|---|---|---|
+| id | uuid | N |  | Primary key (UUID generated by the application) |
+| user_id | uuid | N |  | References `users` |
+| credential_id | bytea | N |  |  |
+| attested_credential_data | bytea | N |  |  |
+| sign_count | bigint | N | 0 |  |
+| uv_initialized | bool | N |  |  |
+| backup_eligible | bool | Y |  |  |
+| backup_state | bool | Y |  |  |
+| name | varchar(100) | N |  | Display name |
+| created_at | timestamptz | N |  | When the row was created |
+| last_used_at | timestamptz | Y |  | When last used |
+| revoked_at | timestamptz | Y |  | When revoked |
+
+Rules: `webauthn_credentials_credential_id_key`: UNIQUE (credential_id); `webauthn_credentials_sign_count_check`: CHECK ((sign_count >= 0)); `ix_webauthn_credentials_user`: INDEX btree (user_id) WHERE (revoked_at IS NULL).
+
 ### 4.2 Organisation
 
 #### `departments`
@@ -1303,7 +1379,7 @@ Created in `V7__general_ledger.sql`. Append-only log of every workflow decision 
 | id | uuid | N |  | Primary key (UUID generated by the application) |
 | document_type | varchar(30) | N |  |  |
 | document_id | uuid | N |  |  |
-| action | varchar(12) | N |  |  |
+| action | varchar(20) | N |  |  |
 | step_order | smallint | Y |  |  |
 | step_code | varchar(20) | Y |  |  |
 | actor_id | uuid | N |  | References `users` |
@@ -1311,7 +1387,7 @@ Created in `V7__general_ledger.sql`. Append-only log of every workflow decision 
 | comment | varchar(1000) | Y |  |  |
 | decided_at | timestamptz | N |  | When decided |
 
-Rules: `approval_decisions_action_check`: CHECK action IN (SUBMIT, APPROVE, RETURN, REJECT, CANCEL, POST, INSTRUCT, CONFIRM, VOID); trigger `trg_approval_decisions_immutable`: BEFORE DELETE OR UPDATE FOR EACH ROW EXECUTE FUNCTION cas_reject_modification(); trigger `trg_approval_decisions_no_truncate`: BEFORE TRUNCATE FOR EACH STATEMENT EXECUTE FUNCTION cas_reject_modification().
+Rules: `approval_decisions_action_check`: CHECK action IN (SUBMIT, APPROVE, RETURN, REJECT, CANCEL, POST, INSTRUCT, CONFIRM, VOID, APPROVE_CHECK); trigger `trg_approval_decisions_immutable`: BEFORE DELETE OR UPDATE FOR EACH ROW EXECUTE FUNCTION cas_reject_modification(); trigger `trg_approval_decisions_no_truncate`: BEFORE TRUNCATE FOR EACH STATEMENT EXECUTE FUNCTION cas_reject_modification().
 
 #### `approval_workflow_steps`
 
@@ -1897,8 +1973,12 @@ Created in `V9__payables_budget_treasury_base.sql`. Issued cheques with number, 
 | created_by | varchar(64) | N |  | Username that created the row |
 | updated_at | timestamptz | N |  | When the row last changed |
 | updated_by | varchar(64) | N |  | Username that last changed the row |
+| prepared_by_id | uuid | Y |  | References `users` (added in V46) |
+| approved_by_id | uuid | Y |  | References `users` (added in V46) |
+| approved_by | varchar(64) | Y |  | (added in V46) |
+| approved_at | timestamptz | Y |  | When approved (added in V46) |
 
-Rules: `check_register_amount_check`: CHECK ((amount > (0))); `check_register_status_check`: CHECK status IN (ISSUED, RELEASED, VOIDED, CLEARED); `uq_check_number`: UNIQUE (bank_account_id, check_number); `uq_check_live_dv`: UNIQUE INDEX btree (dv_id) WHERE ((status) = ANY (ARRAY[('ISSUED'), ('RELEASED')])).
+Rules: `check_register_amount_check`: CHECK ((amount > (0))); `check_register_status_check`: CHECK status IN (PREPARED, ISSUED, RELEASED, VOIDED, CLEARED); `ck_check_approved_by_another`: CHECK (((approved_by_id IS NULL) OR (prepared_by_id IS NULL) OR (approved_by_id <> prepared_by_id))); `uq_check_number`: UNIQUE (bank_account_id, check_number); `uq_check_live_dv`: UNIQUE INDEX btree (dv_id) WHERE ((status) = ANY ((ARRAY['PREPARED', 'ISSUED', 'RELEASED']))).
 
 #### `disbursement_voucher_lines`
 
