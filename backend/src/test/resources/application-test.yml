@@ -16,6 +16,9 @@ cas:
   mfa:
     email-otp:
       enabled: true
+  # Tests run anomaly detection themselves.
+  anomalies:
+    enabled: false
   reports:
     # Tests run report jobs themselves (ReportJobService.processPending); a background poll could claim a job
     # first and leave it RUNNING when the test checks it.

@@ -1258,3 +1258,32 @@ export interface CloseScheduleItem {
   taskId: string; taskName: string; frequency: CloseFrequency; scopeKey: string; scopeLabel: string; dueDate: string;
   status: 'OPEN' | 'DONE' | 'NOT_APPLICABLE'; overdue: boolean;
 }
+
+export type AnomalySeverity = 'HIGH' | 'MEDIUM' | 'LOW';
+export type AnomalyStatus = 'OPEN' | 'EXPLAINED' | 'ESCALATED';
+
+export interface AnomalyFinding {
+  id: string;
+  ruleCode: string;
+  severity: AnomalySeverity;
+  documentType: string | null;
+  documentId: string | null;
+  reference: string | null;
+  amount: string | null;
+  occurredOn: string | null;
+  title: string;
+  detail: string;
+  involvedUsers: string[];
+  detectedAt: string;
+  status: AnomalyStatus;
+  reviewNote: string | null;
+  reviewedBy: string | null;
+  reviewedAt: string | null;
+  version: number;
+}
+
+export interface AnomalySummary {
+  openHigh: number;
+  openMedium: number;
+  openLow: number;
+}

@@ -281,6 +281,7 @@ Trust boundaries:
 * HTML disguised as a PDF is refused (`XssIT`).
 * No secret reaches the logs at DEBUG (`SensitiveLogIT`).
 * The assignee of a change cannot validate it on staging (`TicketsIT`).
+* Someone involved in a flagged document cannot review its anomaly finding, and an external auditor can see findings but not review them (`AnomalyDetectionIT`).
 
 ### 6.5 Open risks needing a decision or an environment
 

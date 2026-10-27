@@ -57,6 +57,7 @@ export const NAV_ITEMS: NavItem[] = [
   { label: 'Approval limits', to: '/admin/approval-limits', anyOf: ['APPROVAL_LIMIT_MANAGE', 'AUDIT_LOG_VIEW', 'ROLE_VIEW'], section: 'Administration' },
   { label: 'Integrations', to: '/integrations', anyOf: ['INTEGRATION_VIEW'], section: 'Administration' },
   { label: 'Audit trail', to: '/audit', anyOf: ['AUDIT_LOG_VIEW', 'SECURITY_EVENT_VIEW'], section: 'Administration' },
+  { label: 'Anomalies', to: '/audit/anomalies', anyOf: ['ANOMALY_VIEW'], section: 'Administration' },
 ];
 
 export function visibleNav(hasPermission: (p: string) => boolean): NavItem[] {

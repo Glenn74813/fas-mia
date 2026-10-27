@@ -114,5 +114,6 @@
 "mfa_recovery_codes": "Single-use recovery codes for a lost authenticator, stored as Argon2id hashes; spent or withdrawn rows are kept for audit.",
 "mfa_email_codes": "E-mailed one-time sign-in codes, bound to one sign-in step, stored as hashes, with attempts counted.",
 "webauthn_credentials": "Passkeys (WebAuthn credentials): public key, signature counter and flags per registered device.",
-"webauthn_challenges": "Single-use WebAuthn challenges for adding a passkey or signing in with one."
+"webauthn_challenges": "Single-use WebAuthn challenges for adding a passkey or signing in with one.",
+"anomaly_findings": "Suspicious-activity findings from the anomaly rules, each recorded once by fingerprint, with the independent review."
 }

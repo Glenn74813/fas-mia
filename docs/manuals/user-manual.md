@@ -464,7 +464,25 @@ nothing. On the **Audit trail**:
 * export through **My reports**;
 * **Verify integrity** to recompute both hash chains.
 
-External-auditor accounts are deactivated by an administrator when the engagement ends (an automatic expiry date exists but cannot yet be set from the screens).
+External-auditor accounts carry an access expiry date, set by an administrator, after which they can no longer sign in.
+
+**Anomalies** (`ANOMALY_VIEW`; reviewing needs `ANOMALY_REVIEW`, held by internal auditors and the chief accountant)
+lists transactions the system flagged as unusual. Detection runs every hour; **Run detection now** runs it at once.
+
+| Rule | Severity | Flags |
+|---|---|---|
+| Duplicate invoice | High | Two invoices from one supplier with the same payable amount within 30 days |
+| Payment after bank change | High | A payment within 7 days of the supplier's bank account being entered or verified |
+| Just below a threshold | Medium | An amount within 5 % below an approval threshold |
+| Backdated entry | Medium | An entry posted more than 45 days after its accounting date |
+| Benford's law | Medium | A period with 300 or more amounts whose first digits deviate from Benford's proportions |
+| Off-hours posting | Low | Posted on a weekend or holiday, or before 06:00 or after 20:00 Manila time |
+| Round amount | Low | A manual entry of ₱100,000 or more that is an exact multiple of ₱10,000 |
+
+A finding is not proof of wrongdoing. Open it through the document link, then **Explain** (with what you checked) or
+**Escalate** (with what needs following up); a note of at least 10 characters is required, and a finding is reviewed
+once. You cannot review a finding about a document you prepared, approved or posted. New high or medium findings
+send reviewers a notification.
 
 ## 14. Concessionaire portal
 

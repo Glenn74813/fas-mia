@@ -1,7 +1,7 @@
 import {
   BadgeCheck, Banknote, BookOpen, BookText, Boxes, Building2, CalendarCheck, CalendarDays, ChartColumn, ChartPie, ClipboardCheck,
   FileSpreadsheet, FileText, Gauge, GitCompare, HandCoins, Inbox, KeyRound, Landmark, LayoutDashboard, LifeBuoy, Link2, ListTree,
-  MessageSquare, Network, PackageOpen, PiggyBank, Plug, Receipt, Repeat, Scale, ScrollText, Send, Settings2, ShieldCheck,
+  MessageSquare, Network, PackageOpen, PiggyBank, Plug, Receipt, Repeat, Scale, ScrollText, Send, Settings2, ShieldAlert, ShieldCheck,
   SlidersHorizontal, TrendingDown, Truck, UserCheck, Users, Wallet, type LucideIcon,
 } from 'lucide-react';
 
@@ -55,4 +55,5 @@ export const NAV_ICONS: Record<string, LucideIcon> = {
   '/admin/approval-limits': SlidersHorizontal,
   '/integrations': Plug,
   '/audit': ScrollText,
+  '/audit/anomalies': ShieldAlert,
 };

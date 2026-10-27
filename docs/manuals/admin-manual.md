@@ -151,7 +151,11 @@ holders.
   restores and as part of release smoke checks.
 * Exports: **My reports** → audit trail export (CSV, XLSX or PDF), by date range, action and actor.
 * Alerts: HIGH-severity security events and dead integrations notify permission holders in the app and by
-  e-mail, throttled per key.
+  e-mail, throttled per key. New high or medium anomaly findings notify `ANOMALY_REVIEW` holders the same way
+  (at most every 30 minutes).
+* Anomaly detection (**Audit → Anomalies**): `cas.anomalies.enabled` (default on), `cas.anomalies.cron` (default
+  minute 20 of every hour, Manila time), `cas.anomalies.lookback-days` (90) and `cas.anomalies.round-amount-min`
+  (100000). Holidays for the off-hours rule come from the business holidays used by ticket SLAs.
 
 ## 10. Background work and operations
 

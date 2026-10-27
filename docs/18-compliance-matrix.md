@@ -60,6 +60,7 @@ certification or legal advice.
 | Search and export of audit records | Audit trail page; CSV/XLSX/PDF export job | `ManagementReportsIT` (audit export) | Met | |
 | Immutable posted records | Triggers on ledger, decisions, movements, events | `PostingInvariantsIT` | Met | |
 | Alerts on high-severity events and dead integrations | `AlertService`, throttled | `SecurityAlertsIT`, `IntegrationsIT` | Met | Central monitoring C-04 |
+| Fraud detection: anomaly detection and alerts (TOR §2.2.3) | Hourly rules for duplicate invoices, payments after a bank-detail change, amounts just below thresholds, backdated, off-hours and round-sum entries, and Benford deviation; alerts to reviewers; independent review with a note | `AnomalyDetectionIT`, Playwright `anomalies.spec.ts` | Met | Thresholds (45 days, 5 %, business hours, round-sum floor) are proposals for MIAA's internal audit to confirm |
 
 ## 4. Data Privacy Act of 2012 (RA 10173)
 

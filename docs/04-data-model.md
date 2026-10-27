@@ -111,6 +111,7 @@ every new migration; edit only this introduction by hand.
 | V46 | `V46__dv_budget_certification_and_check_approval.sql` | TOR Annex A (Controlling): the Budget Division evaluates and approves in-process disbursement vouchers against the Corporate Operating Budget. TOR Annex A (Cash Flow and Treasury): checks for processed DVs are prepared and approved. |
 | V47 | `V47__mfa_email_codes.sql` | E-mail one-time codes as a second factor (TOR §4.2: "OTP via SMS/email"). A code belongs to one sign-in step (the MFA token's id), lives at most as long as that step, is stored only as a hash, and allows five attempts. |
 | V48 | `V48__webauthn_passkeys.sql` | Passkeys (WebAuthn) as a second factor (TOR §4.2: "biometric authentication (if applicable)"). A user may register several; each keeps its public key (in the attested credential data), signature counter and flags. |
+| V49 | `V49__anomaly_findings.sql` | Anomaly detection (TOR §2.2.3: "deploy anomaly detection algorithms to identify suspicious financial activities; implement automated alerts"). Rule-based detectors write findings here; each finding is reported once (fingerprint) and reviewed by an auditor as EXPLAINED or ESCALATED with a note. |
 
 ## 3. Entity-relationship diagrams by domain
 
@@ -892,6 +893,10 @@ References to other domains: `tickets.assignee_id` → `users`; `tickets.reporte
 
 ```mermaid
 erDiagram
+    anomaly_findings {
+        uuid id PK
+        uuid reviewed_by_id FK
+    }
     audit_events {
         bigint id PK
     }
@@ -899,6 +904,8 @@ erDiagram
         bigint id PK
     }
 ```
+
+References to other domains: `anomaly_findings.reviewed_by_id` → `users`.
 
 ### 3.15 Migration and parallel run
 
@@ -1130,7 +1137,7 @@ Created in `V37__access_governance.sql`. Maker-checker requests for role assignm
 | decision_note | varchar(1000) | Y |  |  |
 | version | bigint | N | 0 | Optimistic-lock version, incremented on every update |
 
-Rules: `ck_rgr_decided`: CHECK ((((status) = ANY (ARRAY[('APPROVED'), ('REJECTED')])) = (decided_by_id IS NOT NULL))); `ck_rgr_two_person`: CHECK (((decided_by_id IS NULL) OR ((decided_by_id <> requested_by_id) AND (decided_by_id <> user_id)))); `role_grant_requests_status_check`: CHECK status IN (PENDING, APPROVED, REJECTED, CANCELLED); `uq_rgr_pending`: UNIQUE INDEX btree (user_id) WHERE ((status) = 'PENDING').
+Rules: `ck_rgr_decided`: CHECK ((((status) = ANY ((ARRAY['APPROVED', 'REJECTED']))) = (decided_by_id IS NOT NULL))); `ck_rgr_two_person`: CHECK (((decided_by_id IS NULL) OR ((decided_by_id <> requested_by_id) AND (decided_by_id <> user_id)))); `role_grant_requests_status_check`: CHECK status IN (PENDING, APPROVED, REJECTED, CANCELLED); `uq_rgr_pending`: UNIQUE INDEX btree (user_id) WHERE ((status) = 'PENDING').
 
 #### `role_permissions`
 
@@ -1680,7 +1687,7 @@ Created in `V7__general_ledger.sql`. Journal vouchers (JEVs) before posting: dra
 | updated_at | timestamptz | N |  | When the row last changed |
 | updated_by | varchar(64) | N |  | Username that last changed the row |
 
-Rules: `journal_vouchers_status_check`: CHECK status IN (DRAFT, SUBMITTED, APPROVED, POSTED, RETURNED, REJECTED, CANCELLED); `journal_vouchers_voucher_number_key`: UNIQUE (voucher_number); `uq_jv_live_reversal`: UNIQUE INDEX btree (reversal_of_entry_id) WHERE ((reversal_of_entry_id IS NOT NULL) AND ((status) <> ALL (ARRAY[('REJECTED'), ('CANCELLED')]))).
+Rules: `journal_vouchers_status_check`: CHECK status IN (DRAFT, SUBMITTED, APPROVED, POSTED, RETURNED, REJECTED, CANCELLED); `journal_vouchers_voucher_number_key`: UNIQUE (voucher_number); `uq_jv_live_reversal`: UNIQUE INDEX btree (reversal_of_entry_id) WHERE ((reversal_of_entry_id IS NOT NULL) AND ((status) <> ALL ((ARRAY['REJECTED', 'CANCELLED'])))).
 
 #### `ledger_balances`
 
@@ -2082,7 +2089,7 @@ Created in `V21__integrations_payment_files.sql`. Supplier bank accounts for ele
 | verification_note | varchar(500) | Y |  |  |
 | version | bigint | N | 0 | Optimistic-lock version, incremented on every update |
 
-Rules: `ck_sba_verifier`: CHECK ((((status) <> 'VERIFIED') OR (verified_by IS NOT NULL))); `supplier_bank_accounts_status_check`: CHECK status IN (PENDING, VERIFIED, REJECTED, INACTIVE); `uq_supplier_bank_live`: UNIQUE INDEX btree (supplier_id) WHERE ((status) = ANY (ARRAY[('PENDING'), ('VERIFIED')])).
+Rules: `ck_sba_verifier`: CHECK ((((status) <> 'VERIFIED') OR (verified_by IS NOT NULL))); `supplier_bank_accounts_status_check`: CHECK status IN (PENDING, VERIFIED, REJECTED, INACTIVE); `uq_supplier_bank_live`: UNIQUE INDEX btree (supplier_id) WHERE ((status) = ANY ((ARRAY['PENDING', 'VERIFIED']))).
 
 #### `supplier_invoice_lines`
 
@@ -2133,7 +2140,7 @@ Created in `V9__payables_budget_treasury_base.sql`. Supplier invoices (AP) with 
 | updated_by | varchar(64) | N |  | Username that last changed the row |
 | migration_batch_id | uuid | Y |  | References `migration_batches` (added in V26) |
 
-Rules: `ck_inv_due`: CHECK ((due_date >= invoice_date)); `ck_inv_paid`: CHECK ((paid_amount <= payable_amount)); `supplier_invoices_ewt_amount_check`: CHECK ((ewt_amount >= (0))); `supplier_invoices_net_amount_check`: CHECK ((net_amount >= (0))); `supplier_invoices_paid_amount_check`: CHECK ((paid_amount >= (0))); `supplier_invoices_payable_amount_check`: CHECK ((payable_amount >= (0))); `supplier_invoices_status_check`: CHECK status IN (DRAFT, SUBMITTED, APPROVED, POSTED, RETURNED, REJECTED, CANCELLED); `supplier_invoices_vat_amount_check`: CHECK ((vat_amount >= (0))); `ix_supplier_invoices_migration`: INDEX btree (migration_batch_id) WHERE (migration_batch_id IS NOT NULL); `uq_supplier_invoice_live`: UNIQUE INDEX btree (supplier_id, lower((invoice_number))) WHERE ((status) <> ALL (ARRAY[('REJECTED'), ('CANCELLED')])).
+Rules: `ck_inv_due`: CHECK ((due_date >= invoice_date)); `ck_inv_paid`: CHECK ((paid_amount <= payable_amount)); `supplier_invoices_ewt_amount_check`: CHECK ((ewt_amount >= (0))); `supplier_invoices_net_amount_check`: CHECK ((net_amount >= (0))); `supplier_invoices_paid_amount_check`: CHECK ((paid_amount >= (0))); `supplier_invoices_payable_amount_check`: CHECK ((payable_amount >= (0))); `supplier_invoices_status_check`: CHECK status IN (DRAFT, SUBMITTED, APPROVED, POSTED, RETURNED, REJECTED, CANCELLED); `supplier_invoices_vat_amount_check`: CHECK ((vat_amount >= (0))); `ix_supplier_invoices_migration`: INDEX btree (migration_batch_id) WHERE (migration_batch_id IS NOT NULL); `uq_supplier_invoice_live`: UNIQUE INDEX btree (supplier_id, lower((invoice_number))) WHERE ((status) <> ALL ((ARRAY['REJECTED', 'CANCELLED']))).
 
 #### `suppliers`
 
@@ -2210,7 +2217,7 @@ Created in `V11__receivables_billing.sql`. AR billing documents: invoices, credi
 | updated_by | varchar(64) | N |  | Username that last changed the row |
 | migration_batch_id | uuid | Y |  | References `migration_batches` (added in V26) |
 
-Rules: `billing_documents_billing_period_check`: CHECK (((billing_period IS NULL) OR (billing_period ~ '^[0-9]{4}-[0-9]{2}$'))); `billing_documents_document_number_key`: UNIQUE (document_number); `billing_documents_gross_amount_check`: CHECK ((gross_amount >= (0))); `billing_documents_kind_check`: CHECK kind IN (INVOICE, CREDIT_MEMO, DEBIT_MEMO); `billing_documents_net_amount_check`: CHECK ((net_amount >= (0))); `billing_documents_settled_amount_check`: CHECK ((settled_amount >= (0))); `billing_documents_source_check`: CHECK source IN (MANUAL, CONTRACT, MIGRATION); `billing_documents_status_check`: CHECK status IN (DRAFT, SUBMITTED, APPROVED, POSTED, RETURNED, REJECTED, CANCELLED); `billing_documents_vat_amount_check`: CHECK ((vat_amount >= (0))); `ck_bd_due`: CHECK ((due_date >= document_date)); `ck_bd_memo_ref`: CHECK ((((kind) = 'INVOICE') OR (related_invoice_id IS NOT NULL) OR ((kind) = 'DEBIT_MEMO'))); `ck_bd_migration`: CHECK ((((source) = 'MIGRATION') = (migration_batch_id IS NOT NULL))); `ck_bd_settled`: CHECK ((settled_amount <= gross_amount)); `ix_billing_migration`: INDEX btree (migration_batch_id) WHERE (migration_batch_id IS NOT NULL); `ix_billing_related_invoice`: INDEX btree (related_invoice_id) WHERE (related_invoice_id IS NOT NULL); `uq_contract_period_billing`: UNIQUE INDEX btree (contract_id, billing_period) WHERE ((contract_id IS NOT NULL) AND ((status) <> ALL (ARRAY[('REJECTED'), ('CANCELLED')]))).
+Rules: `billing_documents_billing_period_check`: CHECK (((billing_period IS NULL) OR (billing_period ~ '^[0-9]{4}-[0-9]{2}$'))); `billing_documents_document_number_key`: UNIQUE (document_number); `billing_documents_gross_amount_check`: CHECK ((gross_amount >= (0))); `billing_documents_kind_check`: CHECK kind IN (INVOICE, CREDIT_MEMO, DEBIT_MEMO); `billing_documents_net_amount_check`: CHECK ((net_amount >= (0))); `billing_documents_settled_amount_check`: CHECK ((settled_amount >= (0))); `billing_documents_source_check`: CHECK source IN (MANUAL, CONTRACT, MIGRATION); `billing_documents_status_check`: CHECK status IN (DRAFT, SUBMITTED, APPROVED, POSTED, RETURNED, REJECTED, CANCELLED); `billing_documents_vat_amount_check`: CHECK ((vat_amount >= (0))); `ck_bd_due`: CHECK ((due_date >= document_date)); `ck_bd_memo_ref`: CHECK ((((kind) = 'INVOICE') OR (related_invoice_id IS NOT NULL) OR ((kind) = 'DEBIT_MEMO'))); `ck_bd_migration`: CHECK ((((source) = 'MIGRATION') = (migration_batch_id IS NOT NULL))); `ck_bd_settled`: CHECK ((settled_amount <= gross_amount)); `ix_billing_migration`: INDEX btree (migration_batch_id) WHERE (migration_batch_id IS NOT NULL); `ix_billing_related_invoice`: INDEX btree (related_invoice_id) WHERE (related_invoice_id IS NOT NULL); `uq_contract_period_billing`: UNIQUE INDEX btree (contract_id, billing_period) WHERE ((contract_id IS NOT NULL) AND ((status) <> ALL ((ARRAY['REJECTED', 'CANCELLED'])))).
 
 #### `customer_contracts`
 
@@ -2286,7 +2293,7 @@ Created in `V31__portal_inquiries.sql`. Concessionaire inquiries and payment ref
 | created_at | timestamptz | N |  | When the row was created |
 | version | bigint | N | 0 | Optimistic-lock version, incremented on every update |
 
-Rules: `ck_pi_answered`: CHECK ((((status) = 'OPEN') = (response IS NULL))); `ck_pi_payment`: CHECK ((((kind) <> 'PAYMENT_REFERENCE') OR ((payment_date IS NOT NULL) AND (payment_amount IS NOT NULL) AND (payment_method IS NOT NULL) AND (payment_reference IS NOT NULL)))); `portal_inquiries_kind_check`: CHECK kind IN (PAYMENT_REFERENCE, QUESTION); `portal_inquiries_payment_amount_check`: CHECK (((payment_amount IS NULL) OR (payment_amount > (0)))); `portal_inquiries_payment_method_check`: CHECK (((payment_method IS NULL) OR payment_method IN (CASH, CHECK, BANK_TRANSFER); `portal_inquiries_reference_key`: UNIQUE (reference); `portal_inquiries_status_check`: CHECK status IN (OPEN, ANSWERED, CLOSED).
+Rules: `ck_pi_answered`: CHECK ((((status) = 'OPEN') = (response IS NULL))); `ck_pi_payment`: CHECK ((((kind) <> 'PAYMENT_REFERENCE') OR ((payment_date IS NOT NULL) AND (payment_amount IS NOT NULL) AND (payment_method IS NOT NULL) AND (payment_reference IS NOT NULL)))); `portal_inquiries_kind_check`: CHECK kind IN (PAYMENT_REFERENCE, QUESTION); `portal_inquiries_payment_amount_check`: CHECK (((payment_amount IS NULL) OR (payment_amount > (0)))); `portal_inquiries_payment_method_check`: CHECK (((payment_method IS NULL) OR payment_method IN (CASH, CHECK, BANK_TRANSFER)); `portal_inquiries_reference_key`: UNIQUE (reference); `portal_inquiries_status_check`: CHECK status IN (OPEN, ANSWERED, CLOSED).
 
 #### `portal_link_requests`
 
@@ -3132,9 +3139,37 @@ Created in `V23__ticketing.sql`. Support tickets (incidents, service requests, c
 | release_notes | varchar(4000) | Y |  | (added in V41) |
 | release_reference | varchar(60) | Y |  | (added in V41) |
 
-Rules: `ck_ticket_staging`: CHECK (((staging_validated_at IS NULL) = (staging_validated_by IS NULL))); `tickets_priority_check`: CHECK priority IN (P1, P2, P3, P4); `tickets_satisfaction_check`: CHECK (((satisfaction >= 1) AND (satisfaction <= 5))); `tickets_severity_check`: CHECK severity IN (S1, S2, S3, S4); `tickets_status_check`: CHECK status IN (NEW, ACKNOWLEDGED, PENDING_APPROVAL, APPROVED, IN_PROGRESS, ON_HOLD, RESOLVED, CLOSED, REJECTED, CANCELLED); `tickets_ticket_number_key`: UNIQUE (ticket_number); `tickets_ticket_type_check`: CHECK ticket_type IN (INCIDENT, SERVICE_REQUEST, CHANGE_REQUEST, ENHANCEMENT); `ix_tickets_open`: INDEX btree (status, resolution_due_at) WHERE ((status) <> ALL (ARRAY[('RESOLVED'), ('CLOSED'), ('REJECTED'), ('CANCELLED')])); `ix_tickets_resolved`: INDEX btree (resolved_at) WHERE ((status) = 'RESOLVED').
+Rules: `ck_ticket_staging`: CHECK (((staging_validated_at IS NULL) = (staging_validated_by IS NULL))); `tickets_priority_check`: CHECK priority IN (P1, P2, P3, P4); `tickets_satisfaction_check`: CHECK (((satisfaction >= 1) AND (satisfaction <= 5))); `tickets_severity_check`: CHECK severity IN (S1, S2, S3, S4); `tickets_status_check`: CHECK status IN (NEW, ACKNOWLEDGED, PENDING_APPROVAL, APPROVED, IN_PROGRESS, ON_HOLD, RESOLVED, CLOSED, REJECTED, CANCELLED); `tickets_ticket_number_key`: UNIQUE (ticket_number); `tickets_ticket_type_check`: CHECK ticket_type IN (INCIDENT, SERVICE_REQUEST, CHANGE_REQUEST, ENHANCEMENT); `ix_tickets_open`: INDEX btree (status, resolution_due_at) WHERE ((status) <> ALL ((ARRAY['RESOLVED', 'CLOSED', 'REJECTED', 'CANCELLED']))); `ix_tickets_resolved`: INDEX btree (resolved_at) WHERE ((status) = 'RESOLVED').
 
 ### 4.14 Audit
+
+#### `anomaly_findings`
+
+Created in `V49__anomaly_findings.sql`. Suspicious-activity findings from the anomaly rules, each recorded once by fingerprint, with the independent review.
+
+| Column | Type | Null | Default | Meaning |
+|---|---|---|---|---|
+| id | uuid | N |  | Primary key (UUID generated by the application) |
+| rule_code | varchar(40) | N |  |  |
+| severity | varchar(6) | N |  |  |
+| fingerprint | varchar(200) | N |  |  |
+| document_type | varchar(30) | Y |  |  |
+| document_id | uuid | Y |  |  |
+| reference | varchar(100) | Y |  |  |
+| amount | numeric(19,2) | Y |  |  |
+| occurred_on | date | Y |  |  |
+| title | varchar(300) | N |  |  |
+| detail | varchar(2000) | N |  |  |
+| involved_users | varchar(64)[] | N | '{}'::character varying[] |  |
+| detected_at | timestamptz | N |  | When detected |
+| status | varchar(10) | N | 'OPEN'::character varying | Lifecycle status; legal values in the rules below |
+| review_note | varchar(2000) | Y |  |  |
+| reviewed_by_id | uuid | Y |  | References `users` |
+| reviewed_by | varchar(64) | Y |  |  |
+| reviewed_at | timestamptz | Y |  | When reviewed |
+| version | bigint | N | 0 | Optimistic-lock version, incremented on every update |
+
+Rules: `anomaly_findings_fingerprint_key`: UNIQUE (fingerprint); `anomaly_findings_severity_check`: CHECK severity IN (HIGH, MEDIUM, LOW); `anomaly_findings_status_check`: CHECK status IN (OPEN, EXPLAINED, ESCALATED); `ck_anomaly_reviewed`: CHECK ((((status) = 'OPEN') = (reviewed_at IS NULL))); `ix_anomaly_open`: INDEX btree (severity, detected_at DESC) WHERE ((status) = 'OPEN').
 
 #### `audit_events`
 

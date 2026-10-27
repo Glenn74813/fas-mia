@@ -9,6 +9,7 @@ import { RolesPage } from '../features/admin/RolesPage';
 import { UserDetailPage } from '../features/admin/UserDetailPage';
 import { UsersPage } from '../features/admin/UsersPage';
 import { ChartOfAccountsPage } from '../features/accounts/ChartOfAccountsPage';
+import { AnomaliesPage } from '../features/audit/AnomaliesPage';
 import { AuditPage } from '../features/audit/AuditPage';
 import { AccountLedgerPage } from '../features/general-ledger/AccountLedgerPage';
 import { EntryDetailPage } from '../features/general-ledger/EntryDetailPage';
@@ -176,6 +177,7 @@ export const routes: RouteObject[] = [
       { path: 'budgets/:id', element: <RequireAuth anyOf={['BUDGET_VIEW', 'BUDGET_PREPARE', 'BUDGET_APPROVE']}><BudgetDetailPage /></RequireAuth> },
       { path: 'finance-settings', element: <RequireAuth anyOf={['LEDGER_VIEW', 'ACCOUNT_ADMINISTER', 'BANK_ACCOUNT_MANAGE']}><FinanceSettingsPage /></RequireAuth> },
       { path: 'audit', element: <RequireAuth anyOf={['AUDIT_LOG_VIEW', 'SECURITY_EVENT_VIEW']}><AuditPage /></RequireAuth> },
+      { path: 'audit/anomalies', element: <RequireAuth anyOf={['ANOMALY_VIEW']}><AnomaliesPage /></RequireAuth> },
       { path: '*', element: <p className="text-sm">Page not found.</p> },
     ],
   },

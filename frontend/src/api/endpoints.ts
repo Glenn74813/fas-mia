@@ -3,7 +3,7 @@ import type {
   TicketCategory,
   Clearing, ClearingProposal, CloseCalendarChecklist, CloseFrequency, CloseScheduleItem, CloseTask, GlOpenItem, OpenItemAccount,
   AccountLedger, ChainVerification, ChartSummary, CloseChecklist, CostCenter, CurrentUser, DocumentInfo, EntryDetail,
-  EventRecord, FiscalYear, LineInput, LoginResponse, Page, Period, PeriodChange, Permission, RecurringJournal, Role,
+  AnomalyFinding, AnomalySummary, EventRecord, FiscalYear, LineInput, LoginResponse, Page, Period, PeriodChange, Permission, RecurringJournal, Role,
   RoleAssignmentResult, RoleChangeResult, SodConflict, SubsidiaryAccount, TokenResponse, TotpEnrollment, TrialBalance,
   UserDetail, UserSummary, VoucherDetail, VoucherInput, VoucherSummary,
   AccountMapping, AgingRow, BankAccount, BudgetAdjustment, BudgetView, DvSummary, DvView, InvoiceInput, InvoiceSummary,
@@ -112,6 +112,15 @@ export const auditApi = {
   auditEvents: (q: EventQuery) => api.get<Page<EventRecord>>(`/audit-events${qs({ ...q })}`),
   securityEvents: (q: EventQuery) => api.get<Page<EventRecord>>(`/security-events${qs({ ...q })}`),
   verify: () => api.post<{ audit: ChainVerification; security: ChainVerification }>('/audit-events/verification'),
+};
+
+export const anomalyApi = {
+  list: (q: { status?: string; severity?: string; rule?: string; page?: number; size?: number }) =>
+    api.get<Page<AnomalyFinding>>(`/anomalies${qs({ ...q })}`),
+  summary: () => api.get<AnomalySummary>('/anomalies/summary'),
+  run: () => api.post<{ high: number; medium: number; low: number }>('/anomalies/run'),
+  review: (id: string, body: { version: number; status: 'EXPLAINED' | 'ESCALATED'; note: string }) =>
+    api.post<AnomalyFinding>(`/anomalies/${id}/review`, body),
 };
 
 export const accountApi = {
