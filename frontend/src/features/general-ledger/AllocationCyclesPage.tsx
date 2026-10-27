@@ -113,26 +113,26 @@ export function AllocationCyclesPage() {
         <form onSubmit={submit} className="max-w-4xl space-y-3 rounded-xl border border-slate-200/80 bg-white p-4 shadow-xs">
           <h2 className="text-base font-semibold text-slate-900">New cycle</h2>
           <div className="grid gap-3 sm:grid-cols-2">
-            <label className="text-sm">Code<input value={code} maxLength={30} onChange={(e) => setCode(e.target.value.toUpperCase())} className={`mt-1 block w-full ${select}`} /></label>
-            <label className="text-sm">Name<input value={name} maxLength={200} onChange={(e) => setName(e.target.value)} className={`mt-1 block w-full ${select}`} /></label>
+            <label className="text-sm">Code<input value={code} maxLength={30} onChange={(e) => setCode(e.target.value.toUpperCase())} className={`mt-1.5 block w-full ${select}`} /></label>
+            <label className="text-sm">Name<input value={name} maxLength={200} onChange={(e) => setName(e.target.value)} className={`mt-1.5 block w-full ${select}`} /></label>
           </div>
           {rules.map((r, i) => (
             <fieldset key={i} className="space-y-2 rounded-lg border border-slate-200 p-3">
               <legend className="px-1 text-sm font-medium">Rule {i + 1}</legend>
               <div className="grid gap-2 sm:grid-cols-3">
-                <label className="text-sm">Sender account<select value={r.senderAccountId} onChange={(e) => setRule(i, { senderAccountId: e.target.value })} className={`mt-1 block w-full ${select}`}>
+                <label className="text-sm">Sender account<select value={r.senderAccountId} onChange={(e) => setRule(i, { senderAccountId: e.target.value })} className={`mt-1.5 block w-full ${select}`}>
                   <option value="">Choose…</option>{accounts.map((a) => <option key={a.id} value={a.id}>{a.code} {a.name}</option>)}</select></label>
-                <label className="text-sm">Sender cost centre<select value={r.senderCostCenterId} onChange={(e) => setRule(i, { senderCostCenterId: e.target.value })} className={`mt-1 block w-full ${select}`}>
+                <label className="text-sm">Sender cost centre<select value={r.senderCostCenterId} onChange={(e) => setRule(i, { senderCostCenterId: e.target.value })} className={`mt-1.5 block w-full ${select}`}>
                   <option value="">Choose…</option>{(costCenters.data ?? []).map((c) => <option key={c.id} value={c.id}>{c.code} {c.name}</option>)}</select></label>
-                <label className="text-sm">Key<select value={r.keyType} onChange={(e) => setRule(i, { keyType: e.target.value as RuleForm['keyType'] })} className={`mt-1 block w-full ${select}`}>
+                <label className="text-sm">Key<select value={r.keyType} onChange={(e) => setRule(i, { keyType: e.target.value as RuleForm['keyType'] })} className={`mt-1.5 block w-full ${select}`}>
                   <option value="PERCENT">Fixed percentages</option><option value="QUANTITY">Statistical quantities</option></select></label>
               </div>
               {r.receivers.map((x, k) => (
                 <div key={k} className="flex flex-wrap items-end gap-2">
                   <label className="text-sm">Receiver<select value={x.costCenterId} onChange={(e) => setRule(i, { receivers: r.receivers.map((y, m) => (m === k ? { ...y, costCenterId: e.target.value } : y)) })}
-                    className={`mt-1 block ${select}`}><option value="">Choose…</option>{(costCenters.data ?? []).map((c) => <option key={c.id} value={c.id}>{c.code} {c.name}</option>)}</select></label>
+                    className={`mt-1.5 block ${select}`}><option value="">Choose…</option>{(costCenters.data ?? []).map((c) => <option key={c.id} value={c.id}>{c.code} {c.name}</option>)}</select></label>
                   <label className="text-sm">{r.keyType === 'PERCENT' ? 'Percent' : 'Quantity'}<input inputMode="decimal" value={x.weight}
-                    onChange={(e) => setRule(i, { receivers: r.receivers.map((y, m) => (m === k ? { ...y, weight: e.target.value } : y)) })} className={`mt-1 block w-28 ${select}`} /></label>
+                    onChange={(e) => setRule(i, { receivers: r.receivers.map((y, m) => (m === k ? { ...y, weight: e.target.value } : y)) })} className={`mt-1.5 block w-28 ${select}`} /></label>
                 </div>
               ))}
               <button type="button" className="text-sm text-brand-700 hover:underline" onClick={() => setRule(i, { receivers: [...r.receivers, { costCenterId: '', weight: '' }] })}>

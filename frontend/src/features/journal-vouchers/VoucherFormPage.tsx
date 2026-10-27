@@ -57,7 +57,7 @@ function VoucherForm({ existing }: { existing?: VoucherDetail }) {
       <form onSubmit={submit} className="space-y-4">
         <ErrorAlert error={save.error} />
         <div className="grid gap-4 rounded-xl border border-slate-200/80 bg-white shadow-xs p-5 md:grid-cols-4">
-          <div className="space-y-1">
+          <div className="space-y-1.5">
             <label htmlFor="voucherType" className="block text-sm font-medium text-slate-700">Voucher type</label>
             <select id="voucherType" value={form.voucherType} className="block w-full rounded-lg border border-slate-300 px-3 py-2 shadow-xs text-sm"
               onChange={(e) => setForm({ ...form, voucherType: e.target.value as VoucherInput['voucherType'] })}>

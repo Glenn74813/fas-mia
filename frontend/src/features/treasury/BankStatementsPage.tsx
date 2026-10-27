@@ -44,11 +44,11 @@ export function BankStatementsPage() {
           {imp.data && <p role="status" className="text-sm text-green-800">Imported {imp.data.summary.lineCount} lines for
             {' '}{imp.data.summary.periodStart} to {imp.data.summary.periodEnd}.</p>}
           <div className="grid gap-3 md:grid-cols-4">
-            <div className="space-y-1"><label htmlFor="sbank" className="block text-sm font-medium text-slate-700">Bank account</label>
+            <div className="space-y-1.5"><label htmlFor="sbank" className="block text-sm font-medium text-slate-700">Bank account</label>
               <select id="sbank" value={form.bankAccountId} onChange={(e) => setForm({ ...form, bankAccountId: e.target.value })}
                 className="block w-full rounded-lg border border-slate-300 px-3 py-2 shadow-xs text-sm"><option value="">Select…</option>
                 {(banks.data ?? []).filter((b) => b.status === 'ACTIVE').map((b) => <option key={b.id} value={b.id}>{b.code} ****{b.accountNumberLast4}</option>)}</select></div>
-            <div className="space-y-1"><label htmlFor="sfmt" className="block text-sm font-medium text-slate-700">Format</label>
+            <div className="space-y-1.5"><label htmlFor="sfmt" className="block text-sm font-medium text-slate-700">Format</label>
               <select id="sfmt" value={form.format} onChange={(e) => setForm({ ...form, format: e.target.value })}
                 className="block w-full rounded-lg border border-slate-300 px-3 py-2 shadow-xs text-sm">
                 <option value="CAMT053">ISO 20022 camt.053 (XML)</option><option value="MT940">SWIFT MT940</option><option value="CSV">CSV (CAS layout)</option></select></div>

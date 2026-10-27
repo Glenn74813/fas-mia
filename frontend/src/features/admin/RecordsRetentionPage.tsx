@@ -98,14 +98,14 @@ export function RecordsRetentionPage() {
           {canHold && (
             <form onSubmit={submitHold} className="mb-4 grid max-w-3xl gap-3 rounded-xl border border-slate-200/80 bg-white p-4 shadow-xs sm:grid-cols-2">
               <label className="text-sm">Records
-                <select value={holdYear} onChange={(e) => setHoldYear(e.target.value)} className={`mt-1 ${input}`}>
+                <select value={holdYear} onChange={(e) => setHoldYear(e.target.value)} className={`mt-1.5 ${input}`}>
                   <option value="">Every fiscal year</option>
                   {schedule.data.years.map((y) => <option key={y.fiscalYearId} value={y.fiscalYearId}>Fiscal year {y.fiscalYear}</option>)}
                 </select></label>
               <label className="text-sm">Reference (optional)
-                <input value={reference} maxLength={100} onChange={(e) => setReference(e.target.value)} placeholder="Case or memo number" className={`mt-1 ${input}`} /></label>
+                <input value={reference} maxLength={100} onChange={(e) => setReference(e.target.value)} placeholder="Case or memo number" className={`mt-1.5 ${input}`} /></label>
               <label className="text-sm sm:col-span-2">Reason
-                <textarea rows={2} maxLength={500} value={reason} onChange={(e) => setReason(e.target.value)} className={`mt-1 ${input}`} /></label>
+                <textarea rows={2} maxLength={500} value={reason} onChange={(e) => setReason(e.target.value)} className={`mt-1.5 ${input}`} /></label>
               <div className="sm:col-span-2"><ErrorAlert error={place.error} />
                 <Button type="submit" busy={place.isPending} disabled={reason.trim().length < 10}>Place hold</Button></div>
             </form>

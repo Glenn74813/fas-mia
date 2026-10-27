@@ -83,17 +83,17 @@ export function InboundFilesPage() {
         <form onSubmit={submit} className="mb-6 max-w-3xl space-y-3 rounded-xl border border-slate-200/80 bg-white p-4 shadow-xs">
           <div className="grid gap-3 sm:grid-cols-2">
             <label className="text-sm">Interface
-              <select value={type} onChange={(e) => { setType(e.target.value as InterfaceType); setHeaderValue(''); }} className={`mt-1 ${input}`}>
+              <select value={type} onChange={(e) => { setType(e.target.value as InterfaceType); setHeaderValue(''); }} className={`mt-1.5 ${input}`}>
                 {allowed.map((t) => <option key={t} value={t}>{TYPES[t].label}</option>)}
               </select></label>
             <label className="text-sm">File (.csv, .json or .xml)
-              <input type="file" accept=".csv,.json,.xml" onChange={(e) => setFile(e.target.files?.[0] ?? null)} className="mt-1 block w-full text-sm" /></label>
+              <input type="file" accept=".csv,.json,.xml" onChange={(e) => setFile(e.target.files?.[0] ?? null)} className="mt-1.5 block w-full text-sm" /></label>
             <label className="text-sm">Reference
               <input value={reference} maxLength={100} onChange={(e) => setReference(e.target.value)} placeholder="The sending system's batch number"
-                className={`mt-1 ${input}`} /></label>
+                className={`mt-1.5 ${input}`} /></label>
             {TYPES[type].header.map((h) => (
               <label key={h.name} className="text-sm">{h.label}
-                <input value={headerValue} onChange={(e) => setHeaderValue(e.target.value)} placeholder={h.placeholder} className={`mt-1 ${input}`} /></label>
+                <input value={headerValue} onChange={(e) => setHeaderValue(e.target.value)} placeholder={h.placeholder} className={`mt-1.5 ${input}`} /></label>
             ))}
           </div>
           <p className="text-xs text-slate-500">CSV columns: <span className="font-mono">{TYPES[type].columns}</span>. In JSON and XML the same names

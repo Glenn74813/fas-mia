@@ -40,7 +40,7 @@ export function InquiriesPage() {
                 <span className="font-medium">{i.subject}</span>
                 <Link className="text-brand-700 hover:underline" to={`/receivables/customers/${i.customerId}`}>{i.customerCode} {i.customerName}</Link></div>
               <p className="text-xs text-slate-500">From {i.submittedBy} {formatDateTime(i.createdAt)}{i.billingNumber ? ` · billing ${i.billingNumber}` : ''}</p>
-              {i.kind === 'PAYMENT_REFERENCE' && <p className="mt-1 rounded bg-amber-50 p-2">Reported payment of <Money value={i.paymentAmount!} /> on {i.paymentDate}
+              {i.kind === 'PAYMENT_REFERENCE' && <p className="mt-1.5 rounded bg-amber-50 p-2">Reported payment of <Money value={i.paymentAmount!} /> on {i.paymentDate}
                 ({i.paymentMethod?.replace('_', ' ').toLowerCase()}, reference {i.paymentReference}). Nothing has been recorded: check it against the bank
                 and record the receipt in Collections.</p>}
               <p className="mt-1 whitespace-pre-wrap">{i.message}</p>

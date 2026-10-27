@@ -52,23 +52,23 @@ export function TicketsPage() {
           <ErrorAlert error={create.error} />
           <div className="grid gap-3 md:grid-cols-3">
             <label className="block text-sm">Type
-              <select value={form.ticketType} onChange={(e) => setForm({ ...form, ticketType: e.target.value })} className="mt-1 block w-full rounded-lg border border-slate-300 px-3 py-2 shadow-xs">
+              <select value={form.ticketType} onChange={(e) => setForm({ ...form, ticketType: e.target.value })} className="mt-1.5 block w-full rounded-lg border border-slate-300 px-3 py-2 shadow-xs">
                 {Object.entries(TICKET_TYPES).map(([k, v]) => <option key={k} value={k}>{v}</option>)}</select></label>
             <label className="block text-sm">Priority
-              <select value={form.priority} onChange={(e) => setForm({ ...form, priority: e.target.value })} className="mt-1 block w-full rounded-lg border border-slate-300 px-3 py-2 shadow-xs">
+              <select value={form.priority} onChange={(e) => setForm({ ...form, priority: e.target.value })} className="mt-1.5 block w-full rounded-lg border border-slate-300 px-3 py-2 shadow-xs">
                 <option value="P1">P1 — critical, operations stopped</option><option value="P2">P2 — high, major function impaired</option>
                 <option value="P3">P3 — medium, workaround exists</option><option value="P4">P4 — low, cosmetic or question</option></select></label>
             <label className="block text-sm">Severity
-              <select value={form.severity} onChange={(e) => setForm({ ...form, severity: e.target.value })} className="mt-1 block w-full rounded-lg border border-slate-300 px-3 py-2 shadow-xs">
+              <select value={form.severity} onChange={(e) => setForm({ ...form, severity: e.target.value })} className="mt-1.5 block w-full rounded-lg border border-slate-300 px-3 py-2 shadow-xs">
                 {Object.entries(SEVERITIES).map(([k, v]) => <option key={k} value={k}>{v}</option>)}</select></label>
             <label className="block text-sm">Category
-              <select value={form.categoryId} onChange={(e) => setForm({ ...form, categoryId: e.target.value })} className="mt-1 block w-full rounded-lg border border-slate-300 px-3 py-2 shadow-xs">
+              <select value={form.categoryId} onChange={(e) => setForm({ ...form, categoryId: e.target.value })} className="mt-1.5 block w-full rounded-lg border border-slate-300 px-3 py-2 shadow-xs">
                 <option value="">Choose…</option>{active.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}</select></label>
             <Field label="Module (optional)" value={form.module} onChange={(e) => setForm({ ...form, module: e.target.value })} />
             <div className="md:col-span-3"><Field label="Title" value={form.title} maxLength={200} onChange={(e) => setForm({ ...form, title: e.target.value })} /></div>
             <label className="block text-sm md:col-span-3">Description
               <textarea value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} rows={5} maxLength={4000}
-                className="mt-1 block w-full rounded-lg border border-slate-300 px-3 py-2 shadow-xs" /></label>
+                className="mt-1.5 block w-full rounded-lg border border-slate-300 px-3 py-2 shadow-xs" /></label>
           </div>
           <p className="text-xs text-slate-500">Do not put passwords, account numbers or other secrets in a ticket.</p>
           <div className="flex gap-2"><Button busy={create.isPending} disabled={!form.title.trim() || !form.description.trim() || !form.categoryId} onClick={() => create.mutate()}>Submit ticket</Button>

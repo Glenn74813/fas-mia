@@ -63,7 +63,7 @@ function InvoiceForm({ existing }: { existing?: InvoiceView }) {
             search={(q) => supplierApi.list(q, 0, 50)} optionLabel={(s) => `${s.code} — ${s.name}`} filter={(s) => s.status === 'ACTIVE'}
             selected={supplier} onChange={(id) => setForm({ ...form, supplierId: id, vatCodeId: null })} />
           <Field label="Supplier invoice number" value={form.invoiceNumber} maxLength={60} onChange={(e) => setForm({ ...form, invoiceNumber: e.target.value })} />
-          <div className="space-y-1">
+          <div className="space-y-1.5">
             <label htmlFor="vat" className="block text-sm font-medium text-slate-700">Input VAT</label>
             <select id="vat" value={form.vatCodeId ?? ''} disabled={!supplier?.vatRegistered} onChange={(e) => setForm({ ...form, vatCodeId: e.target.value || null })}
               className="block w-full rounded-lg border border-slate-300 px-3 py-2 shadow-xs text-sm">

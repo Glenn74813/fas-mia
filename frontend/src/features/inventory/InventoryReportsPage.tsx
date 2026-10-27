@@ -64,10 +64,10 @@ export function InventoryReportsPage() {
               <ErrorAlert error={match.error} />
               <div className="grid gap-3 md:grid-cols-3">
                 <label className="block">Goods receipt
-                  <select value={m.grnId} onChange={(e) => setM({ ...m, grnId: e.target.value, invoiceId: '' })} className="mt-1 block w-full rounded-lg border border-slate-300 px-3 py-2 shadow-xs">
+                  <select value={m.grnId} onChange={(e) => setM({ ...m, grnId: e.target.value, invoiceId: '' })} className="mt-1.5 block w-full rounded-lg border border-slate-300 px-3 py-2 shadow-xs">
                     <option value="">Select…</option>{grir.data.receipts.map((r) => <option key={r.id} value={r.id}>{r.documentNumber} — open {r.open}</option>)}</select></label>
                 <label className="block">Supplier invoice
-                  <select value={m.invoiceId} onChange={(e) => setM({ ...m, invoiceId: e.target.value })} className="mt-1 block w-full rounded-lg border border-slate-300 px-3 py-2 shadow-xs">
+                  <select value={m.invoiceId} onChange={(e) => setM({ ...m, invoiceId: e.target.value })} className="mt-1.5 block w-full rounded-lg border border-slate-300 px-3 py-2 shadow-xs">
                     <option value="">Select…</option>{invoices.map((v) => <option key={v.id} value={v.id}>{v.invoiceNumber} — {v.available}</option>)}</select></label>
                 <Field label="Amount to match" inputMode="decimal" value={m.amount} onChange={(e) => setM({ ...m, amount: e.target.value.replace(/[^\d.]/g, '') })} />
               </div>

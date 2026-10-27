@@ -48,7 +48,7 @@ export function RecurringJournalsPage() {
           <div className="grid gap-3 md:grid-cols-3">
             <Field label="Name" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
             <Field label="Voucher description" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} />
-            <div className="space-y-1">
+            <div className="space-y-1.5">
               <label htmlFor="freq" className="block text-sm font-medium text-slate-700">Frequency</label>
               <select id="freq" value={form.frequency} onChange={(e) => setForm({ ...form, frequency: e.target.value })}
                 className="block w-full rounded-lg border border-slate-300 px-3 py-2 shadow-xs text-sm">

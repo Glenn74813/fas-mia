@@ -57,7 +57,7 @@ export function NrvReviewPage() {
       {canManage && (
         <div className="mb-4 flex flex-wrap items-end gap-2">
           <label className="text-sm">Review date<input type="date" value={asOf} onChange={(e) => setAsOf(e.target.value)}
-            className="mt-1 block rounded-lg border border-slate-300 px-3 py-2 shadow-xs" /></label>
+            className="mt-1.5 block rounded-lg border border-slate-300 px-3 py-2 shadow-xs" /></label>
           <Button busy={create.isPending} onClick={() => create.mutate()}>Start review</Button>
         </div>
       )}
@@ -134,7 +134,7 @@ export function NrvReviewPage() {
           {editable && (
             <div className="mt-3 flex flex-wrap items-end gap-2">
               <label className="text-sm">Note (optional)<input value={note} maxLength={500} onChange={(e) => setNote(e.target.value)}
-                className="mt-1 block w-72 rounded-lg border border-slate-300 px-3 py-2 shadow-xs" /></label>
+                className="mt-1.5 block w-72 rounded-lg border border-slate-300 px-3 py-2 shadow-xs" /></label>
               <Button busy={propose.isPending} disabled={r.totalWriteDown === '0.00' || Object.keys(edits).length > 0}
                 onClick={() => propose.mutate(r)}>Propose write-down</Button>
             </div>

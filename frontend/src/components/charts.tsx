@@ -198,7 +198,7 @@ function TableView({ caption, headers, rows }: { caption: string; headers: strin
   return (
     <details className="mt-2 text-xs text-slate-600">
       <summary className="cursor-pointer select-none">Show as table</summary>
-      <table className="mt-1 w-full"><caption className="sr-only">{caption}</caption>
+      <table className="mt-1.5 w-full"><caption className="sr-only">{caption}</caption>
         <thead><tr>{headers.map((h) => <th key={h} className="py-0.5 pr-2 text-left font-medium">{h}</th>)}</tr></thead>
         <tbody>{rows.map((r) => <tr key={r[0]} className="border-t border-slate-100">{r.map((c, i) => <td key={i} className={`py-0.5 pr-2 ${i > 0 ? 'text-right' : ''}`}>{c}</td>)}</tr>)}</tbody>
       </table>

@@ -81,7 +81,7 @@ function Contracts({ customerId, canManage }: { customerId: string; canManage: b
             <Field label="End date" type="date" value={form.endDate} onChange={(e) => setForm({ ...form, endDate: e.target.value })} />
             <Field label="Monthly amount (net of VAT)" inputMode="decimal" value={form.monthlyAmount}
               onChange={(e) => setForm({ ...form, monthlyAmount: e.target.value.replace(/[^\d.]/g, '') })} />
-            <div className="space-y-1"><label htmlFor="kvat" className="block text-sm font-medium text-slate-700">Output VAT</label>
+            <div className="space-y-1.5"><label htmlFor="kvat" className="block text-sm font-medium text-slate-700">Output VAT</label>
               <select id="kvat" value={form.vatCodeId} onChange={(e) => setForm({ ...form, vatCodeId: e.target.value })}
                 className="block w-full rounded-lg border border-slate-300 px-3 py-2 shadow-xs text-sm"><option value="">No VAT</option>
                 {vat.map((t) => <option key={t.id} value={t.id}>{t.code} ({t.rate})</option>)}</select></div>
@@ -89,7 +89,7 @@ function Contracts({ customerId, canManage }: { customerId: string; canManage: b
               <select id="krev" value={form.revenueAccountId} onChange={(e) => setForm({ ...form, revenueAccountId: e.target.value })}
                 className="block w-full rounded-lg border border-slate-300 px-3 py-2 shadow-xs text-sm"><option value="">Select…</option>
                 {revenue.map((a) => <option key={a.id} value={a.id}>{a.code} — {a.name}</option>)}</select></div>
-            <div className="space-y-1"><label htmlFor="kcc" className="block text-sm font-medium text-slate-700">Cost centre</label>
+            <div className="space-y-1.5"><label htmlFor="kcc" className="block text-sm font-medium text-slate-700">Cost centre</label>
               <select id="kcc" value={form.costCenterId} onChange={(e) => setForm({ ...form, costCenterId: e.target.value })}
                 className="block w-full rounded-lg border border-slate-300 px-3 py-2 shadow-xs text-sm"><option value="">—</option>
                 {(costCenters.data ?? []).map((cc) => <option key={cc.id} value={cc.id}>{cc.code}</option>)}</select></div>

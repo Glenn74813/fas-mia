@@ -39,7 +39,7 @@ export function SearchSelect<T extends { id: string }>({ id, label, value, onCha
   const shown = results.data?.items.length ?? 0;
   const cls = compact ? 'w-40 rounded-md border border-slate-300 px-2 py-1' : 'block w-full rounded-lg border border-slate-300 px-3 py-2 shadow-xs text-sm shadow-sm';
   return (
-    <div className={compact ? '' : 'space-y-1'}>
+    <div className={compact ? '' : 'space-y-1.5'}>
       <label htmlFor={id} className={compact ? 'sr-only' : 'block text-sm font-medium text-slate-700'}>{label}</label>
       <div className={compact ? 'flex gap-1' : 'flex gap-2'}>
         {!disabled && <input type="search" value={text} onChange={(e) => setText(e.target.value)} placeholder="Search…"

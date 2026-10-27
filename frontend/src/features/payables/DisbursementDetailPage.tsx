@@ -118,20 +118,20 @@ export function DisbursementDetailPage() {
         {dialog === 'instruct' && (
           <div className="grid gap-3 text-sm sm:grid-cols-2">
             <label>Mode<select value={payment.mode} onChange={(e) => setPayment({ ...payment, mode: e.target.value })}
-              className="mt-1 block w-full rounded-md border border-slate-300 px-2 py-2"><option value="CHECK">Check</option><option value="ADA">ADA / bank transfer</option></select></label>
+              className="mt-1.5 block w-full rounded-md border border-slate-300 px-2 py-2"><option value="CHECK">Check</option><option value="ADA">ADA / bank transfer</option></select></label>
             <label>Bank account<select value={payment.bankAccountId} onChange={(e) => setPayment({ ...payment, bankAccountId: e.target.value })}
-              className="mt-1 block w-full rounded-md border border-slate-300 px-2 py-2"><option value="">Select…</option>
+              className="mt-1.5 block w-full rounded-md border border-slate-300 px-2 py-2"><option value="">Select…</option>
               {(banks.data ?? []).filter((b) => b.status === 'ACTIVE').map((b) => <option key={b.id} value={b.id}>{b.code} ({b.bankName} ****{b.accountNumberLast4})</option>)}</select></label>
             <label>{payment.mode === 'CHECK' ? 'Check number' : 'ADA reference'}<input value={payment.reference}
               onChange={(e) => setPayment({ ...payment, reference: e.target.value.replace(/[^A-Za-z0-9-]/g, '') })}
-              className="mt-1 block w-full rounded-md border border-slate-300 px-2 py-2" /></label>
+              className="mt-1.5 block w-full rounded-md border border-slate-300 px-2 py-2" /></label>
             <label>Payment date<input type="date" value={payment.paymentDate} onChange={(e) => setPayment({ ...payment, paymentDate: e.target.value })}
-              className="mt-1 block w-full rounded-md border border-slate-300 px-2 py-2" /></label>
+              className="mt-1.5 block w-full rounded-md border border-slate-300 px-2 py-2" /></label>
           </div>
         )}
         {dialog === 'confirm' && (
           <label className="block text-sm">Released on<input type="date" value={releasedOn} onChange={(e) => setReleasedOn(e.target.value)}
-            className="mt-1 block rounded-md border border-slate-300 px-2 py-2" /></label>
+            className="mt-1.5 block rounded-md border border-slate-300 px-2 py-2" /></label>
         )}
       </ActionDialog>
     </>

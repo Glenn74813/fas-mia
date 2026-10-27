@@ -88,7 +88,7 @@ export function DataExportsPage() {
                     <td className="max-w-sm px-3 py-2"><span className="block text-xs font-medium text-slate-500">
                       {e.kind === 'ARCHIVE' ? `Archive of fiscal year ${e.fiscalYear}` : 'Full export'}</span>{e.purpose}</td>
                     <td className="px-3 py-2"><Badge tone={TONE[e.status]}>{e.status}</Badge>
-                      {e.error && <span className="mt-1 block text-xs text-red-700">{e.error}</span>}</td>
+                      {e.error && <span className="mt-1.5 block text-xs text-red-700">{e.error}</span>}</td>
                     <td className="max-w-xs px-3 py-2 text-xs">{e.decidedBy ? <>{e.decidedBy}, {formatDateTime(e.decidedAt)}
                       {e.decisionNote && <span className="block text-slate-600">{e.decisionNote}</span>}</> : '—'}</td>
                     <td className="px-3 py-2 text-xs">{e.fileName && <>{e.fileName} ({size(e.sizeBytes)})

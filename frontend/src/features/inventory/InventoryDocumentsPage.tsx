@@ -57,7 +57,7 @@ function ImportMovementsPanel() {
         <select value={form.costCenterId} onChange={(e) => setForm({ ...form, costCenterId: e.target.value })} className={sel}>
           <option value="">Select…</option>{(costCenters.data ?? []).map((c) => <option key={c.id} value={c.id}>{c.code}</option>)}</select></label>}
       <label className="text-sm font-medium text-slate-700 md:col-span-2">CSV file (UTF-8, header row)
-        <input type="file" accept=".csv,text/csv" className="mt-1 block text-sm" onChange={(e) => setFile(e.target.files?.[0] ?? null)} /></label>
+        <input type="file" accept=".csv,text/csv" className="mt-1.5 block text-sm" onChange={(e) => setFile(e.target.files?.[0] ?? null)} /></label>
       <p className="text-xs text-slate-500 md:col-span-3">Columns: {IMPORT_COLUMNS[kind]}. Codes are those of active items and warehouses; at most 500
         lines. The result is a draft, posted by a second person like any other document.</p>
       <div className="flex gap-2 md:col-span-3">
@@ -150,7 +150,7 @@ export function NewInventoryDocumentPage() {
       <div className="space-y-4">
         <ErrorAlert error={save.error} />
         <div className="grid gap-4 rounded-xl border border-slate-200/80 bg-white shadow-xs p-5 md:grid-cols-3">
-          <div className="space-y-1"><label htmlFor="kind" className="block text-sm font-medium text-slate-700">Document</label>
+          <div className="space-y-1.5"><label htmlFor="kind" className="block text-sm font-medium text-slate-700">Document</label>
             <select id="kind" value={kind} onChange={(e) => { setKind(e.target.value as InventoryKind); setLines([emptyLine()]); }} className={sel}>
               {Object.entries(KIND).map(([k, l]) => <option key={k} value={k}>{l}</option>)}</select></div>
           <Field label="Date" type="date" value={head.documentDate} onChange={(e) => setHead({ ...head, documentDate: e.target.value })} />
@@ -160,7 +160,7 @@ export function NewInventoryDocumentPage() {
               onChange={(id) => setHead({ ...head, supplierId: id })} />
           )}
           {kind === 'ISSUE' && (
-            <div className="space-y-1"><label htmlFor="cc" className="block text-sm font-medium text-slate-700">Requesting cost centre</label>
+            <div className="space-y-1.5"><label htmlFor="cc" className="block text-sm font-medium text-slate-700">Requesting cost centre</label>
               <select id="cc" value={head.costCenterId} onChange={(e) => setHead({ ...head, costCenterId: e.target.value })} className={sel}><option value="">Select…</option>
                 {(costCenters.data ?? []).map((c) => <option key={c.id} value={c.id}>{c.code}</option>)}</select></div>
           )}

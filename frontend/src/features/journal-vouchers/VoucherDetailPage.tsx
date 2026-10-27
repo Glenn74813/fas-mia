@@ -225,11 +225,11 @@ export function VoucherDetailPage() {
             {dialog === 'reverse' && (
               <label className="block text-sm">Reversal date
                 <input type="date" value={reversalDate} onChange={(e) => setReversalDate(e.target.value)}
-                  className="mt-1 block rounded-lg border border-slate-300 px-3 py-2 shadow-xs" /></label>
+                  className="mt-1.5 block rounded-lg border border-slate-300 px-3 py-2 shadow-xs" /></label>
             )}
             <label className="block text-sm">{dialog === 'reverse' ? 'Reason' : 'Comment'}{cfg.commentRequired ? ' (required)' : ' (optional)'}
               <textarea value={comment} onChange={(e) => setComment(e.target.value)} rows={3} maxLength={1000}
-                className="mt-1 block w-full rounded-lg border border-slate-300 px-3 py-2 shadow-xs" /></label>
+                className="mt-1.5 block w-full rounded-lg border border-slate-300 px-3 py-2 shadow-xs" /></label>
             <ErrorAlert error={act.error} />
             <div className="flex justify-end gap-2">
               <Button variant="secondary" onClick={() => dialogRef.current?.close()} disabled={act.isPending}>Close</Button>

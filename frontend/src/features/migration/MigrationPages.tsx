@@ -59,7 +59,7 @@ export function MigrationBatchesPage() {
           <h2 className="font-semibold">Upload a batch</h2>
           <ErrorAlert error={upload.error} />
           <div className="grid gap-3 md:grid-cols-3">
-            <div className="space-y-1"><label htmlFor="mkind" className="block text-sm font-medium text-slate-700">Batch type</label>
+            <div className="space-y-1.5"><label htmlFor="mkind" className="block text-sm font-medium text-slate-700">Batch type</label>
               <select id="mkind" value={form.kind} onChange={(e) => setForm({ ...form, kind: e.target.value as MigrationKind })}
                 className="block w-full rounded-lg border border-slate-300 px-3 py-2 shadow-xs text-sm">
                 {KINDS.map((k) => <option key={k.value} value={k.value}>{k.label}</option>)}</select></div>

@@ -99,7 +99,7 @@ export function ApiAccessPage() {
       {canManage && catalog.data && (
         <form className={`${card} max-w-3xl`} onSubmit={(e: FormEvent) => { e.preventDefault(); createClient.mutate(); }}>
           <label className="block text-sm">Client name<input value={clientName} maxLength={120} onChange={(e) => setClientName(e.target.value)}
-            placeholder="For example: FMIS budget reader" className={`mt-1 ${input}`} /></label>
+            placeholder="For example: FMIS budget reader" className={`mt-1.5 ${input}`} /></label>
           <Checkboxes legend="Scopes (read only)" options={catalog.data.scopes} value={scopes} onChange={setScopes} />
           <ErrorAlert error={createClient.error} />
           <Button type="submit" busy={createClient.isPending} disabled={clientName.trim().length < 3 || scopes.length === 0}>Create client</Button>
@@ -134,9 +134,9 @@ export function ApiAccessPage() {
       {canManage && catalog.data && (
         <form className={`${card} max-w-3xl`} onSubmit={(e: FormEvent) => { e.preventDefault(); subscribe.mutate(); }}>
           <div className="grid gap-3 sm:grid-cols-2">
-            <label className="block text-sm">Name<input value={hookName} maxLength={120} onChange={(e) => setHookName(e.target.value)} className={`mt-1 ${input}`} /></label>
+            <label className="block text-sm">Name<input value={hookName} maxLength={120} onChange={(e) => setHookName(e.target.value)} className={`mt-1.5 ${input}`} /></label>
             <label className="block text-sm">URL (HTTPS)<input value={url} maxLength={500} onChange={(e) => setUrl(e.target.value)}
-              placeholder="https://receiver.example.gov.ph/cas" className={`mt-1 ${input}`} /></label>
+              placeholder="https://receiver.example.gov.ph/cas" className={`mt-1.5 ${input}`} /></label>
           </div>
           <Checkboxes legend="Events" options={catalog.data.events} value={events} onChange={setEvents} />
           <ErrorAlert error={subscribe.error} />

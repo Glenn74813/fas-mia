@@ -101,7 +101,7 @@ export function NewReceiptPage() {
             search={(q) => customerApi.list(q, 0, 50)} optionLabel={(c) => `${c.code} — ${c.name}`}
             onChange={(id) => { setForm({ ...form, customerId: id }); setAmounts({}); }} />
           <Field label="Receipt date" type="date" value={form.receiptDate} onChange={(e) => setForm({ ...form, receiptDate: e.target.value })} />
-          <div className="space-y-1"><label htmlFor="method" className="block text-sm font-medium text-slate-700">Payment method</label>
+          <div className="space-y-1.5"><label htmlFor="method" className="block text-sm font-medium text-slate-700">Payment method</label>
             <select id="method" value={form.paymentMethod} className={select} onChange={(e) => setForm({ ...form, paymentMethod: e.target.value })}>
               <option value="CASH">Cash</option><option value="CHECK">Check</option><option value="BANK_TRANSFER">Bank transfer</option></select></div>
           <Field label={form.paymentMethod === 'CHECK' ? 'Check number / bank' : 'Reference'} value={form.paymentReference} maxLength={60}

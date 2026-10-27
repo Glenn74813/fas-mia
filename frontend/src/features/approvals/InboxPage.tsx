@@ -31,7 +31,7 @@ export function InboxPage() {
       <form role="search" className="mb-3 flex flex-wrap items-end gap-2" onSubmit={(e) => { e.preventDefault(); update({ q: text.trim(), queue: '' }); }}>
         <label className="text-sm">Search <input type="search" value={text} onChange={(e) => setText(e.target.value)}
           placeholder="Number, description, counterparty or preparer" className="ml-1 w-80 max-w-full rounded-md border border-slate-300 px-2 py-1" /></label>
-        <button type="submit" className="rounded-md border border-slate-300 bg-white px-3 py-1 text-sm hover:bg-slate-50">Search</button>
+        <button type="submit" className="h-9 rounded-lg border border-slate-300 bg-white px-3.5 text-sm font-medium hover:bg-slate-50">Search</button>
         {search && <button type="button" className="text-sm text-brand-700 hover:underline" onClick={() => { setText(''); update({ q: '' }); }}>Clear search</button>}
       </form>
       <ErrorAlert error={inbox.error} />

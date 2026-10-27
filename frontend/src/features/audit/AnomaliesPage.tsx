@@ -98,7 +98,7 @@ export function AnomaliesPage() {
               <button key={s} type="button" onClick={() => { setStatus('OPEN'); setSeverity(s); setPage(0); }}
                 className="rounded-xl border border-slate-200/80 bg-white p-4 text-left shadow-xs hover:border-brand-300">
                 <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">Open, {s.toLowerCase()} severity</span>
-                <span className="mt-1 block text-2xl font-semibold tabular-nums text-slate-900">{n}</span>
+                <span className="mt-1.5 block text-2xl font-semibold tabular-nums text-slate-900">{n}</span>
               </button>
             ))}
         </div>
@@ -134,8 +134,8 @@ export function AnomaliesPage() {
                     <td className="max-w-md px-3 py-2">
                       <span className="block font-medium text-slate-900">{f.title}</span>
                       <span className="block text-xs text-slate-500">{RULES[f.ruleCode] ?? f.ruleCode}</span>
-                      <span className="mt-1 block text-slate-700">{f.detail}</span>
-                      {f.involvedUsers.length > 0 && <span className="mt-1 block text-xs text-slate-500">Involved: {f.involvedUsers.join(', ')}</span>}
+                      <span className="mt-1.5 block text-slate-700">{f.detail}</span>
+                      {f.involvedUsers.length > 0 && <span className="mt-1.5 block text-xs text-slate-500">Involved: {f.involvedUsers.join(', ')}</span>}
                     </td>
                     <td className="whitespace-nowrap px-3 py-2">{link
                       ? <Link to={link} className="text-brand-700 hover:underline">{f.reference ?? 'Open'}</Link> : f.reference ?? '—'}
@@ -151,8 +151,8 @@ export function AnomaliesPage() {
                         </div>)) : (
                         <div className="max-w-xs">
                           <Badge tone={f.status === 'ESCALATED' ? 'red' : 'green'}>{f.status}</Badge>
-                          <span className="mt-1 block text-xs text-slate-500">{f.reviewedBy}, {formatDateTime(f.reviewedAt)}</span>
-                          <span className="mt-1 block text-xs text-slate-700">{f.reviewNote}</span>
+                          <span className="mt-1.5 block text-xs text-slate-500">{f.reviewedBy}, {formatDateTime(f.reviewedAt)}</span>
+                          <span className="mt-1.5 block text-xs text-slate-700">{f.reviewNote}</span>
                         </div>
                       )}
                     </td>

@@ -76,7 +76,7 @@ export function NewDepositPage() {
       <div className="space-y-4">
         <ErrorAlert error={create.error ?? receipts.error} />
         <div className="grid gap-4 rounded-xl border border-slate-200/80 bg-white shadow-xs p-5 md:grid-cols-3">
-          <div className="space-y-1"><label htmlFor="bank" className="block text-sm font-medium text-slate-700">Bank account</label>
+          <div className="space-y-1.5"><label htmlFor="bank" className="block text-sm font-medium text-slate-700">Bank account</label>
             <select id="bank" value={bankAccountId} onChange={(e) => setBank(e.target.value)} className="block w-full rounded-lg border border-slate-300 px-3 py-2 shadow-xs text-sm">
               <option value="">Select…</option>
               {(banks.data ?? []).filter((b) => b.status === 'ACTIVE').map((b) => <option key={b.id} value={b.id}>{b.code} — {b.bankName} ****{b.accountNumberLast4}</option>)}

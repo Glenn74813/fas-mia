@@ -41,11 +41,11 @@ export function ParallelRunsPage() {
           <h2 className="font-semibold">Compare a legacy trial balance</h2>
           <ErrorAlert error={upload.error} />
           <div className="grid gap-3 md:grid-cols-3">
-            <div className="space-y-1"><label htmlFor="prperiod" className="block text-sm font-medium text-slate-700">CAS period</label>
+            <div className="space-y-1.5"><label htmlFor="prperiod" className="block text-sm font-medium text-slate-700">CAS period</label>
               <select id="prperiod" value={form.periodId} onChange={(e) => setForm({ ...form, periodId: e.target.value })}
                 className="block w-full rounded-lg border border-slate-300 px-3 py-2 shadow-xs text-sm"><option value="">Select…</option>
                 {periods.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}</select></div>
-            <div className="space-y-1"><label htmlFor="prbasis" className="block text-sm font-medium text-slate-700">Compare</label>
+            <div className="space-y-1.5"><label htmlFor="prbasis" className="block text-sm font-medium text-slate-700">Compare</label>
               <select id="prbasis" value={form.basis} onChange={(e) => setForm({ ...form, basis: e.target.value })}
                 className="block w-full rounded-lg border border-slate-300 px-3 py-2 shadow-xs text-sm">
                 <option value="CLOSING">Closing balances</option><option value="PERIOD">The period's movements</option></select></div>

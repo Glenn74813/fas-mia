@@ -37,14 +37,14 @@ export function AssetFormPage() {
       <div className="space-y-4">
         <ErrorAlert error={save.error} />
         <div className="grid gap-4 rounded-xl border border-slate-200/80 bg-white shadow-xs p-5 md:grid-cols-3">
-          <div className="space-y-1"><label htmlFor="cat" className="block text-sm font-medium text-slate-700">Category</label>
+          <div className="space-y-1.5"><label htmlFor="cat" className="block text-sm font-medium text-slate-700">Category</label>
             <select id="cat" value={f.categoryId} onChange={(e) => set({ categoryId: e.target.value })} className={sel}><option value="">Select…</option>
               {(categories.data ?? []).filter((c) => c.status === 'ACTIVE').map((c) => <option key={c.id} value={c.id}>{c.code} — {c.name}</option>)}</select></div>
           <div className="md:col-span-2"><Field label="Description" value={f.description} maxLength={500} onChange={(e) => set({ description: e.target.value })} /></div>
           <Field label="Serial number" value={f.serialNumber ?? ''} onChange={(e) => set({ serialNumber: e.target.value || null })} />
           <Field label="Location" value={f.location ?? ''} onChange={(e) => set({ location: e.target.value || null })} />
           <Field label="Custodian" value={f.custodian ?? ''} onChange={(e) => set({ custodian: e.target.value || null })} />
-          <div className="space-y-1"><label htmlFor="cc" className="block text-sm font-medium text-slate-700">Cost centre</label>
+          <div className="space-y-1.5"><label htmlFor="cc" className="block text-sm font-medium text-slate-700">Cost centre</label>
             <select id="cc" value={f.costCenterId ?? ''} onChange={(e) => set({ costCenterId: e.target.value || null })} className={sel}><option value="">—</option>
               {(costCenters.data ?? []).map((c) => <option key={c.id} value={c.id}>{c.code}</option>)}</select></div>
           <Field label="Acquisition date" type="date" value={f.acquisitionDate} onChange={(e) => set({ acquisitionDate: e.target.value })} />
@@ -63,19 +63,19 @@ export function AssetFormPage() {
                 onChange={() => set({ acquisitionSource: v, supplierInvoiceId: null, aucProjectId: null, offsetAccountId: null })} />{l}</label>))}
           </div>
           {f.acquisitionSource === 'INVOICE' && (
-            <div className="space-y-1"><label htmlFor="inv" className="block text-sm font-medium text-slate-700">Supplier invoice</label>
+            <div className="space-y-1.5"><label htmlFor="inv" className="block text-sm font-medium text-slate-700">Supplier invoice</label>
               <select id="inv" value={f.supplierInvoiceId ?? ''} onChange={(e) => set({ supplierInvoiceId: e.target.value || null })} className={sel}>
                 <option value="">Select…</option>{(invoices.data?.items ?? []).map((i) => <option key={i.id} value={i.id}>{i.invoiceNumber} — {i.supplierName}</option>)}</select>
               <p className="text-xs text-slate-500">The invoice must have charged the category's asset account; it is already in the ledger, so activation posts nothing new.</p></div>
           )}
           {f.acquisitionSource === 'AUC' && (
-            <div className="space-y-1"><label htmlFor="proj" className="block text-sm font-medium text-slate-700">AUC project</label>
+            <div className="space-y-1.5"><label htmlFor="proj" className="block text-sm font-medium text-slate-700">AUC project</label>
               <select id="proj" value={f.aucProjectId ?? ''} onChange={(e) => set({ aucProjectId: e.target.value || null })} className={sel}>
                 <option value="">Select…</option>{(projects.data ?? []).filter((p) => p.status === 'OPEN').map((p) => <option key={p.id} value={p.id}>{p.code} — balance {p.balance}</option>)}</select></div>
           )}
           {f.acquisitionSource === 'OTHER' && (
             <div className="grid gap-3 md:grid-cols-2">
-              <div className="space-y-1"><label htmlFor="off" className="block text-sm font-medium text-slate-700">Offset account</label>
+              <div className="space-y-1.5"><label htmlFor="off" className="block text-sm font-medium text-slate-700">Offset account</label>
                 <select id="off" value={f.offsetAccountId ?? ''} onChange={(e) => set({ offsetAccountId: e.target.value || null })} className={sel}>
                   <option value="">Select…</option>{offsets.map((a) => <option key={a.id} value={a.id}>{a.code} — {a.name}</option>)}</select></div>
               <Field label="Justification" value={f.justification ?? ''} maxLength={1000} onChange={(e) => set({ justification: e.target.value || null })} />

@@ -49,7 +49,7 @@ export function CustomersPage() {
           <div className="grid gap-3 md:grid-cols-3">
             <Field label="Code" value={form.code} onChange={(e) => setForm({ ...form, code: e.target.value })} />
             <Field label="Registered name" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
-            <div className="space-y-1">
+            <div className="space-y-1.5">
               <label htmlFor="ctype" className="block text-sm font-medium text-slate-700">Type</label>
               <select id="ctype" value={form.customerType} onChange={(e) => setForm({ ...form, customerType: e.target.value })}
                 className="block w-full rounded-lg border border-slate-300 px-3 py-2 shadow-xs text-sm">

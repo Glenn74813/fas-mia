@@ -169,18 +169,18 @@ export function TicketDetailPage() {
           { onSuccess: () => setExtra({ rollbackPlan: '', releaseNotes: '', releaseReference: '', satisfaction: '' }) })}>
         {dialog === 'SUBMIT_FOR_APPROVAL' && <label className="block text-sm">Rollback plan
           <textarea value={extra.rollbackPlan} onChange={(e) => setExtra({ ...extra, rollbackPlan: e.target.value })} rows={3} maxLength={4000}
-            className="mt-1 block w-full rounded-lg border border-slate-300 px-3 py-2 shadow-xs" /></label>}
+            className="mt-1.5 block w-full rounded-lg border border-slate-300 px-3 py-2 shadow-xs" /></label>}
         {dialog === 'RESOLVE' && change && <>
           <label className="block text-sm">Release notes
             <textarea value={extra.releaseNotes} onChange={(e) => setExtra({ ...extra, releaseNotes: e.target.value })} rows={3} maxLength={4000}
-              className="mt-1 block w-full rounded-lg border border-slate-300 px-3 py-2 shadow-xs" /></label>
+              className="mt-1.5 block w-full rounded-lg border border-slate-300 px-3 py-2 shadow-xs" /></label>
           <label className="block text-sm">Release reference (optional)
             <input value={extra.releaseReference} onChange={(e) => setExtra({ ...extra, releaseReference: e.target.value })} maxLength={60}
-              className="mt-1 block w-full rounded-lg border border-slate-300 px-3 py-2 shadow-xs" /></label>
+              className="mt-1.5 block w-full rounded-lg border border-slate-300 px-3 py-2 shadow-xs" /></label>
         </>}
         {dialog === 'CLOSE' && <label className="block text-sm">Satisfaction (optional)
           <select value={extra.satisfaction} onChange={(e) => setExtra({ ...extra, satisfaction: e.target.value })}
-            className="mt-1 block w-full rounded-lg border border-slate-300 px-3 py-2 shadow-xs">
+            className="mt-1.5 block w-full rounded-lg border border-slate-300 px-3 py-2 shadow-xs">
             <option value="">No rating</option>{[5, 4, 3, 2, 1].map((n) => <option key={n} value={n}>{n} of 5</option>)}</select></label>}
       </ActionDialog>
     </>

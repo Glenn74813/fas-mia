@@ -66,10 +66,10 @@ export function InventoryItemsPage() {
               <Field label="Item name" value={item.name} onChange={(e) => setItem({ ...item, name: e.target.value })} />
               <Field label="Unit of measure" value={item.unitOfMeasure} onChange={(e) => setItem({ ...item, unitOfMeasure: e.target.value })} />
               <label className="block text-sm md:col-span-3">Inventory account
-                <select value={item.inventoryAccountId} onChange={(e) => setItem({ ...item, inventoryAccountId: e.target.value })} className="mt-1 block w-full rounded-lg border border-slate-300 px-3 py-2 shadow-xs">
+                <select value={item.inventoryAccountId} onChange={(e) => setItem({ ...item, inventoryAccountId: e.target.value })} className="mt-1.5 block w-full rounded-lg border border-slate-300 px-3 py-2 shadow-xs">
                   <option value="">Select…</option>{accounts.filter((a) => a.accountType === 'ASSET').map((a) => <option key={a.id} value={a.id}>{a.code} — {a.name}</option>)}</select></label>
               <label className="block text-sm md:col-span-3">Consumption account
-                <select value={item.consumptionAccountId} onChange={(e) => setItem({ ...item, consumptionAccountId: e.target.value })} className="mt-1 block w-full rounded-lg border border-slate-300 px-3 py-2 shadow-xs">
+                <select value={item.consumptionAccountId} onChange={(e) => setItem({ ...item, consumptionAccountId: e.target.value })} className="mt-1.5 block w-full rounded-lg border border-slate-300 px-3 py-2 shadow-xs">
                   <option value="">Select…</option>{accounts.filter((a) => a.accountType === 'EXPENSE').map((a) => <option key={a.id} value={a.id}>{a.code} — {a.name}</option>)}</select></label>
             </div>
             <Button variant="secondary" busy={createItem.isPending} disabled={!item.code || !item.name || !item.unitOfMeasure || !item.inventoryAccountId

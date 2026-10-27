@@ -45,7 +45,7 @@ export function SuppliersPage() {
             <Field label="Registered name" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
             <Field label="TIN" hint="000-000-000-00000" value={form.tin} onChange={(e) => setForm({ ...form, tin: e.target.value })} />
             <Field label="Address" value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} />
-            <div className="space-y-1">
+            <div className="space-y-1.5">
               <label htmlFor="ewt" className="block text-sm font-medium text-slate-700">Default withholding tax</label>
               <select id="ewt" value={form.defaultEwtCodeId} onChange={(e) => setForm({ ...form, defaultEwtCodeId: e.target.value })}
                 className="block w-full rounded-lg border border-slate-300 px-3 py-2 shadow-xs text-sm">

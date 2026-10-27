@@ -161,7 +161,7 @@ export function ManagementReportPanel({ onQueued }: { onQueued: () => void }) {
                 {Array.from({ length: 28 }, (_, i) => String(i + 1)).map((d) => <option key={d}>{d}</option>)}</select></label>}
               <label>At <select value={schedule.runHour} onChange={(e) => setSchedule({ ...schedule, runHour: e.target.value })} className={select}>
                 {Array.from({ length: 24 }, (_, i) => String(i)).map((h) => <option key={h} value={h}>{h.padStart(2, '0')}:00</option>)}</select></label>
-              <label className="self-center"><input type="checkbox" className="mr-2" checked={schedule.email}
+              <label className="flex h-9 items-center"><input type="checkbox" className="mr-2" checked={schedule.email}
                 onChange={(e) => setSchedule({ ...schedule, email: e.target.checked })} />E-mail me when it is ready</label>
               {has('range') && <label>Covering <select value={schedule.relative} onChange={(e) => setSchedule({ ...schedule, relative: e.target.value })} className={select}>
                 {Object.entries(RELATIVE).map(([k, v]) => <option key={k} value={k}>{v.label}</option>)}</select></label>}

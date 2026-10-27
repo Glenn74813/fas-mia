@@ -47,7 +47,7 @@ export function ReportJobsPage() {
       <PageHeader title="My reports" crumbs={[{ label: 'Reports' }, { label: 'My reports' }]} />
       {hasPermission('FINANCIAL_REPORT_EXPORT') && (
         <section className="mb-4 flex flex-wrap items-end gap-3 rounded-xl border border-slate-200/80 bg-white shadow-xs p-5 text-sm">
-          <span className="font-medium">Trial balance export</span>
+          <span className="flex h-9 items-center font-medium">Trial balance export</span>
           <label>Period <select value={periodId || periods[0]?.id || ''} onChange={(e) => setPeriodId(e.target.value)} className="ml-1 rounded-md border border-slate-300 px-2 py-1">
             {periods.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}</select></label>
           <label>Format <select value={format} onChange={(e) => setFormat(e.target.value)} className="ml-1 rounded-md border border-slate-300 px-2 py-1">

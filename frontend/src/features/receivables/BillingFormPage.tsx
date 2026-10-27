@@ -61,7 +61,7 @@ function BillingForm({ existing }: { existing?: BillingView }) {
       <form onSubmit={submit} className="space-y-4">
         <ErrorAlert error={save.error} />
         <div className="grid gap-4 rounded-xl border border-slate-200/80 bg-white shadow-xs p-5 md:grid-cols-3">
-          <div className="space-y-1"><label htmlFor="kind" className="block text-sm font-medium text-slate-700">Kind</label>
+          <div className="space-y-1.5"><label htmlFor="kind" className="block text-sm font-medium text-slate-700">Kind</label>
             <select id="kind" value={form.kind} disabled={!!existing} className={select}
               onChange={(e) => setForm({ ...form, kind: e.target.value as BillingKind, relatedInvoiceId: null })}>
               {Object.entries(KIND_LABEL).map(([k, v]) => <option key={k} value={k}>{v}</option>)}</select></div>
@@ -70,7 +70,7 @@ function BillingForm({ existing }: { existing?: BillingView }) {
             selected={existingCustomer.data}
             onChange={(id) => setForm({ ...form, customerId: id, relatedInvoiceId: null })} />
           {form.kind !== 'INVOICE' && (
-            <div className="space-y-1"><label htmlFor="related" className="block text-sm font-medium text-slate-700">
+            <div className="space-y-1.5"><label htmlFor="related" className="block text-sm font-medium text-slate-700">
               {memo ? 'Invoice to reduce' : 'Related invoice (optional)'}</label>
               <select id="related" value={form.relatedInvoiceId ?? ''} className={select}
                 onChange={(e) => setForm({ ...form, relatedInvoiceId: e.target.value || null })}>
@@ -81,7 +81,7 @@ function BillingForm({ existing }: { existing?: BillingView }) {
           {!memo && <Field label="Due date" type="date" hint="Blank: document date plus the customer's payment terms" value={form.dueDate ?? ''}
             onChange={(e) => setForm({ ...form, dueDate: e.target.value || null })} />}
           {!memo && (
-            <div className="space-y-1"><label htmlFor="vat" className="block text-sm font-medium text-slate-700">Output VAT</label>
+            <div className="space-y-1.5"><label htmlFor="vat" className="block text-sm font-medium text-slate-700">Output VAT</label>
               <select id="vat" value={form.vatCodeId ?? ''} className={select} onChange={(e) => setForm({ ...form, vatCodeId: e.target.value || null })}>
                 <option value="">No VAT</option>
                 {vatCodes.map((t) => <option key={t.id} value={t.id}>{t.code} ({t.rate})</option>)}</select></div>

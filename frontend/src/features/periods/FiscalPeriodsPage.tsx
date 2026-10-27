@@ -165,7 +165,7 @@ function YearCard({ fy, run }: { fy: FiscalYear; run: (fn: () => Promise<unknown
             {failingWaivable.length > 0 && hasPermission('PERIOD_CLOSE') && (
               <label className="block text-sm">Justification for waivers (recorded in the audit trail)
                 <textarea value={justification} onChange={(e) => setJustification(e.target.value)} rows={2}
-                  className="mt-1 block w-full rounded-lg border border-slate-300 px-3 py-2 shadow-xs" /></label>
+                  className="mt-1.5 block w-full rounded-lg border border-slate-300 px-3 py-2 shadow-xs" /></label>
             )}
             {blocking.length > 0 && <p className="text-sm text-red-700">Checks that cannot be waived are failing; resolve them first.</p>}
             <div className="flex justify-end gap-2">
@@ -190,7 +190,7 @@ function YearCard({ fy, run }: { fy: FiscalYear; run: (fn: () => Promise<unknown
             <p className="text-sm text-slate-700">A different user with reopen authority must approve the request.</p>
             <label className="block text-sm">Reason (at least 10 characters)
               <textarea value={reason} onChange={(e) => setReason(e.target.value)} rows={3}
-                className="mt-1 block w-full rounded-lg border border-slate-300 px-3 py-2 shadow-xs" /></label>
+                className="mt-1.5 block w-full rounded-lg border border-slate-300 px-3 py-2 shadow-xs" /></label>
             <div className="flex justify-end gap-2">
               <Button variant="secondary" onClick={() => reopenDialog.current?.close()}>Cancel</Button>
               <Button disabled={reason.trim().length < 10} onClick={() => run(async () => {

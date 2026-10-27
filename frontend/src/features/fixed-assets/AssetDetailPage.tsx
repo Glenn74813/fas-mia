@@ -115,11 +115,11 @@ export function AssetDetailPage() {
           <div className="grid gap-3 text-sm">
             <Field label="Disposal date" type="date" value={disp.disposalDate} onChange={(e) => setDisp({ ...disp, disposalDate: e.target.value })} />
             <label className="block">Method
-              <select value={disp.method} onChange={(e) => setDisp({ ...disp, method: e.target.value })} className="mt-1 block w-full rounded-lg border border-slate-300 px-3 py-2 shadow-xs">
+              <select value={disp.method} onChange={(e) => setDisp({ ...disp, method: e.target.value })} className="mt-1.5 block w-full rounded-lg border border-slate-300 px-3 py-2 shadow-xs">
                 {['SALE', 'SCRAP', 'DONATION', 'TRANSFER', 'LOSS'].map((m) => <option key={m} value={m}>{m.toLowerCase()}</option>)}</select></label>
             <Field label="Proceeds" inputMode="decimal" value={disp.proceeds} onChange={(e) => setDisp({ ...disp, proceeds: e.target.value.replace(/[^\d.]/g, '') })} />
             <label className="block">Proceeds received in
-              <select value={disp.proceedsAccountId} onChange={(e) => setDisp({ ...disp, proceedsAccountId: e.target.value })} className="mt-1 block w-full rounded-lg border border-slate-300 px-3 py-2 shadow-xs">
+              <select value={disp.proceedsAccountId} onChange={(e) => setDisp({ ...disp, proceedsAccountId: e.target.value })} className="mt-1.5 block w-full rounded-lg border border-slate-300 px-3 py-2 shadow-xs">
                 <option value="">—</option>{cash.map((x) => <option key={x.id} value={x.id}>{x.code} — {x.name}</option>)}</select></label>
             <Field label="Reason / authority" value={disp.reason} onChange={(e) => setDisp({ ...disp, reason: e.target.value })} />
           </div>

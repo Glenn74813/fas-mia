@@ -130,11 +130,11 @@ export function OfficeAssignmentsPanel({ userId, internal }: { userId: string; i
           <label>Department <select value={form.departmentId} onChange={(e) => setForm({ ...form, departmentId: e.target.value })} className={sel}
             disabled={!form.officeId}><option value="">None</option>{depts.map((d) => <option key={d.id} value={d.id}>{d.code} {d.name}</option>)}</select></label>
           <label>From <input type="date" value={form.from} onChange={(e) => setForm({ ...form, from: e.target.value })} className={sel} /></label>
-          <button className="text-brand-700 hover:underline disabled:text-slate-400" disabled={!form.officeId || assign.isPending}
+          <button className="inline-flex h-9 items-center text-brand-700 hover:underline disabled:text-slate-400" disabled={!form.officeId || assign.isPending}
             onClick={() => assign.mutate()}>{current ? 'Transfer' : 'Assign'}</button>
           {current && <>
             <label className="ml-4">End on <input type="date" value={endOn} onChange={(e) => setEndOn(e.target.value)} className={sel} /></label>
-            <button className="text-red-700 hover:underline" disabled={end.isPending} onClick={() => end.mutate(current)}>End assignment</button></>}
+            <button className="inline-flex h-9 items-center text-red-700 hover:underline" disabled={end.isPending} onClick={() => end.mutate(current)}>End assignment</button></>}
         </div>
       )}
     </section>

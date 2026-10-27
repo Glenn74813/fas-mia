@@ -42,7 +42,7 @@ export function CreateUserPage() {
             hint="Lower-case letters, digits, '.', '_' or '-'" />
           <Field label="E-mail" type="email" required value={form.email} onChange={set('email')} />
           <Field label="Display name" required value={form.displayName} onChange={set('displayName')} />
-          <div className="space-y-1">
+          <div className="space-y-1.5">
             <label htmlFor="userType" className="block text-sm font-medium text-slate-700">User type</label>
             <select id="userType" value={form.userType} onChange={set('userType')}
               className="block w-full rounded-lg border border-slate-300 px-3 py-2 shadow-xs text-sm">

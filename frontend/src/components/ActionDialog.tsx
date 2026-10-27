@@ -54,7 +54,7 @@ function DialogBody({ spec, busy, error, onConfirm, onClose, children, confirmDi
       {children}
       <label className="block text-sm">{spec.commentLabel ?? 'Comment'}{spec.commentRequired ? ' (required)' : ' (optional)'}
         <textarea value={comment} onChange={(e) => setComment(e.target.value)} rows={3} maxLength={1000}
-          className="mt-1 block w-full rounded-lg border border-slate-300 px-3 py-2 shadow-xs" /></label>
+          className="mt-1.5 block w-full rounded-lg border border-slate-300 px-3 py-2 shadow-xs" /></label>
       <ErrorAlert error={error} />
       <div className="flex justify-end gap-2">
         <Button variant="secondary" onClick={onClose} disabled={busy}>Close</Button>

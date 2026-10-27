@@ -38,7 +38,7 @@ export function IntegrationsPage() {
           <section key={c.channel} className="rounded-xl border border-slate-200/80 bg-white shadow-xs p-5 text-sm">
             <h2 className="font-semibold">{c.channel} {c.simulated && <Badge tone="amber">SIMULATED</Badge>}</h2>
             <p className="mt-1 text-slate-600">{c.mode}</p>
-            <p className={`mt-1 ${c.availability === 'ENABLED' ? 'text-green-800' : 'text-amber-800'}`}>{c.availability}</p>
+            <p className={`mt-1.5 ${c.availability === 'ENABLED' ? 'text-green-800' : 'text-amber-800'}`}>{c.availability}</p>
             <p className="mt-2 text-xs text-slate-500">{Object.entries(c.counts).map(([k, v]) => `${k.toLowerCase()} ${v}`).join(' · ') || 'No transmissions'}</p>
           </section>
         ))}
