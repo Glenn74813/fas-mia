@@ -31,9 +31,12 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class ApiClientAuthenticator {
 
-    /** The scopes a client may hold: read access to the finance areas, nothing that changes data. */
+    /**
+     * The scopes a client may hold: read access to the finance areas, and sending interface files for a person to review
+     * ({@code INTERFACE_SUBMIT}, which creates nothing by itself). Nothing that creates, approves or posts a document.
+     */
     public static final Set<String> SCOPES = Set.of("LEDGER_VIEW", "AP_VIEW", "AR_VIEW", "TREASURY_VIEW", "BUDGET_VIEW", "FA_VIEW",
-            "INVENTORY_VIEW", "FINANCIAL_REPORT_VIEW");
+            "INVENTORY_VIEW", "FINANCIAL_REPORT_VIEW", "INTERFACE_SUBMIT");
     public static final String ROLE = "ROLE_API_CLIENT";
 
     public record IssuedToken(String accessToken, long expiresIn, String scope) {

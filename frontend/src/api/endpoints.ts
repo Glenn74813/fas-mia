@@ -3,7 +3,7 @@ import type {
   TicketCategory,
   Clearing, ClearingProposal, CloseCalendarChecklist, CloseFrequency, CloseScheduleItem, CloseTask, GlOpenItem, OpenItemAccount,
   AccountLedger, ChainVerification, ChartSummary, CloseChecklist, CostCenter, CurrentUser, DocumentInfo, EntryDetail,
-  AnomalyFinding, AnomalySummary, ApiClient, DataExport, LegalHold, RetentionSchedule, WebhookDelivery, WebhookSubscription, EventRecord, FiscalYear, LineInput, LoginResponse, Page, Period, PeriodChange, Permission, RecurringJournal, Role,
+  AnomalyFinding, AnomalySummary, ApiClient, InterfaceBatch, InterfaceType, DataExport, LegalHold, RetentionSchedule, WebhookDelivery, WebhookSubscription, EventRecord, FiscalYear, LineInput, LoginResponse, Page, Period, PeriodChange, Permission, RecurringJournal, Role,
   RoleAssignmentResult, RoleChangeResult, SodConflict, SubsidiaryAccount, TokenResponse, TotpEnrollment, TrialBalance,
   UserDetail, UserSummary, VoucherDetail, VoucherInput, VoucherSummary,
   AccountMapping, AgingRow, BankAccount, BudgetAdjustment, BudgetView, DvSummary, DvView, InvoiceInput, InvoiceSummary,
@@ -151,6 +151,15 @@ export const apiAccessApi = {
   test: (w: WebhookSubscription) => api.post<WebhookDelivery>(`/webhooks/${w.id}/test`),
   deliveries: (id: string) => api.get<Page<WebhookDelivery>>(`/webhooks/${id}/deliveries?size=25`),
   redeliver: (id: string) => api.post<WebhookDelivery>(`/webhooks/deliveries/${id}/redeliver`),
+};
+
+export const interfaceApi = {
+  list: (q: { type?: string; status?: string; page?: number }) => api.get<Page<InterfaceBatch>>(`/interfaces/batches${qs({ ...q, size: 25 })}`),
+  get: (id: string) => api.get<InterfaceBatch>(`/interfaces/batches/${id}`),
+  upload: (type: InterfaceType, file: File, params: Record<string, string>) =>
+    api.upload<InterfaceBatch>(`/interfaces/${type}/batches/upload${qs(params)}`, file),
+  accept: (b: InterfaceBatch) => api.post<InterfaceBatch>(`/interfaces/batches/${b.id}/accept`, { version: b.version }),
+  reject: (b: InterfaceBatch, note: string) => api.post<InterfaceBatch>(`/interfaces/batches/${b.id}/reject`, { note, version: b.version }),
 };
 
 export const accountApi = {

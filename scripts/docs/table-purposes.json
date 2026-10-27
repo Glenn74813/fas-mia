@@ -115,6 +115,7 @@
 "mfa_email_codes": "E-mailed one-time sign-in codes, bound to one sign-in step, stored as hashes, with attempts counted.",
 "webauthn_credentials": "Passkeys (WebAuthn credentials): public key, signature counter and flags per registered device.",
 "webauthn_challenges": "Single-use WebAuthn challenges for adding a passkey or signing in with one.",
+"interface_batches": "Inbound payroll, FMIS budget and asset files: format, SHA-256, parsed rows, problems found, who sent and decided them, and the drafts created.",
 "api_clients": "Systems allowed to read CAS through the API (OAuth 2.0 client credentials): client id, read scopes, Argon2id secret hash, status and use.",
 "webhook_subscriptions": "Receivers told about events (posting, approval, payment): HTTPS URL, events, encrypted signing secret, status and failures.",
 "webhook_deliveries": "Each event sent to each subscription: payload, attempts, next attempt, last result.",

@@ -36,7 +36,7 @@ import org.springframework.transaction.support.TransactionTemplate;
 
 /**
  * Turns audit-trail events into webhook deliveries and sends them. Events are read in audit order from a cursor, so
- * only committed business changes are announced, once per subscription. Each delivery is a POST of a small JSON
+ * only committed business changes are announced, once per subscription, and only those after the subscription was made. Each delivery is a POST of a small JSON
  * envelope (event id, type, time, resource), never the business data; the receiver fetches what it needs through
  * the API. Requests are signed: {@code X-CAS-Signature: t=<unix seconds>,v1=<hex HMAC-SHA-256 of "t.body">}.
  * Failures are retried after 1 min, 5 min, 30 min, 2 h, 6 h and 12 h, then the delivery is dead; ten dead deliveries
@@ -106,8 +106,9 @@ public class WebhookDispatcher {
                 n += jdbc.update("""
                         INSERT INTO webhook_deliveries (id, subscription_id, event_id, event_type, payload, status, next_attempt_at, created_at)
                         SELECT gen_random_uuid(), w.id, ?, ?, ?, 'PENDING', ?, ? FROM webhook_subscriptions w
-                        WHERE w.status = 'ACTIVE' AND ? = ANY (w.events)
-                        ON CONFLICT (subscription_id, event_id) DO NOTHING""", e.get("event_id"), action, payload, now, now, action);
+                        WHERE w.status = 'ACTIVE' AND ? = ANY (w.events) AND w.created_at <= ?
+                        ON CONFLICT (subscription_id, event_id) DO NOTHING""", e.get("event_id"), action, payload, now, now, action,
+                        e.get("occurred_at"));
             }
             jdbc.update("UPDATE webhook_cursor SET last_audit_id = ? WHERE id = 1", events.get(events.size() - 1).get("id"));
             return n;

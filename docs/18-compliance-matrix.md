@@ -47,7 +47,7 @@ certification or legal advice.
 | Injection and XSS protection | Bound parameters; FindSecBugs; React text rendering; upload type and signature checks | `SqlInjectionIT`, `XssIT`, `security/xss.test.tsx`, `mvn verify` | Met | |
 | Malware scanning of uploads | `MalwareScanner` interface; files marked NOT_SCANNED until an engine is chosen | `DocumentsAndRecurringIT` | Blocked (C-25) | |
 | Rate limiting and abuse protection | Auth and API limits | `ApiRateLimitIT` | Met | Network DDoS protection C-04 |
-| Third-party access (TOR §4.6) | OAuth 2.0 client credentials with read scopes, Argon2id secrets, rotation and revocation; signed webhooks with retries and SSRF protection | `ApiAccessIT` | Met | Write access for interfaces is T9 |
+| Third-party access (TOR §4.6) | OAuth 2.0 client credentials with read scopes, Argon2id secrets, rotation and revocation; signed webhooks with retries and SSRF protection | `ApiAccessIT`, `InboundInterfacesIT` | Met | Clients may also send interface files for review (`INTERFACE_SUBMIT`, T9) |
 | Static security analysis | SpotBugs + FindSecBugs in `mvn verify`, reviewed suppressions | `backend/spotbugs-exclude.xml` | Met | |
 | Penetration test | Threat model in [05](05-security-design.md) §6 as input | — | MIAA activity | Needs a staging environment |
 

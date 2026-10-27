@@ -65,6 +65,7 @@ import { InventoryReportsPage } from '../features/inventory/InventoryReportsPage
 import { FinancialStatementsPage } from '../features/reporting/FinancialStatementsPage';
 import { ReportJobsPage } from '../features/reporting/ReportJobsPage';
 import { ApiAccessPage } from '../features/integrations/ApiAccessPage';
+import { InboundFilesPage } from '../features/integrations/InboundFilesPage';
 import { IntegrationsPage } from '../features/integrations/IntegrationsPage';
 import { SupplierBankPage } from '../features/payables/SupplierBankPage';
 import { PaymentFilesPage } from '../features/treasury/PaymentFilesPage';
@@ -172,6 +173,7 @@ export const routes: RouteObject[] = [
       { path: 'treasury/payment-files', element: <RequireAuth anyOf={['PAYMENT_RELEASE', 'TREASURY_VIEW']}><PaymentFilesPage /></RequireAuth> },
       { path: 'integrations', element: <RequireAuth anyOf={['INTEGRATION_VIEW']}><IntegrationsPage /></RequireAuth> },
       { path: 'integrations/api-access', element: <RequireAuth anyOf={['INTEGRATION_VIEW', 'API_CLIENT_MANAGE']}><ApiAccessPage /></RequireAuth> },
+      { path: 'integrations/inbound', element: <RequireAuth anyOf={['INTEGRATION_VIEW', 'JOURNAL_CREATE', 'BUDGET_PREPARE', 'FA_MANAGE']}><InboundFilesPage /></RequireAuth> },
       { path: 'tickets', element: <RequireAuth anyOf={['TICKET_CREATE', 'TICKET_VIEW_ALL', 'TICKET_WORK']}><TicketsPage /></RequireAuth> },
       { path: 'migration', element: <RequireAuth anyOf={['MIGRATION_PREPARE', 'MIGRATION_APPROVE']}><MigrationBatchesPage /></RequireAuth> },
       { path: 'migration/parallel-runs', element: <RequireAuth anyOf={['MIGRATION_PREPARE', 'MIGRATION_APPROVE']}><ParallelRunsPage /></RequireAuth> },

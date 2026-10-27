@@ -1340,3 +1340,12 @@ export interface WebhookDelivery {
   id: string; subscriptionId: string; eventId: string; eventType: string; status: 'PENDING' | 'DELIVERED' | 'DEAD'; attempts: number;
   nextAttemptAt: string | null; lastStatus: number | null; lastError: string | null; createdAt: string; deliveredAt: string | null;
 }
+
+export type InterfaceType = 'PAYROLL' | 'FMIS_BUDGET' | 'ASSETS';
+
+export interface InterfaceBatch {
+  id: string; interfaceType: InterfaceType; format: 'CSV' | 'JSON' | 'XML'; sourceReference: string; fileSha256: string;
+  status: 'VALIDATED' | 'INVALID' | 'ACCEPTED' | 'REJECTED'; rowCount: number; header: Record<string, string>;
+  rows: Record<string, string>[]; errors: string[]; receivedBy: string; receivedAt: string; decidedBy: string | null;
+  decidedAt: string | null; decisionNote: string | null; resultType: string | null; resultIds: string[]; version: number;
+}

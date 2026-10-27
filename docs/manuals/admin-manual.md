@@ -2,7 +2,7 @@
 
 For system administrators (users, roles, organisation, integrations, tickets) and finance administrators
 (chief accountant and finance manager: chart of accounts, settings, close and approval configuration). Version for
-schema V52, October 2026. Installation and releases are in [19-deployment-and-rollback.md](../19-deployment-and-rollback.md).
+schema V53, October 2026. Installation and releases are in [19-deployment-and-rollback.md](../19-deployment-and-rollback.md).
 
 **Separation of duties applies to administrators too.**
 * System administrators hold no financial permissions. Rules block combining `USER_ADMINISTER` or
@@ -153,7 +153,8 @@ grant_type=client_credentials
 ```
 
 and calls the API with `Authorization: Bearer <access_token>` until the token expires (10 minutes). A client can
-only read within its scopes; it cannot create, approve or post anything. **New secret** replaces the secret (the
+only read within its scopes, plus send interface files for review if it has `INTERFACE_SUBMIT` (§8.2); it cannot
+create, approve or post anything. **New secret** replaces the secret (the
 old one stops working at once); **Revoke** ends the client and its tokens at once. Every token issued and every
 failed attempt is a security event; each client has its own rate limit.
 
@@ -172,6 +173,29 @@ where `v1` is HMAC-SHA-256 of `<t>.<body>` with the secret. The receiver should 
 failed deliveries in a row disable the subscription and alert its managers; **Resume** it once the receiver
 works. **Send test** sends a `PING` event. URLs on this server or on private, link-local or internal networks are
 refused (`cas.webhooks.allow-local-targets` exists for development only and is refused in production).
+
+### 8.2 Inbound files (payroll, FMIS budget, assets)
+
+**Administration → Inbound files** takes files from other systems (TOR §4.6.2). Choose the **Interface**, the
+**File** (.csv, .json or .xml, up to 5 MB and 5,000 rows), a **Reference** (the sending system's batch number) and
+the interface's header value, then **Check file**. The file becomes a batch:
+
+* **VALIDATED**: every row passed; **Create drafts** makes the drafts, or **Reject** with a reason.
+* **INVALID**: the problems are listed by line; correct the file and send it again, or **Reject** it.
+
+| Interface | Permission to accept | Header | Row fields | Accepting creates |
+|---|---|---|---|---|
+| Payroll summary | `JOURNAL_CREATE` | `period` (YYYY-MM) or `accountingDate` | `account_code`, `cost_center_code`, `description`, `debit`, `credit` (must balance) | One draft journal voucher dated the period's last day |
+| FMIS budget | `BUDGET_PREPARE` | `fiscalYear` | `account_code` (budget-controlled), `cost_center_code`, `amount` | The year's budget if there is none, and its draft allocations replaced by the file's |
+| Asset information | `FA_MANAGE` | `offsetAccountCode` | `category_code`, `description`, `serial_number`, `location`, `custodian`, `cost_center_code`, `acquisition_date`, `in_service_date`, `cost`, `residual_value`, `useful_life_months` | Draft fixed assets (acquired as OTHER, credited to the offset account when activated) |
+
+Field names ignore case, spaces, dashes and underscores. In JSON the header fields sit at the top level with the
+rows in a `lines` array; in XML the header is the root's attributes or plain child elements and each row is an
+element with attributes or child elements. Other systems send the same files with
+`POST /api/v1/interfaces/{PAYROLL|FMIS_BUDGET|ASSETS}/batches` (Content-Type `text/csv`, `application/json` or
+`application/xml`, header values as query parameters) using an API client with the `INTERFACE_SUBMIT` scope;
+holders of the permission are notified, and only a person can accept the batch. The same file (by SHA-256) is
+taken once. **These layouts are proposals until MIAA supplies each system's own (C-37).**
 
 ## 9. Audit trail and security events
 
