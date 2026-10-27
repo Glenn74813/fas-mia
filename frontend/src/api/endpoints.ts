@@ -3,7 +3,7 @@ import type {
   TicketCategory,
   Clearing, ClearingProposal, CloseCalendarChecklist, CloseFrequency, CloseScheduleItem, CloseTask, GlOpenItem, OpenItemAccount,
   AccountLedger, ChainVerification, ChartSummary, CloseChecklist, CostCenter, CurrentUser, DocumentInfo, EntryDetail,
-  AnomalyFinding, AnomalySummary, DataExport, LegalHold, RetentionSchedule, EventRecord, FiscalYear, LineInput, LoginResponse, Page, Period, PeriodChange, Permission, RecurringJournal, Role,
+  AnomalyFinding, AnomalySummary, ApiClient, DataExport, LegalHold, RetentionSchedule, WebhookDelivery, WebhookSubscription, EventRecord, FiscalYear, LineInput, LoginResponse, Page, Period, PeriodChange, Permission, RecurringJournal, Role,
   RoleAssignmentResult, RoleChangeResult, SodConflict, SubsidiaryAccount, TokenResponse, TotpEnrollment, TrialBalance,
   UserDetail, UserSummary, VoucherDetail, VoucherInput, VoucherSummary,
   AccountMapping, AgingRow, BankAccount, BudgetAdjustment, BudgetView, DvSummary, DvView, InvoiceInput, InvoiceSummary,
@@ -135,6 +135,22 @@ export const retentionApi = {
   schedule: () => api.get<RetentionSchedule>('/records-retention'),
   hold: (body: { fiscalYearId?: string; reason: string; reference?: string }) => api.post<LegalHold>('/records-retention/holds', body),
   release: (id: string, body: { note: string; version: number }) => api.post<LegalHold>(`/records-retention/holds/${id}/release`, body),
+};
+
+export const apiAccessApi = {
+  catalog: () => api.get<{ scopes: string[]; events: string[] }>('/api-access/catalog'),
+  clients: () => api.get<ApiClient[]>('/api-clients'),
+  createClient: (body: { name: string; description?: string; scopes: string[]; expiresAt?: string }) =>
+    api.post<{ client: ApiClient; clientSecret: string }>('/api-clients', body),
+  rotateClient: (c: ApiClient) => api.post<{ client: ApiClient; clientSecret: string }>(`/api-clients/${c.id}/rotate-secret`, { version: c.version }),
+  revokeClient: (c: ApiClient, reason: string) => api.post<ApiClient>(`/api-clients/${c.id}/revoke`, { reason, version: c.version }),
+  webhooks: () => api.get<WebhookSubscription[]>('/webhooks'),
+  subscribe: (body: { name: string; url: string; events: string[] }) =>
+    api.post<{ subscription: WebhookSubscription; signingSecret: string }>('/webhooks', body),
+  setStatus: (w: WebhookSubscription, status: 'ACTIVE' | 'PAUSED') => api.post<WebhookSubscription>(`/webhooks/${w.id}/status`, { status, version: w.version }),
+  test: (w: WebhookSubscription) => api.post<WebhookDelivery>(`/webhooks/${w.id}/test`),
+  deliveries: (id: string) => api.get<Page<WebhookDelivery>>(`/webhooks/${id}/deliveries?size=25`),
+  redeliver: (id: string) => api.post<WebhookDelivery>(`/webhooks/deliveries/${id}/redeliver`),
 };
 
 export const accountApi = {

@@ -8,6 +8,7 @@ import com.miaa.cas.common.error.ErrorCode;
 import com.miaa.cas.common.error.ProblemFactory;
 import com.miaa.cas.common.web.ClientInfo;
 import com.miaa.cas.security.CasPrincipal;
+import com.miaa.cas.security.client.ApiClientAuthenticator;
 import com.miaa.cas.security.auth.AuthDtos.ChangePasswordRequest;
 import com.miaa.cas.security.auth.AuthDtos.CsrfResponse;
 import com.miaa.cas.security.auth.AuthDtos.CurrentUserResponse;
@@ -40,6 +41,7 @@ import java.util.Map;
 import java.util.UUID;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -64,9 +66,11 @@ public class AuthController {
     private final SessionService sessions;
     private final RefreshCookies cookies;
     private final SecurityEventService securityEvents;
+    private final ApiClientAuthenticator clients;
 
     public AuthController(AuthService auth, PasswordRecoveryService recovery, SessionService sessions,
-            RefreshCookies cookies, SecurityEventService securityEvents) {
+            RefreshCookies cookies, SecurityEventService securityEvents, ApiClientAuthenticator clients) {
+        this.clients = clients;
         this.auth = auth;
         this.recovery = recovery;
         this.sessions = sessions;
@@ -205,6 +209,51 @@ public class AuthController {
         sessions.logout(refreshToken).ifPresent(userId ->
                 securityEvents.record(new Actor(userId, null), "LOGOUT", "SUCCESS", Severity.INFO, Map.of()));
         return ResponseEntity.noContent().header(HttpHeaders.SET_COOKIE, cookies.clear().toString()).build();
+    }
+
+    /**
+     * OAuth 2.0 client-credentials grant (RFC 6749 §4.4) for API clients: credentials in HTTP Basic or in the form body.
+     * Errors use the OAuth error format rather than problem details, as OAuth client libraries expect.
+     */
+    @PostMapping(value = "/token", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+    @Operation(summary = "Access token for an API client (grant_type=client_credentials)")
+    public ResponseEntity<Map<String, Object>> clientToken(HttpServletRequest request) {
+        if (!"client_credentials".equals(request.getParameter("grant_type"))) {
+            return oauthError(HttpStatus.BAD_REQUEST, "unsupported_grant_type", false);
+        }
+        String id = request.getParameter("client_id");
+        String secret = request.getParameter("client_secret");
+        String header = request.getHeader(HttpHeaders.AUTHORIZATION);
+        boolean basic = header != null && header.regionMatches(true, 0, "Basic ", 0, 6);
+        if (basic) {
+            try {
+                String decoded = new String(java.util.Base64.getDecoder().decode(header.substring(6).trim()), java.nio.charset.StandardCharsets.UTF_8);
+                int colon = decoded.indexOf(':');
+                if (colon < 0) {
+                    return oauthError(HttpStatus.UNAUTHORIZED, "invalid_client", true);
+                }
+                id = java.net.URLDecoder.decode(decoded.substring(0, colon), java.nio.charset.StandardCharsets.UTF_8);
+                secret = java.net.URLDecoder.decode(decoded.substring(colon + 1), java.nio.charset.StandardCharsets.UTF_8);
+            } catch (IllegalArgumentException e) {
+                return oauthError(HttpStatus.UNAUTHORIZED, "invalid_client", true);
+            }
+        }
+        if (id == null || secret == null) {
+            return oauthError(HttpStatus.UNAUTHORIZED, "invalid_client", basic);
+        }
+        return clients.issue(id, secret)
+                .map(t -> ResponseEntity.ok().header(HttpHeaders.CACHE_CONTROL, "no-store").header("Pragma", "no-cache")
+                        .<Map<String, Object>>body(Map.of("access_token", t.accessToken(), "token_type", "Bearer", "expires_in", t.expiresIn(),
+                                "scope", t.scope())))
+                .orElseGet(() -> oauthError(HttpStatus.UNAUTHORIZED, "invalid_client", basic));
+    }
+
+    private static ResponseEntity<Map<String, Object>> oauthError(HttpStatus status, String error, boolean basic) {
+        ResponseEntity.BodyBuilder b = ResponseEntity.status(status).header(HttpHeaders.CACHE_CONTROL, "no-store");
+        if (basic) {
+            b.header(HttpHeaders.WWW_AUTHENTICATE, "Basic realm=\"cas\"");
+        }
+        return b.body(Map.of("error", error));
     }
 
     @GetMapping("/me")

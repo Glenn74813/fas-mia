@@ -115,6 +115,10 @@
 "mfa_email_codes": "E-mailed one-time sign-in codes, bound to one sign-in step, stored as hashes, with attempts counted.",
 "webauthn_credentials": "Passkeys (WebAuthn credentials): public key, signature counter and flags per registered device.",
 "webauthn_challenges": "Single-use WebAuthn challenges for adding a passkey or signing in with one.",
+"api_clients": "Systems allowed to read CAS through the API (OAuth 2.0 client credentials): client id, read scopes, Argon2id secret hash, status and use.",
+"webhook_subscriptions": "Receivers told about events (posting, approval, payment): HTTPS URL, events, encrypted signing secret, status and failures.",
+"webhook_deliveries": "Each event sent to each subscription: payload, attempts, next attempt, last result.",
+"webhook_cursor": "How far the webhook dispatcher has read the audit trail.",
 "legal_holds": "Legal holds on a fiscal year's records (or all records): reason, reference, who placed and released them, and why.",
 "data_exports": "Full data exports for MIAA (TOR §3.6): purpose, requester and a different approver, status, and the encrypted file's name, size and SHA-256.",
 "anomaly_findings": "Suspicious-activity findings from the anomaly rules, each recorded once by fingerprint, with the independent review."

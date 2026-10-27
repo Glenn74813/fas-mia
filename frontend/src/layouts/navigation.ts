@@ -59,6 +59,7 @@ export const NAV_ITEMS: NavItem[] = [
   { label: 'Data export', to: '/admin/data-exports', anyOf: ['DATA_EXPORT'], section: 'Administration' },
   { label: 'Records retention', to: '/admin/records-retention', anyOf: ['RECORDS_RETENTION_MANAGE', 'DATA_EXPORT', 'AUDIT_LOG_VIEW'], section: 'Administration' },
   { label: 'Integrations', to: '/integrations', anyOf: ['INTEGRATION_VIEW'], section: 'Administration' },
+  { label: 'API access', to: '/integrations/api-access', anyOf: ['INTEGRATION_VIEW', 'API_CLIENT_MANAGE'], section: 'Administration' },
   { label: 'Audit trail', to: '/audit', anyOf: ['AUDIT_LOG_VIEW', 'SECURITY_EVENT_VIEW'], section: 'Administration' },
   { label: 'Anomalies', to: '/audit/anomalies', anyOf: ['ANOMALY_VIEW'], section: 'Administration' },
 ];

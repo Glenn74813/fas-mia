@@ -1324,3 +1324,19 @@ export interface YearRetention {
 }
 
 export interface RetentionSchedule { retentionYears: number; disposal: string; years: YearRetention[]; holds: LegalHold[] }
+
+export interface ApiClient {
+  id: string; clientId: string; name: string; description: string | null; scopes: string[]; status: 'ACTIVE' | 'REVOKED';
+  expiresAt: string | null; lastUsedAt: string | null; secretRotatedAt: string; createdBy: string; createdAt: string;
+  revokedBy: string | null; revokedAt: string | null; revokeReason: string | null; version: number;
+}
+
+export interface WebhookSubscription {
+  id: string; name: string; url: string; events: string[]; status: 'ACTIVE' | 'PAUSED' | 'DISABLED'; consecutiveFailures: number;
+  createdBy: string; createdAt: string; updatedBy: string; updatedAt: string; version: number;
+}
+
+export interface WebhookDelivery {
+  id: string; subscriptionId: string; eventId: string; eventType: string; status: 'PENDING' | 'DELIVERED' | 'DEAD'; attempts: number;
+  nextAttemptAt: string | null; lastStatus: number | null; lastError: string | null; createdAt: string; deliveredAt: string | null;
+}

@@ -44,6 +44,7 @@ public class TokenService {
     public static final String MFA_AUDIENCE = "cas-mfa";
     public static final String CLAIM_SESSION = "sid";
     public static final String CLAIM_PURPOSE = "purpose";
+    public static final String CLAIM_CLIENT = "cid";
 
     public enum MfaPurpose { VERIFY, ENROLL }
 
@@ -86,6 +87,24 @@ public class TokenService {
                 .notBefore(now)
                 .expiresAt(exp)
                 .claim(CLAIM_SESSION, sessionId.toString())
+                .build();
+        return new AccessToken(encode(claims), exp);
+    }
+
+    /** An access token for an API client (client-credentials grant): no session, the client's id and its scopes. */
+    public AccessToken issueClientToken(UUID clientUuid, String clientId, List<String> scopes) {
+        Instant now = Instant.now(clock);
+        Instant exp = now.plus(cfg.accessTokenTtl());
+        JwtClaimsSet claims = JwtClaimsSet.builder()
+                .issuer(cfg.issuer())
+                .audience(List.of(API_AUDIENCE))
+                .subject("client:" + clientId)
+                .id(UUID.randomUUID().toString())
+                .issuedAt(now)
+                .notBefore(now)
+                .expiresAt(exp)
+                .claim(CLAIM_CLIENT, clientUuid.toString())
+                .claim("scope", String.join(" ", scopes))
                 .build();
         return new AccessToken(encode(claims), exp);
     }

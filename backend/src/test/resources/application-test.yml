@@ -19,6 +19,10 @@ cas:
   # Tests run anomaly detection themselves.
   anomalies:
     enabled: false
+  webhooks:
+    # Tests dispatch webhooks themselves, to a receiver on localhost.
+    poll-interval: P1D
+    allow-local-targets: true
   exports:
     # Tests build data exports themselves (DataExportService.processPending).
     poll-interval: P1D

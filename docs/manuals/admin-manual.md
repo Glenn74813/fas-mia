@@ -2,7 +2,7 @@
 
 For system administrators (users, roles, organisation, integrations, tickets) and finance administrators
 (chief accountant and finance manager: chart of accounts, settings, close and approval configuration). Version for
-schema V51, October 2026. Installation and releases are in [19-deployment-and-rollback.md](../19-deployment-and-rollback.md).
+schema V52, October 2026. Installation and releases are in [19-deployment-and-rollback.md](../19-deployment-and-rollback.md).
 
 **Separation of duties applies to administrators too.**
 * System administrators hold no financial permissions. Rules block combining `USER_ADMINISTER` or
@@ -135,6 +135,43 @@ BIR's specification is available (C-06).
 
 A transmission is never sent twice for the same document. Dead transmissions raise an alert to permission
 holders.
+
+### 8.1 API access (`INTEGRATION_VIEW` to view; `API_CLIENT_MANAGE`, the chief accountant, to change)
+
+**Administration → API access** lets other systems read CAS data and hear about events (TOR §4.6).
+
+**API clients.** **Create client** with a name and one or more read scopes (ledger, payables, receivables,
+treasury, budgets, assets, inventory, reports). The client id and secret are shown **once**; give them to the
+other system's administrator through a secure channel. The system then asks for a token:
+
+```
+POST /api/v1/auth/token
+Content-Type: application/x-www-form-urlencoded
+Authorization: Basic base64(client_id:client_secret)
+
+grant_type=client_credentials
+```
+
+and calls the API with `Authorization: Bearer <access_token>` until the token expires (10 minutes). A client can
+only read within its scopes; it cannot create, approve or post anything. **New secret** replaces the secret (the
+old one stops working at once); **Revoke** ends the client and its tokens at once. Every token issued and every
+failed attempt is a security event; each client has its own rate limit.
+
+**Webhooks.** **Subscribe** an HTTPS URL to events (journal voucher posted, invoice approved or posted, DV approved,
+paid or posted, billing, receipt and deposit posted, budget approved, fiscal year closed). The signing secret is
+shown once. Each event is sent as a small JSON message:
+
+```
+{"id": "<event id>", "type": "JOURNAL_VOUCHER_POSTED", "occurredAt": "...", "resource": {"type": "...", "id": "..."}}
+```
+
+with headers `X-CAS-Event`, `X-CAS-Delivery`, `X-CAS-Attempt` and `X-CAS-Signature: t=<unix time>,v1=<hex>`,
+where `v1` is HMAC-SHA-256 of `<t>.<body>` with the secret. The receiver should check the signature, reject old
+`t` values, answer 2xx quickly and fetch the document through the API. Failed deliveries are retried after 1 min,
+5 min, 30 min, 2 h, 6 h and 12 h; then they are marked failed and can be sent again from **Deliveries**. Ten
+failed deliveries in a row disable the subscription and alert its managers; **Resume** it once the receiver
+works. **Send test** sends a `PING` event. URLs on this server or on private, link-local or internal networks are
+refused (`cas.webhooks.allow-local-targets` exists for development only and is refused in production).
 
 ## 9. Audit trail and security events
 
