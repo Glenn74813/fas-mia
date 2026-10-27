@@ -71,7 +71,7 @@ public final class ReportDtos {
     public record JobRequest(
             @NotNull @Pattern(regexp = "FINANCIAL_STATEMENT|TRIAL_BALANCE|BUDGET_VS_ACTUAL|AP_AGING|AR_AGING|PPE_SCHEDULE|INVENTORY_STOCK|AUDIT_TRAIL"
                     + "|CASH_DISBURSEMENT_JOURNAL|COLLECTION_SUMMARY|GENERAL_LEDGER|SUBSIDIARY_LEDGER|DAILY_COLLECTION_REPORT"
-                    + "|BANK_RECONCILIATION_STATEMENT|WITHHOLDING_SCHEDULE|VARIANCE_ANALYSIS")
+                    + "|BANK_RECONCILIATION_STATEMENT|WITHHOLDING_SCHEDULE|VARIANCE_ANALYSIS|ABSTRACT_OF_BILLS|AD_HOC")
             String reportType,
             @NotNull @Pattern(regexp = "CSV|XLSX|PDF") String format, @NotNull Map<String, String> parameters) {
     }

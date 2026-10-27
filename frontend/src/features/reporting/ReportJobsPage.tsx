@@ -16,7 +16,7 @@ import { formatDateTime } from '../../utils/format';
 export const REPORT_LABEL: Record<string, string> = {
   FINANCIAL_STATEMENT: 'Statement', TRIAL_BALANCE: 'Trial balance', BUDGET_VS_ACTUAL: 'Budget vs actual', AP_AGING: 'AP aging',
   AR_AGING: 'AR aging', PPE_SCHEDULE: 'PPE schedule', INVENTORY_STOCK: 'Inventory valuation', AUDIT_TRAIL: 'Audit trail export',
-  CASH_DISBURSEMENT_JOURNAL: 'Cash Disbursement Journal', COLLECTION_SUMMARY: 'Collection summary', GENERAL_LEDGER: 'General ledger',
+  CASH_DISBURSEMENT_JOURNAL: 'Cash Disbursement Journal', COLLECTION_SUMMARY: 'Collection summary', ABSTRACT_OF_BILLS: 'Abstract of bills', GENERAL_LEDGER: 'General ledger',
   SUBSIDIARY_LEDGER: 'Subsidiary ledger', DAILY_COLLECTION_REPORT: 'Daily collection report', BANK_RECONCILIATION_STATEMENT: 'Bank reconciliation statement',
   WITHHOLDING_SCHEDULE: 'Expanded withholding schedule', VARIANCE_ANALYSIS: 'Variance analysis',
 };

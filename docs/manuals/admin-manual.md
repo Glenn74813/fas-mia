@@ -2,7 +2,7 @@
 
 For system administrators (users, roles, organisation, integrations, tickets) and finance administrators
 (chief accountant and finance manager: chart of accounts, settings, close and approval configuration). Version for
-schema V53, October 2026. Installation and releases are in [19-deployment-and-rollback.md](../19-deployment-and-rollback.md).
+schema V57, October 2026. Installation and releases are in [19-deployment-and-rollback.md](../19-deployment-and-rollback.md).
 
 **Separation of duties applies to administrators too.**
 * System administrators hold no financial permissions. Rules block combining `USER_ADMINISTER` or

@@ -3,6 +3,7 @@ import type {
   TicketCategory,
   Clearing, ClearingProposal, CloseCalendarChecklist, CloseFrequency, CloseScheduleItem, CloseTask, GlOpenItem, OpenItemAccount,
   AccountLedger, ChainVerification, ChartSummary, CloseChecklist, CostCenter, CurrentUser, DocumentInfo, EntryDetail,
+  AdHocDataset, AdHocDefinition, AdHocResult, AdHocSaved, AllocationCycle, AllocationPreview, AllocationRun, NrvReview,
   AnomalyFinding, AnomalySummary, ApiClient, InterfaceBatch, InterfaceType, DataExport, LegalHold, RetentionSchedule, WebhookDelivery, WebhookSubscription, EventRecord, FiscalYear, LineInput, LoginResponse, Page, Period, PeriodChange, Permission, RecurringJournal, Role,
   RoleAssignmentResult, RoleChangeResult, SodConflict, SubsidiaryAccount, TokenResponse, TotpEnrollment, TrialBalance,
   UserDetail, UserSummary, VoucherDetail, VoucherInput, VoucherSummary,
@@ -160,6 +161,37 @@ export const interfaceApi = {
     api.upload<InterfaceBatch>(`/interfaces/${type}/batches/upload${qs(params)}`, file),
   accept: (b: InterfaceBatch) => api.post<InterfaceBatch>(`/interfaces/batches/${b.id}/accept`, { version: b.version }),
   reject: (b: InterfaceBatch, note: string) => api.post<InterfaceBatch>(`/interfaces/batches/${b.id}/reject`, { note, version: b.version }),
+};
+
+export const nrvApi = {
+  list: () => api.get<NrvReview[]>('/inventory/nrv-reviews'),
+  get: (id: string) => api.get<NrvReview>(`/inventory/nrv-reviews/${id}`),
+  create: (asOf: string) => api.post<NrvReview>('/inventory/nrv-reviews', { asOf }),
+  prices: (r: NrvReview, prices: { itemCode: string; marketUnitValue: string | null; source?: string }[]) =>
+    api.put<NrvReview>(`/inventory/nrv-reviews/${r.id}/prices`, { version: r.version, prices }),
+  propose: (r: NrvReview, note: string) => api.post<NrvReview>(`/inventory/nrv-reviews/${r.id}/propose`, { version: r.version, note }),
+  cancel: (r: NrvReview) => api.post<NrvReview>(`/inventory/nrv-reviews/${r.id}/cancel`, { version: r.version }),
+};
+
+export const allocationApi = {
+  list: () => api.get<AllocationCycle[]>('/allocation-cycles'),
+  create: (body: unknown) => api.post<AllocationCycle>('/allocation-cycles', body),
+  update: (id: string, body: unknown) => api.put<AllocationCycle>(`/allocation-cycles/${id}`, body),
+  setStatus: (c: AllocationCycle, status: 'ACTIVE' | 'INACTIVE') => api.post<AllocationCycle>(`/allocation-cycles/${c.id}/status`, { status, version: c.version }),
+  preview: (id: string, periodId: string) => api.get<AllocationPreview>(`/allocation-cycles/${id}/preview?periodId=${periodId}`),
+  run: (id: string, periodId: string) => api.post<AllocationRun>(`/allocation-cycles/${id}/runs`, { periodId }),
+  runs: (id: string) => api.get<AllocationRun[]>(`/allocation-cycles/${id}/runs`),
+};
+
+export const adHocApi = {
+  datasets: () => api.get<AdHocDataset[]>('/ad-hoc-reports/datasets'),
+  preview: (dataset: string, definition: AdHocDefinition) => api.post<AdHocResult>('/ad-hoc-reports/preview', { dataset, definition }),
+  saved: () => api.get<AdHocSaved[]>('/ad-hoc-reports'),
+  save: (body: { name: string; dataset: string; definition: AdHocDefinition; shared: boolean; version?: number }, id?: string) =>
+    id ? api.put<AdHocSaved>(`/ad-hoc-reports/${id}`, body) : api.post<AdHocSaved>('/ad-hoc-reports', body),
+  remove: (id: string) => api.delete<void>(`/ad-hoc-reports/${id}`),
+  export: (s: AdHocSaved, format: 'CSV' | 'XLSX' | 'PDF') =>
+    api.post<{ id: string }>('/report-jobs', { reportType: 'AD_HOC', format, parameters: { definitionId: s.id, dataset: s.dataset } }),
 };
 
 export const accountApi = {

@@ -1349,3 +1349,43 @@ export interface InterfaceBatch {
   rows: Record<string, string>[]; errors: string[]; receivedBy: string; receivedAt: string; decidedBy: string | null;
   decidedAt: string | null; decisionNote: string | null; resultType: string | null; resultIds: string[]; version: number;
 }
+
+export interface NrvLine {
+  itemId: string; itemCode: string; itemName: string; unitOfMeasure: string; quantity: string; unitCost: string; carryingValue: string;
+  lastMovementDate: string | null; issued12m: string; coverageMonths: string | null; slowMoving: boolean; marketUnitValue: string | null;
+  priceSource: string | null; writeDown: string;
+}
+
+export interface NrvReview {
+  id: string; asOf: string; status: 'OPEN' | 'PROPOSED' | 'CANCELLED'; coverageThreshold: string; note: string | null;
+  proposedDocumentId: string | null; preparedBy: string; createdAt: string; totalCarryingValue: string; totalWriteDown: string;
+  slowMovingItems: number; pricedItems: number; lines: NrvLine[]; version: number;
+}
+
+export interface AllocationRule {
+  id: string; seq: number; description: string | null; senderAccountId: string; senderAccountCode: string; senderCostCenterId: string;
+  senderCostCenterCode: string; receiverAccountId: string | null; receiverAccountCode: string | null; keyType: 'PERCENT' | 'QUANTITY';
+  receivers: { costCenterId: string; costCenterCode: string; weight: string }[];
+}
+
+export interface AllocationCycle {
+  id: string; code: string; name: string; description: string | null; status: 'ACTIVE' | 'INACTIVE'; rules: AllocationRule[];
+  updatedBy: string; updatedAt: string; version: number;
+}
+
+export interface AllocationPreview {
+  cycleId: string; periodId: string; periodName: string; total: string; notes: string[];
+  lines: { seq: number; accountCode: string; costCenterCode: string; description: string; debit: string; credit: string }[];
+}
+
+export interface AllocationRun {
+  id: string; periodId: string; periodName: string; voucherId: string; voucherNumber: string | null; voucherStatus: string; total: string;
+  runBy: string; runAt: string;
+}
+
+export interface AdHocColumn { key: string; label: string; type: 'TEXT' | 'DATE' | 'AMOUNT' | 'NUMBER' | 'COUNT' }
+export interface AdHocDataset { code: string; label: string; columns: AdHocColumn[] }
+export interface AdHocFilter { column: string; op: string; value: string; value2?: string }
+export interface AdHocDefinition { columns: string[]; filters: AdHocFilter[]; groupBy: string[]; sort: { column: string; descending: boolean }[]; limit?: number }
+export interface AdHocResult { columns: AdHocColumn[]; rows: (string | number | null)[][]; totals: (string | number | null)[]; truncated: boolean }
+export interface AdHocSaved { id: string; name: string; dataset: string; definition: AdHocDefinition; shared: boolean; owner: string; mine: boolean; updatedAt: string; version: number }

@@ -65,6 +65,9 @@ import { InventoryReportsPage } from '../features/inventory/InventoryReportsPage
 import { FinancialStatementsPage } from '../features/reporting/FinancialStatementsPage';
 import { ReportJobsPage } from '../features/reporting/ReportJobsPage';
 import { ApiAccessPage } from '../features/integrations/ApiAccessPage';
+import { NrvReviewPage } from '../features/inventory/NrvReviewPage';
+import { AllocationCyclesPage } from '../features/general-ledger/AllocationCyclesPage';
+import { AdHocReportsPage } from '../features/reporting/AdHocReportsPage';
 import { InboundFilesPage } from '../features/integrations/InboundFilesPage';
 import { IntegrationsPage } from '../features/integrations/IntegrationsPage';
 import { SupplierBankPage } from '../features/payables/SupplierBankPage';
@@ -125,6 +128,7 @@ export const routes: RouteObject[] = [
       { path: 'chart-of-accounts', element: <RequireAuth anyOf={['LEDGER_VIEW', 'ACCOUNT_ADMINISTER']}><ChartOfAccountsPage /></RequireAuth> },
       { path: 'fiscal-periods', element: <RequireAuth anyOf={['LEDGER_VIEW']}><FiscalPeriodsPage /></RequireAuth> },
       { path: 'close', element: <RequireAuth anyOf={['LEDGER_VIEW']}><CloseCalendarPage /></RequireAuth> },
+      { path: 'general-ledger/allocations', element: <RequireAuth anyOf={['LEDGER_VIEW', 'ALLOCATION_MANAGE']}><AllocationCyclesPage /></RequireAuth> },
       { path: 'general-ledger/open-items', element: <RequireAuth anyOf={['LEDGER_VIEW']}><OpenItemsPage /></RequireAuth> },
       { path: 'payables/suppliers', element: <RequireAuth anyOf={['AP_VIEW']}><SuppliersPage /></RequireAuth> },
       { path: 'payables/invoices', element: <RequireAuth anyOf={['AP_VIEW']}><InvoicesPage /></RequireAuth> },
@@ -165,7 +169,9 @@ export const routes: RouteObject[] = [
       { path: 'inventory/documents', element: <RequireAuth anyOf={['INVENTORY_VIEW']}><InventoryDocumentsPage /></RequireAuth> },
       { path: 'inventory/documents/new', element: <RequireAuth anyOf={['INVENTORY_MANAGE']}><NewInventoryDocumentPage /></RequireAuth> },
       { path: 'inventory/documents/:id', element: <RequireAuth anyOf={['INVENTORY_VIEW']}><InventoryDocumentPage /></RequireAuth> },
+      { path: 'inventory/nrv-reviews', element: <RequireAuth anyOf={['INVENTORY_VIEW', 'INVENTORY_MANAGE']}><NrvReviewPage /></RequireAuth> },
       { path: 'inventory/reports', element: <RequireAuth anyOf={['INVENTORY_VIEW', 'AP_VIEW']}><InventoryReportsPage /></RequireAuth> },
+      { path: 'reports/ad-hoc', element: <RequireAuth anyOf={['LEDGER_VIEW', 'AP_VIEW', 'AR_VIEW']}><AdHocReportsPage /></RequireAuth> },
       { path: 'reports/financial-statements', element: <RequireAuth anyOf={['FINANCIAL_REPORT_VIEW']}><FinancialStatementsPage /></RequireAuth> },
       { path: 'reports/jobs', element: <RequireAuth anyOf={['FINANCIAL_REPORT_VIEW', 'FINANCIAL_REPORT_EXPORT', 'BUDGET_VIEW', 'AP_VIEW', 'AR_VIEW',
         'FA_VIEW', 'INVENTORY_VIEW', 'AUDIT_LOG_VIEW', 'SECURITY_EVENT_VIEW']}><ReportJobsPage /></RequireAuth> },

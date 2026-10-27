@@ -11,6 +11,7 @@ import com.miaa.cas.budgeting.BudgetControl;
 import com.miaa.cas.common.error.ApiException;
 import com.miaa.cas.common.error.ErrorCode;
 import com.miaa.cas.common.money.Money;
+import com.miaa.cas.financialreporting.adhoc.AdHocReportService;
 import com.miaa.cas.financialreporting.export.ReportTable;
 import com.miaa.cas.fixedassets.FaDtos.PpeSchedule;
 import com.miaa.cas.fixedassets.FaDtos.ScheduleRow;
@@ -55,11 +56,13 @@ public class ManagementReportService {
     private final EventStore events;
     private final int auditRowLimit;
     private final VarianceReportService variance;
+    private final AdHocReportService adHoc;
     private final OperationalReportService operational;
 
     public ManagementReportService(JdbcTemplate jdbc, BudgetControl budget, ApReportService ap, ArReportService ar, FaReportService fa,
             InventorySetupService inventory, EventStore events, @Value("${cas.reports.audit-row-limit:100000}") int auditRowLimit,
-            OperationalReportService operational, VarianceReportService variance) {
+            OperationalReportService operational, VarianceReportService variance, AdHocReportService adHoc) {
+        this.adHoc = adHoc;
         this.operational = operational;
         this.variance = variance;
         this.jdbc = jdbc;
@@ -81,6 +84,7 @@ public class ManagementReportService {
             case "PPE_SCHEDULE" -> "FA_VIEW";
             case "INVENTORY_STOCK" -> "INVENTORY_VIEW";
             case "AUDIT_TRAIL" -> "SECURITY".equals(parameters.get("table")) ? "SECURITY_EVENT_VIEW" : "AUDIT_LOG_VIEW";
+            case "AD_HOC" -> AdHocReportService.permissionFor(parameters.get("dataset"));
             default -> OperationalReportService.handles(reportType) ? OperationalReportService.permissionFor(reportType) : "FINANCIAL_REPORT_EXPORT";
         };
     }
@@ -95,6 +99,7 @@ public class ManagementReportService {
                 }
             }
             case VarianceReportService.TYPE -> variance.validate(p);
+            case "AD_HOC" -> adHoc.validateJob(p);
             case "AP_AGING", "AR_AGING" -> {
                 date(p, "asOf");
                 for (String key : List.of("customerId", "supplierId")) {
@@ -125,6 +130,10 @@ public class ManagementReportService {
         return switch (reportType) {
             case "BUDGET_VS_ACTUAL" -> budgetVsActual(uuid(p, "fiscalYearId"), by, at);
             case VarianceReportService.TYPE -> variance.render(p, by, at);
+            case "AD_HOC" -> {
+                ReportTable t = adHoc.render(p, by, at);
+                yield new Rendered(t, "ad_hoc_" + t.title().replaceAll("[^A-Za-z0-9]+", "_"));
+            }
             case "AP_AGING" -> apAging(date(p, "asOf"), blank(p.get("supplierId")) ? null : uuid(p, "supplierId"), by, at);
             case "AR_AGING" -> arAging(date(p, "asOf"), blank(p.get("customerId")) ? null : uuid(p, "customerId"), by, at);
             case "PPE_SCHEDULE" -> ppe(date(p, "from"), date(p, "to"), by, at);

@@ -191,6 +191,16 @@ Clearing posts nothing. Items open more than 90 days appear on the month-end che
 5. The **Closing schedule** lists what falls due between two dates. Tasks due in the last week also appear in
    your Inbox.
 
+### 3.6 Overhead allocation (`LEDGER_VIEW` to see; `ALLOCATION_MANAGE` to define and run)
+
+**General ledger → Overhead allocation** spreads shared costs. A **cycle** has one or more rules; each rule names
+the **Sender account** and **Sender cost centre** whose period balance is moved, the **Key** (fixed percentages that
+add up to 100, or statistical quantities such as floor area or headcount) and the receiving cost centres with
+their percentage or quantity. Choose **Run or preview** and a **Period** to see the lines; **Create draft voucher**
+makes one draft journal voucher dated the period's last day, which you then submit for review, approval and
+posting as usual. A cycle runs once per period, unless its voucher is cancelled or rejected. The cycles and keys
+are MIAA's to set (C-10).
+
 ## 4. Payables
 
 | Task | Who |
@@ -350,6 +360,13 @@ reference is information for the cashier; it is not a receipt.
   **Import as draft**. Every row is checked; nothing is created if any row is wrong.
 * **Inventory reports**: valuation, GR/IR status; **Match** a supplier invoice to goods receipts with the
   **Amount to match**.
+* **Cost vs market review** (`INVENTORY_MANAGE` to prepare): at year end choose the **Review date** and **Start
+  review**. Each item with stock shows its quantity and average cost, last movement, quantity issued in the past
+  twelve months and months of stock; items with no issues or more than 24 months of stock are marked
+  **SLOW-MOVING**. Enter each item's market value per unit (or **Import prices** from a CSV of `item_code`,
+  `market_unit_value` and optionally the source) and **Save prices**; the write-down is the quantity times the
+  amount by which market value is below cost. **Propose write-down** creates a draft price adjustment, posted
+  like any stock document. The basis and the 24-month rule are proposals for MIAA's policy (C-07).
 
 ## 9. Budgets
 
@@ -394,6 +411,9 @@ pending (C-10).
   * the expanded withholding schedule;
   * PPE schedule, inventory valuation, budget versus actual;
   * the variance analysis (see below);
+  * the abstract of bills: every posted bill in a period by customer, with subtotals and totals per kind
+    (layout to be confirmed by the Billing Section);
+  * saved ad hoc reports (see below);
   * the audit trail export (auditors).
 
   **Variance analysis** (`BUDGET_VIEW`): choose the fiscal year, **Through period**, optionally a cost centre, and a
@@ -407,6 +427,13 @@ pending (C-10).
 
   Rows are grouped by account type with subtotals. The layout is proposed until MIAA confirms its budget
   definitions (C-10). It is not available as a scheduled report, because the period is chosen when you queue it.
+
+  **Ad hoc reports** (`LEDGER_VIEW`, `AP_VIEW` or `AR_VIEW` for their datasets): choose a **Dataset** (posted
+  ledger lines, supplier invoices, billings, disbursement vouchers or receipts), tick the **Columns**, add
+  **Conditions** (is, contains, from, to, between and so on), optionally **Group by** columns so amounts are
+  totalled and rows counted, choose the sort, and **Run** to see the first 200 rows. Name it and **Save** (tick
+  **Share** to let colleagues who may see the same records use it); a saved report can be exported as CSV, XLSX or
+  PDF through **My reports**.
 
   **Scheduled reports** repeat a report on a schedule (for example the previous month, month to date). Each
   report needs its own view permission. With **E-mail me when it is ready** (on by default) CAS e-mails you when

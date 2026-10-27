@@ -126,6 +126,20 @@ class OperationalReportsIT extends AbstractReceivablesIT {
         return id;
     }
 
+    @Test
+    void theAbstractOfBillsListsAPeriodsPostedBillsByCustomerWithCreditMemosNegative() throws Exception {
+        int year = newOpenYear();
+        String cid = createCustomerNamed("Abstract Lessee " + year).get("id").asText();
+        JsonNode inv1 = postedBilling(billing("INVOICE", cid, LocalDate.of(year, 6, 1), "PLC-4203", "10000.00", false, null));
+        JsonNode inv2 = postedBilling(billing("INVOICE", cid, LocalDate.of(year, 6, 15), "PLC-4203", "2500.00", false, null));
+        postedBilling(billing("CREDIT_MEMO", cid, LocalDate.of(year, 6, 20), "PLC-4203", "500.00", false, inv1.get("id").asText()));
+        postedBilling(billing("INVOICE", cid, LocalDate.of(year, 7, 1), "PLC-4203", "999.00", false, null)); // outside the period
+        String csv = csv(preparer, "ABSTRACT_OF_BILLS", Map.of("from", year + "-06-01", "to", year + "-06-30"));
+        assertThat(csv).contains("Abstract of bills").contains("Abstract Lessee " + year)
+                .contains(inv1.get("documentNumber").asText()).contains(inv2.get("documentNumber").asText())
+                .contains("-500.00").contains("12000.00").contains("Total, 3 bill(s)").doesNotContain("999.00").contains("PLACEHOLDER layout");
+    }
+
     private ResultActions request(Session who, String type, Map<String, String> params) throws Exception {
         return mvc.perform(post("/api/v1/report-jobs").header("Authorization", who.bearer()).contentType(MediaType.APPLICATION_JSON)
                 .content(toJson(Map.of("reportType", type, "format", "CSV", "parameters", params))));

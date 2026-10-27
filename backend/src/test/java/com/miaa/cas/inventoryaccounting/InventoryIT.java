@@ -161,6 +161,59 @@ class InventoryIT extends AbstractPayablesIT {
         assertThat(moves.get("items").toString()).contains("REVALUATION");
     }
 
+    @Test
+    void aLowerOfCostReviewFlagsSlowMoversAndProposesAWriteDownToMarketValue() throws Exception {
+        int year = newOpenYear();
+        tx.executeWithoutResult(s -> {
+            mappings.set("INVENTORY_GRIR", account("PLC-2104"), Actor.SYSTEM);
+            mappings.set("INVENTORY_REVALUATION", account("PLC-5303"), Actor.SYSTEM);
+        });
+        Session clerk = login(createUser("nrvclerk", "INVENTORY_CLERK"));
+        String tag = String.valueOf(System.nanoTime() % 100000);
+        String wh = created(inv("/warehouses", clerk, Map.of("code", "WN-" + tag, "name", "NRV test"))).get("id").asText();
+        String fast = created(inv("/items", clerk, Map.of("code", "TONER-" + tag, "name", "Toner", "unitOfMeasure", "pc",
+                "inventoryAccountId", account("PLC-1302"), "consumptionAccountId", account("PLC-5202")))).get("id").asText();
+        String slow = created(inv("/items", clerk, Map.of("code", "LENS-" + tag, "name", "Spare lens", "unitOfMeasure", "pc",
+                "inventoryAccountId", account("PLC-1302"), "consumptionAccountId", account("PLC-5202")))).get("id").asText();
+        String supplier = createSupplier(false).get("id").asText();
+        postDoc(clerk, doc("GOODS_RECEIPT", year + "-01-10", supplier, null, line(fast, wh, null, "10", "100"), line(slow, wh, null, "5", "200")));
+        postDoc(clerk, doc("ISSUE", year + "-03-10", null, costCenter("PLC-CC-OPS").toString(), line(fast, wh, null, "6", null)));
+
+        JsonNode review = created(inv("/nrv-reviews", clerk, Map.of("asOf", year + "-06-30")));
+        Map<String, JsonNode> lines = new HashMap<>();
+        review.get("lines").forEach(l -> lines.put(l.get("itemCode").asText(), l));
+        // Toner: 4 left, 6 issued in the year -> 8 months of stock. Lens: nothing issued -> slow-moving.
+        assertThat(new BigDecimal(lines.get("TONER-" + tag).get("coverageMonths").asText())).isEqualByComparingTo("8.0");
+        assertThat(lines.get("TONER-" + tag).get("slowMoving").asBoolean()).isFalse();
+        assertThat(lines.get("LENS-" + tag).get("slowMoving").asBoolean()).isTrue();
+        assertThat(lines.get("LENS-" + tag).get("coverageMonths").isNull()).isTrue();
+
+        String id = review.get("id").asText();
+        mvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put("/api/v1/inventory/nrv-reviews/" + id + "/prices")
+                .header("Authorization", clerk.bearer()).contentType(MediaType.APPLICATION_JSON).content(toJson(Map.of("version", 0,
+                        "prices", List.of(Map.of("itemCode", "NOPE-" + tag, "marketUnitValue", "1")))))).andExpect(status().isBadRequest());
+        JsonNode priced = body(mvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put("/api/v1/inventory/nrv-reviews/" + id
+                + "/prices").header("Authorization", clerk.bearer()).contentType(MediaType.APPLICATION_JSON).content(toJson(Map.of("version", 0,
+                        "prices", List.of(Map.of("itemCode", "TONER-" + tag, "marketUnitValue", "90", "source", "Supplier quote"),
+                                Map.of("itemCode", "LENS-" + tag, "marketUnitValue", "250"))))))
+                .andExpect(status().isOk()).andReturn());
+        // Toner: 4 x (100 - 90) = 40. Lens: market above cost, no write-down.
+        assertThat(new BigDecimal(priced.get("totalWriteDown").asText())).isEqualByComparingTo("40.00");
+
+        JsonNode proposed = ok(inv("/nrv-reviews/" + id + "/propose", clerk, Map.of("version", priced.get("version").asLong(),
+                "note", "Year-end review")));
+        assertThat(proposed.get("status").asText()).isEqualTo("PROPOSED");
+        String docId = proposed.get("proposedDocumentId").asText();
+        JsonNode doc = body(mvc.perform(get("/api/v1/inventory/documents/" + docId).header("Authorization", clerk.bearer())).andReturn());
+        assertThat(doc.get("kind").asText()).isEqualTo("REVALUATION");
+        assertThat(doc.get("status").asText()).isEqualTo("DRAFT");
+        // Posted like any revaluation: the toner is restated to 90 a unit.
+        ok(act(poster, doc, "post"));
+        assertThat(itemView(fast).get("value").asText()).isEqualTo("360.00");
+        assertThat(itemView(slow).get("value").asText()).isEqualTo("1000.00");
+        inv("/nrv-reviews/" + id + "/propose", clerk, Map.of("version", proposed.get("version").asLong())).andExpect(status().isConflict());
+    }
+
     private ResultActions importFile(Session who, String kind, String date, String supplier, String csv) throws Exception {
         return mvc.perform(multipart("/api/v1/inventory/documents/import").file(new MockMultipartFile("file", "lines.csv", "text/csv",
                 csv.getBytes(StandardCharsets.UTF_8))).param("kind", kind).param("documentDate", date).param("description", "Imported delivery")

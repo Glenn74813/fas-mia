@@ -43,7 +43,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class OperationalReportService {
 
     static final Set<String> TYPES = Set.of("CASH_DISBURSEMENT_JOURNAL", "COLLECTION_SUMMARY", "GENERAL_LEDGER", "SUBSIDIARY_LEDGER",
-            "DAILY_COLLECTION_REPORT", "BANK_RECONCILIATION_STATEMENT", "WITHHOLDING_SCHEDULE");
+            "DAILY_COLLECTION_REPORT", "BANK_RECONCILIATION_STATEMENT", "WITHHOLDING_SCHEDULE", "ABSTRACT_OF_BILLS");
 
     private static final String ORG = "Manila International Airport Authority";
 
@@ -69,7 +69,7 @@ public class OperationalReportService {
     static String permissionFor(String type) {
         return switch (type) {
             case "CASH_DISBURSEMENT_JOURNAL", "WITHHOLDING_SCHEDULE" -> "AP_VIEW";
-            case "COLLECTION_SUMMARY" -> "AR_VIEW";
+            case "COLLECTION_SUMMARY", "ABSTRACT_OF_BILLS" -> "AR_VIEW";
             case "GENERAL_LEDGER", "SUBSIDIARY_LEDGER" -> "LEDGER_VIEW";
             case "DAILY_COLLECTION_REPORT", "BANK_RECONCILIATION_STATEMENT" -> "TREASURY_VIEW";
             default -> throw new IllegalArgumentException(type);
@@ -78,7 +78,7 @@ public class OperationalReportService {
 
     void validate(String type, Map<String, String> p) {
         switch (type) {
-            case "CASH_DISBURSEMENT_JOURNAL", "COLLECTION_SUMMARY", "GENERAL_LEDGER", "SUBSIDIARY_LEDGER" -> {
+            case "CASH_DISBURSEMENT_JOURNAL", "COLLECTION_SUMMARY", "GENERAL_LEDGER", "SUBSIDIARY_LEDGER", "ABSTRACT_OF_BILLS" -> {
                 if (date(p, "to").isBefore(date(p, "from"))) {
                     throw bad("'to' cannot precede 'from'.");
                 }
@@ -123,6 +123,7 @@ public class OperationalReportService {
             case "DAILY_COLLECTION_REPORT" -> dailyCollectionReport(date(p, "date"), by, at);
             case "BANK_RECONCILIATION_STATEMENT" -> bankReconciliationStatement(uuid(p, "reconciliationId"), by, at);
             case "WITHHOLDING_SCHEDULE" -> withholding(integer(p, "year"), integer(p, "quarter"), by, at);
+            case "ABSTRACT_OF_BILLS" -> abstractOfBills(date(p, "from"), date(p, "to"), by, at);
             default -> throw new IllegalArgumentException(type);
         };
     }
@@ -193,6 +194,64 @@ public class OperationalReportService {
                 List.of("Receipts", "Cash", "Check", "Bank transfer", "Total collected", "Tax withheld"), rows,
                 List.of("Posted collections by receipt date. Balances migrated at cutover are not collections of the period and are "
                         + "excluded.", generated(by, at))), "collection_summary_" + from + "_" + to);
+    }
+
+    /**
+     * Abstract of bills (TOR Annex A, Billing): every posted billing document dated in the period, by customer, with
+     * subtotals per customer and totals per kind. Credit memos reduce the totals. The layout is a proposal until the
+     * Billing Section confirms its form.
+     */
+    private Rendered abstractOfBills(LocalDate from, LocalDate to, String by, String at) {
+        List<ReportTable.Row> rows = new ArrayList<>();
+        Map<String, BigDecimal[]> byKind = new java.util.TreeMap<>();
+        BigDecimal[] grand = {BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO};
+        String[] customer = {null};
+        BigDecimal[] sub = {BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO};
+        int[] count = {0};
+        Runnable closeCustomer = () -> {
+            if (customer[0] != null) {
+                rows.add(new ReportTable.Row("Subtotal " + customer[0], 1, true, java.util.Arrays.asList(null, null, null, null,
+                        Money.of(sub[0]), Money.of(sub[1]), Money.of(sub[2]))));
+                java.util.Arrays.fill(sub, BigDecimal.ZERO);
+            }
+        };
+        jdbc.query("""
+                SELECT c.code, c.name, b.document_number, b.kind, b.document_date, b.billing_period, b.due_date,
+                       CASE WHEN b.kind = 'CREDIT_MEMO' THEN -1 ELSE 1 END AS sign, b.net_amount, b.vat_amount, b.gross_amount
+                FROM billing_documents b JOIN customers c ON c.id = b.customer_id
+                WHERE b.status = 'POSTED' AND b.document_date BETWEEN ? AND ?
+                ORDER BY c.name, c.code, b.document_date, b.document_number""", rs -> {
+            String who = rs.getString("code") + " " + rs.getString("name");
+            if (!who.equals(customer[0])) {
+                closeCustomer.run();
+                customer[0] = who;
+                rows.add(new ReportTable.Row(who, 0, true, java.util.Collections.nCopies(7, null)));
+            }
+            BigDecimal sign = BigDecimal.valueOf(rs.getInt("sign"));
+            BigDecimal[] v = {rs.getBigDecimal("net_amount").multiply(sign), rs.getBigDecimal("vat_amount").multiply(sign),
+                rs.getBigDecimal("gross_amount").multiply(sign)};
+            String kind = rs.getString("kind");
+            BigDecimal[] k = byKind.computeIfAbsent(kind, x -> new BigDecimal[] {BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO});
+            for (int i = 0; i < 3; i++) {
+                sub[i] = sub[i].add(v[i]);
+                grand[i] = grand[i].add(v[i]);
+                k[i] = k[i].add(v[i]);
+            }
+            count[0]++;
+            rows.add(new ReportTable.Row(rs.getString("document_number"), 1, false, java.util.Arrays.asList(kind.replace('_', ' '),
+                    rs.getDate("document_date").toString(), rs.getString("billing_period") == null ? "" : rs.getString("billing_period"),
+                    rs.getDate("due_date").toString(), Money.of(v[0]), Money.of(v[1]), Money.of(v[2]))));
+        }, Date.valueOf(from), Date.valueOf(to));
+        closeCustomer.run();
+        byKind.forEach((kind, v) -> rows.add(new ReportTable.Row("Total " + kind.replace('_', ' ').toLowerCase(), 0, false,
+                java.util.Arrays.asList(null, null, null, null, Money.of(v[0]), Money.of(v[1]), Money.of(v[2])))));
+        rows.add(new ReportTable.Row("Total, " + count[0] + " bill(s)", 0, true, java.util.Arrays.asList(null, null, null, null,
+                Money.of(grand[0]), Money.of(grand[1]), Money.of(grand[2]))));
+        return new Rendered(new ReportTable("Abstract of bills", List.of(ORG, "Bills dated " + from + " to " + to), "Customer / bill",
+                List.of("Kind", "Date", "Billing period", "Due", "Net", "VAT", "Gross"), rows,
+                List.of("Posted invoices, debit memos and credit memos (credit memos as negative amounts).",
+                        "PLACEHOLDER layout: to be confirmed by the Billing Section against MIAA's abstract of bills form.",
+                        generated(by, at))), "abstract_of_bills_" + from + "_" + to);
     }
 
     /** Opening balance, every posted line and the running balance of each account, in the account's normal-balance sign. */

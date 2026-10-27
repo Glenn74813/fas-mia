@@ -51,10 +51,12 @@ class CashForecastIT extends AbstractReceivablesIT {
         assertThat(delta(before, after, 1, "receivables")).isEqualByComparingTo("50000.00");
         assertThat(delta(before, after, 1, "payables")).isEqualByComparingTo("7920.00");
         assertThat(delta(before, after, 2, "vouchers")).isEqualByComparingTo("3000.00");
-        // 357,000.00 left, spread over 365 days: January's 31 days, then February's 28.
-        BigDecimal perDay = new BigDecimal("357000.00").divide(BigDecimal.valueOf(365), 10, RoundingMode.HALF_UP);
-        assertThat(amount(after, 0, "budget")).isEqualByComparingTo(perDay.multiply(BigDecimal.valueOf(31)).setScale(2, RoundingMode.HALF_UP));
-        assertThat(amount(after, 1, "budget")).isEqualByComparingTo(perDay.multiply(BigDecimal.valueOf(28)).setScale(2, RoundingMode.HALF_UP));
+        // 357,000.00 left (365,000 less the 8,000.00 invoice), spread over the year's days (366 in a leap year): January's 31,
+        // then February's.
+        BigDecimal perDay = new BigDecimal("357000.00").divide(BigDecimal.valueOf(java.time.Year.of(year).length()), 10, RoundingMode.HALF_UP);
+        assertThat(delta(before, after, 0, "budget")).isEqualByComparingTo(perDay.multiply(BigDecimal.valueOf(31)).setScale(2, RoundingMode.HALF_UP));
+        assertThat(delta(before, after, 1, "budget")).isEqualByComparingTo(perDay.multiply(
+                BigDecimal.valueOf(java.time.YearMonth.of(year, 2).lengthOfMonth())).setScale(2, RoundingMode.HALF_UP));
         // Each bucket opens at the previous close.
         for (int b = 1; b < 4; b++) {
             assertThat(amount(after, b, "opening")).isEqualByComparingTo(amount(after, b - 1, "closing"));

@@ -23,6 +23,7 @@ const REPORTS: Def[] = [
   { type: 'WITHHOLDING_SCHEDULE', label: 'Expanded withholding schedule', permission: 'AP_VIEW', params: ['quarter'] },
   { type: 'AR_AGING', label: 'Accounts receivable aging', permission: 'AR_VIEW', params: ['asOf', 'customer'] },
   { type: 'COLLECTION_SUMMARY', label: 'Collection summary', permission: 'AR_VIEW', params: ['range'] },
+  { type: 'ABSTRACT_OF_BILLS', label: 'Abstract of bills', permission: 'AR_VIEW', params: ['range'] },
   { type: 'DAILY_COLLECTION_REPORT', label: 'Daily collection report', permission: 'TREASURY_VIEW', params: ['date'] },
   { type: 'BANK_RECONCILIATION_STATEMENT', label: 'Bank reconciliation statement', permission: 'TREASURY_VIEW', params: ['reconciliation'] },
   { type: 'PPE_SCHEDULE', label: 'PPE schedule', permission: 'FA_VIEW', params: ['range'] },

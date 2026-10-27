@@ -116,6 +116,10 @@ every new migration; edit only this introduction by hand.
 | V51 | `V51__records_retention.sql` | Records retention (TOR §4.5, Annex A.9): every closed fiscal year is kept at least cas.records.retention-years (10) after it ends; it can be archived as a sealed export of its records, documents and audit trail (two people, like a full export); and legal holds record that records must not be disposed of. Purging records is not provided: posted records and the hash-chained audit trail are immutable until MIAA decides how lawful disposal works (C-05, C-13). |
 | V52 | `V52__api_clients_and_webhooks.sql` | Third-party access (TOR §4.6, Annex A.4). API clients sign in with the OAuth 2.0 client-credentials grant and get short-lived tokens limited to read-only scopes; their secrets are stored as Argon2id hashes, can be rotated and revoked, and every client has its own rate limit. |
 | V53 | `V53__interface_batches.sql` | Inbound interfaces (TOR §4.6.2, Annex D): payroll summaries, FMIS budget data and asset information arrive as CSV, JSON or XML, from a person or an API client. Each file is validated into a batch; a person with the matching permission then accepts it, which creates draft records (a journal voucher, budget allocations, fixed assets) that go through the normal review and approval. |
+| V54 | `V54__abstract_of_bills_report.sql` | The abstract of bills (TOR Annex A, Billing) runs as an ordinary report job. |
+| V55 | `V55__inventory_nrv_review.sql` | Lower of cost and net realisable value (TOR Annex B.4): a year-end review snapshots each item's quantity and weighted-average cost, its movement rate and coverage (slow-moving flags), and the market value per unit entered or imported for it. The write-down is proposed as a draft inventory revaluation (unit cost restated to market value), which is reviewed and posted like any other inventory document. |
+| V56 | `V56__overhead_allocation.sql` | Overhead allocation (TOR §3.5.1, Annex B.7, B.8): a cycle is a set of rules, each moving the period balance of a sender account in a sender cost centre to receiving cost centres by a key: fixed percentages or statistical quantities (for example floor area or headcount). Running a cycle for a period creates one draft journal voucher, which is reviewed, approved and posted like any other. |
+| V57 | `V57__ad_hoc_reports.sql` | Ad hoc reports (TOR Annex B.5): accounting staff build reports over approved datasets (ledger lines, supplier invoices, billings, disbursements, receipts) by choosing columns, filters, grouping, totals and order. Definitions are saved, optionally shared with others who may see the dataset, and exported through the ordinary report job. |
 
 ## 3. Entity-relationship diagrams by domain
 
@@ -268,6 +272,26 @@ erDiagram
         uuid id PK
         uuid fiscal_year_id FK
     }
+    allocation_cycles {
+        uuid id PK
+    }
+    allocation_receivers {
+        uuid rule_id PK,FK
+        uuid cost_center_id PK,FK
+    }
+    allocation_rules {
+        uuid id PK
+        uuid cycle_id FK
+        uuid sender_account_id FK
+        uuid sender_cost_center_id FK
+        uuid receiver_account_id FK
+    }
+    allocation_runs {
+        uuid id PK
+        uuid cycle_id FK
+        uuid period_id FK
+        uuid voucher_id FK
+    }
     approval_decisions {
         uuid id PK
         uuid actor_id FK
@@ -382,6 +406,15 @@ erDiagram
         uuid account_id FK
     }
     fiscal_years ||--o{ accounting_periods : "fiscal_year_id"
+    cost_centers ||--o{ allocation_receivers : "cost_center_id"
+    allocation_rules ||--o{ allocation_receivers : "rule_id"
+    allocation_cycles ||--o{ allocation_rules : "cycle_id"
+    chart_of_accounts |o--o{ allocation_rules : "receiver_account_id"
+    chart_of_accounts ||--o{ allocation_rules : "sender_account_id"
+    cost_centers ||--o{ allocation_rules : "sender_cost_center_id"
+    allocation_cycles ||--o{ allocation_runs : "cycle_id"
+    accounting_periods ||--o{ allocation_runs : "period_id"
+    journal_vouchers ||--o{ allocation_runs : "voucher_id"
     approval_workflows ||--o{ approval_workflow_steps : "voucher_type"
     chart_of_accounts |o--o{ chart_of_accounts : "parent_id"
     close_tasks ||--o{ close_task_completions : "task_id"
@@ -785,6 +818,15 @@ erDiagram
         uuid item_id FK
         uuid warehouse_id FK
     }
+    inventory_nrv_lines {
+        uuid review_id PK,FK
+        uuid item_id PK,FK
+    }
+    inventory_nrv_reviews {
+        uuid id PK
+        uuid proposed_document_id FK
+        uuid prepared_by_id FK
+    }
     inventory_valuations {
         uuid item_id PK,FK
     }
@@ -801,15 +843,22 @@ erDiagram
     inventory_documents ||--o{ inventory_movements : "document_id"
     inventory_items ||--o{ inventory_movements : "item_id"
     warehouses |o--o{ inventory_movements : "warehouse_id"
+    inventory_items ||--o{ inventory_nrv_lines : "item_id"
+    inventory_nrv_reviews ||--o{ inventory_nrv_lines : "review_id"
+    inventory_documents |o--o{ inventory_nrv_reviews : "proposed_document_id"
     inventory_items ||--o{ inventory_valuations : "item_id"
 ```
 
-References to other domains: `gr_ir_matches.invoice_id` → `supplier_invoices`; `inventory_documents.cost_center_id` → `cost_centers`; `inventory_documents.migration_batch_id` → `migration_batches`; `inventory_documents.posted_entry_id` → `journal_entries`; `inventory_documents.prepared_by_id` → `users`; `inventory_documents.supplier_id` → `suppliers`; `inventory_items.consumption_account_id` → `chart_of_accounts`; `inventory_items.inventory_account_id` → `chart_of_accounts`.
+References to other domains: `gr_ir_matches.invoice_id` → `supplier_invoices`; `inventory_documents.cost_center_id` → `cost_centers`; `inventory_documents.migration_batch_id` → `migration_batches`; `inventory_documents.posted_entry_id` → `journal_entries`; `inventory_documents.prepared_by_id` → `users`; `inventory_documents.supplier_id` → `suppliers`; `inventory_items.consumption_account_id` → `chart_of_accounts`; `inventory_items.inventory_account_id` → `chart_of_accounts`; `inventory_nrv_reviews.prepared_by_id` → `users`.
 
 ### 3.11 Reporting
 
 ```mermaid
 erDiagram
+    report_definitions {
+        uuid id PK
+        uuid owner_id FK
+    }
     report_jobs {
         uuid id PK
         uuid requested_by_id FK
@@ -833,7 +882,7 @@ erDiagram
     report_templates ||--o{ report_template_lines : "template_id"
 ```
 
-References to other domains: `report_jobs.requested_by_id` → `users`; `report_schedules.owner_id` → `users`; `report_templates.created_by_id` → `users`.
+References to other domains: `report_definitions.owner_id` → `users`; `report_jobs.requested_by_id` → `users`; `report_schedules.owner_id` → `users`; `report_templates.created_by_id` → `users`.
 
 ### 3.12 Integrations and notifications
 
@@ -1413,6 +1462,68 @@ Created in `V7__general_ledger.sql`. Periods 1-12 and the adjustment period 13 o
 | updated_by | varchar(64) | N |  | Username that last changed the row |
 
 Rules: `accounting_periods_period_number_check`: CHECK (((period_number >= 1) AND (period_number <= 13))); `accounting_periods_period_type_check`: CHECK period_type IN (REGULAR, ADJUSTMENT); `accounting_periods_sequence_key_key`: UNIQUE (sequence_key); `accounting_periods_status_check`: CHECK status IN (FUTURE, OPEN, SOFT_CLOSED, CLOSED); `ck_adjustment_is_13`: CHECK ((((period_type) = 'ADJUSTMENT') = (period_number = 13))); `ck_period_dates`: CHECK ((end_date >= start_date)); `uq_period_number`: UNIQUE (fiscal_year_id, period_number).
+
+#### `allocation_cycles`
+
+Created in `V56__overhead_allocation.sql`. Overhead allocation cycles (TOR B.7, B.8): code, name, status.
+
+| Column | Type | Null | Default | Meaning |
+|---|---|---|---|---|
+| id | uuid | N |  | Primary key (UUID generated by the application) |
+| code | varchar(30) | N |  | Business code |
+| name | varchar(200) | N |  | Display name |
+| description | varchar(1000) | Y |  | Free-text description |
+| status | varchar(10) | N |  | Lifecycle status; legal values in the rules below |
+| created_by | varchar(64) | N |  | Username that created the row |
+| created_at | timestamptz | N |  | When the row was created |
+| updated_by | varchar(64) | N |  | Username that last changed the row |
+| updated_at | timestamptz | N |  | When the row last changed |
+| version | bigint | N | 0 | Optimistic-lock version, incremented on every update |
+
+Rules: `allocation_cycles_code_key`: UNIQUE (code); `allocation_cycles_status_check`: CHECK status IN (ACTIVE, INACTIVE).
+
+#### `allocation_receivers`
+
+Created in `V56__overhead_allocation.sql`. Receiving cost centres of an allocation rule with their percentage or quantity.
+
+| Column | Type | Null | Default | Meaning |
+|---|---|---|---|---|
+| rule_id | uuid | N |  | References `allocation_rules` |
+| cost_center_id | uuid | N |  | References `cost_centers` |
+| weight | numeric(19,4) | N |  |  |
+
+Rules: `allocation_receivers_weight_check`: CHECK ((weight > (0))).
+
+#### `allocation_rules`
+
+Created in `V56__overhead_allocation.sql`. A cycle's rules: sender account and cost centre, receiver account, key type.
+
+| Column | Type | Null | Default | Meaning |
+|---|---|---|---|---|
+| id | uuid | N |  | Primary key (UUID generated by the application) |
+| cycle_id | uuid | N |  | References `allocation_cycles` |
+| seq | integer | N |  |  |
+| description | varchar(300) | Y |  | Free-text description |
+| sender_account_id | uuid | N |  | References `chart_of_accounts` |
+| sender_cost_center_id | uuid | N |  | References `cost_centers` |
+| receiver_account_id | uuid | Y |  | The account debited at the receivers; the sender's account when NULL. |
+| key_type | varchar(10) | N |  |  |
+
+Rules: `allocation_rules_cycle_id_seq_key`: UNIQUE (cycle_id, seq); `allocation_rules_key_type_check`: CHECK key_type IN (PERCENT, QUANTITY).
+
+#### `allocation_runs`
+
+Created in `V56__overhead_allocation.sql`. Each run of a cycle for a period and the draft journal voucher it created.
+
+| Column | Type | Null | Default | Meaning |
+|---|---|---|---|---|
+| id | uuid | N |  | Primary key (UUID generated by the application) |
+| cycle_id | uuid | N |  | References `allocation_cycles` |
+| period_id | uuid | N |  | References `accounting_periods` |
+| voucher_id | uuid | N |  | References `journal_vouchers` |
+| total | numeric(19,2) | N |  |  |
+| run_by | varchar(64) | N |  |  |
+| run_at | timestamptz | N |  | When run |
 
 #### `approval_decisions`
 
@@ -2846,6 +2957,45 @@ Created in `V17__inventory_accounting.sql`. Immutable record of every quantity o
 
 Rules: `ck_inventory_movement_warehouse`: CHECK (((warehouse_id IS NOT NULL) OR ((movement_type) = 'REVALUATION'))); `inventory_movements_movement_type_check`: CHECK movement_type IN (RECEIPT, ISSUE, COUNT_GAIN, COUNT_LOSS, TRANSFER_OUT, TRANSFER_IN, OPENING, REVALUATION); trigger `trg_inventory_movements_immutable`: BEFORE DELETE OR UPDATE FOR EACH ROW EXECUTE FUNCTION inventory_movements_immutable().
 
+#### `inventory_nrv_lines`
+
+Created in `V55__inventory_nrv_review.sql`. Each item in a cost vs market review: quantity, cost, movement rate, coverage, market value and write-down.
+
+| Column | Type | Null | Default | Meaning |
+|---|---|---|---|---|
+| review_id | uuid | N |  | References `inventory_nrv_reviews` |
+| item_id | uuid | N |  | References `inventory_items` |
+| quantity | numeric(19,4) | N |  |  |
+| unit_cost | numeric(19,6) | N |  |  |
+| carrying_value | numeric(19,2) | N |  |  |
+| last_movement_date | date | Y |  | Last movement date |
+| issued_12m | numeric(19,4) | N |  |  |
+| coverage_months | numeric(10,1) | Y |  | Months of stock at the last twelve months' issue rate; NULL when nothing was issued. |
+| slow_moving | bool | N |  |  |
+| market_unit_value | numeric(19,6) | Y |  |  |
+| price_source | varchar(200) | Y |  |  |
+| write_down | numeric(19,2) | N | 0 |  |
+
+#### `inventory_nrv_reviews`
+
+Created in `V55__inventory_nrv_review.sql`. Lower of cost and market reviews: date, slow-moving threshold, status and the draft write-down proposed.
+
+| Column | Type | Null | Default | Meaning |
+|---|---|---|---|---|
+| id | uuid | N |  | Primary key (UUID generated by the application) |
+| as_of | date | N |  |  |
+| status | varchar(10) | N |  | Lifecycle status; legal values in the rules below |
+| coverage_threshold | numeric(6,1) | N |  |  |
+| note | varchar(1000) | Y |  |  |
+| proposed_document_id | uuid | Y |  | References `inventory_documents` |
+| prepared_by_id | uuid | N |  | References `users` |
+| prepared_by | varchar(64) | N |  | Username of the preparer |
+| created_at | timestamptz | N |  | When the row was created |
+| updated_at | timestamptz | N |  | When the row last changed |
+| version | bigint | N | 0 | Optimistic-lock version, incremented on every update |
+
+Rules: `ck_nrv_proposed`: CHECK ((((status) = 'PROPOSED') = (proposed_document_id IS NOT NULL))); `inventory_nrv_reviews_status_check`: CHECK status IN (OPEN, PROPOSED, CANCELLED).
+
 #### `inventory_valuations`
 
 Created in `V17__inventory_accounting.sql`. The weighted-average cost pool of an item (quantity and value across warehouses). *Migration note:* The weighted-average cost pool of an item: average = value / quantity.
@@ -2875,6 +3025,23 @@ Rules: `warehouses_code_key`: UNIQUE (code); `warehouses_status_check`: CHECK st
 
 ### 4.11 Reporting
 
+#### `report_definitions`
+
+Created in `V57__ad_hoc_reports.sql`. Saved ad hoc reports: dataset, columns, filters, grouping and order; owner and whether shared.
+
+| Column | Type | Null | Default | Meaning |
+|---|---|---|---|---|
+| id | uuid | N |  | Primary key (UUID generated by the application) |
+| name | varchar(120) | N |  | Display name |
+| dataset | varchar(30) | N |  |  |
+| definition | jsonb | N |  |  |
+| shared | bool | N | false |  |
+| owner_id | uuid | N |  | References `users` |
+| owner | varchar(64) | N |  |  |
+| created_at | timestamptz | N |  | When the row was created |
+| updated_at | timestamptz | N |  | When the row last changed |
+| version | bigint | N | 0 | Optimistic-lock version, incremented on every update |
+
 #### `report_jobs`
 
 Created in `V19__financial_reporting.sql`. Background report jobs with their parameters, status and generated file (encrypted).
@@ -2900,7 +3067,7 @@ Created in `V19__financial_reporting.sql`. Background report jobs with their par
 | content_encryption | varchar(12) | N | 'NONE'::character varying | Encryption scheme of the stored bytes ('NONE' or the AES-256-GCM scheme of V35) (added in V35) |
 | schedule_id | uuid | Y |  | References `report_schedules` (added in V45) |
 
-Rules: `report_jobs_content_encryption_check`: CHECK content_encryption IN (NONE, AES-256-GCM); `report_jobs_format_check`: CHECK format IN (CSV, XLSX, PDF); `report_jobs_report_type_check`: CHECK report_type IN (FINANCIAL_STATEMENT, TRIAL_BALANCE, BUDGET_VS_ACTUAL, AP_AGING, AR_AGING, PPE_SCHEDULE, INVENTORY_STOCK, AUDIT_TRAIL, CASH_DISBURSEMENT_JOURNAL, COLLECTION_SUMMARY, GENERAL_LEDGER, SUBSIDIARY_LEDGER, DAILY_COLLECTION_REPORT, BANK_RECONCILIATION_STATEMENT, WITHHOLDING_SCHEDULE, VARIANCE_ANALYSIS); `report_jobs_status_check`: CHECK status IN (QUEUED, RUNNING, DONE, FAILED, EXPIRED); `ix_report_jobs_queue`: INDEX btree (status, requested_at) WHERE ((status) = 'QUEUED').
+Rules: `report_jobs_content_encryption_check`: CHECK content_encryption IN (NONE, AES-256-GCM); `report_jobs_format_check`: CHECK format IN (CSV, XLSX, PDF); `report_jobs_report_type_check`: CHECK report_type IN (FINANCIAL_STATEMENT, TRIAL_BALANCE, BUDGET_VS_ACTUAL, AP_AGING, AR_AGING, PPE_SCHEDULE, INVENTORY_STOCK, AUDIT_TRAIL, CASH_DISBURSEMENT_JOURNAL, COLLECTION_SUMMARY, GENERAL_LEDGER, SUBSIDIARY_LEDGER, DAILY_COLLECTION_REPORT, BANK_RECONCILIATION_STATEMENT, WITHHOLDING_SCHEDULE, VARIANCE_ANALYSIS, ABSTRACT_OF_BILLS, AD_HOC); `report_jobs_status_check`: CHECK status IN (QUEUED, RUNNING, DONE, FAILED, EXPIRED); `ix_report_jobs_queue`: INDEX btree (status, requested_at) WHERE ((status) = 'QUEUED').
 
 #### `report_schedules`
 
