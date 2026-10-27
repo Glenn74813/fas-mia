@@ -13,6 +13,10 @@ cas:
     enabled: false
   outbox:
     dispatch-enabled: false
+  reports:
+    # Tests run report jobs themselves (ReportJobService.processPending); a background poll could claim a job
+    # first and leave it RUNNING when the test checks it.
+    poll-interval: P1D
 spring:
   flyway:
     clean-disabled: false

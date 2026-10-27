@@ -32,7 +32,7 @@ schema V41, October 2026. Installation and releases are in [19-deployment-and-ro
 | Action | Effect |
 |---|---|
 | **Issue password** | Sets a new temporary password; the user must change it at the next sign-in |
-| **Reset MFA** | Removes the authenticator; the user enrols again at the next sign-in |
+| **Reset MFA** | Removes the authenticator and withdraws the user's unused recovery codes; the user enrols again at the next sign-in. Needed only when the user has no recovery code left |
 | **Revoke sessions** | Signs the user out everywhere immediately |
 | **Unlock** | Lifts a lockout after repeated wrong passwords |
 | **Deactivate** / **Activate** | Blocks or restores sign-in; history is kept (users are never deleted) |

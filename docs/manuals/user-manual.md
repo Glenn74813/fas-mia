@@ -11,13 +11,27 @@ You need your username (or e-mail), your password and an authenticator app on yo
 Authenticator or Microsoft Authenticator.
 
 1. Open CAS and enter your **Username or e-mail** and **Password**; choose **Continue**.
-2. Enter the **6-digit code** shown by your authenticator app; choose **Verify**.
+2. Enter the **6-digit code** shown for **MIAA CAS** in your authenticator app; choose **Verify**.
 
 **First sign-in.** Your administrator gives you a temporary password.
-1. Sign in with it. CAS shows a set-up code: scan it with your authenticator app, or type the secret.
+1. Sign in with it. CAS shows a QR code: in your authenticator app add an account (Microsoft Authenticator:
+   **+ → Other account**) and scan it, or type the manual key.
 2. Enter the 6-digit code to activate the app.
-3. CAS then asks you to choose your own password: **Current password**, **New password**,
+3. CAS shows ten **recovery codes**, once. Download, print or copy them and keep them away from your phone. Tick
+   **I have saved these codes somewhere safe** and choose **Continue**.
+4. CAS then asks you to choose your own password: **Current password**, **New password**,
    **Confirm new password**, **Save password**.
+
+**Lost authenticator.** If you lose your phone or remove MIAA CAS from the app:
+1. Sign in with your password. On the code screen choose **Lost your authenticator? Use a recovery code**.
+2. Enter one of your saved codes (for example `ABCDE-23456`) and choose **Continue**. Each code works once.
+3. CAS asks you to set up your authenticator again, then shows a new set of recovery codes. The old codes stop
+   working. Every use of a recovery code is recorded for the security reviewers.
+
+**Recovery codes on your profile.** **My profile → Two-step verification** shows how many codes you have left.
+To replace them, enter a current 6-digit code and choose **Generate new codes**; the previous codes stop working.
+Turning on your authenticator app's own backup (Microsoft Authenticator: **Settings → Backup**) also brings CAS
+back on a new phone.
 
 Passwords:
 * 12 to 128 characters, with at least three of upper case, lower case, digits and symbols;
@@ -34,7 +48,8 @@ Passwords:
 | Five wrong passwords in a row lock the account for 15 minutes | A general sign-in error; it never says whether the account exists or is locked |
 | A code can be used only once | Wait for the next code (30 seconds) |
 | Sessions end after 8 hours | You are asked to sign in again |
-| Lost phone | Ask an administrator to **Reset MFA**; you enrol again at the next sign-in |
+| Lost phone | Use a recovery code (above). With no codes left, ask an administrator to **Reset MFA**; you enrol again at the next sign-in |
+| Wrong recovery code | Counts as a failed sign-in, like a wrong password |
 
 ### 1.2 The screen
 

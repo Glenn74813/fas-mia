@@ -16,6 +16,9 @@ import com.miaa.cas.security.auth.AuthDtos.LoginRequest;
 import com.miaa.cas.security.auth.AuthDtos.LoginResponse;
 import com.miaa.cas.security.auth.AuthDtos.MfaCodeRequest;
 import com.miaa.cas.security.auth.AuthDtos.MfaTokenRequest;
+import com.miaa.cas.security.auth.AuthDtos.RecoveryCodesResponse;
+import com.miaa.cas.security.auth.AuthDtos.RecoveryRequest;
+import com.miaa.cas.security.auth.AuthDtos.RegenerateRecoveryCodesRequest;
 import com.miaa.cas.security.auth.AuthDtos.ResetPasswordRequest;
 import com.miaa.cas.security.auth.AuthDtos.TokenResponse;
 import com.miaa.cas.security.auth.AuthDtos.TotpEnrollmentResponse;
@@ -27,6 +30,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.List;
 import java.util.Map;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -83,7 +87,23 @@ public class AuthController {
     @PostMapping("/mfa/totp/activate")
     @Operation(summary = "Confirm enrolment with a first code and sign in")
     public ResponseEntity<TokenResponse> activate(@Valid @RequestBody MfaCodeRequest request, HttpServletRequest http) {
-        return tokenResponse(auth.activateTotp(request.mfaToken(), request.code(), ClientInfo.from(http)));
+        AuthService.Enrolled enrolled = auth.activateTotp(request.mfaToken(), request.code(), ClientInfo.from(http));
+        return tokenResponse(enrolled.tokens(), enrolled.recoveryCodes());
+    }
+
+    @PostMapping("/mfa/recovery")
+    @Operation(summary = "Lost authenticator: spend a recovery code; continue with a new authenticator enrolment")
+    public LoginResponse recover(@Valid @RequestBody RecoveryRequest request) {
+        return auth.recoverWithCode(request.mfaToken(), request.recoveryCode());
+    }
+
+    @PostMapping("/recovery-codes")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Replace own recovery codes (needs a current authenticator code); the codes are shown once")
+    public ResponseEntity<RecoveryCodesResponse> regenerateRecoveryCodes(@AuthenticationPrincipal CasPrincipal principal,
+            @Valid @RequestBody RegenerateRecoveryCodesRequest request) {
+        return ResponseEntity.ok().header(HttpHeaders.CACHE_CONTROL, "no-store")
+                .body(new RecoveryCodesResponse(auth.regenerateRecoveryCodes(principal, request.code())));
     }
 
     @PostMapping("/mfa/dev-bypass")
@@ -154,9 +174,13 @@ public class AuthController {
     }
 
     private ResponseEntity<TokenResponse> tokenResponse(IssuedTokens issued) {
+        return tokenResponse(issued, null);
+    }
+
+    private ResponseEntity<TokenResponse> tokenResponse(IssuedTokens issued, List<String> recoveryCodes) {
         long expiresIn = Duration.between(Instant.now(), issued.accessToken().expiresAt()).toSeconds();
         TokenResponse body = new TokenResponse(issued.accessToken().value(), "Bearer", Math.max(expiresIn, 0),
-                issued.refreshExpiresAt(), auth.currentUser(issued.userId()));
+                issued.refreshExpiresAt(), auth.currentUser(issued.userId()), recoveryCodes);
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, cookies.issue(issued.refreshToken(), issued.refreshExpiresAt()).toString())
                 .header(HttpHeaders.CACHE_CONTROL, "no-store")

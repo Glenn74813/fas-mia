@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import java.time.Instant;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -33,14 +34,25 @@ public final class AuthDtos {
     public record TotpEnrollmentResponse(String secret, String otpauthUri) {
     }
 
+    public record RecoveryRequest(@NotBlank @Size(max = 4096) String mfaToken, @NotBlank @Size(max = 32) String recoveryCode) {
+    }
+
+    public record RegenerateRecoveryCodesRequest(
+            @NotBlank @Pattern(regexp = "\\d{6}", message = "must be a 6-digit code") String code) {
+    }
+
+    public record RecoveryCodesResponse(List<String> codes) {
+    }
+
+    /** recoveryCodes is present only right after an authenticator is enrolled: the one time they are shown. */
     @JsonInclude(JsonInclude.Include.NON_NULL)
     public record TokenResponse(String accessToken, String tokenType, long expiresIn, Instant sessionExpiresAt,
-            CurrentUserResponse user) {
+            CurrentUserResponse user, List<String> recoveryCodes) {
     }
 
     public record CurrentUserResponse(UUID id, String username, String displayName, String email, String userType,
             Set<String> roles, Set<String> permissions, boolean mustChangePassword, boolean mfaEnrolled,
-            Instant lastLoginAt) {
+            int recoveryCodesRemaining, Instant lastLoginAt) {
     }
 
     public record ChangePasswordRequest(@NotBlank @Size(max = 128) String currentPassword,

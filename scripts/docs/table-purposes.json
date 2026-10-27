@@ -110,5 +110,6 @@
 "user_roles": "Roles held by each user.",
 "user_sessions": "One row per sign-in session; the access token carries its id.",
 "users": "User accounts (internal staff, concessionaire portal users, external auditors).",
-"warehouses": "Warehouses holding stock."
+"warehouses": "Warehouses holding stock.",
+"mfa_recovery_codes": "Single-use recovery codes for a lost authenticator, stored as Argon2id hashes; spent or withdrawn rows are kept for audit."
 }

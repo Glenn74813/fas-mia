@@ -1,7 +1,13 @@
+import { useState, type FormEvent } from 'react';
 import { Link } from 'react-router';
+import { authApi } from '../../api/endpoints';
 import { useAuth } from '../../auth/AuthContext';
 import { Badge } from '../../components/Badge';
+import { Button } from '../../components/Button';
+import { ErrorAlert } from '../../components/ErrorAlert';
+import { Field } from '../../components/Field';
 import { PageHeader } from '../../components/PageHeader';
+import { RecoveryCodes } from '../../components/RecoveryCodes';
 import { visibleNav } from '../../layouts/navigation';
 import { formatDateTime, humanize } from '../../utils/format';
 
@@ -42,7 +48,65 @@ export function ProfilePage({ portal = false }: { portal?: boolean }) {
             </ul>
           )}
         </section>
+        <TwoStepVerification />
       </div>
     </>
+  );
+}
+
+/** Recovery codes: how many are left, and a new set on demand (needs a current authenticator code). */
+function TwoStepVerification() {
+  const { user, reloadUser } = useAuth();
+  const [code, setCode] = useState('');
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<unknown>(null);
+  const [codes, setCodes] = useState<string[] | null>(null);
+  if (!user?.mfaEnrolled) return null;
+  const left = user.recoveryCodesRemaining;
+
+  const generate = async (e: FormEvent) => {
+    e.preventDefault();
+    setBusy(true);
+    setError(null);
+    try {
+      setCodes((await authApi.regenerateRecoveryCodes(code)).codes);
+      setCode('');
+      await reloadUser();
+    } catch (err) {
+      setError(err);
+      setCode('');
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <section className="rounded-xl border border-slate-200/80 bg-white shadow-xs p-5 md:col-span-2" aria-labelledby="mfa">
+      <h2 id="mfa" className="mb-1 font-semibold">Two-step verification</h2>
+      <p className="mb-4 text-sm text-slate-600">If you lose your authenticator, a recovery code lets you sign in once and
+        set it up again.</p>
+      <p className="mb-4 flex items-center gap-2 text-sm">
+        <span className="text-slate-500">Recovery codes left:</span>
+        <Badge tone={left === 0 ? 'red' : left <= 3 ? 'amber' : 'green'}>{`${left} of 10`}</Badge>
+        {left === 0 && <span className="text-slate-600">Generate a set now, in case you lose your phone.</span>}
+      </p>
+      {codes ? (
+        <div className="space-y-3">
+          <p className="text-sm text-slate-700"><strong>Save these new codes now; they are shown only once.</strong> Your
+            previous codes no longer work.</p>
+          <RecoveryCodes codes={codes} username={user.username} />
+          <Button variant="secondary" onClick={() => setCodes(null)}>Done</Button>
+        </div>
+      ) : (
+        <form onSubmit={generate} className="flex max-w-md flex-wrap items-end gap-3">
+          <div className="min-w-40 flex-1">
+            <Field label="Current 6-digit code" name="regenCode" inputMode="numeric" autoComplete="one-time-code" pattern="\d{6}"
+              maxLength={6} required value={code} onChange={(e) => setCode(e.target.value.replace(/\D/g, ''))} />
+          </div>
+          <Button type="submit" busy={busy} disabled={code.length !== 6}>Generate new codes</Button>
+          <div className="w-full"><ErrorAlert error={error} /></div>
+        </form>
+      )}
+    </section>
   );
 }

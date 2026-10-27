@@ -13,6 +13,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<CurrentUser | null>(null);
   const [sessionExpiresAt, setSessionExpiresAt] = useState<string | null>(null);
   const [pendingMfa, setPendingMfa] = useState<PendingMfa | null>(null);
+  const [heldSignIn, setHeldSignIn] = useState<TokenResponse | null>(null);
 
   const signedIn = useCallback((tokens: TokenResponse) => {
     session.setAccessToken(tokens.accessToken);
@@ -64,9 +65,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const tokens = pendingMfa.status === 'MFA_ENROLLMENT_REQUIRED'
       ? await authApi.activateTotp(pendingMfa.mfaToken, code)
       : await authApi.verifyTotp(pendingMfa.mfaToken, code);
-    signedIn(tokens);
+    if (tokens.recoveryCodes?.length) {
+      // Show the codes before the app opens; the session is already valid on the server. The enrolment step is over.
+      setHeldSignIn(tokens);
+      setPendingMfa(null);
+    } else {
+      signedIn(tokens);
+    }
     return tokens;
   }, [pendingMfa, signedIn]);
+
+  const recoverWithCode = useCallback(async (recoveryCode: string) => {
+    if (!pendingMfa) throw new Error('No sign-in in progress');
+    const res = await authApi.recover(pendingMfa.mfaToken, recoveryCode);
+    setPendingMfa({ status: res.status, mfaToken: res.mfaToken });
+  }, [pendingMfa]);
+
+  const acknowledgeRecoveryCodes = useCallback(() => {
+    if (heldSignIn) signedIn(heldSignIn);
+    setHeldSignIn(null);
+  }, [heldSignIn, signedIn]);
 
   const logout = useCallback(async () => {
     try {
@@ -83,10 +101,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const hasPermission = useCallback((p: string) => !!user && user.permissions.includes(p), [user]);
 
   const value = useMemo<AuthState>(() => ({
-    status, user, sessionExpiresAt, pendingMfa, passwordStep, beginEnrollment, completeMfa, logout, reloadUser,
-    hasPermission,
-  }), [status, user, sessionExpiresAt, pendingMfa, passwordStep, beginEnrollment, completeMfa, logout, reloadUser,
-    hasPermission]);
+    status, user, sessionExpiresAt, pendingMfa, passwordStep, beginEnrollment, completeMfa, recoverWithCode,
+    newRecoveryCodes: heldSignIn?.recoveryCodes ?? null, acknowledgeRecoveryCodes, logout, reloadUser, hasPermission,
+  }), [status, user, sessionExpiresAt, pendingMfa, passwordStep, beginEnrollment, completeMfa, recoverWithCode, heldSignIn,
+    acknowledgeRecoveryCodes, logout, reloadUser, hasPermission]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

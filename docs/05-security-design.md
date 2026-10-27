@@ -14,6 +14,8 @@ MFA_ENROLLMENT_REQUIRED:
    POST /auth/mfa/totp/activate {mfaToken, code}    ──► tokens (method ACTIVE)
 MFA_REQUIRED:
    POST /auth/mfa/verify        {mfaToken, code}    ──► tokens
+   POST /auth/mfa/recovery      {mfaToken, recoveryCode} ──► {status: MFA_ENROLLMENT_REQUIRED, mfaToken}
+                                (lost authenticator: continue with a new enrolment; no tokens yet)
 
 tokens = 200 {accessToken, expiresIn, user}  +  Set-Cookie: CAS_REFRESH=<opaque>;
          HttpOnly; Secure; SameSite=Strict; Path=/api/v1/auth
@@ -26,6 +28,13 @@ tokens = 200 {accessToken, expiresIn, user}  +  Set-Cookie: CAS_REFRESH=<opaque>
 * The `mfaToken` is useless against the API (`aud=cas-mfa` is rejected by the resource server).
 * TOTP: RFC 6238, SHA-1, 6 digits, 30 s step, ±1 step skew; the last accepted step is stored
   so a code can never be used twice.
+* Recovery codes (V43, `RecoveryCodeService`): ten single-use codes of 10 characters (50 bits each) are returned
+  once by `/auth/mfa/totp/activate` and stored only as Argon2id hashes. A recovery code never issues a session by
+  itself: it spends the code, revokes the authenticator and all sessions, records `MFA_RECOVERY_CODE_USED`
+  (MEDIUM) and requires a new enrolment, which issues a new set and withdraws the old one. A wrong code counts
+  towards the lockout like a wrong password. A signed-in user can replace the set (`POST /auth/recovery-codes`) only
+  with a current authenticator code, so a stolen access token cannot mint codes. An administrator's **Reset MFA**
+  also withdraws the codes (`MfaRecoveryIT`).
 
 ## 2. Tokens
 

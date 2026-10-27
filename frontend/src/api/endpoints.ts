@@ -26,6 +26,9 @@ export const authApi = {
   activateTotp: (mfaToken: string, code: string) =>
     api.post<TokenResponse>('/auth/mfa/totp/activate', { mfaToken, code }, noAuth),
   verifyTotp: (mfaToken: string, code: string) => api.post<TokenResponse>('/auth/mfa/verify', { mfaToken, code }, noAuth),
+  recover: (mfaToken: string, recoveryCode: string) =>
+    api.post<LoginResponse>('/auth/mfa/recovery', { mfaToken, recoveryCode }, noAuth),
+  regenerateRecoveryCodes: (code: string) => api.post<{ codes: string[] }>('/auth/recovery-codes', { code }),
   devBypass: (mfaToken: string) => api.post<TokenResponse>('/auth/mfa/dev-bypass', { mfaToken }, noAuth),
   me: () => api.get<CurrentUser>('/auth/me'),
   changePassword: (currentPassword: string, newPassword: string) =>

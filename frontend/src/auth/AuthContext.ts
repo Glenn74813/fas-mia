@@ -16,6 +16,11 @@ export interface AuthState {
   passwordStep: (identifier: string, password: string) => Promise<LoginResponse>;
   beginEnrollment: () => Promise<TotpEnrollment>;
   completeMfa: (code: string) => Promise<TokenResponse>;
+  /** Lost authenticator: spends a recovery code; the sign-in continues with a new authenticator enrolment. */
+  recoverWithCode: (recoveryCode: string) => Promise<void>;
+  /** Recovery codes from a just-completed enrolment; the session starts once the user confirms they saved them. */
+  newRecoveryCodes: string[] | null;
+  acknowledgeRecoveryCodes: () => void;
   logout: () => Promise<void>;
   reloadUser: () => Promise<void>;
   hasPermission: (permission: string) => boolean;

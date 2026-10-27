@@ -16,7 +16,7 @@ function mockFetch(handler: Handler) {
 const tokens = (access: string) => ({
   accessToken: access, tokenType: 'Bearer', expiresIn: 600, sessionExpiresAt: '2026-10-22T12:00:00Z',
   user: { id: 'u1', username: 'j.cruz', displayName: 'J', email: 'j@x', userType: 'INTERNAL', roles: [], permissions: [],
-    mustChangePassword: false, mfaEnrolled: true, lastLoginAt: null },
+    mustChangePassword: false, mfaEnrolled: true, recoveryCodesRemaining: 10, lastLoginAt: null },
 });
 
 describe('api client', () => {

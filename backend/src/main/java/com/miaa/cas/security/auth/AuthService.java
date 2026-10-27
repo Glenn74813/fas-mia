@@ -21,12 +21,14 @@ import com.miaa.cas.security.auth.AuthDtos.LoginStatus;
 import com.miaa.cas.security.auth.AuthDtos.TotpEnrollmentResponse;
 import com.miaa.cas.security.jwt.TokenService;
 import com.miaa.cas.security.jwt.TokenService.MfaPurpose;
+import com.miaa.cas.security.mfa.RecoveryCodeService;
 import com.miaa.cas.security.mfa.Totp;
 import com.miaa.cas.security.password.PasswordPolicy;
 import com.miaa.cas.security.session.SessionService;
 import com.miaa.cas.security.session.SessionService.IssuedTokens;
 import java.time.Clock;
 import java.time.Instant;
+import java.util.List;
 import java.util.Map;
 import java.util.OptionalLong;
 import java.util.UUID;
@@ -35,8 +37,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Interactive sign-in: password step, mandatory TOTP second factor (with first-time enrolment),
- * profile and password change. Failure paths commit their lockout counters and security events
+ * Interactive sign-in: password step, mandatory TOTP second factor (with first-time enrolment and one-time recovery
+ * codes for a lost authenticator), profile and password change. Failure paths commit their lockout counters and security events
  * ({@code noRollbackFor}) before the exception reaches the client.
  */
 @Service
@@ -58,13 +60,19 @@ public class AuthService {
     private final CasProperties properties;
     private final Clock clock;
     private final DevMfaBypass devMfaBypass;
+    private final RecoveryCodeService recoveryCodes;
     private final String dummyHash;
+
+    /** A completed enrolment: the session, and the recovery codes to show once. */
+    public record Enrolled(IssuedTokens tokens, List<String> recoveryCodes) {
+    }
 
     public AuthService(UserRepository users, MfaMethodRepository mfaMethods, RoleAssignments roleAssignments,
             PasswordEncoder passwordEncoder, PasswordPolicy passwordPolicy, TokenService tokens, SessionService sessions,
             SecurityEventService securityEvents, AuditService audit, AesGcmEncryptor encryptor, CasProperties properties,
-            Clock clock, DevMfaBypass devMfaBypass) {
+            Clock clock, DevMfaBypass devMfaBypass, RecoveryCodeService recoveryCodes) {
         this.devMfaBypass = devMfaBypass;
+        this.recoveryCodes = recoveryCodes;
         this.users = users;
         this.mfaMethods = mfaMethods;
         this.roleAssignments = roleAssignments;
@@ -149,7 +157,7 @@ public class AuthService {
     }
 
     @Transactional(noRollbackFor = ApiException.class)
-    public IssuedTokens activateTotp(String mfaToken, String code, ClientInfo client) {
+    public Enrolled activateTotp(String mfaToken, String code, ClientInfo client) {
         UUID userId = tokens.parseMfaToken(mfaToken, MfaPurpose.ENROLL).userId();
         User user = lockedCandidate(userId);
         Instant now = Instant.now(clock);
@@ -163,8 +171,56 @@ public class AuthService {
             throw new ApiException(ErrorCode.AUTH_MFA_INVALID, "The verification code is not valid.");
         }
         pending.activate(step.getAsLong(), now);
-        audit.record(actor, "MFA_ENROLLED", "USER", user.getId(), Map.of("method", MfaMethod.TOTP));
-        return completeSignIn(user, actor, client, now);
+        List<String> codes = recoveryCodes.issue(userId, now);
+        audit.record(actor, "MFA_ENROLLED", "USER", user.getId(), Map.of("method", MfaMethod.TOTP, "recoveryCodesIssued", codes.size()));
+        return new Enrolled(completeSignIn(user, actor, client, now), codes);
+    }
+
+    /**
+     * Lost authenticator: a recovery code replaces the authenticator code at the second step. The code is spent, the
+     * old authenticator and the user's other sessions are withdrawn, and the user must enrol a new authenticator now
+     * (which issues a fresh set of codes) before any session starts. Failures count towards the account lockout.
+     */
+    @Transactional(noRollbackFor = ApiException.class)
+    public LoginResponse recoverWithCode(String mfaToken, String recoveryCode) {
+        UUID userId = tokens.parseMfaToken(mfaToken, MfaPurpose.VERIFY).userId();
+        User user = lockedCandidate(userId);
+        Instant now = Instant.now(clock);
+        Actor actor = new Actor(user.getId(), user.getUsername());
+        if (!recoveryCodes.consume(userId, recoveryCode, now)) {
+            registerFailure(user, actor, "MFA_RECOVERY_FAILED", now);
+            throw new ApiException(ErrorCode.AUTH_MFA_INVALID, "The recovery code is not valid or has already been used.");
+        }
+        List<MfaMethod> active = mfaMethods.findByUserIdAndStatus(userId, MfaMethod.ACTIVE);
+        active.forEach(m -> m.revoke(now));
+        int revokedSessions = sessions.revokeAll(userId, "MFA_RECOVERED");
+        int left = recoveryCodes.remaining(userId);
+        securityEvents.record(actor, "MFA_RECOVERY_CODE_USED", "SUCCESS", Severity.MEDIUM,
+                Map.of("authenticatorsRevoked", active.size(), "sessionsRevoked", revokedSessions, "codesLeft", left));
+        audit.record(actor, "MFA_RECOVERED", "USER", userId, Map.of("authenticatorsRevoked", active.size()));
+        return new LoginResponse(LoginStatus.MFA_ENROLLMENT_REQUIRED, tokens.issueMfaToken(userId, MfaPurpose.ENROLL));
+    }
+
+    /** Replaces the signed-in user's recovery codes; needs a current authenticator code, so a stolen session cannot. */
+    @Transactional(noRollbackFor = ApiException.class)
+    public List<String> regenerateRecoveryCodes(CasPrincipal principal, String code) {
+        User user = users.findByIdForUpdate(principal.userId()).orElseThrow(() -> ApiException.notFound("User"));
+        Instant now = Instant.now(clock);
+        Actor actor = new Actor(user.getId(), user.getUsername());
+        MfaMethod method = activeTotp(user.getId());
+        if (method == null) {
+            throw new ApiException(ErrorCode.INVALID_STATE, "Set up an authenticator first.");
+        }
+        OptionalLong step = Totp.verify(encryptor.decrypt(method.getSecretCiphertext(), aad(user.getId())), code, now,
+                method.getLastUsedStep(), TOTP_WINDOW);
+        if (step.isEmpty()) {
+            registerFailure(user, actor, "MFA_FAILED", now);
+            throw new ApiException(ErrorCode.AUTH_MFA_INVALID, "The verification code is not valid.");
+        }
+        method.markUsed(step.getAsLong());
+        List<String> codes = recoveryCodes.issue(user.getId(), now);
+        audit.record(actor, "MFA_RECOVERY_CODES_REGENERATED", "USER", user.getId(), Map.of("issued", codes.size()));
+        return codes;
     }
 
     /** Development only: completes the sign-in of a user named in cas.mfa.dev-bypass-users without a code. */
@@ -206,7 +262,7 @@ public class AuthService {
         return new CurrentUserResponse(user.getId(), user.getUsername(), user.getDisplayName(), user.getEmail(),
                 user.getUserType().name(), roleAssignments.roleCodes(userId),
                 user.isMustChangePassword() ? java.util.Set.of() : roleAssignments.effectivePermissions(userId),
-                user.isMustChangePassword(), activeTotp(userId) != null, user.getLastLoginAt());
+                user.isMustChangePassword(), activeTotp(userId) != null, recoveryCodes.remaining(userId), user.getLastLoginAt());
     }
 
     @Transactional(noRollbackFor = ApiException.class)

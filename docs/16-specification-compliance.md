@@ -131,6 +131,19 @@ Ordered by value to MIAA's users and auditors.
 
     **Built** (§3l).
 
+Second round (27 Oct 2026), from the "still open" notes above and the demonstration:
+
+15. **Sign-in recovery** (§9.2): recovery codes for a lost authenticator, and clearer instructions on the
+    verification screen. **Built** (§3m).
+16. **Variance analysis report** (§11.4, §11.8): budget against actual by account and cost centre for a chosen
+    period, with amount and percentage variances. The layout is proposed until MIAA reviews it.
+17. **Report delivery** (§11.8): e-mail the owner when a scheduled report finishes, with a link to **My reports**
+    (not the file itself).
+18. **External-auditor access expiry** (§9.3): set and change it on the user screens, not only through the API.
+19. **Column sorting** (§12): sortable columns on the main list pages, using the paging API's existing `sort`.
+20. **Engineering checks** (§2, §7, §19): architecture tests that enforce the module layering, and a release
+    workflow that versions and builds the images when started by hand.
+
 ## 3a. Gaps 1–3: what was built
 
 | Gap | Built | Verified by |
@@ -293,6 +306,18 @@ Limits:
   the surplus to operating cash) is not built.
 * The SCE opening balance covers equity accounts only. When an earlier fiscal year has not been closed, its result
   is in the SFP's cumulative surplus but in neither the SCE's opening balance nor the year's surplus.
+
+## 3m. Gap 15: sign-in recovery
+
+| Part | Built | Verified by |
+|---|---|---|
+| Recovery codes | Ten single-use codes (`ABCDE-23456`, 50 bits each) are returned once when an authenticator is enrolled and stored only as Argon2id hashes (V43). The app shows them on a **Save your recovery codes** screen, with copy and download, and opens only after the user confirms saving them | `MfaRecoveryIT.enrolmentShowsTenCodesOnceAndStoresOnlyHashes`, `MfaPage.test.tsx`, e2e `admin-onboarding.spec.ts` |
+| Using a code | **Lost your authenticator? Use a recovery code** on the verification screen. A valid code is spent; the authenticator and every session are revoked; the user must enrol a new authenticator (fresh QR, new set of codes) before a session starts. Case, spaces and hyphens are ignored. A wrong code counts towards the lockout; each use is a MEDIUM security event | `MfaRecoveryIT.recoveryCodeReplacesTheAuthenticatorAndRequiresANewOne`, `aSpentOrWrongCodeIsRefusedAndCountsTowardsLockout`, e2e |
+| Replacing codes | **My profile → Two-step verification** shows the codes left and generates a new set; this needs a current authenticator code, so a stolen session cannot mint codes | `MfaRecoveryIT.newCodesNeedACurrentAuthenticatorCode` |
+| Administrator reset | **Reset MFA** also withdraws the unused codes | `MfaRecoveryIT.administratorResetWithdrawsTheCodes` |
+| Verification screen | Says where the code comes from, how to add the account in Microsoft Authenticator, and what to do with no codes left | `MfaPage.test.tsx` |
+
+Accounts enrolled before V43 have no codes until they generate a set on their profile.
 
 ## 4. Blocked on MIAA decisions
 

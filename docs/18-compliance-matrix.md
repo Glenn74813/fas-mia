@@ -22,7 +22,7 @@ certification or legal advice.
 |---|---|---|---|---|
 | Unique named accounts; username or e-mail sign-in | `users` with unique username and case-insensitive e-mail | `AuthFlowIT` | Met | |
 | Strong password policy and hashing | `PasswordPolicy` (12–128, classes, blocked list, history); Argon2id | `PasswordPolicyTest`, `PasswordHashingTest` | Met | Argon2 cost to be tuned on production hardware |
-| MFA for all interactive users | TOTP, mandatory, replay-safe | `TotpTest`, `AuthFlowIT` | Met | E-mail/SMS OTP blocked (C-16); WebAuthn not built |
+| MFA for all interactive users | TOTP, mandatory, replay-safe; single-use recovery codes for a lost authenticator, which force a new enrolment | `TotpTest`, `AuthFlowIT`, `MfaRecoveryIT` | Met | E-mail/SMS OTP blocked (C-16); WebAuthn not built |
 | Lockout and throttling | 5 failures → 15 min lock (database); per-address auth limit; cluster-wide API limit | `AuthFlowIT`, `AuthRateLimitFilterTest`, `ApiRateLimitIT` | Met | |
 | Session security and revocation | Short RS256 access token; rotating refresh token with reuse detection; admin revocation | `AuthFlowIT`, `UserAdminIT` | Met | |
 | Role-based access, deny by default | Permissions per role; `@PreAuthorize` everywhere; `denyAll()` fallback | `SecurityBaselineIT`, `RoleAdminIT` | Met | Role matrix is a proposal (C-08) |

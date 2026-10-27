@@ -64,6 +64,13 @@ test('administrator onboards a user who enrols MFA and sets a password', async (
   const secret = manual!.replace('Manual key:', '').trim();
   await page.getByLabel('6-digit code').fill(totp(secret));
   await page.getByRole('button', { name: 'Verify' }).click();
+  // Recovery codes are shown once; the app opens only after the user confirms saving them.
+  await expect(page.getByRole('heading', { name: 'Save your recovery codes' })).toBeVisible();
+  const recoveryCodes = await page.getByRole('list', { name: 'Recovery codes' }).getByRole('listitem').allTextContents();
+  expect(recoveryCodes).toHaveLength(10);
+  await expect(page.getByRole('button', { name: 'Continue' })).toBeDisabled();
+  await page.getByLabel('I have saved these codes somewhere safe.').check();
+  await page.getByRole('button', { name: 'Continue' }).click();
   await expect(page.getByRole('heading', { name: 'Choose a new password' })).toBeVisible();
   await page.getByLabel('Current password').fill(temporary);
   await page.getByLabel('New password', { exact: true }).fill(final);
@@ -91,5 +98,22 @@ test('administrator onboards a user who enrols MFA and sets a password', async (
   await signIn(page, username, final);
   await page.getByLabel('6-digit code').fill(totp(secret));
   await page.getByRole('button', { name: 'Verify' }).click();
+  await expect(page.getByRole('heading', { name: 'Welcome, E2E Accountant' })).toBeVisible();
+
+  // Lost authenticator: a saved recovery code leads straight to setting up a new one.
+  await page.getByRole('button', { name: 'Account menu' }).click();
+  await page.getByRole('menuitem', { name: 'Sign out' }).click();
+  await signIn(page, username, final);
+  await page.getByRole('button', { name: /Use a recovery code/ }).click();
+  await page.getByLabel('Recovery code').fill(recoveryCodes[0]!);
+  await page.getByRole('button', { name: 'Continue' }).click();
+  await expect(page.getByRole('heading', { name: 'Set up your authenticator' })).toBeVisible();
+  const replacement = (await page.getByText(/Manual key:/).textContent())!.replace('Manual key:', '').trim();
+  expect(replacement).not.toBe(secret);
+  await page.getByLabel('6-digit code').fill(totp(replacement));
+  await page.getByRole('button', { name: 'Verify' }).click();
+  await expect(page.getByRole('heading', { name: 'Save your recovery codes' })).toBeVisible();
+  await page.getByLabel('I have saved these codes somewhere safe.').check();
+  await page.getByRole('button', { name: 'Continue' }).click();
   await expect(page.getByRole('heading', { name: 'Welcome, E2E Accountant' })).toBeVisible();
 });

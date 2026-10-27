@@ -23,6 +23,7 @@ export interface CurrentUser {
   permissions: string[];
   mustChangePassword: boolean;
   mfaEnrolled: boolean;
+  recoveryCodesRemaining: number;
   lastLoginAt: string | null;
 }
 
@@ -32,6 +33,8 @@ export interface TokenResponse {
   expiresIn: number;
   sessionExpiresAt: string;
   user: CurrentUser;
+  /** Present only right after an authenticator is enrolled: the one time the codes are shown. */
+  recoveryCodes?: string[];
 }
 
 export interface Page<T> {

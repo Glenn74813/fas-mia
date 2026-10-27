@@ -24,6 +24,7 @@ clarification item).
 | FR-AUTH-12 | MS §9.1 | Account activation / deactivation | identity | 1 | Done-verified | `UserAdminIT` |
 | FR-AUTH-13 | MS §9.1 | Authentication event auditing | audit | 1 | Done-verified | `AuthFlowIT`, `AuditIntegrityIT` |
 | FR-AUTH-14 | MS §9.1 | Forced password change for admin-issued temporary passwords | security | 1 | Done-verified | `AuthFlowIT.temporaryPasswordRestrictsAccess` |
+| FR-AUTH-15 | MS §9.2 | Recovery codes for a lost authenticator: shown once, hashed, single use, re-enrolment required, replaceable with a current code, withdrawn by an MFA reset | security | 5 | Done-verified | `MfaRecoveryIT`, `MfaPage.test.tsx`, e2e `admin-onboarding.spec.ts` |
 | FR-RBAC-01 | MS §9.3 | Configurable roles separated from fine-grained permissions | identity | 1 | Done-verified | `RoleAdminIT` |
 | FR-UI-01 | MS §12 | SPA: sign-in, MFA enrolment, forced password change, permission-driven navigation, user/role admin, audit viewer, separate portal shell | frontend | 1 | Done-verified | Vitest (17 tests), Playwright `admin-onboarding.spec.ts` against live stack |
 | FR-RBAC-02 | MS §9.3 | Deny by default, least privilege | config | 1 | Done-verified | `SecurityBaselineIT` |
