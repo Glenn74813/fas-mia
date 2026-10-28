@@ -1,4 +1,4 @@
-import { useEffect, useId, useMemo, useRef, useState } from 'react';
+import { useEffect, useId, useLayoutEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
 
 export interface ComboOption {
   value: string;
@@ -33,6 +33,8 @@ export function Combobox({ value, onChange, options, placeholder = 'Select…', 
   const [text, setText] = useState('');
   const [active, setActive] = useState(0);
   const listRef = useRef<HTMLUListElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [place, setPlace] = useState<CSSProperties>({});
   const selected = options.find((o) => o.value === value);
 
   const matches = useMemo(() => {
@@ -44,6 +46,24 @@ export function Combobox({ value, onChange, options, placeholder = 'Select…', 
   useEffect(() => {
     listRef.current?.querySelector<HTMLElement>(`[data-index="${active}"]`)?.scrollIntoView?.({ block: 'nearest' });
   }, [active, open]);
+
+  // The list is placed against the window, so a table's scroll box (overflow) cannot clip it; it opens upwards when
+  // there is more room above the field than below.
+  useLayoutEffect(() => {
+    if (!open) return;
+    const update = () => {
+      const r = inputRef.current?.getBoundingClientRect();
+      if (!r) return;
+      const below = window.innerHeight - r.bottom;
+      const up = below < 240 && r.top > below;
+      setPlace({ position: 'fixed', left: r.left, minWidth: r.width, maxHeight: Math.max(160, Math.min(288, (up ? r.top : below) - 12)),
+        ...(up ? { bottom: window.innerHeight - r.top + 4 } : { top: r.bottom + 4 }) });
+    };
+    update();
+    window.addEventListener('scroll', update, true);
+    window.addEventListener('resize', update);
+    return () => { window.removeEventListener('scroll', update, true); window.removeEventListener('resize', update); };
+  }, [open]);
 
   const show = () => {
     if (disabled) return;
@@ -61,6 +81,7 @@ export function Combobox({ value, onChange, options, placeholder = 'Select…', 
     <div className={`relative ${className.includes('w-full') ? 'block w-full' : 'inline-block'}`}>
       <input
         {...rest}
+        ref={inputRef}
         id={id}
         type="text"
         role="combobox"
@@ -98,7 +119,7 @@ export function Combobox({ value, onChange, options, placeholder = 'Select…', 
       </svg>
       {open && (
         <ul ref={listRef} id={listId} role="listbox"
-          className="absolute left-0 z-30 mt-1 max-h-72 min-w-full w-max max-w-[36rem] overflow-auto rounded-md border border-slate-200 bg-white py-1 text-sm shadow-lg">
+          style={place} className="z-50 w-max max-w-[36rem] overflow-auto rounded-md border border-slate-200 bg-white py-1 text-sm shadow-lg">
           {rows.map((o, i) => (
             <li key={o.value || '__empty'} id={`${listId}-${i}`} data-index={i} role="option" aria-selected={o.value === value}
               className={`cursor-pointer whitespace-nowrap px-3 py-1.5 ${i === active ? 'bg-brand-50 text-brand-900' : ''} ${o.value ? '' : 'text-slate-500'} ${o.value === value ? 'font-medium' : ''}`}
