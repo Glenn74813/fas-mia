@@ -158,7 +158,7 @@ public class AccountService {
                     }
                     continue;
                 }
-                rows.add(line.split(",", -1));
+                rows.add(splitCsvLine(line));
                 lineNumbers.add(n);
             }
         } catch (IOException e) {
@@ -212,6 +212,35 @@ public class AccountService {
         audit.record(actor, "CHART_OF_ACCOUNTS_IMPORTED", "CHART_OF_ACCOUNTS", null,
                 Map.of("created", created, "placeholder", placeholder));
         return new ImportResult(created, placeholder, List.of());
+    }
+
+    /** One CSV record (RFC 4180 quoting, so titles may contain commas). */
+    static String[] splitCsvLine(String line) {
+        List<String> fields = new ArrayList<>();
+        StringBuilder f = new StringBuilder();
+        boolean quoted = false;
+        for (int i = 0; i < line.length(); i++) {
+            char c = line.charAt(i);
+            if (quoted) {
+                if (c == '"' && i + 1 < line.length() && line.charAt(i + 1) == '"') {
+                    f.append('"');
+                    i++;
+                } else if (c == '"') {
+                    quoted = false;
+                } else {
+                    f.append(c);
+                }
+            } else if (c == '"' && f.isEmpty()) {
+                quoted = true;
+            } else if (c == ',') {
+                fields.add(f.toString());
+                f.setLength(0);
+            } else {
+                f.append(c);
+            }
+        }
+        fields.add(f.toString());
+        return fields.toArray(String[]::new);
     }
 
     private Account build(AccountRequest req, boolean placeholder, Actor actor) {

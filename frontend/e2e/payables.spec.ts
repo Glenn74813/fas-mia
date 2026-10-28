@@ -45,7 +45,7 @@ test('a supplier invoice is recognised, paid by check and reconciled, each step 
   await page.getByLabel('Input VAT').selectOption({ label: 'PLC-VAT-IN (0.1200)' });
   await page.getByLabel('Accounting date').fill(today);
   await page.getByLabel('Description', { exact: true }).fill('Aircon preventive maintenance, terminal 3');
-  await page.getByLabel('Line 1 account').selectOption({ label: 'PLC-5202 — [PLACEHOLDER] Repairs and maintenance' });
+  await page.getByLabel('Line 1 account').selectOption({ label: '50213050 — Repairs and Maintenance-Machinery and Equipment' });
   await page.getByLabel('Line 1 cost centre').selectOption({ label: 'PLC-CC-OPS' });
   await page.getByLabel('Line 1 net amount').fill('20000.00');
   await page.getByRole('button', { name: 'Save draft' }).click();

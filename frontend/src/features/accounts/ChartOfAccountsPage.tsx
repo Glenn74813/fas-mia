@@ -26,6 +26,7 @@ export function ChartOfAccountsPage() {
   const qc = useQueryClient();
   const chart = useChart();
   const [q, setQ] = useState('');
+  const [showInactive, setShowInactive] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
   const importCsv = useMutation({
     mutationFn: (file: File) => accountApi.importCsv(file, false),
@@ -35,7 +36,9 @@ export function ChartOfAccountsPage() {
   if (chart.error) return <ErrorAlert error={chart.error} />;
   const byId = new Map(chart.data.accounts.map((a) => [a.id, a]));
   const needle = q.trim().toLowerCase();
-  const rows = chart.data.accounts.filter((a) => !needle || a.code.toLowerCase().includes(needle) || a.name.toLowerCase().includes(needle));
+  const inactive = chart.data.accounts.filter((a) => a.status !== 'ACTIVE').length;
+  const rows = chart.data.accounts.filter((a) => (showInactive || a.status === 'ACTIVE')
+    && (!needle || a.code.toLowerCase().includes(needle) || a.name.toLowerCase().includes(needle)));
 
   return (
     <>
@@ -58,6 +61,12 @@ export function ChartOfAccountsPage() {
       {importCsv.data && <p role="status" className="mb-3 text-sm text-emerald-700">{importCsv.data.created} accounts imported.</p>}
       <input aria-label="Filter accounts" placeholder="Filter by code or name" value={q} onChange={(e) => setQ(e.target.value)}
         className="mb-3 w-72 rounded-lg border border-slate-300 px-3 py-2 shadow-xs text-sm" />
+      {inactive > 0 && (
+        <label className="mb-3 ml-4 inline-flex items-center gap-2 text-sm text-slate-600">
+          <input type="checkbox" checked={showInactive} onChange={(e) => setShowInactive(e.target.checked)} />
+          Show {inactive} inactive accounts (kept for their posted history)
+        </label>
+      )}
       <div className="overflow-x-auto rounded-xl border border-slate-200/80 bg-white shadow-xs">
         <table className="min-w-full text-sm">
           <thead className="border-b border-slate-200 bg-slate-50/80 text-left text-[11px] font-semibold uppercase tracking-wider text-slate-500">
@@ -77,7 +86,7 @@ export function ChartOfAccountsPage() {
                   {a.subsidiaryType && <Badge tone="blue">{`SL: ${a.subsidiaryType}`}</Badge>}
                   {a.placeholder && <Badge tone="amber">PLACEHOLDER</Badge>}
                 </td>
-                <td className="px-3 py-1.5 text-xs">{a.fsLineCode ?? '—'}</td>
+                <td className="whitespace-nowrap px-3 py-1.5 text-xs">{a.fsLineCode ?? '—'}</td>
                 <td className="px-3 py-1.5"><StatusBadge status={a.status} /></td>
               </tr>
             ))}

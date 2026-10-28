@@ -59,7 +59,7 @@ test('a period closes only with justified waivers, refuses postings once closed,
   const cc = ((await (await ctx.get(`${API}/api/v1/cost-centers`)).json()) as { id: string; code: string }[]).find((c) => c.code === 'PLC-CC-FIN')!.id;
   const res = await ctx.post(`${API}/api/v1/journal-vouchers`, { data: { voucherType: 'STANDARD', accountingDate: period.startDate,
     adjustmentPeriod: false, description: 'E2E posting into a closed period', lines: [
-      { accountId: id('PLC-5201'), costCenterId: cc, debit: '10.00', credit: '0' }, { accountId: id('PLC-1102'), debit: '0', credit: '10.00' }] } });
+      { accountId: id('50204020'), costCenterId: cc, debit: '10.00', credit: '0' }, { accountId: id('10102020'), debit: '0', credit: '10.00' }] } });
   expect(res.status()).toBeGreaterThanOrEqual(400);
   expect(await res.text()).toMatch(/closed/i);
   await ctx.dispose();

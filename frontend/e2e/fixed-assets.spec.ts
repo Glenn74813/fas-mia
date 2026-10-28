@@ -76,7 +76,7 @@ test('an asset is registered, activated, depreciated and disposed of, each contr
   await page.getByLabel('In-service date').fill(inService);
   await page.getByLabel('Cost', { exact: true }).fill('60000.00');
   await page.getByLabel('Other (donation, transfer-in, found)').check();
-  await page.getByLabel('Offset account').selectOption({ label: 'PLC-4203 — [PLACEHOLDER] Miscellaneous income' });
+  await page.getByLabel('Offset account').selectOption({ label: '40699990 — Miscellaneous Income' });
   await page.getByLabel('Justification').fill('Donated by an airline partner, deed of donation attached');
   await page.getByRole('button', { name: 'Save draft' }).click();
   await expect(page.getByRole('heading', { name: 'Asset (draft)' })).toBeVisible();

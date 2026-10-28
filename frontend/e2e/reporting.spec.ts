@@ -18,8 +18,8 @@ test('the statement of financial position balances on screen and exports to XLSX
   await nextTotpWindow();
   await signIn(page, chief);
   await nav(page, 'Financial statements');
-  await page.getByLabel('Statement').selectOption({ label: '[PLACEHOLDER] Statement of Financial Position (v1)' });
-  await expect(page.getByRole('heading', { name: '[PLACEHOLDER] Statement of Financial Position' })).toBeVisible();
+  await page.getByLabel('Statement').selectOption({ label: 'Statement of Financial Position (v1)' });
+  await expect(page.getByRole('heading', { name: 'Statement of Financial Position' })).toBeVisible();
   await expect(page.getByText('BALANCED', { exact: true })).toBeVisible();
   await expect(page.getByText('Accounts with balances not shown on this statement')).toHaveCount(0);
   const totalAssets = (await page.getByRole('row', { name: /^Total assets/ }).getByRole('cell').nth(1).textContent())!;
@@ -34,18 +34,18 @@ test('the statement of financial position balances on screen and exports to XLSX
   const download = page.waitForEvent('download');
   await row.getByRole('button', { name: 'Download' }).click();
   const file = await download;
-  expect(file.suggestedFilename()).toMatch(/^PLC-SFP_.*\.xlsx$/);
+  expect(file.suggestedFilename()).toMatch(/^RCA-SFP_.*\.xlsx$/);
 
   // Movement statements: the cash flow statement reconciles opening and closing cash, and the statement of changes in
   // equity agrees with the equity on the statement of financial position.
   await nav(page, 'Financial statements');
-  await page.getByLabel('Statement').selectOption({ label: '[PLACEHOLDER] Cash Flow Statement (v1)' });
-  await expect(page.getByRole('heading', { name: '[PLACEHOLDER] Cash Flow Statement' })).toBeVisible();
-  await expect(page.getByRole('row', { name: /^Collections from customers and other revenue/ })).toBeVisible();
+  await page.getByLabel('Statement').selectOption({ label: 'Statement of Cash Flows (v1)' });
+  await expect(page.getByRole('heading', { name: 'Statement of Cash Flows' })).toBeVisible();
+  await expect(page.getByRole('row', { name: /^Collections from customers and other income/ })).toBeVisible();
   await expect(page.getByText('BALANCED', { exact: true })).toBeVisible();
   await expect(page.getByText('Movements not classified by any line of this statement')).toHaveCount(0);
-  await page.getByLabel('Statement').selectOption({ label: '[PLACEHOLDER] Statement of Changes in Equity (v1)' });
-  await expect(page.getByRole('heading', { name: '[PLACEHOLDER] Statement of Changes in Equity' })).toBeVisible();
+  await page.getByLabel('Statement').selectOption({ label: 'Statement of Changes in Equity (v1)' });
+  await expect(page.getByRole('heading', { name: 'Statement of Changes in Equity' })).toBeVisible();
   await expect(page.getByText('BALANCED', { exact: true })).toBeVisible();
 });
 

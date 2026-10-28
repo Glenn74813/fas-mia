@@ -46,7 +46,7 @@ test('a concession invoice is billed, collected with tax withheld, reconciled an
   await page.getByLabel('Customer', { exact: true }).selectOption({ label: `${code} — ${name}` });
   await page.getByLabel('Output VAT').selectOption({ label: 'PLC-VAT-OUT (0.1200)' });
   await page.getByLabel('Description', { exact: true }).fill('Concession rent, retail unit T3-21');
-  await page.getByLabel('Line 1 account').selectOption({ label: 'PLC-4201 — [PLACEHOLDER] Rental income - concessions' });
+  await page.getByLabel('Line 1 account').selectOption({ label: '40202050 — Rent/Lease Income' });
   await page.getByLabel('Line 1 description').fill('Monthly rent');
   await page.getByLabel('Line 1 net amount').fill('50000.00');
   await page.getByRole('button', { name: 'Save draft' }).click();

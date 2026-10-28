@@ -107,7 +107,7 @@ CAS is single-company and PHP-only; FX is C-21).
 |---|---|---|
 | BIR CAS registration, PTU, e-receipts/e-invoices, EIS transmission (RR 9-2009, 8-2022, 11-2025), 2307 | §2.2.1, §3.10, A, B.10 | C-06: EIS schema and Permit to Transmit; registration with BIR. The sandbox adapter and transmission log are ready |
 | BIR monthly VAT, withholding and income tax reports; quarterly COA, annual DBM, GCG reports | §4.5, A, B.5 | C-06, C-07: official formats |
-| Official chart of accounts and account codes | §2.2.1 | C-22, C-07. The framework is settled: MIAA reports under PFRS (2023 COA audit report); its statement headings are public (§8) |
+| MIAA's sub-accounts and confirmation of the proposed account flags | §2.2.1 | C-22, C-07. The framework is settled (PFRS) and COA's Revised Chart of Accounts for Government Corporations (2019) is loaded in development (§8) |
 | PPE lapsing schedule format; revaluation and impairment | A, B.2 | C-07, C-30 |
 | Bank file formats and payment channels | B.3, D | C-11 |
 | Legacy data, volumes and migration plan | §3.7, F | C-12 |
@@ -155,8 +155,10 @@ The open items in §5 were searched in public sources; the findings and sources 
   a government business enterprise (COA Circulars 2015-003 and 2022-003), not under PPSAS. Its statements are the
   Statements of Financial Position, Comprehensive Income, Changes in Equity and Cash Flows, with headings from
   COA's government chart of accounts (Business and Service Income, Personnel Services, Maintenance and Other
-  Operating Expenses, Non-Cash Expenses, Subsidy to Other Funds and so on). The detailed account codes are still
-  needed. The lower-of-cost-and-NRV review (T12) matches PFRS.
+  Operating Expenses, Non-Cash Expenses, Subsidy to Other Funds and so on). The account codes are COA's Revised
+  Chart of Accounts for Government Corporations (2019), Circulars 2020-002 and 2021-005, now loaded in development
+  with statement templates over it; MIAA's sub-accounts and the proposed flags remain to confirm (C-22). The
+  lower-of-cost-and-NRV review (T12) matches PFRS.
 * **NAIA concession (new C-38).** Since 14 September 2024 New NAIA Infra Corp. operates NAIA; MIAA is the regulator
   and receives an upfront payment, a fixed annual payment and 82.16% of covered gross revenues. If the TOR predates
   this, the billing, receivables, concessionaire portal and FMIS interface scope should be restated, and the

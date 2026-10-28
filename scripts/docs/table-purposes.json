@@ -26,7 +26,7 @@
 "budget_reservations": "Amounts reserved against an allocation by submitted documents; released or consumed on posting.",
 "budgets": "The Corporate Operating Budget of a fiscal year (one per year).",
 "business_holidays": "Holiday calendar for business-hours SLA clocks.",
-"chart_of_accounts": "Hierarchical chart of accounts with attributes (type, normal balance, postable, statement line, cost-centre and sub-ledger requirements, budget control, open-item management). Development uses [PLACEHOLDER] PLC- codes (C-22).",
+"chart_of_accounts": "Hierarchical chart of accounts with attributes (type, normal balance, postable, statement line, cost-centre and sub-ledger requirements, budget control, open-item management). Development uses COA's Revised Chart of Accounts for Government Corporations (2019); the former [PLACEHOLDER] PLC- accounts are inactive (C-22).",
 "check_register": "Issued cheques with number, payee, amount and status.",
 "close_task_completions": "A close task ticked off for one scope (day, period, quarter or year) with outcome and note.",
 "close_tasks": "Manual tasks of the close calendar per frequency, with the responsible permission and due offset ([PLACEHOLDER] seed, C-33).",

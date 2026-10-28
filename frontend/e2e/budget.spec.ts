@@ -34,8 +34,8 @@ test('a budget is validated, approved by a second person, and realignments may o
   await expect(page.getByRole('heading', { name: `Corporate Operating Budget ${fy.fiscalYear}` })).toBeVisible();
 
   // Validation: the same account and cost centre twice is refused, with the reason shown.
-  const utilities = 'PLC-5201 — [PLACEHOLDER] Utilities';
-  const repairs = 'PLC-5202 — [PLACEHOLDER] Repairs and maintenance';
+  const utilities = '50204020 — Electricity Expenses';
+  const repairs = '50213050 — Repairs and Maintenance-Machinery and Equipment';
   await page.getByLabel('Allocation 1 account').selectOption({ label: utilities });
   await page.getByLabel('Allocation 1 cost centre').selectOption({ label: 'PLC-CC-FIN' });
   await page.getByLabel('Allocation 1 amount').fill('50000.00');
@@ -53,7 +53,7 @@ test('a budget is validated, approved by a second person, and realignments may o
   await page.getByLabel('Allocation 2 cost centre').selectOption({ label: 'PLC-CC-FIN' });
   await page.getByLabel('Allocation 2 amount').fill('30000.00');
   await page.getByRole('button', { name: 'Save allocations' }).click();
-  await expect(page.getByRole('row', { name: /PLC-5202.*30,000\.00/ }).first()).toBeVisible();
+  await expect(page.getByRole('row', { name: /50213050.*30,000\.00/ }).first()).toBeVisible();
   await act(page, 'Submit', 'Submit', 'Budget call figures for the year.');
   await expect(page.getByRole('main').getByText('SUBMITTED', { exact: true }).first()).toBeVisible();
   // The preparer cannot approve their own budget.
@@ -71,14 +71,14 @@ test('a budget is validated, approved by a second person, and realignments may o
   // A realignment larger than the source's available budget cannot be approved; one within it can.
   await signIn(page, officer);
   await page.goto(budgetUrl);
-  await page.getByLabel('From allocation').selectOption({ label: 'From PLC-5201 / PLC-CC-FIN' });
-  await page.getByLabel('To allocation').selectOption({ label: 'To PLC-5202 / PLC-CC-FIN' });
+  await page.getByLabel('From allocation').selectOption({ label: 'From 50204020 / PLC-CC-FIN' });
+  await page.getByLabel('To allocation').selectOption({ label: 'To 50213050 / PLC-CC-FIN' });
   await page.getByLabel('Adjustment amount').fill('60000.00');
   await page.getByLabel('Adjustment reason').fill('Move utilities savings to repairs');
   await page.getByRole('button', { name: 'Request' }).click();
   await expect(page.getByText(/60,000\.00/).first()).toBeVisible();
-  await page.getByLabel('From allocation').selectOption({ label: 'From PLC-5201 / PLC-CC-FIN' });
-  await page.getByLabel('To allocation').selectOption({ label: 'To PLC-5202 / PLC-CC-FIN' });
+  await page.getByLabel('From allocation').selectOption({ label: 'From 50204020 / PLC-CC-FIN' });
+  await page.getByLabel('To allocation').selectOption({ label: 'To 50213050 / PLC-CC-FIN' });
   await page.getByLabel('Adjustment amount').fill('5000.00');
   await page.getByLabel('Adjustment reason').fill('Urgent roof repair in the terminal');
   await page.getByRole('button', { name: 'Request' }).click();
@@ -97,8 +97,8 @@ test('a budget is validated, approved by a second person, and realignments may o
   const fits = page.getByRole('listitem').filter({ hasText: 'Urgent roof repair' });
   await fits.getByRole('button', { name: 'Approve' }).click();
   await expect(fits.getByText('APPROVED')).toBeVisible();
-  await expect(page.getByRole('row', { name: /PLC-5201.*45,000\.00/ }).first()).toBeVisible();
-  await expect(page.getByRole('row', { name: /PLC-5202.*35,000\.00/ }).first()).toBeVisible();
+  await expect(page.getByRole('row', { name: /50204020.*45,000\.00/ }).first()).toBeVisible();
+  await expect(page.getByRole('row', { name: /50213050.*35,000\.00/ }).first()).toBeVisible();
 
   // Variance analysis of the same budget: nothing is spent yet in this future year, so the full budget to date is favourable.
   await nav(page, 'My reports');
@@ -117,5 +117,5 @@ test('a budget is validated, approved by a second person, and realignments may o
   expect(file.suggestedFilename()).toBe(`variance_analysis_${fy.fiscalYear}_p06.csv`);
   const text = (await import('node:fs')).readFileSync((await file.path())!, 'utf8');
   expect(text).toContain('Variance analysis: budget against actual');
-  expect(text).toMatch(/PLC-5201[^\n]*,45000\.00,22500\.00,0\.00,22500\.00,100\.0,45000\.00,"Favourable"/);
+  expect(text).toMatch(/50204020[^\n]*,45000\.00,22500\.00,0\.00,22500\.00,100\.0,45000\.00,"Favourable"/);
 });

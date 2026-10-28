@@ -13,6 +13,9 @@ fi
 export CAS_JWT_PRIVATE_KEY_PATH="$PWD/.secrets/jwt_private.pem" CAS_JWT_PUBLIC_KEY_PATH="$PWD/.secrets/jwt_public.pem"
 export SPRING_PROFILES_ACTIVE=prod CAS_OPENAPI_ENABLED=false
 export SERVER_ADDRESS=127.0.0.1 MANAGEMENT_SERVER_ADDRESS=127.0.0.1
+# The demo's approved budget was entered on the old placeholder accounts, so budget checks on the official chart
+# warn rather than block until a budget is approved on the official accounts. Production keeps BLOCK.
+export CAS_BUDGET_ENFORCEMENT="${CAS_BUDGET_ENFORCEMENT:-WARN}"
 # Run from a copy, so rebuilding backend/target while the demo is up cannot pull the jar from under it.
 mkdir -p .devdata
 # Copy then rename: a demo still shutting down keeps reading the old file instead of a half-written one.

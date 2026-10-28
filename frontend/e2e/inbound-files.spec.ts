@@ -23,7 +23,7 @@ test('an accountant checks a payroll file, sees its problems, then turns a good 
 
   // An unbalanced file: kept as INVALID with its problems listed.
   await main.getByLabel('File (.csv, .json or .xml)').setInputFiles({ name: 'payroll-bad.csv', mimeType: 'text/csv',
-    buffer: Buffer.from(`account_code,debit,credit\nPLC-5201,100.00,\nPLC-1102,,90.00\nNO-SUCH,5.00,\n`) });
+    buffer: Buffer.from(`account_code,debit,credit\n50204020,100.00,\n10102020,,90.00\nNO-SUCH,5.00,\n`) });
   await main.getByLabel('Reference').fill(`PR-BAD-${stamp}`);
   await main.getByLabel('Payroll period').fill('2026-10');
   await main.getByRole('button', { name: 'Check file' }).click();
@@ -31,7 +31,7 @@ test('an accountant checks a payroll file, sees its problems, then turns a good 
 
   // A good one: VALIDATED, then drafts.
   await main.getByLabel('File (.csv, .json or .xml)').setInputFiles({ name: 'payroll.csv', mimeType: 'text/csv',
-    buffer: Buffer.from(`account_code,cost_center_code,description,debit,credit\nPLC-5201,PLC-CC-FIN,Salaries ${stamp},250.00,\nPLC-1102,,Net pay,,250.00\n`) });
+    buffer: Buffer.from(`account_code,cost_center_code,description,debit,credit\n50204020,PLC-CC-FIN,Salaries ${stamp},250.00,\n10102020,,Net pay,,250.00\n`) });
   await main.getByLabel('Reference').fill(`PR-${stamp}`);
   await main.getByLabel('Payroll period').fill('2026-10');
   await main.getByRole('button', { name: 'Check file' }).click();

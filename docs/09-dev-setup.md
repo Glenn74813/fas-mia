@@ -64,7 +64,18 @@ cd frontend && npm ci && npm run dev
 With the `dev` profile and an empty database, the backend loads the **placeholder** chart of accounts
 (`backend/src/main/resources/seed/placeholder-chart-of-accounts.csv`, `PLC-` codes, every account flagged
 `placeholder`), placeholder cost centres, and the current fiscal year with periods opened up to the current
-month. Never enable `cas.accounting.allow-placeholder-accounts` outside development and testing.
+month. It then moves the setup onto COA's **Revised Chart of Accounts for Government Corporations (2019)**
+(`seed/coa-rca-gc-2019.csv`; `DevOfficialChart`): account mappings, tax codes, bank accounts, asset categories,
+stock items and similar settings follow `seed/plc-to-rca-gc-2019.csv`, the `RCA-` statement templates replace the
+`PLC-` ones, and the placeholder accounts are deactivated. Their posted history stays and is reported under the
+official statement lines. One changeover entry (source `SL_CHART_CHANGEOVER`, attributed to the service user
+`system.conversion`, which cannot sign in) moves the balance-sheet balances onto the official accounts per cost centre
+and sub-ledger account, so the payables and receivables control accounts reconcile; income and expense stay where
+they were posted. The entry is written outside the voucher approval workflow, which the audit trail records. Integration tests keep using the placeholder chart. Never enable
+`cas.accounting.allow-placeholder-accounts` outside development and testing.
+
+The public demo (`scripts/run-backend-demo.sh`) runs budget control in WARN mode because its approved budget
+was entered on the placeholder accounts; production keeps BLOCK.
 
 ## Tests
 

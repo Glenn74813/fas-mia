@@ -1,0 +1,1337 @@
+# Revised Chart of Accounts for Government Corporations (2019), prescribed under COA Circular No. 2020-002 dated
+# January 28, 2020, as listed in Annex A of COA Circular No. 2021-005 dated July 22, 2021 (right-hand column).
+# Codes and titles are COA's. fsLineCode groups accounts on the statement lines of MIAA's audited statements; the
+# cost-centre, subsidiary-ledger and budget-control flags are CAS proposals for MIAA to confirm (C-07, C-10, C-22).
+code,name,type,normalBalance,parentCode,postable,fsLineCode,requiresCostCenter,subsidiaryType,budgetControlled
+1,Assets,ASSET,DEBIT,,false,,false,,false
+101,Cash and Cash Equivalents,ASSET,DEBIT,1,false,RCA-SFP-CASH,false,,false
+10101,Cash on Hand,ASSET,DEBIT,101,false,RCA-SFP-CASH,false,,false
+10101010,Cash-Collecting Officers,ASSET,DEBIT,10101,true,RCA-SFP-CASH,false,,false
+10101020,Petty Cash,ASSET,DEBIT,10101,true,RCA-SFP-CASH,false,,false
+10101030,Local Currency on Hand,ASSET,DEBIT,10101,true,RCA-SFP-CASH,false,,false
+10101040,Foreign Currency on Hand,ASSET,DEBIT,10101,true,RCA-SFP-CASH,false,,false
+10101050,Checks and Other Cash Items,ASSET,DEBIT,10101,true,RCA-SFP-CASH,false,,false
+10101060,Treasury Fund Capital,ASSET,DEBIT,10101,true,RCA-SFP-CASH,false,,false
+10102,Cash in Bank-Local Currency,ASSET,DEBIT,101,false,RCA-SFP-CASH,false,,false
+10102010,"Cash in Bank-Local Currency, Bangko Sentral ng Pilipinas",ASSET,DEBIT,10102,true,RCA-SFP-CASH,false,,false
+10102020,"Cash in Bank-Local Currency, Current Account",ASSET,DEBIT,10102,true,RCA-SFP-CASH,false,,false
+10102030,"Cash in Bank-Local Currency, Savings Account",ASSET,DEBIT,10102,true,RCA-SFP-CASH,false,,false
+10102050,Due from Bangko Sentral ng Pilipinas-Local Currency,ASSET,DEBIT,10102,true,RCA-SFP-CASH,false,,false
+10102060,Due from Other Banks-Local Currency,ASSET,DEBIT,10102,true,RCA-SFP-CASH,false,,false
+10103,Cash in Bank-Foreign Currency,ASSET,DEBIT,101,false,RCA-SFP-CASH,false,,false
+10103010,"Cash in Bank-Foreign Currency, Bangko Sentral ng Pilipinas",ASSET,DEBIT,10103,true,RCA-SFP-CASH,false,,false
+10103020,"Cash in Bank-Foreign Currency, Current Account",ASSET,DEBIT,10103,true,RCA-SFP-CASH,false,,false
+10103030,"Cash in Bank-Foreign Currency, Savings Account",ASSET,DEBIT,10103,true,RCA-SFP-CASH,false,,false
+10103050,Due from Bangko Sentral ng Pilipinas-Foreign Currency,ASSET,DEBIT,10103,true,RCA-SFP-CASH,false,,false
+10103060,Due from Other Banks-Foreign Currency,ASSET,DEBIT,10103,true,RCA-SFP-CASH,false,,false
+10105,Cash Equivalents,ASSET,DEBIT,101,false,RCA-SFP-CASH,false,,false
+10105010,Treasury Bills,ASSET,DEBIT,10105,true,RCA-SFP-CASH,false,,false
+10105020,Time Deposits-Local Currency,ASSET,DEBIT,10105,true,RCA-SFP-CASH,false,,false
+10105030,Time Deposits-Foreign Currency,ASSET,DEBIT,10105,true,RCA-SFP-CASH,false,,false
+10105040,Treasury Bonds,ASSET,DEBIT,10105,true,RCA-SFP-CASH,false,,false
+10105050,Cash in Transit,ASSET,DEBIT,10105,true,RCA-SFP-CASH,false,,false
+10105060,Special Savings Deposit-Local Currency,ASSET,DEBIT,10105,true,RCA-SFP-CASH,false,,false
+10105070,Special Savings Deposit-Foreign Currency,ASSET,DEBIT,10105,true,RCA-SFP-CASH,false,,false
+102,Investments,ASSET,DEBIT,1,false,RCA-SFP-FIN,false,,false
+10201,Financial Assets at Fair Value Through Surplus/Profit or Deficit/Loss,ASSET,DEBIT,102,false,RCA-SFP-FIN,false,,false
+10201010,Financial Assets Held for Trading,ASSET,DEBIT,10201,true,RCA-SFP-FIN,false,,false
+10201020,Financial Assets Designated at Fair Value Through Surplus/Profit or Deficit/Loss,ASSET,DEBIT,10201,true,RCA-SFP-FIN,false,,false
+10201030,Derivative Financial Assets Held for Trading,ASSET,DEBIT,10201,true,RCA-SFP-FIN,false,,false
+10201040,Derivative Financial Assets Designated at Fair Value Through Surplus/Profit or Deficit/Loss,ASSET,DEBIT,10201,true,RCA-SFP-FIN,false,,false
+10202,Financial Assets-Held to Maturity,ASSET,DEBIT,102,false,RCA-SFP-FIN,false,,false
+10202010,Investments in Treasury Bills-Local,ASSET,DEBIT,10202,true,RCA-SFP-FIN,false,,false
+10202012,Allowance for Impairment-Investments in Treasury Bills-Local,ASSET,CREDIT,10202,true,RCA-SFP-FIN,false,,false
+10202020,Investments in Treasury Bills-Foreign,ASSET,DEBIT,10202,true,RCA-SFP-FIN,false,,false
+10202022,Allowance for Impairment-Investments in Treasury Bills-Foreign,ASSET,CREDIT,10202,true,RCA-SFP-FIN,false,,false
+10202050,Investments in Bonds-Local,ASSET,DEBIT,10202,true,RCA-SFP-FIN,false,,false
+10202052,Allowance for Impairment-Investments in Bonds-Local,ASSET,CREDIT,10202,true,RCA-SFP-FIN,false,,false
+10202053,Premium on Investments in Bonds-Local,ASSET,DEBIT,10202,true,RCA-SFP-FIN,false,,false
+10202054,Discount on Investments in Bonds-Local,ASSET,CREDIT,10202,true,RCA-SFP-FIN,false,,false
+10202060,Investments in Bonds-Foreign,ASSET,DEBIT,10202,true,RCA-SFP-FIN,false,,false
+10202062,Allowance for Impairment-Investments in Bonds-Foreign,ASSET,CREDIT,10202,true,RCA-SFP-FIN,false,,false
+10202063,Premium on Investments in Bonds-Foreign,ASSET,DEBIT,10202,true,RCA-SFP-FIN,false,,false
+10202064,Discount on Investments in Bonds-Foreign,ASSET,CREDIT,10202,true,RCA-SFP-FIN,false,,false
+10205,Investments in Joint Ventures,ASSET,DEBIT,102,false,RCA-SFP-FIN,false,,false
+10205010,Investments in Joint Ventures,ASSET,DEBIT,10205,true,RCA-SFP-FIN,false,,false
+10205012,Allowance for Impairment-Investments in Joint Ventures,ASSET,CREDIT,10205,true,RCA-SFP-FIN,false,,false
+10206,Investments in Associates/Affiliates,ASSET,DEBIT,102,false,RCA-SFP-FIN,false,,false
+10206010,Investments in Associates/Affiliates,ASSET,DEBIT,10206,true,RCA-SFP-FIN,false,,false
+10206012,Allowance for Impairment-Investments in Associates/Affiliates,ASSET,CREDIT,10206,true,RCA-SFP-FIN,false,,false
+10207,Sinking Fund,ASSET,DEBIT,102,false,RCA-SFP-FIN,false,,false
+10207010,Sinking Fund,ASSET,DEBIT,10207,true,RCA-SFP-FIN,false,,false
+10208,Financial Assets-Available for Sale Securities,ASSET,DEBIT,102,false,RCA-SFP-FIN,false,,false
+10208010,Available for Sale Securities,ASSET,DEBIT,10208,true,RCA-SFP-FIN,false,,false
+10208012,Allowance for Impairment-Available for Sale Securities,ASSET,CREDIT,10208,true,RCA-SFP-FIN,false,,false
+10209,Financial Assets-Domestic Investments,ASSET,DEBIT,102,false,RCA-SFP-FIN,false,,false
+10209010,Domestic Securities,ASSET,DEBIT,10209,true,RCA-SFP-FIN,false,,false
+10209012,Allowance for Impairment-Domestic Securities,ASSET,CREDIT,10209,true,RCA-SFP-FIN,false,,false
+10209020,Domestic Securities Purchased Under Repurchase Agreement,ASSET,DEBIT,10209,true,RCA-SFP-FIN,false,,false
+10209022,Allowance for Impairment-Domestic Securities Purchased Under Repurchase Agreement,ASSET,CREDIT,10209,true,RCA-SFP-FIN,false,,false
+10209030,Due from Local Banks,ASSET,DEBIT,10209,true,RCA-SFP-FIN,false,,false
+10209032,Allowance for Impairment-Due from Local Banks,ASSET,CREDIT,10209,true,RCA-SFP-FIN,false,,false
+10210,Investments in Subsidiaries,ASSET,DEBIT,102,false,RCA-SFP-FIN,false,,false
+10210010,Investments in Subsidiaries,ASSET,DEBIT,10210,true,RCA-SFP-FIN,false,,false
+10210012,Allowance for Impairment-Investments in Subsidiaries,ASSET,CREDIT,10210,true,RCA-SFP-FIN,false,,false
+10211,Investments in Time Deposits,ASSET,DEBIT,102,false,RCA-SFP-FIN,false,,false
+10211010,Investments in Time Deposits-Local Currency,ASSET,DEBIT,10211,true,RCA-SFP-FIN,false,,false
+10211020,Investments in Time Deposits-Foreign Currency,ASSET,DEBIT,10211,true,RCA-SFP-FIN,false,,false
+10212,Investment Securities at Amortized Cost,ASSET,DEBIT,102,false,RCA-SFP-FIN,false,,false
+10212010,Investment Securities at Amortized Cost,ASSET,DEBIT,10212,true,RCA-SFP-FIN,false,,false
+10212012,Allowance for Impairment-Investment Securities at Amortized Cost,ASSET,CREDIT,10212,true,RCA-SFP-FIN,false,,false
+10213,Financial Assets at Fair Value Through Other Comprehensive Income,ASSET,DEBIT,102,false,RCA-SFP-FIN,false,,false
+10213010,Financial Assets at Fair Value Through Other Comprehensive Income,ASSET,DEBIT,10213,true,RCA-SFP-FIN,false,,false
+10214,Investments in Branch,ASSET,DEBIT,102,false,RCA-SFP-FIN,false,,false
+10214010,Investments in Branch,ASSET,DEBIT,10214,true,RCA-SFP-FIN,false,,false
+10299,Other Investments,ASSET,DEBIT,102,false,RCA-SFP-FIN,false,,false
+10299010,Investments in Stocks,ASSET,DEBIT,10299,true,RCA-SFP-FIN,false,,false
+10299012,Allowance for Impairment-Investments in Stocks,ASSET,CREDIT,10299,true,RCA-SFP-FIN,false,,false
+10299020,Investments in Non-Marketable Securities,ASSET,DEBIT,10299,true,RCA-SFP-FIN,false,,false
+10299022,Allowance for Impairment-Investments in Non-Marketable Securities,ASSET,CREDIT,10299,true,RCA-SFP-FIN,false,,false
+10299990,Other Investments,ASSET,DEBIT,10299,true,RCA-SFP-FIN,false,,false
+10299992,Allowance for Impairment-Other Investments,ASSET,CREDIT,10299,true,RCA-SFP-FIN,false,,false
+103,Receivables,ASSET,DEBIT,1,false,RCA-SFP-REC,false,,false
+10301,Loans and Receivable Accounts,ASSET,DEBIT,103,false,RCA-SFP-REC,false,,false
+10301010,Accounts Receivable,ASSET,DEBIT,10301,true,RCA-SFP-REC,false,CUSTOMER,false
+10301012,Allowance for Impairment-Accounts Receivable,ASSET,CREDIT,10301,true,RCA-SFP-REC,false,,false
+10301020,Notes Receivable,ASSET,DEBIT,10301,true,RCA-SFP-REC,false,,false
+10301022,Allowance for Impairment-Notes Receivable,ASSET,CREDIT,10301,true,RCA-SFP-REC,false,,false
+10301040,Loans Receivable-Local Government Units,ASSET,DEBIT,10301,true,RCA-SFP-REC,false,,false
+10301042,Allowance for Impairment-Loans Receivable-Local Government Units,ASSET,CREDIT,10301,true,RCA-SFP-REC,false,,false
+10301050,Interests Receivable,ASSET,DEBIT,10301,true,RCA-SFP-REC,false,,false
+10301052,Allowance for Impairment-Interests Receivable,ASSET,CREDIT,10301,true,RCA-SFP-REC,false,,false
+10301060,Dividends Receivable,ASSET,DEBIT,10301,true,RCA-SFP-REC,false,,false
+10301062,Allowance for Impairment-Dividends Receivable,ASSET,CREDIT,10301,true,RCA-SFP-REC,false,,false
+10301070,Loans Receivable-Other Government Corporations,ASSET,DEBIT,10301,true,RCA-SFP-REC,false,,false
+10301072,Allowance for Impairment-Loans Receivable-Other Government Corporations,ASSET,CREDIT,10301,true,RCA-SFP-REC,false,,false
+10301080,Subrogated Claims Receivable,ASSET,DEBIT,10301,true,RCA-SFP-REC,false,,false
+10301082,Allowance for Impairment-Subrogated Claims Receivable,ASSET,CREDIT,10301,true,RCA-SFP-REC,false,,false
+10301090,Contributions and Premiums Receivable,ASSET,DEBIT,10301,true,RCA-SFP-REC,false,,false
+10301092,Allowance for Impairment-Contributions and Premiums Receivable,ASSET,CREDIT,10301,true,RCA-SFP-REC,false,,false
+10301100,Mortgage Contracts Receivable,ASSET,DEBIT,10301,true,RCA-SFP-REC,false,,false
+10301102,Allowance for Impairment-Mortgage Contracts Receivable,ASSET,CREDIT,10301,true,RCA-SFP-REC,false,,false
+10301110,Loans to Bangko Sentral ng Pilipinas,ASSET,DEBIT,10301,true,RCA-SFP-REC,false,,false
+10301112,Allowance for Impairment-Loans to Bangko Sentral ng Pilipinas,ASSET,CREDIT,10301,true,RCA-SFP-REC,false,,false
+10301120,Inter-bank Loans Receivable,ASSET,DEBIT,10301,true,RCA-SFP-REC,false,,false
+10301122,Allowance for Impairment-Inter-bank Loans Receivable,ASSET,CREDIT,10301,true,RCA-SFP-REC,false,,false
+10301130,Deficiency Claims Receivable,ASSET,DEBIT,10301,true,RCA-SFP-REC,false,,false
+10301132,Allowance for Impairment-Deficiency Claims Receivable,ASSET,CREDIT,10301,true,RCA-SFP-REC,false,,false
+10301150,Accrued Service Fee Receivable,ASSET,DEBIT,10301,true,RCA-SFP-REC,false,,false
+10301152,Allowance for Impairment-Accrued Service Fee Receivable,ASSET,CREDIT,10301,true,RCA-SFP-REC,false,,false
+10301160,Sales Contract Receivable,ASSET,DEBIT,10301,true,RCA-SFP-REC,false,,false
+10301162,Allowance for Impairment-Sales Contract Receivable,ASSET,CREDIT,10301,true,RCA-SFP-REC,false,,false
+10301164,Sales Contract Receivable-Discount,ASSET,CREDIT,10301,true,RCA-SFP-REC,false,,false
+10301170,Reinsurance Receivable,ASSET,DEBIT,10301,true,RCA-SFP-REC,false,,false
+10301172,Allowance for Impairment-Reinsurance Receivable,ASSET,CREDIT,10301,true,RCA-SFP-REC,false,,false
+10301180,Due from Head Office/Branches/Agencies Abroad,ASSET,DEBIT,10301,true,RCA-SFP-REC,false,,false
+10301182,Allowance for Impairment-Due from Head Office/Branches/Agencies Abroad,ASSET,CREDIT,10301,true,RCA-SFP-REC,false,,false
+10301190,Receivership and Liquidation Receivable,ASSET,DEBIT,10301,true,RCA-SFP-REC,false,,false
+10301192,Allowance for Impairment-Receivership and Liquidation Receivable,ASSET,CREDIT,10301,true,RCA-SFP-REC,false,,false
+10301200,Assigned Receivables,ASSET,DEBIT,10301,true,RCA-SFP-REC,false,,false
+10301202,Allowance for Impairment-Assigned Receivables,ASSET,CREDIT,10301,true,RCA-SFP-REC,false,,false
+10301220,Receivables from Joint Ventures,ASSET,DEBIT,10301,true,RCA-SFP-REC,false,,false
+10301222,Allowance for Impairment-Receivables from Joint Ventures,ASSET,CREDIT,10301,true,RCA-SFP-REC,false,,false
+10301230,Receivables from Joint Operators,ASSET,DEBIT,10301,true,RCA-SFP-REC,false,,false
+10301232,Allowance for Impairment-Receivables from Joint Operators,ASSET,CREDIT,10301,true,RCA-SFP-REC,false,,false
+10301240,Service Concession Arrangements Receivable,ASSET,DEBIT,10301,true,RCA-SFP-REC,false,,false
+10301242,Allowance for Impairment-Service Concession Arrangements Receivable,ASSET,CREDIT,10301,true,RCA-SFP-REC,false,,false
+10301260,Receivable-Collecting Banks/Agents,ASSET,DEBIT,10301,true,RCA-SFP-REC,false,,false
+10301262,Allowance for Impairment-Receivable-Collecting Banks/Agents,ASSET,CREDIT,10301,true,RCA-SFP-REC,false,,false
+10301270,Installment Sales Receivable,ASSET,DEBIT,10301,true,RCA-SFP-REC,false,,false
+10301272,Allowance for Impairment-Installment Sales Receivable,ASSET,CREDIT,10301,true,RCA-SFP-REC,false,,false
+10301280,Loans Receivable,ASSET,DEBIT,10301,true,RCA-SFP-REC,false,,false
+10301282,Allowance for Impairment-Loans Receivable,ASSET,CREDIT,10301,true,RCA-SFP-REC,false,,false
+10301290,Overnight Lending Account,ASSET,DEBIT,10301,true,RCA-SFP-REC,false,,false
+10301300,Power Supply System Revenue Receivable,ASSET,DEBIT,10301,true,RCA-SFP-REC,false,,false
+10301302,Allowance for Impairment-Power Supply System Revenue Receivable,ASSET,CREDIT,10301,true,RCA-SFP-REC,false,,false
+10301310,Contracts Receivable,ASSET,DEBIT,10301,true,RCA-SFP-REC,false,,false
+10301312,Allowance for Impairment-Contracts Receivable,ASSET,CREDIT,10301,true,RCA-SFP-REC,false,,false
+10301990,Loans Receivables-Others,ASSET,DEBIT,10301,true,RCA-SFP-REC,false,,false
+10301992,Allowance for Impairment-Loans Receivable-Others,ASSET,CREDIT,10301,true,RCA-SFP-REC,false,,false
+10302,Lease Receivable,ASSET,DEBIT,103,false,RCA-SFP-REC,false,,false
+10302010,Operating Lease Receivable,ASSET,DEBIT,10302,true,RCA-SFP-REC,false,,false
+10302012,Allowance for Impairment-Operating Lease Receivable,ASSET,CREDIT,10302,true,RCA-SFP-REC,false,,false
+10302020,Finance Lease Receivable,ASSET,DEBIT,10302,true,RCA-SFP-REC,false,,false
+10302022,Allowance for Impairment-Finance Lease Receivable,ASSET,CREDIT,10302,true,RCA-SFP-REC,false,,false
+10303,Inter-Agency Receivables,ASSET,DEBIT,103,false,RCA-SFP-REC,false,,false
+10303010,Due from National Government Agencies,ASSET,DEBIT,10303,true,RCA-SFP-REC,false,,false
+10303012,Allowance for Impairment-Due from National Government Agencies,ASSET,CREDIT,10303,true,RCA-SFP-REC,false,,false
+10303030,Due from Local Government Units,ASSET,DEBIT,10303,true,RCA-SFP-REC,false,,false
+10303032,Allowance for Impairment-Due from Local Government Units,ASSET,CREDIT,10303,true,RCA-SFP-REC,false,,false
+10303050,Due from Other Government Corporations,ASSET,DEBIT,10303,true,RCA-SFP-REC,false,,false
+10303052,Allowance for Impairment-Due from Other Government Corporations,ASSET,CREDIT,10303,true,RCA-SFP-REC,false,,false
+10303060,Due from Subsidiaries,ASSET,DEBIT,10303,true,RCA-SFP-REC,false,,false
+10303062,Allowance for Impairment-Due from Subsidiaries,ASSET,CREDIT,10303,true,RCA-SFP-REC,false,,false
+10303070,Due from Parent Corporations,ASSET,DEBIT,10303,true,RCA-SFP-REC,false,,false
+10303072,Allowance for Impairment-Due from Parent Corporation,ASSET,CREDIT,10303,true,RCA-SFP-REC,false,,false
+10303080,Due from Associates/Affiliates,ASSET,DEBIT,10303,true,RCA-SFP-REC,false,,false
+10303082,Allowance for Impairment-Due from Associates/Affiliates,ASSET,CREDIT,10303,true,RCA-SFP-REC,false,,false
+10304,Intra-Agency Receivables,ASSET,DEBIT,103,false,RCA-SFP-REC,false,,false
+10304040,Due from Operating/Field Units,ASSET,DEBIT,10304,true,RCA-SFP-REC,false,,false
+10304050,Due from Other Funds,ASSET,DEBIT,10304,true,RCA-SFP-REC,false,,false
+10304060,Due from Central Office/Home/Head Office,ASSET,DEBIT,10304,true,RCA-SFP-REC,false,,false
+10304070,Due from Regional/Branch Offices,ASSET,DEBIT,10304,true,RCA-SFP-REC,false,,false
+10399,Other Receivables,ASSET,DEBIT,103,false,RCA-SFP-REC,false,,false
+10399010,Receivables-Disallowances/Charges,ASSET,DEBIT,10399,true,RCA-SFP-REC,false,,false
+10399020,Due from Officers and Employees,ASSET,DEBIT,10399,true,RCA-SFP-REC,false,EMPLOYEE,false
+10399022,Allowance for Impairment-Due from Officers and Employees,ASSET,CREDIT,10399,true,RCA-SFP-REC,false,,false
+10399030,Due from Non-Government Organizations/Civil Society Organizations,ASSET,DEBIT,10399,true,RCA-SFP-REC,false,,false
+10399032,Allowance for Impairment-Due from Non-Government Organizations/Civil Society Organizations,ASSET,CREDIT,10399,true,RCA-SFP-REC,false,,false
+10399040,Insurance Claims Receivable,ASSET,DEBIT,10399,true,RCA-SFP-REC,false,,false
+10399042,Allowance for Impairment-Insurance Claims Receivable,ASSET,CREDIT,10399,true,RCA-SFP-REC,false,,false
+10399050,Deficiency Judgment Receivable,ASSET,DEBIT,10399,true,RCA-SFP-REC,false,,false
+10399052,Allowance for Impairment-Deficiency Judgment Receivable,ASSET,CREDIT,10399,true,RCA-SFP-REC,false,,false
+10399060,Subscriptions Receivable,ASSET,DEBIT,10399,true,RCA-SFP-REC,false,,false
+10399070,Guarantee Receivables,ASSET,DEBIT,10399,true,RCA-SFP-REC,false,,false
+10399072,Allowance for Impairment-Guarantee Receivables,ASSET,CREDIT,10399,true,RCA-SFP-REC,false,,false
+10399080,Unremitted Recoveries,ASSET,DEBIT,10399,true,RCA-SFP-REC,false,,false
+10399082,Allowance for Impairment-Unremitted Recoveries,ASSET,CREDIT,10399,true,RCA-SFP-REC,false,,false
+10399090,Guaranty Call Receivable,ASSET,DEBIT,10399,true,RCA-SFP-REC,false,,false
+10399092,Allowance for Impairment-Guaranty Call Receivable,ASSET,CREDIT,10399,true,RCA-SFP-REC,false,,false
+10399100,Universal Charge Receivable,ASSET,DEBIT,10399,true,RCA-SFP-REC,false,,false
+10399102,Allowance for Impairment-Universal Charge Receivable,ASSET,CREDIT,10399,true,RCA-SFP-REC,false,,false
+10399110,Due from Administrator of Funds,ASSET,DEBIT,10399,true,RCA-SFP-REC,false,,false
+10399120,Due from Insurance Companies' Clients,ASSET,DEBIT,10399,true,RCA-SFP-REC,false,,false
+10399122,Allowance for Impairment-Due from Insurance Companies' Clients,ASSET,CREDIT,10399,true,RCA-SFP-REC,false,,false
+10399130,Due from Reinsurance Companies' Clients,ASSET,DEBIT,10399,true,RCA-SFP-REC,false,,false
+10399132,Allowance for Impairment-Due from Reinsurance Companies' Clients,ASSET,CREDIT,10399,true,RCA-SFP-REC,false,,false
+10399140,Due from Insurance Companies,ASSET,DEBIT,10399,true,RCA-SFP-REC,false,,false
+10399142,Allowance for Impairment-Due from Insurance Companies,ASSET,CREDIT,10399,true,RCA-SFP-REC,false,,false
+10399150,Due from Reinsurance Companies,ASSET,DEBIT,10399,true,RCA-SFP-REC,false,,false
+10399152,Allowance for Impairment-Due from Reinsurance Companies,ASSET,CREDIT,10399,true,RCA-SFP-REC,false,,false
+10399990,Other Receivables,ASSET,DEBIT,10399,true,RCA-SFP-REC,false,,false
+10399992,Allowance for Impairment-Other Receivables,ASSET,CREDIT,10399,true,RCA-SFP-REC,false,,false
+104,Inventories,ASSET,DEBIT,1,false,RCA-SFP-INV,false,,false
+10401,Inventory Held for Sale,ASSET,DEBIT,104,false,RCA-SFP-INV,false,,false
+10401010,Merchandise Inventory,ASSET,DEBIT,10401,true,RCA-SFP-INV,false,,false
+10401012,Allowance for Impairment-Merchandise Inventory,ASSET,CREDIT,10401,true,RCA-SFP-INV,false,,false
+10402,Inventory Held for Distribution,ASSET,DEBIT,104,false,RCA-SFP-INV,false,,false
+10402010,Food Supplies for Distribution,ASSET,DEBIT,10402,true,RCA-SFP-INV,false,,false
+10402012,Allowance for Impairment-Food Supplies for Distribution,ASSET,CREDIT,10402,true,RCA-SFP-INV,false,,false
+10402020,Welfare Goods for Distribution,ASSET,DEBIT,10402,true,RCA-SFP-INV,false,,false
+10402022,Allowance for Impairment-Welfare Goods for Distribution,ASSET,CREDIT,10402,true,RCA-SFP-INV,false,,false
+10402030,Drugs and Medicines for Distribution,ASSET,DEBIT,10402,true,RCA-SFP-INV,false,,false
+10402032,Allowance for Impairment-Drugs and Medicines for Distribution,ASSET,CREDIT,10402,true,RCA-SFP-INV,false,,false
+10402040,"Medical, Dental and Laboratory Supplies for Distribution",ASSET,DEBIT,10402,true,RCA-SFP-INV,false,,false
+10402042,"Allowance for Impairment-Medical, Dental and Laboratory Supplies for Distribution",ASSET,CREDIT,10402,true,RCA-SFP-INV,false,,false
+10402050,Agricultural and Marine Supplies for Distribution,ASSET,DEBIT,10402,true,RCA-SFP-INV,false,,false
+10402052,Allowance for Impairment-Agricultural and Marine Supplies for Distribution,ASSET,CREDIT,10402,true,RCA-SFP-INV,false,,false
+10402060,Agricultural Produce for Distribution,ASSET,DEBIT,10402,true,RCA-SFP-INV,false,,false
+10402062,Allowance for Impairment-Agricultural Produce for Distribution,ASSET,CREDIT,10402,true,RCA-SFP-INV,false,,false
+10402070,Textbooks and Instructional Materials for Distribution,ASSET,DEBIT,10402,true,RCA-SFP-INV,false,,false
+10402072,Allowance for Impairment-Textbooks and Instructional Materials for Distribution,ASSET,CREDIT,10402,true,RCA-SFP-INV,false,,false
+10402080,Construction Materials for Distribution,ASSET,DEBIT,10402,true,RCA-SFP-INV,false,,false
+10402082,Allowance for Impairment-Construction Materials for Distribution,ASSET,CREDIT,10402,true,RCA-SFP-INV,false,,false
+10402090,Property and Equipment for Distribution,ASSET,DEBIT,10402,true,RCA-SFP-INV,false,,false
+10402092,Allowance for Impairment-Property and Equipment for Distribution,ASSET,CREDIT,10402,true,RCA-SFP-INV,false,,false
+10402100,Aquaculture Produce for Distribution,ASSET,DEBIT,10402,true,RCA-SFP-INV,false,,false
+10402102,Allowance for Impairment-Aquaculture Produce for Distribution,ASSET,CREDIT,10402,true,RCA-SFP-INV,false,,false
+10402990,Other Supplies and Materials for Distribution,ASSET,DEBIT,10402,true,RCA-SFP-INV,false,,false
+10402992,Allowance for Impairment-Other Supplies and Materials for Distribution,ASSET,CREDIT,10402,true,RCA-SFP-INV,false,,false
+10403,Inventory Held for Manufacturing,ASSET,DEBIT,104,false,RCA-SFP-INV,false,,false
+10403010,Raw Materials Inventory,ASSET,DEBIT,10403,true,RCA-SFP-INV,false,,false
+10403012,Allowance for Impairment-Raw Materials Inventory,ASSET,CREDIT,10403,true,RCA-SFP-INV,false,,false
+10403020,Work-in-Process Inventory,ASSET,DEBIT,10403,true,RCA-SFP-INV,false,,false
+10403022,Allowance for Impairment-Work-in-Process Inventory,ASSET,CREDIT,10403,true,RCA-SFP-INV,false,,false
+10403030,Finished Goods Inventory,ASSET,DEBIT,10403,true,RCA-SFP-INV,false,,false
+10403032,Allowance for Impairment-Finished Goods Inventory,ASSET,CREDIT,10403,true,RCA-SFP-INV,false,,false
+10404,Inventory Held for Consumption,ASSET,DEBIT,104,false,RCA-SFP-INV,false,,false
+10404010,Office Supplies Inventory,ASSET,DEBIT,10404,true,RCA-SFP-INV,false,,false
+10404012,Allowance for Impairment-Office Supplies Inventory,ASSET,CREDIT,10404,true,RCA-SFP-INV,false,,false
+10404020,"Accountable Forms, Plates and Stickers Inventory",ASSET,DEBIT,10404,true,RCA-SFP-INV,false,,false
+10404022,"Allowance for Impairment-Accountable Forms, Plates and Stickers Inventory",ASSET,CREDIT,10404,true,RCA-SFP-INV,false,,false
+10404030,Non-Accountable Forms Inventory,ASSET,DEBIT,10404,true,RCA-SFP-INV,false,,false
+10404032,Allowance for Impairment-Non-Accountable Forms Inventory,ASSET,CREDIT,10404,true,RCA-SFP-INV,false,,false
+10404040,Animal/Zoological Supplies Inventory,ASSET,DEBIT,10404,true,RCA-SFP-INV,false,,false
+10404042,Allowance for Impairment-Animal/Zoological Supplies Inventory,ASSET,CREDIT,10404,true,RCA-SFP-INV,false,,false
+10404050,Food Supplies Inventory,ASSET,DEBIT,10404,true,RCA-SFP-INV,false,,false
+10404052,Allowance for Impairment-Food Supplies Inventory,ASSET,CREDIT,10404,true,RCA-SFP-INV,false,,false
+10404060,Drugs and Medicines Inventory,ASSET,DEBIT,10404,true,RCA-SFP-INV,false,,false
+10404062,Allowance for Impairment-Drugs and Medicines Inventory,ASSET,CREDIT,10404,true,RCA-SFP-INV,false,,false
+10404070,"Medical, Dental and Laboratory Supplies Inventory",ASSET,DEBIT,10404,true,RCA-SFP-INV,false,,false
+10404072,"Allowance for Impairment-Medical, Dental and Laboratory Supplies Inventory",ASSET,CREDIT,10404,true,RCA-SFP-INV,false,,false
+10404080,"Fuel, Oil and Lubricants Inventory",ASSET,DEBIT,10404,true,RCA-SFP-INV,false,,false
+10404082,"Allowance for Impairment-Fuel, Oil and Lubricants Inventory",ASSET,CREDIT,10404,true,RCA-SFP-INV,false,,false
+10404090,Agricultural and Marine Supplies Inventory,ASSET,DEBIT,10404,true,RCA-SFP-INV,false,,false
+10404092,Allowance for Impairment-Agricultural and Marine Supplies Inventory,ASSET,CREDIT,10404,true,RCA-SFP-INV,false,,false
+10404100,Textbooks and Instructional Materials Inventory,ASSET,DEBIT,10404,true,RCA-SFP-INV,false,,false
+10404102,Allowance for Impairment-Textbooks and Instructional Materials Inventory,ASSET,CREDIT,10404,true,RCA-SFP-INV,false,,false
+10404110,"Military, Police and Traffic Supplies Inventory",ASSET,DEBIT,10404,true,RCA-SFP-INV,false,,false
+10404112,"Allowance for Impairment-Military, Police and Traffic Supplies Inventory",ASSET,CREDIT,10404,true,RCA-SFP-INV,false,,false
+10404120,Chemical and Filtering Supplies Inventory,ASSET,DEBIT,10404,true,RCA-SFP-INV,false,,false
+10404122,Allowance for Impairment-Chemical and Filtering Supplies Inventory,ASSET,CREDIT,10404,true,RCA-SFP-INV,false,,false
+10404130,Construction Materials Inventory,ASSET,DEBIT,10404,true,RCA-SFP-INV,false,,false
+10404132,Allowance for Impairment-Construction Materials Inventory,ASSET,CREDIT,10404,true,RCA-SFP-INV,false,,false
+10404140,Currency Inventory,ASSET,DEBIT,10404,true,RCA-SFP-INV,false,,false
+10404142,Allowance for Impairment-Currency Inventory,ASSET,CREDIT,10404,true,RCA-SFP-INV,false,,false
+10404150,Demonetized Coins for Melting,ASSET,DEBIT,10404,true,RCA-SFP-INV,false,,false
+10404152,Allowance for Impairment-Demonetized Coins for Melting,ASSET,CREDIT,10404,true,RCA-SFP-INV,false,,false
+10404160,Information Materials Inventory,ASSET,DEBIT,10404,true,RCA-SFP-INV,false,,false
+10404162,Allowance for Impairment-Information Materials Inventory,ASSET,CREDIT,10404,true,RCA-SFP-INV,false,,false
+10404170,Linens and Beddings,ASSET,DEBIT,10404,true,RCA-SFP-INV,false,,false
+10404172,Allowance for Impairment-Linens and Beddings,ASSET,CREDIT,10404,true,RCA-SFP-INV,false,,false
+10404180,Play/Bet Slips and Thermal Rolls Supplies Inventories,ASSET,DEBIT,10404,true,RCA-SFP-INV,false,,false
+10404182,Allowance for Impairment-Play/Bet Slips and Thermal Rolls Supplies Inventories,ASSET,CREDIT,10404,true,RCA-SFP-INV,false,,false
+10404190,Electrical Supplies and Materials Inventory,ASSET,DEBIT,10404,true,RCA-SFP-INV,false,,false
+10404192,Allowance for Impairment-Electrical Supplies and Materials Inventory,ASSET,CREDIT,10404,true,RCA-SFP-INV,false,,false
+10404200,Agricultural Produce for Consumption,ASSET,DEBIT,10404,true,RCA-SFP-INV,false,,false
+10404202,Allowance for Impairment-Agricultural Produce for Consumption,ASSET,CREDIT,10404,true,RCA-SFP-INV,false,,false
+10404210,Aquaculture Produce for Consumption,ASSET,DEBIT,10404,true,RCA-SFP-INV,false,,false
+10404212,Allowance for Impairment-Aquaculture Produce for Consumption,ASSET,CREDIT,10404,true,RCA-SFP-INV,false,,false
+10404220,Supplies and Materials for Water Systems Operations,ASSET,DEBIT,10404,true,RCA-SFP-INV,false,,false
+10404222,Allowance for Impairment-Supplies and Materials for Water Systems Operations,ASSET,CREDIT,10404,true,RCA-SFP-INV,false,,false
+10404230,Housekeeping/Cleaning Supplies,ASSET,DEBIT,10404,true,RCA-SFP-INV,false,,false
+10404232,Allowance for Impairment-Housekeeping/Cleaning Supplies,ASSET,CREDIT,10404,true,RCA-SFP-INV,false,,false
+10404990,Other Supplies and Materials Inventory,ASSET,DEBIT,10404,true,RCA-SFP-INV,false,,false
+10404992,Allowance for Impairment-Other Supplies and Materials Inventory,ASSET,CREDIT,10404,true,RCA-SFP-INV,false,,false
+10405,Semi-Expendable Machinery and Equipment,ASSET,DEBIT,104,false,RCA-SFP-INV,false,,false
+10405020,Semi-Expendable Office Equipment,ASSET,DEBIT,10405,true,RCA-SFP-INV,false,,false
+10405022,Allowance for Impairment-Semi-Expendable Office Equipment,ASSET,CREDIT,10405,true,RCA-SFP-INV,false,,false
+10405030,Semi-Expendable Information and Communications Technology Equipment,ASSET,DEBIT,10405,true,RCA-SFP-INV,false,,false
+10405032,Allowance for Impairment-Semi-Expendable Information and Communications Technology Equipment,ASSET,CREDIT,10405,true,RCA-SFP-INV,false,,false
+10405040,Semi-Expendable Agricultural and Forestry Equipment,ASSET,DEBIT,10405,true,RCA-SFP-INV,false,,false
+10405042,Allowance for Impairment-Semi-Expendable Agricultural and Forestry Equipment,ASSET,CREDIT,10405,true,RCA-SFP-INV,false,,false
+10405050,Semi-Expendable Marine and Fishery Equipment,ASSET,DEBIT,10405,true,RCA-SFP-INV,false,,false
+10405052,Allowance for Impairment-Semi-Expendable Marine and Fishery Equipment,ASSET,CREDIT,10405,true,RCA-SFP-INV,false,,false
+10405060,Semi-Expendable Airport Equipment,ASSET,DEBIT,10405,true,RCA-SFP-INV,false,,false
+10405062,Allowance for Impairment-Semi-Expendable Airport Equipment,ASSET,CREDIT,10405,true,RCA-SFP-INV,false,,false
+10405070,Semi-Expendable Communications Equipment,ASSET,DEBIT,10405,true,RCA-SFP-INV,false,,false
+10405072,Allowance for Impairment-Semi-Expendable Communications Equipment,ASSET,CREDIT,10405,true,RCA-SFP-INV,false,,false
+10405080,Semi-Expendable Disaster Response and Rescue Equipment,ASSET,DEBIT,10405,true,RCA-SFP-INV,false,,false
+10405082,Allowance for Impairment-Semi-Expendable Disaster Response and Rescue Equipment,ASSET,CREDIT,10405,true,RCA-SFP-INV,false,,false
+10405090,"Semi-Expendable Military, Police and Security Equipment",ASSET,DEBIT,10405,true,RCA-SFP-INV,false,,false
+10405092,"Allowance for Impairment-Semi-Expendable Military, Police and Security Equipment",ASSET,CREDIT,10405,true,RCA-SFP-INV,false,,false
+10405100,Semi-Expendable Medical Equipment,ASSET,DEBIT,10405,true,RCA-SFP-INV,false,,false
+10405102,Allowance for Impairment-Semi-Expendable Medical Equipment,ASSET,CREDIT,10405,true,RCA-SFP-INV,false,,false
+10405110,Semi-Expendable Printing Equipment,ASSET,DEBIT,10405,true,RCA-SFP-INV,false,,false
+10405112,Allowance for Impairment-Semi-Expendable Printing Equipment,ASSET,CREDIT,10405,true,RCA-SFP-INV,false,,false
+10405120,Semi-Expendable Sports Equipment,ASSET,DEBIT,10405,true,RCA-SFP-INV,false,,false
+10405122,Allowance for Impairment-Semi-Expendable Sports Equipment,ASSET,CREDIT,10405,true,RCA-SFP-INV,false,,false
+10405130,Semi-Expendable Technical and Scientific Equipment,ASSET,DEBIT,10405,true,RCA-SFP-INV,false,,false
+10405132,Allowance for Impairment-Semi-Expendable Technical and Scientific Equipment,ASSET,CREDIT,10405,true,RCA-SFP-INV,false,,false
+10405140,Semi-Expendable Construction Equipment,ASSET,DEBIT,10405,true,RCA-SFP-INV,false,,false
+10405142,Allowance for Impairment-Semi-Expendable Construction Equipment,ASSET,CREDIT,10405,true,RCA-SFP-INV,false,,false
+10405150,Semi-Expendable Gaming Equipment,ASSET,DEBIT,10405,true,RCA-SFP-INV,false,,false
+10405152,Allowance for Impairment-Semi-Expendable Gaming Equipment,ASSET,CREDIT,10405,true,RCA-SFP-INV,false,,false
+10405160,Semi-Expendable Kitchen Equipment,ASSET,DEBIT,10405,true,RCA-SFP-INV,false,,false
+10405162,Allowance for Impairment-Semi-Expendable Kitchen Equipment,ASSET,CREDIT,10405,true,RCA-SFP-INV,false,,false
+10405170,Semi-Expendable Electrical Equipment,ASSET,DEBIT,10405,true,RCA-SFP-INV,false,,false
+10405172,Allowance for Impairment-Semi-Expendable Electrical Equipment,ASSET,CREDIT,10405,true,RCA-SFP-INV,false,,false
+10405990,Semi-Expendable Other Machinery and Equipment,ASSET,DEBIT,10405,true,RCA-SFP-INV,false,,false
+10405992,Allowance for Impairment-Semi-Expendable Other Machinery and Equipment,ASSET,CREDIT,10405,true,RCA-SFP-INV,false,,false
+10406,"Semi-Expendable Furniture, Fixtures and Books",ASSET,DEBIT,104,false,RCA-SFP-INV,false,,false
+10406010,Semi-Expendable Furniture and Fixtures,ASSET,DEBIT,10406,true,RCA-SFP-INV,false,,false
+10406012,Allowance for Impairment-Semi-Expendable Furniture and Fixtures,ASSET,CREDIT,10406,true,RCA-SFP-INV,false,,false
+10406020,Semi-Expendable Books,ASSET,DEBIT,10406,true,RCA-SFP-INV,false,,false
+10406022,Allowance for Impairment-Semi-Expendable Books,ASSET,CREDIT,10406,true,RCA-SFP-INV,false,,false
+10407,Domestic Gold and Silver Inventory,ASSET,DEBIT,104,false,RCA-SFP-INV,false,,false
+10407010,Gold for Refining,ASSET,DEBIT,10407,true,RCA-SFP-INV,false,,false
+10407020,Gold for Domestic Sales,ASSET,DEBIT,10407,true,RCA-SFP-INV,false,,false
+10407030,Silver for Domestic Sales,ASSET,DEBIT,10407,true,RCA-SFP-INV,false,,false
+10407040,Silver for Refining,ASSET,DEBIT,10407,true,RCA-SFP-INV,false,,false
+10408,Plant Inventory,ASSET,DEBIT,104,false,RCA-SFP-INV,false,,false
+10408010,Plant Inventory,ASSET,DEBIT,10408,true,RCA-SFP-INV,false,,false
+10498,Construction in Progress-Construction Contracts,ASSET,DEBIT,104,false,RCA-SFP-INV,false,,false
+10498010,Construction in Progress-Construction Contracts,ASSET,DEBIT,10498,true,RCA-SFP-INV,false,,false
+10498011,Progress Billings,ASSET,CREDIT,10498,true,RCA-SFP-INV,false,,false
+105,Investment Property,ASSET,DEBIT,1,false,RCA-SFP-IP,false,,false
+10501,Land and Buildings,ASSET,DEBIT,105,false,RCA-SFP-IP,false,,false
+10501010,"Investment Property, Land",ASSET,DEBIT,10501,true,RCA-SFP-IP,false,,false
+10501012,"Accumulated Impairment Losses-Investment Property, Land",ASSET,CREDIT,10501,true,RCA-SFP-IP,false,,false
+10501020,"Investment Property, Buildings",ASSET,DEBIT,10501,true,RCA-SFP-IP,false,,false
+10501021,"Accumulated Depreciation-Investment Property, Buildings",ASSET,CREDIT,10501,true,RCA-SFP-IP,false,,false
+10501022,"Accumulated Impairment Losses-Investment Property, Buildings",ASSET,CREDIT,10501,true,RCA-SFP-IP,false,,false
+10598,Construction in Progress,ASSET,DEBIT,105,false,RCA-SFP-IP,false,,false
+10598010,"Construction in Progress-Investment Property, Buildings",ASSET,DEBIT,10598,true,RCA-SFP-IP,false,,false
+106,"Property, Plant and Equipment",ASSET,DEBIT,1,false,,false,,false
+10601,Land,ASSET,DEBIT,106,false,RCA-SFP-PPE,false,,false
+10601010,Land,ASSET,DEBIT,10601,true,RCA-SFP-PPE,false,,false
+10601012,Accumulated Impairment Losses-Land,ASSET,CREDIT,10601,true,RCA-SFP-PPE,false,,false
+10602,Land Improvements,ASSET,DEBIT,106,false,RCA-SFP-PPE,false,,false
+10602010,"Land Improvements, Aquaculture Structures",ASSET,DEBIT,10602,true,RCA-SFP-PPE,false,,false
+10602011,"Accumulated Depreciation-Land Improvements, Aquaculture Structures",ASSET,CREDIT,10602,true,RCA-SFP-PPE,false,,false
+10602012,"Accumulated Impairment Losses-Land Improvements, Aquaculture Structures",ASSET,CREDIT,10602,true,RCA-SFP-PPE,false,,false
+10602020,"Land Improvements, Reforestation Projects",ASSET,DEBIT,10602,true,RCA-SFP-PPE,false,,false
+10602022,"Accumulated Impairment Losses-Land Improvements, Reforestation Projects",ASSET,CREDIT,10602,true,RCA-SFP-PPE,false,,false
+10602990,Other Land Improvements,ASSET,DEBIT,10602,true,RCA-SFP-PPE,false,,false
+10602991,Accumulated Depreciation-Other Land Improvements,ASSET,CREDIT,10602,true,RCA-SFP-PPE,false,,false
+10602992,Accumulated Impairment Losses-Other Land Improvements,ASSET,CREDIT,10602,true,RCA-SFP-PPE,false,,false
+10603,Infrastructure Assets,ASSET,DEBIT,106,false,RCA-SFP-PPE,false,,false
+10603010,Road Networks,ASSET,DEBIT,10603,true,RCA-SFP-PPE,false,,false
+10603011,Accumulated Depreciation-Road Networks,ASSET,CREDIT,10603,true,RCA-SFP-PPE,false,,false
+10603012,Accumulated Impairment Losses-Road Networks,ASSET,CREDIT,10603,true,RCA-SFP-PPE,false,,false
+10603020,Flood Control Systems,ASSET,DEBIT,10603,true,RCA-SFP-PPE,false,,false
+10603021,Accumulated Depreciation-Flood Control Systems,ASSET,CREDIT,10603,true,RCA-SFP-PPE,false,,false
+10603022,Accumulated Impairment Losses-Flood Control Systems,ASSET,CREDIT,10603,true,RCA-SFP-PPE,false,,false
+10603030,Sewer Systems,ASSET,DEBIT,10603,true,RCA-SFP-PPE,false,,false
+10603031,Accumulated Depreciation-Sewer Systems,ASSET,CREDIT,10603,true,RCA-SFP-PPE,false,,false
+10603032,Accumulated Impairment Losses-Sewer Systems,ASSET,CREDIT,10603,true,RCA-SFP-PPE,false,,false
+10603040,Water Supply Systems,ASSET,DEBIT,10603,true,RCA-SFP-PPE,false,,false
+10603041,Accumulated Depreciation-Water Supply Systems,ASSET,CREDIT,10603,true,RCA-SFP-PPE,false,,false
+10603042,Accumulated Impairment Losses-Water Supply Systems,ASSET,CREDIT,10603,true,RCA-SFP-PPE,false,,false
+10603050,Power Supply Systems,ASSET,DEBIT,10603,true,RCA-SFP-PPE,false,,false
+10603051,Accumulated Depreciation-Power Supply Systems,ASSET,CREDIT,10603,true,RCA-SFP-PPE,false,,false
+10603052,Accumulated Impairment Losses-Power Supply Systems,ASSET,CREDIT,10603,true,RCA-SFP-PPE,false,,false
+10603060,Communications Networks,ASSET,DEBIT,10603,true,RCA-SFP-PPE,false,,false
+10603061,Accumulated Depreciation-Communications Networks,ASSET,CREDIT,10603,true,RCA-SFP-PPE,false,,false
+10603062,Accumulated Impairment Losses-Communications Networks,ASSET,CREDIT,10603,true,RCA-SFP-PPE,false,,false
+10603070,Seaport Systems,ASSET,DEBIT,10603,true,RCA-SFP-PPE,false,,false
+10603071,Accumulated Depreciation-Seaport Systems,ASSET,CREDIT,10603,true,RCA-SFP-PPE,false,,false
+10603072,Accumulated Impairment Losses-Seaport Systems,ASSET,CREDIT,10603,true,RCA-SFP-PPE,false,,false
+10603080,Airport Systems,ASSET,DEBIT,10603,true,RCA-SFP-PPE,false,,false
+10603081,Accumulated Depreciation-Airport Systems,ASSET,CREDIT,10603,true,RCA-SFP-PPE,false,,false
+10603082,Accumulated Impairment Losses-Airport Systems,ASSET,CREDIT,10603,true,RCA-SFP-PPE,false,,false
+10603090,"Parks, Plazas and Monuments",ASSET,DEBIT,10603,true,RCA-SFP-PPE,false,,false
+10603091,"Accumulated Depreciation-Parks, Plazas and Monuments",ASSET,CREDIT,10603,true,RCA-SFP-PPE,false,,false
+10603092,"Accumulated Impairment Losses-Parks, Plazas and Monuments",ASSET,CREDIT,10603,true,RCA-SFP-PPE,false,,false
+10603100,Railway Systems,ASSET,DEBIT,10603,true,RCA-SFP-PPE,false,,false
+10603101,Accumulated Depreciation-Railway Systems,ASSET,CREDIT,10603,true,RCA-SFP-PPE,false,,false
+10603102,Accumulated Impairment Losses-Railway Systems,ASSET,CREDIT,10603,true,RCA-SFP-PPE,false,,false
+10603110,Plant-Utility Plant in Service (UPIS),ASSET,DEBIT,10603,true,RCA-SFP-PPE,false,,false
+10603111,Accumulated Depreciation-Plant (UPIS),ASSET,CREDIT,10603,true,RCA-SFP-PPE,false,,false
+10603112,Accumulated Impairment Losses-Plant (UPIS),ASSET,CREDIT,10603,true,RCA-SFP-PPE,false,,false
+10603990,Other Infrastructure Assets,ASSET,DEBIT,10603,true,RCA-SFP-PPE,false,,false
+10603991,Accumulated Depreciation-Other Infrastructure Assets,ASSET,CREDIT,10603,true,RCA-SFP-PPE,false,,false
+10603992,Accumulated Impairment Losses-Other Infrastructure Assets,ASSET,CREDIT,10603,true,RCA-SFP-PPE,false,,false
+10604,Buildings and Other Structures,ASSET,DEBIT,106,false,RCA-SFP-PPE,false,,false
+10604010,Buildings,ASSET,DEBIT,10604,true,RCA-SFP-PPE,false,,false
+10604011,Accumulated Depreciation-Buildings,ASSET,CREDIT,10604,true,RCA-SFP-PPE,false,,false
+10604012,Accumulated Impairment Losses-Buildings,ASSET,CREDIT,10604,true,RCA-SFP-PPE,false,,false
+10604020,School Buildings,ASSET,DEBIT,10604,true,RCA-SFP-PPE,false,,false
+10604021,Accumulated Depreciation-School Buildings,ASSET,CREDIT,10604,true,RCA-SFP-PPE,false,,false
+10604022,Accumulated Impairment Losses-School Buildings,ASSET,CREDIT,10604,true,RCA-SFP-PPE,false,,false
+10604030,Hospitals and Health Centers,ASSET,DEBIT,10604,true,RCA-SFP-PPE,false,,false
+10604031,Accumulated Depreciation-Hospitals and Health Centers,ASSET,CREDIT,10604,true,RCA-SFP-PPE,false,,false
+10604032,Accumulated Impairment Losses-Hospitals and Health Centers,ASSET,CREDIT,10604,true,RCA-SFP-PPE,false,,false
+10604040,Markets,ASSET,DEBIT,10604,true,RCA-SFP-PPE,false,,false
+10604041,Accumulated Depreciation-Markets,ASSET,CREDIT,10604,true,RCA-SFP-PPE,false,,false
+10604042,Accumulated Impairment Losses-Markets,ASSET,CREDIT,10604,true,RCA-SFP-PPE,false,,false
+10604050,Slaughterhouses,ASSET,DEBIT,10604,true,RCA-SFP-PPE,false,,false
+10604051,Accumulated Depreciation-Slaughterhouses,ASSET,CREDIT,10604,true,RCA-SFP-PPE,false,,false
+10604052,Accumulated Impairment Losses-Slaughterhouses,ASSET,CREDIT,10604,true,RCA-SFP-PPE,false,,false
+10604060,Hostels and Dormitories,ASSET,DEBIT,10604,true,RCA-SFP-PPE,false,,false
+10604061,Accumulated Depreciation-Hostels and Dormitories,ASSET,CREDIT,10604,true,RCA-SFP-PPE,false,,false
+10604062,Accumulated Impairment Losses-Hostels and Dormitories,ASSET,CREDIT,10604,true,RCA-SFP-PPE,false,,false
+10604070,"Water Plant, Structure and Improvements",ASSET,DEBIT,10604,true,RCA-SFP-PPE,false,,false
+10604071,"Accumulated Depreciation-Water Plant, Structure and Improvements",ASSET,CREDIT,10604,true,RCA-SFP-PPE,false,,false
+10604072,Accumulated Impairment Losses-Water Plant Structure and Improvements,ASSET,CREDIT,10604,true,RCA-SFP-PPE,false,,false
+10604990,Other Structures,ASSET,DEBIT,10604,true,RCA-SFP-PPE,false,,false
+10604991,Accumulated Depreciation-Other Structures,ASSET,CREDIT,10604,true,RCA-SFP-PPE,false,,false
+10604992,Accumulated Impairment Losses-Other Structures,ASSET,CREDIT,10604,true,RCA-SFP-PPE,false,,false
+10605,Machinery and Equipment,ASSET,DEBIT,106,false,RCA-SFP-PPE,false,,false
+10605020,Office Equipment,ASSET,DEBIT,10605,true,RCA-SFP-PPE,false,,false
+10605021,Accumulated Depreciation-Office Equipment,ASSET,CREDIT,10605,true,RCA-SFP-PPE,false,,false
+10605022,Accumulated Impairment Losses-Office Equipment,ASSET,CREDIT,10605,true,RCA-SFP-PPE,false,,false
+10605030,Information and Communications Technology Equipment,ASSET,DEBIT,10605,true,RCA-SFP-PPE,false,,false
+10605031,Accumulated Depreciation-Information and Communications Technology Equipment,ASSET,CREDIT,10605,true,RCA-SFP-PPE,false,,false
+10605032,Accumulated Impairment Losses-Information and Communications Technology Equipment,ASSET,CREDIT,10605,true,RCA-SFP-PPE,false,,false
+10605040,Agricultural and Forestry Equipment,ASSET,DEBIT,10605,true,RCA-SFP-PPE,false,,false
+10605041,Accumulated Depreciation-Agricultural and Forestry Equipment,ASSET,CREDIT,10605,true,RCA-SFP-PPE,false,,false
+10605042,Accumulated Impairment Losses-Agricultural and Forestry Equipment,ASSET,CREDIT,10605,true,RCA-SFP-PPE,false,,false
+10605050,Marine and Fishery Equipment,ASSET,DEBIT,10605,true,RCA-SFP-PPE,false,,false
+10605051,Accumulated Depreciation-Marine and Fishery Equipment,ASSET,CREDIT,10605,true,RCA-SFP-PPE,false,,false
+10605052,Accumulated Impairment Losses-Marine and Fishery Equipment,ASSET,CREDIT,10605,true,RCA-SFP-PPE,false,,false
+10605060,Airport Equipment,ASSET,DEBIT,10605,true,RCA-SFP-PPE,false,,false
+10605061,Accumulated Depreciation-Airport Equipment,ASSET,CREDIT,10605,true,RCA-SFP-PPE,false,,false
+10605062,Accumulated Impairment Losses-Airport Equipment,ASSET,CREDIT,10605,true,RCA-SFP-PPE,false,,false
+10605070,Communications Equipment,ASSET,DEBIT,10605,true,RCA-SFP-PPE,false,,false
+10605071,Accumulated Depreciation-Communications Equipment,ASSET,CREDIT,10605,true,RCA-SFP-PPE,false,,false
+10605072,Accumulated Impairment Losses-Communications Equipment,ASSET,CREDIT,10605,true,RCA-SFP-PPE,false,,false
+10605080,Construction and Heavy Equipment,ASSET,DEBIT,10605,true,RCA-SFP-PPE,false,,false
+10605081,Accumulated Depreciation-Construction and Heavy Equipment,ASSET,CREDIT,10605,true,RCA-SFP-PPE,false,,false
+10605082,Accumulated Impairment Losses-Construction and Heavy Equipment,ASSET,CREDIT,10605,true,RCA-SFP-PPE,false,,false
+10605090,Disaster Response and Rescue Equipment,ASSET,DEBIT,10605,true,RCA-SFP-PPE,false,,false
+10605091,Accumulated Depreciation-Disaster Response and Rescue Equipment,ASSET,CREDIT,10605,true,RCA-SFP-PPE,false,,false
+10605092,Accumulated Impairment Losses-Disaster Response and Rescue Equipment,ASSET,CREDIT,10605,true,RCA-SFP-PPE,false,,false
+10605100,"Military, Police and Security Equipment",ASSET,DEBIT,10605,true,RCA-SFP-PPE,false,,false
+10605101,"Accumulated Depreciation-Military, Police and Security Equipment",ASSET,CREDIT,10605,true,RCA-SFP-PPE,false,,false
+10605102,"Accumulated Impairment Losses-Military, Police and Security Equipment",ASSET,CREDIT,10605,true,RCA-SFP-PPE,false,,false
+10605110,Medical Equipment,ASSET,DEBIT,10605,true,RCA-SFP-PPE,false,,false
+10605111,Accumulated Depreciation-Medical Equipment,ASSET,CREDIT,10605,true,RCA-SFP-PPE,false,,false
+10605112,Accumulated Impairment Losses-Medical Equipment,ASSET,CREDIT,10605,true,RCA-SFP-PPE,false,,false
+10605120,Printing Equipment,ASSET,DEBIT,10605,true,RCA-SFP-PPE,false,,false
+10605121,Accumulated Depreciation-Printing Equipment,ASSET,CREDIT,10605,true,RCA-SFP-PPE,false,,false
+10605122,Accumulated Impairment Losses-Printing Equipment,ASSET,CREDIT,10605,true,RCA-SFP-PPE,false,,false
+10605130,Sports Equipment,ASSET,DEBIT,10605,true,RCA-SFP-PPE,false,,false
+10605131,Accumulated Depreciation-Sports Equipment,ASSET,CREDIT,10605,true,RCA-SFP-PPE,false,,false
+10605132,Accumulated Impairment Losses-Sports Equipment,ASSET,CREDIT,10605,true,RCA-SFP-PPE,false,,false
+10605140,Technical and Scientific Equipment,ASSET,DEBIT,10605,true,RCA-SFP-PPE,false,,false
+10605141,Accumulated Depreciation-Technical and Scientific Equipment,ASSET,CREDIT,10605,true,RCA-SFP-PPE,false,,false
+10605142,Accumulated Impairment Losses-Technical and Scientific Equipment,ASSET,CREDIT,10605,true,RCA-SFP-PPE,false,,false
+10605150,Gaming Equipment,ASSET,DEBIT,10605,true,RCA-SFP-PPE,false,,false
+10605151,Accumulated Depreciation-Gaming Equipment,ASSET,CREDIT,10605,true,RCA-SFP-PPE,false,,false
+10605152,Accumulated Impairment Losses-Gaming Equipment,ASSET,CREDIT,10605,true,RCA-SFP-PPE,false,,false
+10605160,Kitchen Equipment,ASSET,DEBIT,10605,true,RCA-SFP-PPE,false,,false
+10605161,Accumulated Depreciation-Kitchen Equipment,ASSET,CREDIT,10605,true,RCA-SFP-PPE,false,,false
+10605162,Accumulated Impairment Losses-Kitchen Equipment,ASSET,CREDIT,10605,true,RCA-SFP-PPE,false,,false
+10605170,Electrical Equipment,ASSET,DEBIT,10605,true,RCA-SFP-PPE,false,,false
+10605171,Accumulated Depreciation-Electrical Equipment,ASSET,CREDIT,10605,true,RCA-SFP-PPE,false,,false
+10605172,Accumulated Impairment Losses-Electrical Equipment,ASSET,CREDIT,10605,true,RCA-SFP-PPE,false,,false
+10605990,Other Machinery and Equipment,ASSET,DEBIT,10605,true,RCA-SFP-PPE,false,,false
+10605991,Accumulated Depreciation-Other Machinery and Equipment,ASSET,CREDIT,10605,true,RCA-SFP-PPE,false,,false
+10605992,Accumulated Impairment Losses-Other Machinery and Equipment,ASSET,CREDIT,10605,true,RCA-SFP-PPE,false,,false
+10606,Transportation Equipment,ASSET,DEBIT,106,false,RCA-SFP-PPE,false,,false
+10606010,Motor Vehicles,ASSET,DEBIT,10606,true,RCA-SFP-PPE,false,,false
+10606011,Accumulated Depreciation-Motor Vehicles,ASSET,CREDIT,10606,true,RCA-SFP-PPE,false,,false
+10606012,Accumulated Impairment Losses-Motor Vehicles,ASSET,CREDIT,10606,true,RCA-SFP-PPE,false,,false
+10606020,Trains,ASSET,DEBIT,10606,true,RCA-SFP-PPE,false,,false
+10606021,Accumulated Depreciation-Trains,ASSET,CREDIT,10606,true,RCA-SFP-PPE,false,,false
+10606022,Accumulated Impairment Losses-Trains,ASSET,CREDIT,10606,true,RCA-SFP-PPE,false,,false
+10606030,Aircrafts and Aircrafts Ground Equipment,ASSET,DEBIT,10606,true,RCA-SFP-PPE,false,,false
+10606031,Accumulated Depreciation-Aircrafts and Aircrafts Ground Equipment,ASSET,CREDIT,10606,true,RCA-SFP-PPE,false,,false
+10606032,Accumulated Impairment Losses-Aircrafts and Aircrafts Ground Equipment,ASSET,CREDIT,10606,true,RCA-SFP-PPE,false,,false
+10606040,Watercrafts,ASSET,DEBIT,10606,true,RCA-SFP-PPE,false,,false
+10606041,Accumulated Depreciation-Watercrafts,ASSET,CREDIT,10606,true,RCA-SFP-PPE,false,,false
+10606042,Accumulated Impairment Losses-Watercrafts,ASSET,CREDIT,10606,true,RCA-SFP-PPE,false,,false
+10606990,Other Transportation Equipment,ASSET,DEBIT,10606,true,RCA-SFP-PPE,false,,false
+10606991,Accumulated Depreciation-Other Transportation Equipment,ASSET,CREDIT,10606,true,RCA-SFP-PPE,false,,false
+10606992,Accumulated Impairment Losses-Other Transportation Equipment,ASSET,CREDIT,10606,true,RCA-SFP-PPE,false,,false
+10607,"Furniture, Fixtures and Books",ASSET,DEBIT,106,false,RCA-SFP-PPE,false,,false
+10607010,Furniture and Fixtures,ASSET,DEBIT,10607,true,RCA-SFP-PPE,false,,false
+10607011,Accumulated Depreciation-Furniture and Fixtures,ASSET,CREDIT,10607,true,RCA-SFP-PPE,false,,false
+10607012,Accumulated Impairment Losses-Furniture and Fixtures,ASSET,CREDIT,10607,true,RCA-SFP-PPE,false,,false
+10607020,Books,ASSET,DEBIT,10607,true,RCA-SFP-PPE,false,,false
+10607021,Accumulated Depreciation-Books,ASSET,CREDIT,10607,true,RCA-SFP-PPE,false,,false
+10607022,Accumulated Impairment Losses-Books,ASSET,CREDIT,10607,true,RCA-SFP-PPE,false,,false
+10608,Leased Assets,ASSET,DEBIT,106,false,RCA-SFP-ROU,false,,false
+10608010,"Leased Assets, Land",ASSET,DEBIT,10608,true,RCA-SFP-ROU,false,,false
+10608012,"Accumulated Impairment Losses-Leased Assets, Land",ASSET,CREDIT,10608,true,RCA-SFP-ROU,false,,false
+10608020,"Leased Assets, Buildings and Other Structures",ASSET,DEBIT,10608,true,RCA-SFP-ROU,false,,false
+10608021,"Accumulated Depreciation-Leased Assets, Buildings and Other Structures",ASSET,CREDIT,10608,true,RCA-SFP-ROU,false,,false
+10608022,"Accumulated Impairment Losses-Leased Assets, Buildings and Other Structures",ASSET,CREDIT,10608,true,RCA-SFP-ROU,false,,false
+10608030,"Leased Assets, Machinery and Equipment",ASSET,DEBIT,10608,true,RCA-SFP-ROU,false,,false
+10608031,"Accumulated Depreciation-Leased Assets, Machinery and Equipment",ASSET,CREDIT,10608,true,RCA-SFP-ROU,false,,false
+10608032,"Accumulated Impairment Losses-Leased Assets, Machinery and Equipment",ASSET,CREDIT,10608,true,RCA-SFP-ROU,false,,false
+10608040,"Leased Assets, Transportation Equipment",ASSET,DEBIT,10608,true,RCA-SFP-ROU,false,,false
+10608041,"Accumulated Depreciation-Leased Assets, Transportation Equipment",ASSET,CREDIT,10608,true,RCA-SFP-ROU,false,,false
+10608042,"Accumulated Impairment Losses-Leased Assets, Transportation Equipment",ASSET,CREDIT,10608,true,RCA-SFP-ROU,false,,false
+10608050,"Leased Assets, Furniture and Fixtures",ASSET,DEBIT,10608,true,RCA-SFP-ROU,false,,false
+10608051,"Accumulated Depreciation-Leased Assets, Furniture and Fixtures",ASSET,CREDIT,10608,true,RCA-SFP-ROU,false,,false
+10608052,"Accumulated Impairment Losses-Leased Assets, Furniture and Fixtures",ASSET,CREDIT,10608,true,RCA-SFP-ROU,false,,false
+10608990,Other Leased Assets,ASSET,DEBIT,10608,true,RCA-SFP-ROU,false,,false
+10608991,Accumulated Depreciation-Other Leased Assets,ASSET,CREDIT,10608,true,RCA-SFP-ROU,false,,false
+10608992,Accumulated Impairment Losses-Other Leased Assets,ASSET,CREDIT,10608,true,RCA-SFP-ROU,false,,false
+10609,Leased Assets Improvements,ASSET,DEBIT,106,false,RCA-SFP-ROU,false,,false
+10609010,"Leased Assets Improvements, Land",ASSET,DEBIT,10609,true,RCA-SFP-ROU,false,,false
+10609011,"Accumulated Depreciation-Leased Assets Improvements, Land",ASSET,CREDIT,10609,true,RCA-SFP-ROU,false,,false
+10609012,"Accumulated Impairment Losses-Leased Assets Improvements, Land",ASSET,CREDIT,10609,true,RCA-SFP-ROU,false,,false
+10609020,"Leased Asset Improvements, Buildings and Other Structures",ASSET,DEBIT,10609,true,RCA-SFP-ROU,false,,false
+10609021,"Accumulated Depreciation-Leased Asset Improvements, Buildings and Other Structures",ASSET,CREDIT,10609,true,RCA-SFP-ROU,false,,false
+10609022,"Accumulated Impairment Losses-Leased Asset Improvements, Buildings and Other Structures",ASSET,CREDIT,10609,true,RCA-SFP-ROU,false,,false
+10609990,Other Leased Assets Improvements,ASSET,DEBIT,10609,true,RCA-SFP-ROU,false,,false
+10609991,Accumulated Depreciation-Other Leased Assets Improvements,ASSET,CREDIT,10609,true,RCA-SFP-ROU,false,,false
+10609992,Accumulated Impairment Losses-Other Leased Assets Improvements,ASSET,CREDIT,10609,true,RCA-SFP-ROU,false,,false
+10611,Heritage Assets,ASSET,DEBIT,106,false,RCA-SFP-PPE,false,,false
+10611010,Historical Buildings,ASSET,DEBIT,10611,true,RCA-SFP-PPE,false,,false
+10611011,Accumulated Depreciation-Historical Buildings,ASSET,CREDIT,10611,true,RCA-SFP-PPE,false,,false
+10611012,Accumulated Impairment Losses-Historical Buildings,ASSET,CREDIT,10611,true,RCA-SFP-PPE,false,,false
+10611020,Works of Arts and Archeological Specimens,ASSET,DEBIT,10611,true,RCA-SFP-PPE,false,,false
+10611021,Accumulated Depreciation-Works of Arts and Archeological Specimens,ASSET,CREDIT,10611,true,RCA-SFP-PPE,false,,false
+10611022,Accumulated Impairment Losses-Works of Arts and Archeological Specimens,ASSET,CREDIT,10611,true,RCA-SFP-PPE,false,,false
+10611030,Numismatic Collections and Gold Artifacts,ASSET,DEBIT,10611,true,RCA-SFP-PPE,false,,false
+10611040,Items for Exhibit,ASSET,DEBIT,10611,true,RCA-SFP-PPE,false,,false
+10611042,Accumulated Impairment Losses-Items for Exhibit,ASSET,CREDIT,10611,true,RCA-SFP-PPE,false,,false
+10611990,Other Heritage Assets,ASSET,DEBIT,10611,true,RCA-SFP-PPE,false,,false
+10611991,Accumulated Depreciation-Other Heritage Assets,ASSET,CREDIT,10611,true,RCA-SFP-PPE,false,,false
+10611992,Accumulated Impairment Losses-Other Heritage Assets,ASSET,CREDIT,10611,true,RCA-SFP-PPE,false,,false
+10612,Service Concession-Tangible Assets,ASSET,DEBIT,106,false,RCA-SFP-PPE,false,,false
+10612010,Service Concession-Road Networks,ASSET,DEBIT,10612,true,RCA-SFP-PPE,false,,false
+10612011,Accumulated Depreciation-Service Concession-Road Networks,ASSET,CREDIT,10612,true,RCA-SFP-PPE,false,,false
+10612012,Accumulated Impairment Losses-Service Concession-Road Networks,ASSET,CREDIT,10612,true,RCA-SFP-PPE,false,,false
+10612020,Service Concession-Flood Control Systems,ASSET,DEBIT,10612,true,RCA-SFP-PPE,false,,false
+10612021,Accumulated Depreciation-Service Concession-Flood Control Systems,ASSET,CREDIT,10612,true,RCA-SFP-PPE,false,,false
+10612022,Accumulated Impairment Losses-Service Concession-Flood Control Systems,ASSET,CREDIT,10612,true,RCA-SFP-PPE,false,,false
+10612030,Service Concession-Sewer Systems,ASSET,DEBIT,10612,true,RCA-SFP-PPE,false,,false
+10612031,Accumulated Depreciation-Service Concession-Sewer Systems,ASSET,CREDIT,10612,true,RCA-SFP-PPE,false,,false
+10612032,Accumulated Impairment Losses-Service Concession-Sewer Systems,ASSET,CREDIT,10612,true,RCA-SFP-PPE,false,,false
+10612040,Service Concession-Water Supply Systems,ASSET,DEBIT,10612,true,RCA-SFP-PPE,false,,false
+10612041,Accumulated Depreciation-Service Concession-Water Supply Systems,ASSET,CREDIT,10612,true,RCA-SFP-PPE,false,,false
+10612042,Accumulated Impairment Losses-Service Concession-Water Supply Systems,ASSET,CREDIT,10612,true,RCA-SFP-PPE,false,,false
+10612050,Service Concession-Power Supply Systems,ASSET,DEBIT,10612,true,RCA-SFP-PPE,false,,false
+10612051,Accumulated Depreciation-Service Concession-Power Supply Systems,ASSET,CREDIT,10612,true,RCA-SFP-PPE,false,,false
+10612052,Accumulated Impairment Losses-Service Concession-Power Supply Systems,ASSET,CREDIT,10612,true,RCA-SFP-PPE,false,,false
+10612060,Service Concession-Communications Networks,ASSET,DEBIT,10612,true,RCA-SFP-PPE,false,,false
+10612061,Accumulated Depreciation-Service Concession-Communications Networks,ASSET,CREDIT,10612,true,RCA-SFP-PPE,false,,false
+10612062,Accumulated Impairment Losses-Service Concession-Communications Networks,ASSET,CREDIT,10612,true,RCA-SFP-PPE,false,,false
+10612070,Service Concession-Seaport Systems,ASSET,DEBIT,10612,true,RCA-SFP-PPE,false,,false
+10612071,Accumulated Depreciation-Service Concession-Seaport Systems,ASSET,CREDIT,10612,true,RCA-SFP-PPE,false,,false
+10612072,Accumulated Impairment Losses-Service Concession-Seaport Systems,ASSET,CREDIT,10612,true,RCA-SFP-PPE,false,,false
+10612080,Service Concession-Airport Systems,ASSET,DEBIT,10612,true,RCA-SFP-PPE,false,,false
+10612081,Accumulated Depreciation-Service Concession-Airport Systems,ASSET,CREDIT,10612,true,RCA-SFP-PPE,false,,false
+10612082,Accumulated Impairment Losses-Service Concession-Airport Systems,ASSET,CREDIT,10612,true,RCA-SFP-PPE,false,,false
+10612090,"Service Concession-Parks, Plazas and Monuments",ASSET,DEBIT,10612,true,RCA-SFP-PPE,false,,false
+10612091,"Accumulated Depreciation-Service Concession-Parks, Plazas and Monuments",ASSET,CREDIT,10612,true,RCA-SFP-PPE,false,,false
+10612092,"Accumulated Impairment Losses-Service Concession-Parks, Plazas and Monuments",ASSET,CREDIT,10612,true,RCA-SFP-PPE,false,,false
+10612100,Service Concession-Railway Systems,ASSET,DEBIT,10612,true,RCA-SFP-PPE,false,,false
+10612101,Accumulated Depreciation-Service Concession-Railway Systems,ASSET,CREDIT,10612,true,RCA-SFP-PPE,false,,false
+10612102,Accumulated Impairment Losses-Service Concession-Railway Systems,ASSET,CREDIT,10612,true,RCA-SFP-PPE,false,,false
+10612110,Service Concession-Buildings and Other Structures,ASSET,DEBIT,10612,true,RCA-SFP-PPE,false,,false
+10612111,Accumulated Depreciation-Service Concession-Buildings and Other Structures,ASSET,CREDIT,10612,true,RCA-SFP-PPE,false,,false
+10612112,Accumulated Impairment Losses-Service Concession-Buildings and Other Structures,ASSET,CREDIT,10612,true,RCA-SFP-PPE,false,,false
+10612120,Service Concession-Machinery and Equipment,ASSET,DEBIT,10612,true,RCA-SFP-PPE,false,,false
+10612121,Accumulated Depreciation-Service Concession-Machinery and Equipment,ASSET,CREDIT,10612,true,RCA-SFP-PPE,false,,false
+10612122,Accumulated Impairment Losses-Service Concession-Machinery and Equipment,ASSET,CREDIT,10612,true,RCA-SFP-PPE,false,,false
+10612130,Service Concession-Transportation Equipment,ASSET,DEBIT,10612,true,RCA-SFP-PPE,false,,false
+10612131,Accumulated Depreciation-Service Concession-Transportation Equipment,ASSET,CREDIT,10612,true,RCA-SFP-PPE,false,,false
+10612132,Accumulated Impairment Losses-Service Concession-Transportation Equipment,ASSET,CREDIT,10612,true,RCA-SFP-PPE,false,,false
+10612140,"Service Concession-Furniture, Fixtures and Books",ASSET,DEBIT,10612,true,RCA-SFP-PPE,false,,false
+10612141,"Accumulated Depreciation-Service Concession-Furniture, Fixtures and Books",ASSET,CREDIT,10612,true,RCA-SFP-PPE,false,,false
+10612142,"Accumulated Impairment Losses-Service Concession-Furniture, Fixtures and Books",ASSET,CREDIT,10612,true,RCA-SFP-PPE,false,,false
+10612150,Service Concession-Land,ASSET,DEBIT,10612,true,RCA-SFP-PPE,false,,false
+10612152,Accumulated Impairment Losses-Service Concession-Land,ASSET,CREDIT,10612,true,RCA-SFP-PPE,false,,false
+10612990,Other Service Concession Assets,ASSET,DEBIT,10612,true,RCA-SFP-PPE,false,,false
+10612991,Accumulated Depreciation-Other Service Concession Assets,ASSET,CREDIT,10612,true,RCA-SFP-PPE,false,,false
+10612992,Accumulated Impairment Losses-Other Service Concession Assets,ASSET,CREDIT,10612,true,RCA-SFP-PPE,false,,false
+10613,Exploration and Evaluation Assets,ASSET,DEBIT,106,false,RCA-SFP-PPE,false,,false
+10613010,Underground Tunnel,ASSET,DEBIT,10613,true,RCA-SFP-PPE,false,,false
+10613011,Accumulated Depreciation-Underground Tunnel,ASSET,CREDIT,10613,true,RCA-SFP-PPE,false,,false
+10613012,Accumulated Impairment Losses-Underground Tunnel,ASSET,CREDIT,10613,true,RCA-SFP-PPE,false,,false
+10613020,Mining Equipment,ASSET,DEBIT,10613,true,RCA-SFP-PPE,false,,false
+10613021,Accumulated Depreciation-Mining Equipment,ASSET,CREDIT,10613,true,RCA-SFP-PPE,false,,false
+10613022,Accumulated Impairment Losses-Mining Equipment,ASSET,CREDIT,10613,true,RCA-SFP-PPE,false,,false
+10613990,Other Exploration and Evaluation Assets,ASSET,DEBIT,10613,true,RCA-SFP-PPE,false,,false
+10613991,Accumulated Depreciation-Other Exploration and Evaluation Assets,ASSET,CREDIT,10613,true,RCA-SFP-PPE,false,,false
+10613992,Accumulated Impairment Losses-Other Exploration and Evaluation Assets,ASSET,CREDIT,10613,true,RCA-SFP-PPE,false,,false
+10614,"Bearer Trees, Plants and Crops",ASSET,DEBIT,106,false,RCA-SFP-PPE,false,,false
+10614010,"Bearer Trees, Plants and Crops",ASSET,DEBIT,10614,true,RCA-SFP-PPE,false,,false
+10614011,"Accumulated Depreciation-Bearer Trees, Plants and Crops",ASSET,CREDIT,10614,true,RCA-SFP-PPE,false,,false
+10614012,"Accumulated Impairment Losses-Bearer Trees, Plants and Crops",ASSET,CREDIT,10614,true,RCA-SFP-PPE,false,,false
+10614020,"Growing Bearer Trees, Plants and Crops",ASSET,DEBIT,10614,true,RCA-SFP-PPE,false,,false
+10698,Construction in Progress,ASSET,DEBIT,106,false,RCA-SFP-PPE,false,,false
+10698010,Construction in Progress-Land Improvements,ASSET,DEBIT,10698,true,RCA-SFP-PPE,false,,false
+10698020,Construction in Progress-Infrastructure Assets,ASSET,DEBIT,10698,true,RCA-SFP-PPE,false,,false
+10698030,Construction in Progress-Buildings and Other Structures,ASSET,DEBIT,10698,true,RCA-SFP-PPE,false,OTHER,false
+10698040,Construction in Progress-Leased Assets,ASSET,DEBIT,10698,true,RCA-SFP-PPE,false,,false
+10698050,Construction in Progress-Leased Assets Improvements,ASSET,DEBIT,10698,true,RCA-SFP-PPE,false,,false
+10698060,Construction in Progress-Furniture and Fixtures,ASSET,DEBIT,10698,true,RCA-SFP-PPE,false,,false
+10698070,Construction in Progress-Heritage Assets,ASSET,DEBIT,10698,true,RCA-SFP-PPE,false,,false
+10698080,Construction in Progress-Service Concession Assets,ASSET,DEBIT,10698,true,RCA-SFP-PPE,false,,false
+10699,"Other Property, Plant and Equipment",ASSET,DEBIT,106,false,RCA-SFP-PPE,false,,false
+10699010,"Work, Zoo and/or Other Animals",ASSET,DEBIT,10699,true,RCA-SFP-PPE,false,,false
+10699011,"Accumulated Depreciation-Work, Zoo and/or Other Animals",ASSET,CREDIT,10699,true,RCA-SFP-PPE,false,,false
+10699012,"Accumulated Impairment Losses-Work, Zoo and/or Other Animals",ASSET,CREDIT,10699,true,RCA-SFP-PPE,false,,false
+10699020,"Growing Work, Zoo and/or Other Animals",ASSET,DEBIT,10699,true,RCA-SFP-PPE,false,,false
+10699990,"Other Property, Plant and Equipment",ASSET,DEBIT,10699,true,RCA-SFP-PPE,false,,false
+10699991,"Accumulated Depreciation-Other Property, Plant and Equipment",ASSET,CREDIT,10699,true,RCA-SFP-PPE,false,,false
+10699992,"Accumulated Impairment Losses-Other Property, Plant and Equipment",ASSET,CREDIT,10699,true,RCA-SFP-PPE,false,,false
+107,Biological Assets,ASSET,DEBIT,1,false,RCA-SFP-ONCA,false,,false
+10701,Bearer Biological Assets,ASSET,DEBIT,107,false,RCA-SFP-ONCA,false,,false
+10701010,Breeding Stocks,ASSET,DEBIT,10701,true,RCA-SFP-ONCA,false,,false
+10701011,Accumulated Depreciation-Breeding Stocks,ASSET,CREDIT,10701,true,RCA-SFP-ONCA,false,,false
+10701012,Accumulated Impairment Losses-Breeding Stocks,ASSET,CREDIT,10701,true,RCA-SFP-ONCA,false,,false
+10701020,Livestock,ASSET,DEBIT,10701,true,RCA-SFP-ONCA,false,,false
+10701021,Accumulated Depreciation-Livestock,ASSET,CREDIT,10701,true,RCA-SFP-ONCA,false,,false
+10701022,Accumulated Impairment Losses-Livestock,ASSET,CREDIT,10701,true,RCA-SFP-ONCA,false,,false
+10701030,"Trees, Plants and Crops",ASSET,DEBIT,10701,true,RCA-SFP-ONCA,false,,false
+10701031,"Accumulated Depreciation-Trees, Plants and Crops",ASSET,CREDIT,10701,true,RCA-SFP-ONCA,false,,false
+10701032,"Accumulated Impairment Losses-Trees, Plants and Crops",ASSET,CREDIT,10701,true,RCA-SFP-ONCA,false,,false
+10701040,Aquaculture,ASSET,DEBIT,10701,true,RCA-SFP-ONCA,false,,false
+10701041,Accumulated Depreciation-Aquaculture,ASSET,CREDIT,10701,true,RCA-SFP-ONCA,false,,false
+10701042,Accumulated Impairment Losses-Aquaculture,ASSET,CREDIT,10701,true,RCA-SFP-ONCA,false,,false
+10701990,Other Bearer Biological Assets,ASSET,DEBIT,10701,true,RCA-SFP-ONCA,false,,false
+10701991,Accumulated Depreciation-Other Bearer Biological Assets,ASSET,CREDIT,10701,true,RCA-SFP-ONCA,false,,false
+10701992,Accumulated Impairment Losses-Other Bearer Biological Assets,ASSET,CREDIT,10701,true,RCA-SFP-ONCA,false,,false
+10702,Consumable Biological Assets,ASSET,DEBIT,107,false,RCA-SFP-ONCA,false,,false
+10702010,Livestock Held for Consumption/Sale/Distribution,ASSET,DEBIT,10702,true,RCA-SFP-ONCA,false,,false
+10702012,Accumulated Impairment Losses-Livestock Held for Consumption/Sale/Distribution,ASSET,CREDIT,10702,true,RCA-SFP-ONCA,false,,false
+10702020,"Trees, Plants and Crops Held for Consumption/Sale/Distribution",ASSET,DEBIT,10702,true,RCA-SFP-ONCA,false,,false
+10702022,"Accumulated Impairment Losses-Trees, Plants and Crops Held for Consumption/Sale/Distribution",ASSET,CREDIT,10702,true,RCA-SFP-ONCA,false,,false
+10702030,Agricultural Produce Growing on Bearer Plant,ASSET,DEBIT,10702,true,RCA-SFP-ONCA,false,,false
+10702032,Accumulated Impairment Losses-Agricultural Produce Growing on Bearer Plant,ASSET,CREDIT,10702,true,RCA-SFP-ONCA,false,,false
+10702990,Other Consumable Biological Assets,ASSET,DEBIT,10702,true,RCA-SFP-ONCA,false,,false
+10702992,Accumulated Impairment Losses-Other Consumable Biological Assets,ASSET,CREDIT,10702,true,RCA-SFP-ONCA,false,,false
+108,Intangible Assets,ASSET,DEBIT,1,false,RCA-SFP-INT,false,,false
+10801,Intangible Assets,ASSET,DEBIT,108,false,RCA-SFP-INT,false,,false
+10801010,Patents,ASSET,DEBIT,10801,true,RCA-SFP-INT,false,,false
+10801011,Accumulated Amortization-Patents,ASSET,CREDIT,10801,true,RCA-SFP-INT,false,,false
+10801012,Accumulated Impairment Losses-Patents,ASSET,CREDIT,10801,true,RCA-SFP-INT,false,,false
+10801020,Computer Software,ASSET,DEBIT,10801,true,RCA-SFP-INT,false,,false
+10801021,Accumulated Amortization-Computer Software,ASSET,CREDIT,10801,true,RCA-SFP-INT,false,,false
+10801022,Accumulated Impairment Losses-Computer Software,ASSET,CREDIT,10801,true,RCA-SFP-INT,false,,false
+10801030,Websites,ASSET,DEBIT,10801,true,RCA-SFP-INT,false,,false
+10801031,Accumulated Amortization-Websites,ASSET,CREDIT,10801,true,RCA-SFP-INT,false,,false
+10801032,Accumulated Impairment Losses-Websites,ASSET,CREDIT,10801,true,RCA-SFP-INT,false,,false
+10801040,Goodwill,ASSET,DEBIT,10801,true,RCA-SFP-INT,false,,false
+10801042,Accumulated Impairment Losses-Goodwill,ASSET,CREDIT,10801,true,RCA-SFP-INT,false,,false
+10801050,Copyrights,ASSET,DEBIT,10801,true,RCA-SFP-INT,false,,false
+10801051,Accumulated Amortization-Copyrights,ASSET,CREDIT,10801,true,RCA-SFP-INT,false,,false
+10801052,Accumulated Impairment Losses-Copyrights,ASSET,CREDIT,10801,true,RCA-SFP-INT,false,,false
+10801990,Other Intangible Assets,ASSET,DEBIT,10801,true,RCA-SFP-INT,false,,false
+10801991,Accumulated Amortization-Other Intangible Assets,ASSET,CREDIT,10801,true,RCA-SFP-INT,false,,false
+10801992,Accumulated Impairment Losses-Other Intangible Assets,ASSET,CREDIT,10801,true,RCA-SFP-INT,false,,false
+10802,Service Concession-Intangible Assets,ASSET,DEBIT,108,false,RCA-SFP-INT,false,,false
+10802010,Service Concession-Intangible Assets,ASSET,DEBIT,10802,true,RCA-SFP-INT,false,,false
+10802011,Accumulated Amortization-Service Concession-Intangible Assets,ASSET,CREDIT,10802,true,RCA-SFP-INT,false,,false
+10802012,Accumulated Impairment Losses-Service Concession-Intangible Assets,ASSET,CREDIT,10802,true,RCA-SFP-INT,false,,false
+10898,Development in Progress,ASSET,DEBIT,108,false,RCA-SFP-INT,false,,false
+10898010,Development in Progress-Patents,ASSET,DEBIT,10898,true,RCA-SFP-INT,false,,false
+10898020,Development in Progress-Computer Software,ASSET,DEBIT,10898,true,RCA-SFP-INT,false,,false
+10898030,Development in Progress-Websites,ASSET,DEBIT,10898,true,RCA-SFP-INT,false,,false
+10898990,Development in Progress-Other Intangible Assets,ASSET,DEBIT,10898,true,RCA-SFP-INT,false,,false
+109,International Reserves,ASSET,DEBIT,1,false,RCA-SFP-FIN,false,,false
+10901,International Reserves,ASSET,DEBIT,109,false,RCA-SFP-FIN,false,,false
+10901010,Due from Foreign Banks-Demand Deposits,ASSET,DEBIT,10901,true,RCA-SFP-FIN,false,,false
+10901020,Foreign Currency on Hand,ASSET,DEBIT,10901,true,RCA-SFP-FIN,false,,false
+10901030,Foreign Currency in Transit,ASSET,DEBIT,10901,true,RCA-SFP-FIN,false,,false
+10901040,Foreign Investments,ASSET,DEBIT,10901,true,RCA-SFP-FIN,false,,false
+10901050,Gold with Foreign Financial Institutions,ASSET,DEBIT,10901,true,RCA-SFP-FIN,false,,false
+10901060,Accrued Interest Paid on Foreign Securities Purchased,ASSET,DEBIT,10901,true,RCA-SFP-FIN,false,,false
+10901070,Holdings of Special Drawing Rights,ASSET,DEBIT,10901,true,RCA-SFP-FIN,false,,false
+10901080,Foreign Securities Purchased Under Agreement to Resell,ASSET,DEBIT,10901,true,RCA-SFP-FIN,false,,false
+10901090,Due from Foreign Banks-Time Deposits,ASSET,DEBIT,10901,true,RCA-SFP-FIN,false,,false
+10901100,Due From/To Broker-Foreign Investments,ASSET,DEBIT,10901,true,RCA-SFP-FIN,false,,false
+10901110,Loan to International Monetary Fund,ASSET,DEBIT,10901,true,RCA-SFP-FIN,false,,false
+110,Non-International Reserves Foreign Assets,ASSET,DEBIT,1,false,RCA-SFP-FIN,false,,false
+11001,Foreign Exchange Receivables,ASSET,DEBIT,110,false,RCA-SFP-FIN,false,,false
+11001010,Foreign Exchange Receivables,ASSET,DEBIT,11001,true,RCA-SFP-FIN,false,,false
+11002,Due from Foreign Banks-Special Accounts,ASSET,DEBIT,110,false,RCA-SFP-FIN,false,,false
+11002010,Due from Foreign Banks-Special Accounts,ASSET,DEBIT,11002,true,RCA-SFP-FIN,false,,false
+11003,Investments in Other Foreign Exchange Denominated Securities,ASSET,DEBIT,110,false,RCA-SFP-FIN,false,,false
+11003010,Investments in Other Foreign Exchange Denominated Securities,ASSET,DEBIT,11003,true,RCA-SFP-FIN,false,,false
+111,Non-Current Assets Held for Sale,ASSET,DEBIT,1,false,RCA-SFP-OCA,false,,false
+11101,Non-Current Assets Held for Sale,ASSET,DEBIT,111,false,RCA-SFP-OCA,false,,false
+11101010,Non-Current Assets Held for Sale,ASSET,DEBIT,11101,true,RCA-SFP-OCA,false,,false
+11101012,Accumulated Impairment Losses-Non-Current Assets Held for Sale,ASSET,CREDIT,11101,true,RCA-SFP-OCA,false,,false
+112,Deferred Tax Assets,ASSET,DEBIT,1,false,RCA-SFP-DTA,false,,false
+11201,Deferred Tax Assets,ASSET,DEBIT,112,false,RCA-SFP-DTA,false,,false
+11201010,Deferred Tax Assets,ASSET,DEBIT,11201,true,RCA-SFP-DTA,false,,false
+199,Other Assets,ASSET,DEBIT,1,false,,false,,false
+19901,Advances,ASSET,DEBIT,199,false,RCA-SFP-OCA,false,,false
+19901010,Advances for Operating Expenses,ASSET,DEBIT,19901,true,RCA-SFP-OCA,false,,false
+19901020,Advances for Payroll,ASSET,DEBIT,19901,true,RCA-SFP-OCA,false,,false
+19901030,Advances to Special Disbursing Officer,ASSET,DEBIT,19901,true,RCA-SFP-OCA,false,,false
+19901040,Advances to Officers and Employees,ASSET,DEBIT,19901,true,RCA-SFP-OCA,false,EMPLOYEE,false
+19902,Prepayments,ASSET,DEBIT,199,false,RCA-SFP-OCA,false,,false
+19902010,Advances to Contractors/Sub-Contractors,ASSET,DEBIT,19902,true,RCA-SFP-OCA,false,SUPPLIER,false
+19902020,Prepaid Rent,ASSET,DEBIT,19902,true,RCA-SFP-OCA,false,,false
+19902030,Prepaid Registration,ASSET,DEBIT,19902,true,RCA-SFP-OCA,false,,false
+19902040,Prepaid Interest,ASSET,DEBIT,19902,true,RCA-SFP-OCA,false,,false
+19902050,Prepaid Insurance,ASSET,DEBIT,19902,true,RCA-SFP-OCA,false,,false
+19902060,Input Tax,ASSET,DEBIT,19902,true,RCA-SFP-OCA,false,,false
+19902070,Creditable Input Tax,ASSET,DEBIT,19902,true,RCA-SFP-OCA,false,,false
+19902080,Withholding Tax at Source,ASSET,DEBIT,19902,true,RCA-SFP-OCA,false,,false
+19902090,Prepaid Benefit Cost,ASSET,DEBIT,19902,true,RCA-SFP-OCA,false,,false
+19902100,Prepaid Subscription,ASSET,DEBIT,19902,true,RCA-SFP-OCA,false,,false
+19902990,Other Prepayments,ASSET,DEBIT,19902,true,RCA-SFP-OCA,false,,false
+19903,Deposits,ASSET,DEBIT,199,false,RCA-SFP-ONCA,false,,false
+19903010,Deposit on Letters of Credit,ASSET,DEBIT,19903,true,RCA-SFP-ONCA,false,,false
+19903020,Guaranty Deposits,ASSET,DEBIT,19903,true,RCA-SFP-ONCA,false,,false
+19903990,Other Deposits,ASSET,DEBIT,19903,true,RCA-SFP-ONCA,false,,false
+19904,Restricted Fund,ASSET,DEBIT,199,false,RCA-SFP-ONCA,false,,false
+19904010,Restricted Fund,ASSET,DEBIT,19904,true,RCA-SFP-ONCA,false,,false
+19999,Other Assets,ASSET,DEBIT,199,false,RCA-SFP-ONCA,false,,false
+19999020,Foreclosed Property/Assets,ASSET,DEBIT,19999,true,RCA-SFP-ONCA,false,,false
+19999022,Accumulated Impairment Losses-Foreclosed Property/Assets,ASSET,CREDIT,19999,true,RCA-SFP-ONCA,false,,false
+19999030,Forfeited Property/Assets,ASSET,DEBIT,19999,true,RCA-SFP-ONCA,false,,false
+19999032,Accumulated Impairment Losses-Forfeited Property/Assets,ASSET,CREDIT,19999,true,RCA-SFP-ONCA,false,,false
+19999040,Confiscated Property/Assets,ASSET,DEBIT,19999,true,RCA-SFP-ONCA,false,,false
+19999042,Accumulated Impairment Losses-Confiscated Property/Assets,ASSET,CREDIT,19999,true,RCA-SFP-ONCA,false,,false
+19999050,Abandoned/Surrendered Property/Assets,ASSET,DEBIT,19999,true,RCA-SFP-ONCA,false,,false
+19999052,Accumulated Impairment Losses-Abandoned/Surrendered Property/Assets,ASSET,CREDIT,19999,true,RCA-SFP-ONCA,false,,false
+19999060,Demonetized Commemorative Coins,ASSET,DEBIT,19999,true,RCA-SFP-ONCA,false,,false
+19999070,Commemorative Notes and Coins,ASSET,DEBIT,19999,true,RCA-SFP-ONCA,false,,false
+19999080,Deferred Charges/Losses,ASSET,DEBIT,19999,true,RCA-SFP-ONCA,false,,false
+19999980,Revaluation of Foreign Currency,ASSET,DEBIT,19999,true,RCA-SFP-ONCA,false,,false
+19999990,Other Assets,ASSET,DEBIT,19999,true,RCA-SFP-ONCA,false,,false
+19999992,Accumulated Impairment Losses-Other Assets,ASSET,CREDIT,19999,true,RCA-SFP-ONCA,false,,false
+2,Liabilities,LIABILITY,CREDIT,,false,,false,,false
+201,Financial Liabilities,LIABILITY,CREDIT,2,false,,false,,false
+20101,Payables,LIABILITY,CREDIT,201,false,,false,,false
+20101010,Accounts Payable,LIABILITY,CREDIT,20101,true,RCA-SFP-FL,false,SUPPLIER,false
+20101020,Due to Officers and Employees,LIABILITY,CREDIT,20101,true,RCA-SFP-FL,false,EMPLOYEE,false
+20101040,Notes Payable,LIABILITY,CREDIT,20101,true,RCA-SFP-FL,false,,false
+20101043,Premium on Notes Payable,LIABILITY,CREDIT,20101,true,RCA-SFP-FL,false,,false
+20101044,Discount on Notes Payable,LIABILITY,DEBIT,20101,true,RCA-SFP-FL,false,,false
+20101050,Interest Payable,LIABILITY,CREDIT,20101,true,RCA-SFP-FL,false,,false
+20101060,Operating Lease Payable,LIABILITY,CREDIT,20101,true,RCA-SFP-LEASE,false,,false
+20101070,Finance Lease Payable,LIABILITY,CREDIT,20101,true,RCA-SFP-LEASE,false,,false
+20101080,Awards/Rewards Payable,LIABILITY,CREDIT,20101,true,RCA-SFP-FL,false,,false
+20101090,Service Concession Arrangements Payable,LIABILITY,CREDIT,20101,true,RCA-SFP-FL,false,,false
+20101100,Accrued Benefits Payable,LIABILITY,CREDIT,20101,true,RCA-SFP-FL,false,,false
+20101110,Insurance/Reinsurance Premium Payable,LIABILITY,CREDIT,20101,true,RCA-SFP-FL,false,,false
+20101120,Prizes Payable,LIABILITY,CREDIT,20101,true,RCA-SFP-FL,false,,false
+20101130,Indemnities Payable,LIABILITY,CREDIT,20101,true,RCA-SFP-FL,false,,false
+20101140,Payables to Joint Ventures,LIABILITY,CREDIT,20101,true,RCA-SFP-FL,false,,false
+20101150,Payables to Joint Operators,LIABILITY,CREDIT,20101,true,RCA-SFP-FL,false,,false
+20101160,Charity Expenses Payable,LIABILITY,CREDIT,20101,true,RCA-SFP-FL,false,,false
+20101170,Claims Pay-out Payable,LIABILITY,CREDIT,20101,true,RCA-SFP-FL,false,,false
+20102,Bills/Bonds/Loans Payable,LIABILITY,CREDIT,201,false,RCA-SFP-FL,false,,false
+20102020,Bonds Payable-Domestic,LIABILITY,CREDIT,20102,true,RCA-SFP-FL,false,,false
+20102023,Premium on Bonds Payable-Domestic,LIABILITY,CREDIT,20102,true,RCA-SFP-FL,false,,false
+20102024,Discount on Bonds Payable-Domestic,LIABILITY,DEBIT,20102,true,RCA-SFP-FL,false,,false
+20102025,Bond Issue Cost-Domestic,LIABILITY,DEBIT,20102,true,RCA-SFP-FL,false,,false
+20102030,Bonds Payable-Foreign,LIABILITY,CREDIT,20102,true,RCA-SFP-FL,false,,false
+20102033,Premium on Bonds Payable-Foreign,LIABILITY,CREDIT,20102,true,RCA-SFP-FL,false,,false
+20102034,Discount on Bonds Payable-Foreign,LIABILITY,DEBIT,20102,true,RCA-SFP-FL,false,,false
+20102035,Bond Issue Cost-Foreign,LIABILITY,DEBIT,20102,true,RCA-SFP-FL,false,,false
+20102040,Loans Payable-Domestic,LIABILITY,CREDIT,20102,true,RCA-SFP-FL,false,,false
+20102050,Loans Payable-Foreign,LIABILITY,CREDIT,20102,true,RCA-SFP-FL,false,,false
+20102060,Bills Payable-Bangko Sentral ng Pilipinas,LIABILITY,CREDIT,20102,true,RCA-SFP-FL,false,,false
+20102070,Redeemable Preferred Shares,LIABILITY,CREDIT,20102,true,RCA-SFP-FL,false,,false
+20102080,Term Loan Facility,LIABILITY,CREDIT,20102,true,RCA-SFP-FL,false,,false
+20102990,Other Bills/Bonds/Loans Payable,LIABILITY,CREDIT,20102,true,RCA-SFP-FL,false,,false
+20104,Financial Liabilities Designated at Fair Value through Surplus/Profit or Deficit/Loss,LIABILITY,CREDIT,201,false,RCA-SFP-FL,false,,false
+20104010,Financial Liability Designated at Fair Value through Surplus/Profit or Deficit/Loss,LIABILITY,CREDIT,20104,true,RCA-SFP-FL,false,,false
+20105,Financial Liabilities Held for Trading,LIABILITY,CREDIT,201,false,RCA-SFP-FL,false,,false
+20105010,Derivatives Financial Liability with Negative Fair Value Held for Trading,LIABILITY,CREDIT,20105,true,RCA-SFP-FL,false,,false
+20105020,Liability for Short Position,LIABILITY,CREDIT,20105,true,RCA-SFP-FL,false,,false
+20105030,Derivative Liability,LIABILITY,CREDIT,20105,true,RCA-SFP-FL,false,,false
+20106,Financial Liabilities Associated with Transferred Assets,LIABILITY,CREDIT,201,false,RCA-SFP-FL,false,,false
+20106010,Financial Liabilities Associated with Transferred Assets,LIABILITY,CREDIT,20106,true,RCA-SFP-FL,false,,false
+20107,Domestic Securities Sold Under Repurchase Agreements,LIABILITY,CREDIT,201,false,RCA-SFP-FL,false,,false
+20107010,Domestic Securities Sold Under Repurchase Agreements,LIABILITY,CREDIT,20107,true,RCA-SFP-FL,false,,false
+20108,Unsecured Subordinated Debt,LIABILITY,CREDIT,201,false,RCA-SFP-FL,false,,false
+20108010,Unsecured Subordinated Debt,LIABILITY,CREDIT,20108,true,RCA-SFP-FL,false,,false
+20108013,Unamortized Unsecured Subordinated Debt Premium,LIABILITY,CREDIT,20108,true,RCA-SFP-FL,false,,false
+20108014,Unamortized Unsecured Subordinated Debt Discount,LIABILITY,DEBIT,20108,true,RCA-SFP-FL,false,,false
+20109,Financial Liabilities on Insured Deposit Claims,LIABILITY,CREDIT,201,false,RCA-SFP-FL,false,,false
+20109010,Insured Deposit Claims Payable,LIABILITY,CREDIT,20109,true,RCA-SFP-FL,false,,false
+20199,Other Financial Liabilities,LIABILITY,CREDIT,201,false,RCA-SFP-FL,false,,false
+20199990,Other Financial Liabilities,LIABILITY,CREDIT,20199,true,RCA-SFP-FL,false,,false
+202,Inter-Agency Payables,LIABILITY,CREDIT,2,false,RCA-SFP-IAP,false,,false
+20201,Inter-Agency Payables,LIABILITY,CREDIT,202,false,RCA-SFP-IAP,false,,false
+20201010,Due to BIR,LIABILITY,CREDIT,20201,true,RCA-SFP-IAP,false,,false
+20201020,Due to GSIS,LIABILITY,CREDIT,20201,true,RCA-SFP-IAP,false,,false
+20201030,Due to Pag-IBIG,LIABILITY,CREDIT,20201,true,RCA-SFP-IAP,false,,false
+20201040,Due to PhilHealth,LIABILITY,CREDIT,20201,true,RCA-SFP-IAP,false,,false
+20201050,Due to NGAs,LIABILITY,CREDIT,20201,true,RCA-SFP-IAP,false,,false
+20201060,Due to Other Government Corporations,LIABILITY,CREDIT,20201,true,RCA-SFP-IAP,false,,false
+20201070,Due to LGUs,LIABILITY,CREDIT,20201,true,RCA-SFP-IAP,false,,false
+20201080,Due to Subsidiaries,LIABILITY,CREDIT,20201,true,RCA-SFP-IAP,false,,false
+20201090,Due to Treasurer of the Philippines,LIABILITY,CREDIT,20201,true,RCA-SFP-IAP,false,,false
+20201100,Due to Parent Corporations,LIABILITY,CREDIT,20201,true,RCA-SFP-IAP,false,,false
+20201110,Due to SSS,LIABILITY,CREDIT,20201,true,RCA-SFP-IAP,false,,false
+20201120,Value Added Tax Payable,LIABILITY,CREDIT,20201,true,RCA-SFP-IAP,false,,false
+20201130,Income Tax Payable,LIABILITY,CREDIT,20201,true,RCA-SFP-IAP,false,,false
+20201140,Due to Associates/Affiliates,LIABILITY,CREDIT,20201,true,RCA-SFP-IAP,false,,false
+20202,Due to Bangko Sentral ng Pilipinas/Other Banks/Others,LIABILITY,CREDIT,202,false,RCA-SFP-IAP,false,,false
+20202010,Due to Bangko Sentral ng Pilipinas,LIABILITY,CREDIT,20202,true,RCA-SFP-IAP,false,,false
+20202020,Due to Resident Banks-Clearing Accounts,LIABILITY,CREDIT,20202,true,RCA-SFP-IAP,false,,false
+20202030,Due to Non-Resident Banks-Working Capital,LIABILITY,CREDIT,20202,true,RCA-SFP-IAP,false,,false
+20202040,Due to Foreign Currency Deposit Unit/Regional Banking Units,LIABILITY,CREDIT,20202,true,RCA-SFP-IAP,false,,false
+20202050,Interbank Loans Payable,LIABILITY,CREDIT,20202,true,RCA-SFP-IAP,false,,false
+20202060,Allocation of Special Drawing Rights,LIABILITY,CREDIT,20202,true,RCA-SFP-IAP,false,,false
+20202070,Due to Philippine Deposit Insurance Corporation,LIABILITY,CREDIT,20202,true,RCA-SFP-IAP,false,,false
+20202080,Due to Philippine Crop Insurance Corporation,LIABILITY,CREDIT,20202,true,RCA-SFP-IAP,false,,false
+20202090,Due to Head Office/Branches/Agencies Abroad,LIABILITY,CREDIT,20202,true,RCA-SFP-IAP,false,,false
+20202990,Others,LIABILITY,CREDIT,20202,true,RCA-SFP-IAP,false,,false
+203,Intra-Agency Payables,LIABILITY,CREDIT,2,false,RCA-SFP-OP,false,,false
+20301,Intra-Agency Payables,LIABILITY,CREDIT,203,false,RCA-SFP-OP,false,,false
+20301040,Due to Operating Units/Field Units,LIABILITY,CREDIT,20301,true,RCA-SFP-OP,false,,false
+20301050,Due to Other Funds,LIABILITY,CREDIT,20301,true,RCA-SFP-OP,false,,false
+20301060,Due to Central/Home/Head Office,LIABILITY,CREDIT,20301,true,RCA-SFP-OP,false,,false
+20301070,Due to Regional/Branch Offices,LIABILITY,CREDIT,20301,true,RCA-SFP-OP,false,,false
+204,Trust Liabilities,LIABILITY,CREDIT,2,false,RCA-SFP-TRUST,false,,false
+20401,Trust Liabilities,LIABILITY,CREDIT,204,false,RCA-SFP-TRUST,false,,false
+20401010,Trust Liabilities,LIABILITY,CREDIT,20401,true,RCA-SFP-TRUST,false,,false
+20401020,Trust Liabilities-Disaster Risk Reduction and Management Fund,LIABILITY,CREDIT,20401,true,RCA-SFP-TRUST,false,,false
+20401030,Bail Bonds Payable,LIABILITY,CREDIT,20401,true,RCA-SFP-TRUST,false,,false
+20401040,Guaranty/Security Deposits Payable,LIABILITY,CREDIT,20401,true,RCA-SFP-TRUST,false,,false
+20401050,Customers' Deposits Payable,LIABILITY,CREDIT,20401,true,RCA-SFP-TRUST,false,CUSTOMER,false
+20401060,Margin Deposits,LIABILITY,CREDIT,20401,true,RCA-SFP-TRUST,false,,false
+20401070,Deposit from Prospective Investors,LIABILITY,CREDIT,20401,true,RCA-SFP-TRUST,false,,false
+20401080,Trust Liabilities-Disallowances/Charges,LIABILITY,CREDIT,20401,true,RCA-SFP-TRUST,false,,false
+20401090,Due to Insurance Companies,LIABILITY,CREDIT,20401,true,RCA-SFP-TRUST,false,,false
+20401100,Due to Reinsurance Companies,LIABILITY,CREDIT,20401,true,RCA-SFP-TRUST,false,,false
+20401110,Due to Insurance Companies' Clients,LIABILITY,CREDIT,20401,true,RCA-SFP-TRUST,false,,false
+20401120,Due to Reinsurance Companies' Clients,LIABILITY,CREDIT,20401,true,RCA-SFP-TRUST,false,,false
+205,Deferred Credits/Unearned Revenue/Income,LIABILITY,CREDIT,2,false,RCA-SFP-DEF,false,,false
+20501,Deferred Credits,LIABILITY,CREDIT,205,false,RCA-SFP-DEF,false,,false
+20501010,Deferred Finance Lease Revenue,LIABILITY,CREDIT,20501,true,RCA-SFP-DEF,false,,false
+20501020,Deferred Service Concession Revenue,LIABILITY,CREDIT,20501,true,RCA-SFP-DEF,false,,false
+20501030,Output Tax,LIABILITY,CREDIT,20501,true,RCA-SFP-DEF,false,,false
+20501040,Deferred Revenue from Grants and Donations,LIABILITY,CREDIT,20501,true,RCA-SFP-DEF,false,,false
+20501990,Other Deferred Credits,LIABILITY,CREDIT,20501,true,RCA-SFP-DEF,false,,false
+20502,Unearned Revenue/Income,LIABILITY,CREDIT,205,false,RCA-SFP-DEF,false,,false
+20502010,Unearned Revenue/Income-Investment Property,LIABILITY,CREDIT,20502,true,RCA-SFP-DEF,false,,false
+20502020,Unearned Tax Subsidy,LIABILITY,CREDIT,20502,true,RCA-SFP-DEF,false,,false
+20502030,Commitment Contribution,LIABILITY,CREDIT,20502,true,RCA-SFP-DEF,false,,false
+20502040,Reserve for Unearned Premiums,LIABILITY,CREDIT,20502,true,RCA-SFP-DEF,false,,false
+20502050,Unearned Interest Income,LIABILITY,CREDIT,20502,true,RCA-SFP-DEF,false,,false
+20502990,Other Unearned Revenue/Income,LIABILITY,CREDIT,20502,true,RCA-SFP-DEF,false,,false
+206,Provisions,LIABILITY,CREDIT,2,false,RCA-SFP-PROV,false,,false
+20601,Provisions,LIABILITY,CREDIT,206,false,RCA-SFP-PROV,false,,false
+20601010,Pension Benefits Payable,LIABILITY,CREDIT,20601,true,RCA-SFP-PROV,false,,false
+20601020,Leave Benefits Payable,LIABILITY,CREDIT,20601,true,RCA-SFP-PROV,false,,false
+20601030,Retirement Gratuity Payable,LIABILITY,CREDIT,20601,true,RCA-SFP-PROV,false,,false
+20601040,Provision for Product Warranty,LIABILITY,CREDIT,20601,true,RCA-SFP-PROV,false,,false
+20601050,Provision for Environmental Damages,LIABILITY,CREDIT,20601,true,RCA-SFP-PROV,false,,false
+20601060,Accrued Benefit Cost,LIABILITY,CREDIT,20601,true,RCA-SFP-PROV,false,,false
+20601070,Provision for Health Benefits,LIABILITY,CREDIT,20601,true,RCA-SFP-PROV,false,,false
+20601080,Provision for Indemnity Fluctuation,LIABILITY,CREDIT,20601,true,RCA-SFP-PROV,false,,false
+20601990,Other Provisions,LIABILITY,CREDIT,20601,true,RCA-SFP-PROV,false,,false
+207,Currency Issued,LIABILITY,CREDIT,2,false,RCA-SFP-OP,false,,false
+20701,Currency Issued,LIABILITY,CREDIT,207,false,RCA-SFP-OP,false,,false
+20701010,Currency Issued,LIABILITY,CREDIT,20701,true,RCA-SFP-OP,false,,false
+208,Deposit Liabilities,LIABILITY,CREDIT,2,false,RCA-SFP-OP,false,,false
+20801,Deposit Liabilities,LIABILITY,CREDIT,208,false,RCA-SFP-OP,false,,false
+20801010,Foreign Currency Deposits,LIABILITY,CREDIT,20801,true,RCA-SFP-OP,false,,false
+20801020,International Financial Institutions,LIABILITY,CREDIT,20801,true,RCA-SFP-OP,false,,false
+20801030,Demand Deposit-Reserves,LIABILITY,CREDIT,20801,true,RCA-SFP-OP,false,,false
+20801040,Demand Deposit,LIABILITY,CREDIT,20801,true,RCA-SFP-OP,false,,false
+20801050,Demand Deposit-Others,LIABILITY,CREDIT,20801,true,RCA-SFP-OP,false,,false
+20801060,Savings Deposit,LIABILITY,CREDIT,20801,true,RCA-SFP-OP,false,,false
+20801070,Fixed-term Deposit,LIABILITY,CREDIT,20801,true,RCA-SFP-OP,false,,false
+20801080,Withdrawal in Progress,LIABILITY,CREDIT,20801,true,RCA-SFP-OP,false,,false
+20801090,Negotiable Order of Withdrawal Accounts,LIABILITY,CREDIT,20801,true,RCA-SFP-OP,false,,false
+20801100,Time Certificates of Deposit,LIABILITY,CREDIT,20801,true,RCA-SFP-OP,false,,false
+20801110,Long-term Negotiable Certificates of Deposit,LIABILITY,CREDIT,20801,true,RCA-SFP-OP,false,,false
+20801120,Special Deposit Account,LIABILITY,CREDIT,20801,true,RCA-SFP-OP,false,,false
+20801130,Overnight Deposit Account,LIABILITY,CREDIT,20801,true,RCA-SFP-OP,false,,false
+20801140,Term Deposit Account,LIABILITY,CREDIT,20801,true,RCA-SFP-OP,false,,false
+209,Deferred Tax Liabilities,LIABILITY,CREDIT,2,false,RCA-SFP-DTL,false,,false
+20901,Deferred Tax Liabilities,LIABILITY,CREDIT,209,false,RCA-SFP-DTL,false,,false
+20901010,Deferred Tax Liabilities,LIABILITY,CREDIT,20901,true,RCA-SFP-DTL,false,,false
+299,Other Payables,LIABILITY,CREDIT,2,false,RCA-SFP-OP,false,,false
+29999,Other Payables,LIABILITY,CREDIT,299,false,RCA-SFP-OP,false,,false
+29999010,Special Time Deposit,LIABILITY,CREDIT,29999,true,RCA-SFP-OP,false,,false
+29999020,Treasurer/Cashier/Manager's Check,LIABILITY,CREDIT,29999,true,RCA-SFP-OP,false,,false
+29999030,Payment Order Payable,LIABILITY,CREDIT,29999,true,RCA-SFP-OP,false,,false
+29999040,Undistributed Collections,LIABILITY,CREDIT,29999,true,RCA-SFP-OP,false,,false
+29999050,Unclaimed Balances,LIABILITY,CREDIT,29999,true,RCA-SFP-OP,false,,false
+29999060,Loans by Regional Banking Units from Foreign Currency Deposit Unit/Expanded Foreign Currency Deposit Unit,LIABILITY,CREDIT,29999,true,RCA-SFP-OP,false,,false
+29999070,Liability for Letters of Credit,LIABILITY,CREDIT,29999,true,RCA-SFP-OP,false,,false
+29999080,Outstanding Acceptances Executed by or for Account of the Bank,LIABILITY,CREDIT,29999,true,RCA-SFP-OP,false,,false
+29999090,Dividends Payable,LIABILITY,CREDIT,29999,true,RCA-SFP-OP,false,,false
+29999100,Servicing Liabilities,LIABILITY,CREDIT,29999,true,RCA-SFP-OP,false,,false
+29999120,Return Premiums Payable,LIABILITY,CREDIT,29999,true,RCA-SFP-OP,false,,false
+29999130,No Claim Bonus Payable,LIABILITY,CREDIT,29999,true,RCA-SFP-OP,false,,false
+29999140,Due to International Monetary Fund,LIABILITY,CREDIT,29999,true,RCA-SFP-OP,false,,false
+29999150,Derivative Instruments in a Gain/(Loss) Position,LIABILITY,CREDIT,29999,true,RCA-SFP-OP,false,,false
+29999160,Due to Non-Government Organizations/Civil Society Organizations,LIABILITY,CREDIT,29999,true,RCA-SFP-OP,false,,false
+29999990,Other Payables,LIABILITY,CREDIT,29999,true,RCA-SFP-OP,false,,false
+3,Equity,EQUITY,CREDIT,,false,,false,,false
+301,Government Equity,EQUITY,CREDIT,3,false,RCA-SFP-GE,false,,false
+30101,Government Equity,EQUITY,CREDIT,301,false,RCA-SFP-GE,false,,false
+30101010,Accumulated Surplus/(Deficit),EQUITY,CREDIT,30101,true,RCA-SFP-GE,false,,false
+30101020,Government Equity,EQUITY,CREDIT,30101,true,RCA-SFP-GE,false,,false
+30101030,Contributed Capital,EQUITY,CREDIT,30101,true,RCA-SFP-GE,false,,false
+302,Revaluation Surplus,EQUITY,CREDIT,3,false,RCA-SFP-OE,false,,false
+30201,Revaluation Surplus,EQUITY,CREDIT,302,false,RCA-SFP-OE,false,,false
+30201010,Revaluation Surplus,EQUITY,CREDIT,30201,true,RCA-SFP-OE,false,,false
+303,Intermediate Accounts,EQUITY,CREDIT,3,false,RCA-SFP-RE,false,,false
+30301,Intermediate Accounts,EQUITY,CREDIT,303,false,RCA-SFP-RE,false,,false
+30301020,Revenue/Income and Expense Summary,EQUITY,CREDIT,30301,true,RCA-SFP-RE,false,,false
+305,Unrealized Gain/(Loss),EQUITY,CREDIT,3,false,RCA-SFP-OE,false,,false
+30501,Unrealized Gain/(Loss),EQUITY,CREDIT,305,false,RCA-SFP-OE,false,,false
+30501020,Unrealized Gain/(Loss) from Changes in the Fair Value of Financial Instruments,EQUITY,CREDIT,30501,true,RCA-SFP-OE,false,,false
+307,Retained Earnings/(Deficit),EQUITY,CREDIT,3,false,RCA-SFP-RE,false,,false
+30701,Retained Earnings/(Deficit),EQUITY,CREDIT,307,false,RCA-SFP-RE,false,,false
+30701010,Retained Earnings/(Deficit),EQUITY,CREDIT,30701,true,RCA-SFP-RE,false,,false
+308,Stockholders' Equity,EQUITY,CREDIT,3,false,RCA-SFP-OE,false,,false
+30801,Stockholders' Equity,EQUITY,CREDIT,308,false,RCA-SFP-OE,false,,false
+30801010,Share Capital,EQUITY,CREDIT,30801,true,RCA-SFP-OE,false,,false
+30801020,Share Premium,EQUITY,CREDIT,30801,true,RCA-SFP-OE,false,,false
+30801030,Subscribed Share Capital,EQUITY,CREDIT,30801,true,RCA-SFP-OE,false,,false
+30801040,Treasury Shares,EQUITY,DEBIT,30801,true,RCA-SFP-OE,false,,false
+30801050,Stock Dividend Distributable,EQUITY,CREDIT,30801,true,RCA-SFP-OE,false,,false
+30801060,Equity Component of Compound Financial Instruments,EQUITY,CREDIT,30801,true,RCA-SFP-OE,false,,false
+30801070,Minority Interests in Subsidiaries,EQUITY,CREDIT,30801,true,RCA-SFP-OE,false,,false
+30801990,Other Equity Instruments,EQUITY,CREDIT,30801,true,RCA-SFP-OE,false,,false
+309,Cumulative Translation Adjustment,EQUITY,CREDIT,3,false,RCA-SFP-OE,false,,false
+30901,Cumulative Translation Adjustment,EQUITY,CREDIT,309,false,RCA-SFP-OE,false,,false
+30901010,Cumulative Translation Adjustment,EQUITY,CREDIT,30901,true,RCA-SFP-OE,false,,false
+311,Members' Equity,EQUITY,CREDIT,3,false,RCA-SFP-OE,false,,false
+31101,Members' Equity,EQUITY,CREDIT,311,false,RCA-SFP-OE,false,,false
+31101010,Members' Equity,EQUITY,CREDIT,31101,true,RCA-SFP-OE,false,,false
+312,Home/Head Office,EQUITY,CREDIT,3,false,RCA-SFP-OE,false,,false
+31201,Home/Head Office,EQUITY,CREDIT,312,false,RCA-SFP-OE,false,,false
+31201010,Home/Head Office,EQUITY,CREDIT,31201,true,RCA-SFP-OE,false,,false
+313,Remeasurement Gain/(Loss),EQUITY,CREDIT,3,false,RCA-SFP-OE,false,,false
+31301,Remeasurement Gain/(Loss),EQUITY,CREDIT,313,false,RCA-SFP-OE,false,,false
+31301010,Remeasurement Gain,EQUITY,CREDIT,31301,true,RCA-SFP-OE,false,,false
+31301020,Remeasurement Loss,EQUITY,DEBIT,31301,true,RCA-SFP-OE,false,,false
+314,Share in the Net Assets/Equity of Associates,EQUITY,CREDIT,3,false,RCA-SFP-OE,false,,false
+31401,Share in the Net Assets/Equity of Associates,EQUITY,CREDIT,314,false,RCA-SFP-OE,false,,false
+31401010,Share in the Net Assets/Equity of Associates,EQUITY,CREDIT,31401,true,RCA-SFP-OE,false,,false
+315,Share in the Net Assets/Equity of Joint Ventures,EQUITY,CREDIT,3,false,RCA-SFP-OE,false,,false
+31501,Share in the Net Assets/Equity of Joint Ventures,EQUITY,CREDIT,315,false,RCA-SFP-OE,false,,false
+31501010,Share in the Net Assets/Equity of Joint Ventures,EQUITY,CREDIT,31501,true,RCA-SFP-OE,false,,false
+4,Revenue/Income,REVENUE,CREDIT,,false,,false,,false
+401,Tax Revenue,REVENUE,CREDIT,4,false,RCA-SCI-BSI,false,,false
+40101,Tax Revenue-Individual and Corporation,REVENUE,CREDIT,401,false,RCA-SCI-BSI,false,,false
+40101030,Travel Tax,REVENUE,CREDIT,40101,true,RCA-SCI-BSI,false,,false
+402,Service and Business Income,REVENUE,CREDIT,4,false,RCA-SCI-BSI,false,,false
+40201,Service Income,REVENUE,CREDIT,402,false,RCA-SCI-BSI,false,,false
+40201010,Permit Fees,REVENUE,CREDIT,40201,true,RCA-SCI-BSI,false,,false
+40201020,Registration Fees,REVENUE,CREDIT,40201,true,RCA-SCI-BSI,false,,false
+40201030,"Registration Plates, Tags and Stickers Fees",REVENUE,CREDIT,40201,true,RCA-SCI-BSI,false,,false
+40201040,Clearance and Certification Fees,REVENUE,CREDIT,40201,true,RCA-SCI-BSI,false,,false
+40201050,Franchising Fees,REVENUE,CREDIT,40201,true,RCA-SCI-BSI,false,,false
+40201060,Licensing Fees,REVENUE,CREDIT,40201,true,RCA-SCI-BSI,false,,false
+40201070,Supervision and Regulation Enforcement Fees,REVENUE,CREDIT,40201,true,RCA-SCI-BSI,false,,false
+40201080,Spectrum Usage Fees,REVENUE,CREDIT,40201,true,RCA-SCI-BSI,false,,false
+40201090,Legal Fees,REVENUE,CREDIT,40201,true,RCA-SCI-BSI,false,,false
+40201100,Inspection Fees,REVENUE,CREDIT,40201,true,RCA-SCI-BSI,false,,false
+40201110,Verification and Authentication Fees,REVENUE,CREDIT,40201,true,RCA-SCI-BSI,false,,false
+40201130,Processing Fees,REVENUE,CREDIT,40201,true,RCA-SCI-BSI,false,,false
+40201140,Fines and Penalties-Service Income,REVENUE,CREDIT,40201,true,RCA-SCI-BSI,false,,false
+40201150,Mail Services Revenue,REVENUE,CREDIT,40201,true,RCA-SCI-BSI,false,,false
+40201151,Discounts on Mailing Services,REVENUE,DEBIT,40201,true,RCA-SCI-BSI,false,,false
+40201160,Postal Payment Service Revenue,REVENUE,CREDIT,40201,true,RCA-SCI-BSI,false,,false
+40201170,Fees and Commissions Income,REVENUE,CREDIT,40201,true,RCA-SCI-BSI,false,,false
+40201180,Consultancy Fees,REVENUE,CREDIT,40201,true,RCA-SCI-BSI,false,,false
+40201190,Participation Fees,REVENUE,CREDIT,40201,true,RCA-SCI-BSI,false,,false
+40201200,Research Fees,REVENUE,CREDIT,40201,true,RCA-SCI-BSI,false,,false
+40201210,Accreditation Fees,REVENUE,CREDIT,40201,true,RCA-SCI-BSI,false,,false
+40201220,Cancellation Fees,REVENUE,CREDIT,40201,true,RCA-SCI-BSI,false,,false
+40201230,Harmonization Fees,REVENUE,CREDIT,40201,true,RCA-SCI-BSI,false,,false
+40201240,Sewerage/Garbage Fees,REVENUE,CREDIT,40201,true,RCA-SCI-BSI,false,,false
+40201250,Transshipment Fees,REVENUE,CREDIT,40201,true,RCA-SCI-BSI,false,,false
+40201260,Passport and Visa Application Fees,REVENUE,CREDIT,40201,true,RCA-SCI-BSI,false,,false
+40201990,Other Service Income,REVENUE,CREDIT,40201,true,RCA-SCI-BSI,false,,false
+40202,Business Income,REVENUE,CREDIT,402,false,RCA-SCI-BSI,false,,false
+40202010,School/Course Fees,REVENUE,CREDIT,40202,true,RCA-SCI-BSI,false,,false
+40202020,Affiliation Fees,REVENUE,CREDIT,40202,true,RCA-SCI-BSI,false,,false
+40202030,Examination Fees,REVENUE,CREDIT,40202,true,RCA-SCI-BSI,false,,false
+40202040,Seminar/Training Fees,REVENUE,CREDIT,40202,true,RCA-SCI-BSI,false,,false
+40202050,Rent/Lease Income,REVENUE,CREDIT,40202,true,RCA-SCI-BSI,false,,false
+40202060,Communications Network Fees,REVENUE,CREDIT,40202,true,RCA-SCI-BSI,false,,false
+40202070,Transportation System Fees,REVENUE,CREDIT,40202,true,RCA-SCI-BSI,false,,false
+40202080,Road Network Fees,REVENUE,CREDIT,40202,true,RCA-SCI-BSI,false,,false
+40202090,Waterworks System Fees,REVENUE,CREDIT,40202,true,RCA-SCI-BSI,false,,false
+40202100,Power Supply System Revenue,REVENUE,CREDIT,40202,true,RCA-SCI-BSI,false,,false
+40202101,Power Supply System Revenue Adjustment,REVENUE,DEBIT,40202,true,RCA-SCI-BSI,false,,false
+40202110,Seaport System Fees,REVENUE,CREDIT,40202,true,RCA-SCI-BSI,false,,false
+40202120,Landing and Parking Fees,REVENUE,CREDIT,40202,true,RCA-SCI-BSI,false,,false
+40202130,Income from Hostels/Dormitories and Other Like Facilities,REVENUE,CREDIT,40202,true,RCA-SCI-BSI,false,,false
+40202140,Slaughterhouse Operation,REVENUE,CREDIT,40202,true,RCA-SCI-BSI,false,,false
+40202150,Income from Printing and Publication,REVENUE,CREDIT,40202,true,RCA-SCI-BSI,false,,false
+40202160,Sales Revenue,REVENUE,CREDIT,40202,true,RCA-SCI-BSI,false,,false
+40202161,Sales Discounts,REVENUE,DEBIT,40202,true,RCA-SCI-BSI,false,,false
+40202162,Sales Returns and Allowances,REVENUE,DEBIT,40202,true,RCA-SCI-BSI,false,,false
+40202170,Hospital Fees,REVENUE,CREDIT,40202,true,RCA-SCI-BSI,false,,false
+40202171,"Hospital Discounts, Allowances and Free Services",REVENUE,DEBIT,40202,true,RCA-SCI-BSI,false,,false
+40202180,Guarantee Income,REVENUE,CREDIT,40202,true,RCA-SCI-BSI,false,,false
+40202190,Fidelity Insurance Income,REVENUE,CREDIT,40202,true,RCA-SCI-BSI,false,,false
+40202200,Dividend Income,REVENUE,CREDIT,40202,true,RCA-SCI-BSI,false,,false
+40202210,Interest Income,REVENUE,CREDIT,40202,true,RCA-SCI-BSI,false,,false
+40202220,Share in the Profit/Revenue of Joint Venture,REVENUE,CREDIT,40202,true,RCA-SCI-BSI,false,,false
+40202230,Fines and Penalties-Business Income,REVENUE,CREDIT,40202,true,RCA-SCI-BSI,false,,false
+40202240,Service Concession Revenue,REVENUE,CREDIT,40202,true,RCA-SCI-BSI,false,,false
+40202250,Insurance/Reinsurance Premium,REVENUE,CREDIT,40202,true,RCA-SCI-BSI,false,,false
+40202251,Insurance/Reinsurance Premium Discount,REVENUE,DEBIT,40202,true,RCA-SCI-BSI,false,,false
+40202252,Returns and Cancellations of Insurance/Reinsurance Premiums,REVENUE,DEBIT,40202,true,RCA-SCI-BSI,false,,false
+40202253,Insurance/Reinsurance Premium Reserves,REVENUE,DEBIT,40202,true,RCA-SCI-BSI,false,,false
+40202260,Income from Acquired/Foreclosed Assets,REVENUE,CREDIT,40202,true,RCA-SCI-BSI,false,,false
+40202270,Members' Contribution,REVENUE,CREDIT,40202,true,RCA-SCI-BSI,false,,false
+40202280,Share in the Profit/Revenue of Associates/Affiliates,REVENUE,CREDIT,40202,true,RCA-SCI-BSI,false,,false
+40202290,Demurrage Revenue,REVENUE,CREDIT,40202,true,RCA-SCI-BSI,false,,false
+40202300,Income from Gaming Operations,REVENUE,CREDIT,40202,true,RCA-SCI-BSI,false,,false
+40202310,Forfeited Prizes,REVENUE,CREDIT,40202,true,RCA-SCI-BSI,false,,false
+40202320,Royalty Fees,REVENUE,CREDIT,40202,true,RCA-SCI-BSI,false,,false
+40202330,Assessment Income,REVENUE,CREDIT,40202,true,RCA-SCI-BSI,false,,false
+40202340,Management Fees,REVENUE,CREDIT,40202,true,RCA-SCI-BSI,false,,false
+40202350,Visitorial Fees,REVENUE,CREDIT,40202,true,RCA-SCI-BSI,false,,false
+40202360,Admission Fees,REVENUE,CREDIT,40202,true,RCA-SCI-BSI,false,,false
+40202370,Annual Philippine Retirement Authority Fees,REVENUE,CREDIT,40202,true,RCA-SCI-BSI,false,,false
+40202380,Income from Communications Facilities,REVENUE,CREDIT,40202,true,RCA-SCI-BSI,false,,false
+40202390,Construction Revenue,REVENUE,CREDIT,40202,true,RCA-SCI-BSI,false,,false
+40202400,Theater Operating Revenue,REVENUE,CREDIT,40202,true,RCA-SCI-BSI,false,,false
+40202990,Other Business Income,REVENUE,CREDIT,40202,true,RCA-SCI-BSI,false,,false
+403,Assistance and Subsidy from,REVENUE,CREDIT,4,false,RCA-SCI-AS,false,,false
+40301,Assistance and Subsidy from,REVENUE,CREDIT,403,false,RCA-SCI-AS,false,,false
+40301010,Subsidy from National Government,REVENUE,CREDIT,40301,true,RCA-SCI-AS,false,,false
+40301020,Assistance from National Government Agencies,REVENUE,CREDIT,40301,true,RCA-SCI-AS,false,,false
+40301030,Assistance from Local Government Units,REVENUE,CREDIT,40301,true,RCA-SCI-AS,false,,false
+40301040,Assistance from Government Corporations,REVENUE,CREDIT,40301,true,RCA-SCI-AS,false,,false
+40301050,Subsidy from Other Funds,REVENUE,CREDIT,40301,true,RCA-SCI-AS,false,,false
+40301060,Subsidy from Central Office,REVENUE,CREDIT,40301,true,RCA-SCI-AS,false,,false
+40301070,Subsidy from Regional Office/Branch Offices,REVENUE,CREDIT,40301,true,RCA-SCI-AS,false,,false
+404,"Shares, Donations and Grants",REVENUE,CREDIT,4,false,RCA-SCI-SDG,false,,false
+40401,Shares,REVENUE,CREDIT,404,false,RCA-SCI-SDG,false,,false
+40401010,Share from National Wealth,REVENUE,CREDIT,40401,true,RCA-SCI-SDG,false,,false
+40401020,Share from PAGCOR/PCSO,REVENUE,CREDIT,40401,true,RCA-SCI-SDG,false,,false
+40401030,Share from Earnings of Government Corporations,REVENUE,CREDIT,40401,true,RCA-SCI-SDG,false,,false
+40401040,Share in Universal Charge,REVENUE,CREDIT,40401,true,RCA-SCI-SDG,false,,false
+40402,Donations,REVENUE,CREDIT,404,false,RCA-SCI-SDG,false,,false
+40402010,Donations in Cash,REVENUE,CREDIT,40402,true,RCA-SCI-SDG,false,,false
+40402020,Donations in Kind,REVENUE,CREDIT,40402,true,RCA-SCI-SDG,false,,false
+40403,Grants,REVENUE,CREDIT,404,false,RCA-SCI-SDG,false,,false
+40403010,Grants in Cash,REVENUE,CREDIT,40403,true,RCA-SCI-SDG,false,,false
+40403020,Grants in Kind,REVENUE,CREDIT,40403,true,RCA-SCI-SDG,false,,false
+405,Gains,REVENUE,CREDIT,4,false,RCA-SCI-GAIN,false,,false
+40501,Gains,REVENUE,CREDIT,405,false,RCA-SCI-GAIN,false,,false
+40501010,Gain on Foreign Exchange (FOREX),REVENUE,CREDIT,40501,true,RCA-SCI-GAIN,false,,false
+40501020,Gain on Sale/Redemption/Transfer of Investments,REVENUE,CREDIT,40501,true,RCA-SCI-GAIN,false,,false
+40501030,Gain on Sale of Investment Property,REVENUE,CREDIT,40501,true,RCA-SCI-GAIN,false,,false
+40501040,"Gain on Sale of Property, Plant and Equipment",REVENUE,CREDIT,40501,true,RCA-SCI-GAIN,false,,false
+40501050,Gain on Initial Recognition of Biological Assets,REVENUE,CREDIT,40501,true,RCA-SCI-GAIN,false,,false
+40501060,Gain on Sale of Biological Assets,REVENUE,CREDIT,40501,true,RCA-SCI-GAIN,false,,false
+40501070,Gain from Changes in Fair Value Less Cost to Sell of Biological Assets Due to Physical Change,REVENUE,CREDIT,40501,true,RCA-SCI-GAIN,false,,false
+40501080,Gain from Changes in Fair Value Less Cost to Sell of Biological Assets Due to Price Change,REVENUE,CREDIT,40501,true,RCA-SCI-GAIN,false,,false
+40501090,Gain on Sale of Agricultural Produce,REVENUE,CREDIT,40501,true,RCA-SCI-GAIN,false,,false
+40501100,Gain on Sale of Intangible Assets,REVENUE,CREDIT,40501,true,RCA-SCI-GAIN,false,,false
+40501110,Gain from Changes in Fair Value of Financial Instruments,REVENUE,CREDIT,40501,true,RCA-SCI-GAIN,false,,false
+40501120,Gain on Initial Recognition of Agricultural Produce,REVENUE,CREDIT,40501,true,RCA-SCI-GAIN,false,,false
+40501130,Gain on Sale/Redemption/Transfer of Financial Liabilities,REVENUE,CREDIT,40501,true,RCA-SCI-GAIN,false,,false
+40501140,Gain from Fair Value Adjustment in Hedge Accounting,REVENUE,CREDIT,40501,true,RCA-SCI-GAIN,false,,false
+40501150,Gain on Securitization,REVENUE,CREDIT,40501,true,RCA-SCI-GAIN,false,,false
+40501160,Gain from Changes in Fair Value of Investment Property,REVENUE,CREDIT,40501,true,RCA-SCI-GAIN,false,,false
+40501170,Gain on Sale of Unserviceable Property,REVENUE,CREDIT,40501,true,RCA-SCI-GAIN,false,,false
+40501180,Gain from Contract Implementation,REVENUE,CREDIT,40501,true,RCA-SCI-GAIN,false,,false
+40501990,Other Gains,REVENUE,CREDIT,40501,true,RCA-SCI-GAIN,false,,false
+406,Other Non-Operating Income,REVENUE,CREDIT,4,false,RCA-SCI-ONOI,false,,false
+40601,Sale of Assets,REVENUE,CREDIT,406,false,RCA-SCI-ONOI,false,,false
+40601010,Sale of Garnished/Confiscated/Abandoned/Seized Goods and Property,REVENUE,CREDIT,40601,true,RCA-SCI-ONOI,false,,false
+40602,Reversal of Impairment Loss,REVENUE,CREDIT,406,false,RCA-SCI-ONOI,false,,false
+40602010,Reversal of Impairment Loss,REVENUE,CREDIT,40602,true,RCA-SCI-ONOI,false,,false
+40699,Miscellaneous Income,REVENUE,CREDIT,406,false,RCA-SCI-ONOI,false,,false
+40699010,Proceeds from Insurance/Indemnities,REVENUE,CREDIT,40699,true,RCA-SCI-ONOI,false,,false
+40699990,Miscellaneous Income,REVENUE,CREDIT,40699,true,RCA-SCI-ONOI,false,,false
+5,Expenses,EXPENSE,DEBIT,,false,,false,,false
+501,Personnel Services,EXPENSE,DEBIT,5,false,RCA-SCI-PS,false,,false
+50101,Salaries and Wages,EXPENSE,DEBIT,501,false,RCA-SCI-PS,false,,false
+50101010,Salaries and Wages-Regular,EXPENSE,DEBIT,50101,true,RCA-SCI-PS,true,,true
+50101020,Salaries and Wages-Casual/Contractual,EXPENSE,DEBIT,50101,true,RCA-SCI-PS,true,,true
+50102,Other Compensation,EXPENSE,DEBIT,501,false,RCA-SCI-PS,false,,false
+50102010,Personnel Economic Relief Allowance (PERA),EXPENSE,DEBIT,50102,true,RCA-SCI-PS,true,,true
+50102020,Representation Allowance (RA),EXPENSE,DEBIT,50102,true,RCA-SCI-PS,true,,true
+50102030,Transportation Allowance (TA),EXPENSE,DEBIT,50102,true,RCA-SCI-PS,true,,true
+50102040,Clothing/Uniform Allowance,EXPENSE,DEBIT,50102,true,RCA-SCI-PS,true,,true
+50102050,Subsistence Allowance,EXPENSE,DEBIT,50102,true,RCA-SCI-PS,true,,true
+50102060,Laundry Allowance,EXPENSE,DEBIT,50102,true,RCA-SCI-PS,true,,true
+50102070,Quarters Allowance,EXPENSE,DEBIT,50102,true,RCA-SCI-PS,true,,true
+50102080,Productivity Incentive Allowance,EXPENSE,DEBIT,50102,true,RCA-SCI-PS,true,,true
+50102090,Overseas Allowance,EXPENSE,DEBIT,50102,true,RCA-SCI-PS,true,,true
+50102100,Honoraria,EXPENSE,DEBIT,50102,true,RCA-SCI-PS,true,,true
+50102110,Hazard Pay,EXPENSE,DEBIT,50102,true,RCA-SCI-PS,true,,true
+50102120,Longevity Pay,EXPENSE,DEBIT,50102,true,RCA-SCI-PS,true,,true
+50102130,Overtime and Night Pay,EXPENSE,DEBIT,50102,true,RCA-SCI-PS,true,,true
+50102140,Year-End Bonus,EXPENSE,DEBIT,50102,true,RCA-SCI-PS,true,,true
+50102150,Cash Gift,EXPENSE,DEBIT,50102,true,RCA-SCI-PS,true,,true
+50102160,Mid-Year Bonus,EXPENSE,DEBIT,50102,true,RCA-SCI-PS,true,,true
+50102170,Directors and Committee Members' Fees,EXPENSE,DEBIT,50102,true,RCA-SCI-PS,true,,true
+50102990,Other Bonuses and Allowances,EXPENSE,DEBIT,50102,true,RCA-SCI-PS,true,,true
+50103,Personnel Benefit Contributions,EXPENSE,DEBIT,501,false,RCA-SCI-PS,false,,false
+50103010,Retirement and Life Insurance Premiums,EXPENSE,DEBIT,50103,true,RCA-SCI-PS,true,,true
+50103020,Pag-IBIG Contributions,EXPENSE,DEBIT,50103,true,RCA-SCI-PS,true,,true
+50103030,PhilHealth Contributions,EXPENSE,DEBIT,50103,true,RCA-SCI-PS,true,,true
+50103040,Employees Compensation Insurance Premiums,EXPENSE,DEBIT,50103,true,RCA-SCI-PS,true,,true
+50103050,Provident/Welfare Fund Contributions,EXPENSE,DEBIT,50103,true,RCA-SCI-PS,true,,true
+50104,Other Personnel Benefits,EXPENSE,DEBIT,501,false,RCA-SCI-PS,false,,false
+50104010,Pension Benefits,EXPENSE,DEBIT,50104,true,RCA-SCI-PS,true,,true
+50104020,Retirement Gratuity,EXPENSE,DEBIT,50104,true,RCA-SCI-PS,true,,true
+50104030,Terminal Leave Benefits,EXPENSE,DEBIT,50104,true,RCA-SCI-PS,true,,true
+50104990,Other Personnel Benefits,EXPENSE,DEBIT,50104,true,RCA-SCI-PS,true,,true
+502,Maintenance and Other Operating Expenses,EXPENSE,DEBIT,5,false,,false,,false
+50201,Traveling Expenses,EXPENSE,DEBIT,502,false,RCA-SCI-MOOE,false,,false
+50201010,Traveling Expenses-Local,EXPENSE,DEBIT,50201,true,RCA-SCI-MOOE,true,,true
+50201020,Traveling Expenses-Foreign,EXPENSE,DEBIT,50201,true,RCA-SCI-MOOE,true,,true
+50202,Training and Scholarship Expenses,EXPENSE,DEBIT,502,false,RCA-SCI-MOOE,false,,false
+50202010,Training Expenses,EXPENSE,DEBIT,50202,true,RCA-SCI-MOOE,true,,true
+50202020,Scholarship Grants/Expenses,EXPENSE,DEBIT,50202,true,RCA-SCI-MOOE,true,,true
+50203,Supplies and Materials Expenses,EXPENSE,DEBIT,502,false,RCA-SCI-MOOE,false,,false
+50203010,Office Supplies Expenses,EXPENSE,DEBIT,50203,true,RCA-SCI-MOOE,true,,true
+50203020,Accountable Forms Expenses,EXPENSE,DEBIT,50203,true,RCA-SCI-MOOE,true,,true
+50203030,Non-Accountable Forms Expenses,EXPENSE,DEBIT,50203,true,RCA-SCI-MOOE,true,,true
+50203040,Animal/Zoological Supplies Expenses,EXPENSE,DEBIT,50203,true,RCA-SCI-MOOE,true,,true
+50203050,Food Supplies Expenses,EXPENSE,DEBIT,50203,true,RCA-SCI-MOOE,true,,true
+50203060,Welfare Goods Expenses,EXPENSE,DEBIT,50203,true,RCA-SCI-MOOE,true,,true
+50203070,Drugs and Medicines Expenses,EXPENSE,DEBIT,50203,true,RCA-SCI-MOOE,true,,true
+50203080,"Medical, Dental and Laboratory Supplies Expenses",EXPENSE,DEBIT,50203,true,RCA-SCI-MOOE,true,,true
+50203090,"Fuel, Oil and Lubricants Expenses",EXPENSE,DEBIT,50203,true,RCA-SCI-MOOE,true,,true
+50203100,Agricultural and Marine Supplies Expenses,EXPENSE,DEBIT,50203,true,RCA-SCI-MOOE,true,,true
+50203110,Textbooks and Instructional Materials Expenses,EXPENSE,DEBIT,50203,true,RCA-SCI-MOOE,true,,true
+50203120,"Military, Police and Traffic Supplies Expenses",EXPENSE,DEBIT,50203,true,RCA-SCI-MOOE,true,,true
+50203130,Chemical and Filtering Supplies Expenses,EXPENSE,DEBIT,50203,true,RCA-SCI-MOOE,true,,true
+50203140,Linens and Beddings Expenses,EXPENSE,DEBIT,50203,true,RCA-SCI-MOOE,true,,true
+50203210,Semi-Expendable Machinery and Equipment Expenses,EXPENSE,DEBIT,50203,true,RCA-SCI-MOOE,true,,true
+50203220,"Semi-Expendable Furniture, Fixtures and Books Expenses",EXPENSE,DEBIT,50203,true,RCA-SCI-MOOE,true,,true
+50203230,Agricultural Produce Expenses,EXPENSE,DEBIT,50203,true,RCA-SCI-MOOE,true,,true
+50203240,Aquaculture Produce Expenses,EXPENSE,DEBIT,50203,true,RCA-SCI-MOOE,true,,true
+50203250,Play/Bet Slips and Thermal Rolls Supplies Expenses,EXPENSE,DEBIT,50203,true,RCA-SCI-MOOE,true,,true
+50203260,Electrical Supplies and Materials Expenses,EXPENSE,DEBIT,50203,true,RCA-SCI-MOOE,true,,true
+50203270,Supplies and Materials for Water Systems Operations Expense,EXPENSE,DEBIT,50203,true,RCA-SCI-MOOE,true,,true
+50203280,Housekeeping/Cleaning Supplies Expense,EXPENSE,DEBIT,50203,true,RCA-SCI-MOOE,true,,true
+50203990,Other Supplies and Materials Expenses,EXPENSE,DEBIT,50203,true,RCA-SCI-MOOE,true,,true
+50204,Utility Expenses,EXPENSE,DEBIT,502,false,RCA-SCI-MOOE,false,,false
+50204010,Water Expenses,EXPENSE,DEBIT,50204,true,RCA-SCI-MOOE,true,,true
+50204020,Electricity Expenses,EXPENSE,DEBIT,50204,true,RCA-SCI-MOOE,true,,true
+50204030,Gas/Heating Expenses,EXPENSE,DEBIT,50204,true,RCA-SCI-MOOE,true,,true
+50204990,Other Utility Expenses,EXPENSE,DEBIT,50204,true,RCA-SCI-MOOE,true,,true
+50205,Communications Expenses,EXPENSE,DEBIT,502,false,RCA-SCI-MOOE,false,,false
+50205010,Postage and Courier Services,EXPENSE,DEBIT,50205,true,RCA-SCI-MOOE,true,,true
+50205020,Telephone Expenses,EXPENSE,DEBIT,50205,true,RCA-SCI-MOOE,true,,true
+50205030,Internet Subscription Expenses,EXPENSE,DEBIT,50205,true,RCA-SCI-MOOE,true,,true
+50205040,"Cable, Satellite, Telegraph and Radio Expenses",EXPENSE,DEBIT,50205,true,RCA-SCI-MOOE,true,,true
+50206,"Awards/Rewards, Prizes and Indemnities",EXPENSE,DEBIT,502,false,RCA-SCI-MOOE,false,,false
+50206010,Awards/Rewards Expenses,EXPENSE,DEBIT,50206,true,RCA-SCI-MOOE,true,,true
+50206020,Prizes,EXPENSE,DEBIT,50206,true,RCA-SCI-MOOE,true,,true
+50206030,Indemnities,EXPENSE,DEBIT,50206,true,RCA-SCI-MOOE,true,,true
+50207,"Survey, Research, Exploration and Development Expenses",EXPENSE,DEBIT,502,false,RCA-SCI-MOOE,false,,false
+50207010,Survey Expenses,EXPENSE,DEBIT,50207,true,RCA-SCI-MOOE,true,,true
+50207020,"Research, Exploration and Development Expenses",EXPENSE,DEBIT,50207,true,RCA-SCI-MOOE,true,,true
+50208,Demolition/Relocation and Desilting/Drilling/Dredging Expenses,EXPENSE,DEBIT,502,false,RCA-SCI-MOOE,false,,false
+50208010,Demolition and Relocation Expenses,EXPENSE,DEBIT,50208,true,RCA-SCI-MOOE,true,,true
+50208020,"Desilting, Drilling and Dredging Expenses",EXPENSE,DEBIT,50208,true,RCA-SCI-MOOE,true,,true
+50209,"Generation, Transmission and Distribution Expenses",EXPENSE,DEBIT,502,false,RCA-SCI-MOOE,false,,false
+50209010,"Generation, Transmission and Distribution Expenses",EXPENSE,DEBIT,50209,true,RCA-SCI-MOOE,true,,true
+50210,"Confidential, Intelligence and Extraordinary Expenses",EXPENSE,DEBIT,502,false,RCA-SCI-MOOE,false,,false
+50210010,Confidential Expenses,EXPENSE,DEBIT,50210,true,RCA-SCI-MOOE,true,,true
+50210020,Intelligence Expenses,EXPENSE,DEBIT,50210,true,RCA-SCI-MOOE,true,,true
+50210030,Extraordinary and Miscellaneous Expenses,EXPENSE,DEBIT,50210,true,RCA-SCI-MOOE,true,,true
+50211,Professional Services,EXPENSE,DEBIT,502,false,RCA-SCI-MOOE,false,,false
+50211010,Legal Services,EXPENSE,DEBIT,50211,true,RCA-SCI-MOOE,true,,true
+50211020,Auditing Services,EXPENSE,DEBIT,50211,true,RCA-SCI-MOOE,true,,true
+50211030,Consultancy Services,EXPENSE,DEBIT,50211,true,RCA-SCI-MOOE,true,,true
+50211990,Other Professional Services,EXPENSE,DEBIT,50211,true,RCA-SCI-MOOE,true,,true
+50212,General Services,EXPENSE,DEBIT,502,false,RCA-SCI-MOOE,false,,false
+50212010,Environment/Sanitary Services,EXPENSE,DEBIT,50212,true,RCA-SCI-MOOE,true,,true
+50212020,Janitorial Services,EXPENSE,DEBIT,50212,true,RCA-SCI-MOOE,true,,true
+50212030,Security Services,EXPENSE,DEBIT,50212,true,RCA-SCI-MOOE,true,,true
+50212990,Other General Services,EXPENSE,DEBIT,50212,true,RCA-SCI-MOOE,true,,true
+50213,Repairs and Maintenance,EXPENSE,DEBIT,502,false,RCA-SCI-MOOE,false,,false
+50213010,Repairs and Maintenance-Investment Property,EXPENSE,DEBIT,50213,true,RCA-SCI-MOOE,true,,true
+50213020,Repairs and Maintenance-Land Improvements,EXPENSE,DEBIT,50213,true,RCA-SCI-MOOE,true,,true
+50213030,Repairs and Maintenance-Infrastructure Assets,EXPENSE,DEBIT,50213,true,RCA-SCI-MOOE,true,,true
+50213040,Repairs and Maintenance-Buildings and Other Structures,EXPENSE,DEBIT,50213,true,RCA-SCI-MOOE,true,,true
+50213050,Repairs and Maintenance-Machinery and Equipment,EXPENSE,DEBIT,50213,true,RCA-SCI-MOOE,true,,true
+50213060,Repairs and Maintenance-Transportation Equipment,EXPENSE,DEBIT,50213,true,RCA-SCI-MOOE,true,,true
+50213070,Repairs and Maintenance-Furniture and Fixtures,EXPENSE,DEBIT,50213,true,RCA-SCI-MOOE,true,,true
+50213080,Repairs and Maintenance-Leased Assets,EXPENSE,DEBIT,50213,true,RCA-SCI-MOOE,true,,true
+50213090,Repairs and Maintenance-Leased Assets Improvements,EXPENSE,DEBIT,50213,true,RCA-SCI-MOOE,true,,true
+50213100,Restoration and Maintenance-Heritage Assets,EXPENSE,DEBIT,50213,true,RCA-SCI-MOOE,true,,true
+50213110,Repairs and Maintenance-Service Concession Assets,EXPENSE,DEBIT,50213,true,RCA-SCI-MOOE,true,,true
+50213120,Repairs and Maintenance-Exploration and Evaluation Assets,EXPENSE,DEBIT,50213,true,RCA-SCI-MOOE,true,,true
+50213210,Repairs and Maintenance-Semi-Expendable Machinery and Equipment,EXPENSE,DEBIT,50213,true,RCA-SCI-MOOE,true,,true
+50213220,"Repairs and Maintenance-Semi-Expendable Furniture, Fixtures and Books",EXPENSE,DEBIT,50213,true,RCA-SCI-MOOE,true,,true
+50213980,Repairs and Maintenance-Others,EXPENSE,DEBIT,50213,true,RCA-SCI-MOOE,true,,true
+50213990,"Repairs and Maintenance-Other Property, Plant and Equipment",EXPENSE,DEBIT,50213,true,RCA-SCI-MOOE,true,,true
+50214,Assistance/Subsidy/Contribution to,EXPENSE,DEBIT,502,false,,false,,false
+50214020,Assistance to NGAs,EXPENSE,DEBIT,50214,true,RCA-SCI-MOOE,true,,true
+50214030,Assistance to Local Government Units,EXPENSE,DEBIT,50214,true,RCA-SCI-MOOE,true,,true
+50214050,Assistance to Non-Government Organizations/Civil Society Organizations,EXPENSE,DEBIT,50214,true,RCA-SCI-MOOE,true,,true
+50214070,Subsidy to Regional/Branch Offices,EXPENSE,DEBIT,50214,true,RCA-SCI-MOOE,true,,true
+50214080,Subsidy to Operating Units,EXPENSE,DEBIT,50214,true,RCA-SCI-MOOE,true,,true
+50214090,Subsidy to Other Funds,EXPENSE,DEBIT,50214,true,RCA-SCI-SUB,false,,false
+50214100,Assistance to Government Corporations,EXPENSE,DEBIT,50214,true,RCA-SCI-MOOE,true,,true
+50214110,Contribution to AFP Modernization,EXPENSE,DEBIT,50214,true,RCA-SCI-MOOE,true,,true
+50214120,Charity Expenses,EXPENSE,DEBIT,50214,true,RCA-SCI-MOOE,true,,true
+50214990,Assistance/Subsidies/Contribution-Others,EXPENSE,DEBIT,50214,true,RCA-SCI-MOOE,true,,true
+50215,"Taxes, Insurance Premiums and Other Fees",EXPENSE,DEBIT,502,false,,false,,false
+50215010,"Taxes, Duties and Licenses",EXPENSE,DEBIT,50215,true,RCA-SCI-MOOE,true,,true
+50215020,Fidelity Bond Premiums,EXPENSE,DEBIT,50215,true,RCA-SCI-MOOE,true,,true
+50215030,Insurance/Reinsurance Expenses,EXPENSE,DEBIT,50215,true,RCA-SCI-MOOE,true,,true
+50215040,Income Tax Expenses,EXPENSE,DEBIT,50215,true,RCA-SCI-TAX,false,,false
+50216,Labor and Wages,EXPENSE,DEBIT,502,false,RCA-SCI-MOOE,false,,false
+50216010,Labor and Wages,EXPENSE,DEBIT,50216,true,RCA-SCI-MOOE,true,,true
+50217,Members' Benefits,EXPENSE,DEBIT,502,false,RCA-SCI-MOOE,false,,false
+50217010,Members' Benefits,EXPENSE,DEBIT,50217,true,RCA-SCI-MOOE,true,,true
+50218,Receivership and Liquidation Expense,EXPENSE,DEBIT,502,false,RCA-SCI-MOOE,false,,false
+50218010,Receivership and Liquidation Expense,EXPENSE,DEBIT,50218,true,RCA-SCI-MOOE,true,,true
+50219,Deposit Claims Pay-out Expenses,EXPENSE,DEBIT,502,false,RCA-SCI-MOOE,false,,false
+50219010,Deposit Claims Pay-out Expenses,EXPENSE,DEBIT,50219,true,RCA-SCI-MOOE,true,,true
+50220,Claims Pay-out Expenses,EXPENSE,DEBIT,502,false,RCA-SCI-MOOE,false,,false
+50220010,Claims Pay-out Expenses,EXPENSE,DEBIT,50220,true,RCA-SCI-MOOE,true,,true
+50299,Other Maintenance and Operating Expenses,EXPENSE,DEBIT,502,false,RCA-SCI-MOOE,false,,false
+50299010,"Advertising, Promotional and Marketing Expenses",EXPENSE,DEBIT,50299,true,RCA-SCI-MOOE,true,,true
+50299020,Printing and Publication Expenses,EXPENSE,DEBIT,50299,true,RCA-SCI-MOOE,true,,true
+50299030,Representation Expenses,EXPENSE,DEBIT,50299,true,RCA-SCI-MOOE,true,,true
+50299040,Transportation and Delivery Expenses,EXPENSE,DEBIT,50299,true,RCA-SCI-MOOE,true,,true
+50299050,Rent/Lease Expenses,EXPENSE,DEBIT,50299,true,RCA-SCI-MOOE,true,,true
+50299060,Membership Dues and Contributions to Organizations,EXPENSE,DEBIT,50299,true,RCA-SCI-MOOE,true,,true
+50299070,Subscription Expenses,EXPENSE,DEBIT,50299,true,RCA-SCI-MOOE,true,,true
+50299080,Donations,EXPENSE,DEBIT,50299,true,RCA-SCI-MOOE,true,,true
+50299090,Litigation/Acquired Assets Expenses,EXPENSE,DEBIT,50299,true,RCA-SCI-MOOE,true,,true
+50299110,International Mail Exchange Expenses,EXPENSE,DEBIT,50299,true,RCA-SCI-MOOE,true,,true
+50299130,Lottery Draws Expenses,EXPENSE,DEBIT,50299,true,RCA-SCI-MOOE,true,,true
+50299140,Documentary Stamps Expenses,EXPENSE,DEBIT,50299,true,RCA-SCI-MOOE,true,,true
+50299150,Fees and Commission Expenses,EXPENSE,DEBIT,50299,true,RCA-SCI-MOOE,true,,true
+50299170,Underwriting Expenses,EXPENSE,DEBIT,50299,true,RCA-SCI-MOOE,true,,true
+50299180,Major Events and Conventions Expenses,EXPENSE,DEBIT,50299,true,RCA-SCI-MOOE,true,,true
+50299190,Crop/Non-Crop Insurance Benefits,EXPENSE,DEBIT,50299,true,RCA-SCI-MOOE,true,,true
+50299210,Legal Defense Expense,EXPENSE,DEBIT,50299,true,RCA-SCI-MOOE,true,,true
+50299220,Warranty Expenses,EXPENSE,DEBIT,50299,true,RCA-SCI-MOOE,true,,true
+50299230,Environment Rectification Expenses,EXPENSE,DEBIT,50299,true,RCA-SCI-MOOE,true,,true
+50299240,Printing and Minting Costs,EXPENSE,DEBIT,50299,true,RCA-SCI-MOOE,true,,true
+50299250,Reserve for Indemnity Fluctuation,EXPENSE,DEBIT,50299,true,RCA-SCI-MOOE,true,,true
+50299260,Production Expenses,EXPENSE,DEBIT,50299,true,RCA-SCI-MOOE,true,,true
+50299990,Other Maintenance and Operating Expenses,EXPENSE,DEBIT,50299,true,RCA-SCI-MOOE,true,,true
+503,Financial Expenses,EXPENSE,DEBIT,5,false,RCA-SCI-FIN,false,,false
+50301,Financial Expenses,EXPENSE,DEBIT,503,false,RCA-SCI-FIN,false,,false
+50301010,Management Supervision/Trusteeship Fees,EXPENSE,DEBIT,50301,true,RCA-SCI-FIN,false,,false
+50301020,Interest Expenses,EXPENSE,DEBIT,50301,true,RCA-SCI-FIN,false,,false
+50301030,Guarantee Fees,EXPENSE,DEBIT,50301,true,RCA-SCI-FIN,false,,false
+50301040,Bank Charges,EXPENSE,DEBIT,50301,true,RCA-SCI-FIN,false,,false
+50301050,Commitment Fees,EXPENSE,DEBIT,50301,true,RCA-SCI-FIN,false,,false
+50301990,Other Financial Charges,EXPENSE,DEBIT,50301,true,RCA-SCI-FIN,false,,false
+504,Direct Costs,EXPENSE,DEBIT,5,false,RCA-SCI-DC,false,,false
+50401,Cost of Goods Manufactured,EXPENSE,DEBIT,504,false,RCA-SCI-DC,false,,false
+50401010,Direct Labor,EXPENSE,DEBIT,50401,true,RCA-SCI-DC,false,,false
+50401020,Manufacturing Overhead,EXPENSE,DEBIT,50401,true,RCA-SCI-DC,false,,false
+50401030,Direct Materials,EXPENSE,DEBIT,50401,true,RCA-SCI-DC,false,,false
+50402,Cost of Sales,EXPENSE,DEBIT,504,false,RCA-SCI-DC,false,,false
+50402010,Cost of Sales,EXPENSE,DEBIT,50402,true,RCA-SCI-DC,false,,false
+50403,Cost of Services/Contract,EXPENSE,DEBIT,504,false,RCA-SCI-DC,false,,false
+50403010,Cost of Services/Contract,EXPENSE,DEBIT,50403,true,RCA-SCI-DC,false,,false
+505,Non-Cash Expenses,EXPENSE,DEBIT,5,false,RCA-SCI-NC,false,,false
+50501,Depreciation,EXPENSE,DEBIT,505,false,RCA-SCI-NC,false,,false
+50501010,Depreciation-Investment Property,EXPENSE,DEBIT,50501,true,RCA-SCI-NC,false,,false
+50501020,Depreciation-Land Improvements,EXPENSE,DEBIT,50501,true,RCA-SCI-NC,false,,false
+50501030,Depreciation-Infrastructure Assets,EXPENSE,DEBIT,50501,true,RCA-SCI-NC,false,,false
+50501040,Depreciation-Buildings and Other Structures,EXPENSE,DEBIT,50501,true,RCA-SCI-NC,false,,false
+50501050,Depreciation-Machinery and Equipment,EXPENSE,DEBIT,50501,true,RCA-SCI-NC,false,,false
+50501060,Depreciation-Transportation Equipment,EXPENSE,DEBIT,50501,true,RCA-SCI-NC,false,,false
+50501070,"Depreciation-Furniture, Fixtures and Books",EXPENSE,DEBIT,50501,true,RCA-SCI-NC,false,,false
+50501080,Depreciation-Leased Assets,EXPENSE,DEBIT,50501,true,RCA-SCI-NC,false,,false
+50501090,Depreciation-Leased Assets Improvements,EXPENSE,DEBIT,50501,true,RCA-SCI-NC,false,,false
+50501100,Depreciation-Heritage Assets,EXPENSE,DEBIT,50501,true,RCA-SCI-NC,false,,false
+50501110,Depreciation-Service Concession Assets,EXPENSE,DEBIT,50501,true,RCA-SCI-NC,false,,false
+50501120,Depreciation-Exploration and Evaluation Assets,EXPENSE,DEBIT,50501,true,RCA-SCI-NC,false,,false
+50501130,Depreciation-Bearer Biological Assets,EXPENSE,DEBIT,50501,true,RCA-SCI-NC,false,,false
+50501140,"Depreciation-Bearer Trees, Plants and Crops",EXPENSE,DEBIT,50501,true,RCA-SCI-NC,false,,false
+50501990,"Depreciation-Other Property, Plant and Equipment",EXPENSE,DEBIT,50501,true,RCA-SCI-NC,false,,false
+50502,Amortization,EXPENSE,DEBIT,505,false,RCA-SCI-NC,false,,false
+50502010,Amortization-Intangible Assets,EXPENSE,DEBIT,50502,true,RCA-SCI-NC,false,,false
+50502020,Amortization-Service Concession-Intangible Assets,EXPENSE,DEBIT,50502,true,RCA-SCI-NC,false,,false
+50503,Impairment Loss,EXPENSE,DEBIT,505,false,RCA-SCI-NC,false,,false
+50503010,Impairment Loss-Financial Assets Held to Maturity,EXPENSE,DEBIT,50503,true,RCA-SCI-NC,false,,false
+50503020,Impairment Loss-Loans and Receivables,EXPENSE,DEBIT,50503,true,RCA-SCI-NC,false,,false
+50503030,Impairment Loss-Lease Receivables,EXPENSE,DEBIT,50503,true,RCA-SCI-NC,false,,false
+50503050,Impairment Loss-Investments in Joint Venture,EXPENSE,DEBIT,50503,true,RCA-SCI-NC,false,,false
+50503060,Impairment Loss-Other Receivables,EXPENSE,DEBIT,50503,true,RCA-SCI-NC,false,,false
+50503070,Impairment Loss-Inventories,EXPENSE,DEBIT,50503,true,RCA-SCI-NC,false,,false
+50503080,Impairment Loss-Investment Property,EXPENSE,DEBIT,50503,true,RCA-SCI-NC,false,,false
+50503090,"Impairment Loss-Property, Plant and Equipment",EXPENSE,DEBIT,50503,true,RCA-SCI-NC,false,,false
+50503100,Impairment Loss-Biological Assets,EXPENSE,DEBIT,50503,true,RCA-SCI-NC,false,,false
+50503110,Impairment Loss-Intangible Assets,EXPENSE,DEBIT,50503,true,RCA-SCI-NC,false,,false
+50503120,Impairment Loss-Investments in Associates/Affiliates,EXPENSE,DEBIT,50503,true,RCA-SCI-NC,false,,false
+50503130,Impairment Loss-Domestic Investments,EXPENSE,DEBIT,50503,true,RCA-SCI-NC,false,,false
+50503140,Impairment Loss-Investments in Stocks,EXPENSE,DEBIT,50503,true,RCA-SCI-NC,false,,false
+50503150,Impairment Loss-Investments in Subsidiaries,EXPENSE,DEBIT,50503,true,RCA-SCI-NC,false,,false
+50503160,Impairment Loss-Non-Current Assets Held for Sale,EXPENSE,DEBIT,50503,true,RCA-SCI-NC,false,,false
+50503170,Impairment Loss-Service Concession-Intangible Assets,EXPENSE,DEBIT,50503,true,RCA-SCI-NC,false,,false
+50503180,Impairment Loss-Other Investments,EXPENSE,DEBIT,50503,true,RCA-SCI-NC,false,,false
+50503190,Impairment Loss-Investment Securities at Amortized Cost,EXPENSE,DEBIT,50503,true,RCA-SCI-NC,false,,false
+50503200,Impairment Loss-Financial Assets-Available for Sale Securities,EXPENSE,DEBIT,50503,true,RCA-SCI-NC,false,,false
+50503990,Impairment Loss-Other Assets,EXPENSE,DEBIT,50503,true,RCA-SCI-NC,false,,false
+50504,Losses,EXPENSE,DEBIT,505,false,RCA-SCI-NC,false,,false
+50504010,Loss on Foreign Exchange (FOREX),EXPENSE,DEBIT,50504,true,RCA-SCI-NC,false,,false
+50504020,Loss on Sale/Redemption/Transfer of Investments,EXPENSE,DEBIT,50504,true,RCA-SCI-NC,false,,false
+50504030,Loss on Sale of Investment Property,EXPENSE,DEBIT,50504,true,RCA-SCI-NC,false,,false
+50504040,"Loss on Sale of Property, Plant and Equipment",EXPENSE,DEBIT,50504,true,RCA-SCI-NC,false,,false
+50504050,Loss on Sale of Biological Assets,EXPENSE,DEBIT,50504,true,RCA-SCI-NC,false,,false
+50504060,Loss on Sale of Agricultural Produce,EXPENSE,DEBIT,50504,true,RCA-SCI-NC,false,,false
+50504070,Loss on Sale of Intangible Assets,EXPENSE,DEBIT,50504,true,RCA-SCI-NC,false,,false
+50504080,Loss on Sale of Assets,EXPENSE,DEBIT,50504,true,RCA-SCI-NC,false,,false
+50504090,Loss of Assets,EXPENSE,DEBIT,50504,true,RCA-SCI-NC,false,,false
+50504110,Loss on Initial Recognition of Biological Assets,EXPENSE,DEBIT,50504,true,RCA-SCI-NC,false,,false
+50504120,Loss from Changes in Fair Value of Financial Instruments,EXPENSE,DEBIT,50504,true,RCA-SCI-NC,false,,false
+50504130,Loss from Changes in Fair Value Less Cost to Sell of Biological Assets Due to Physical Change,EXPENSE,DEBIT,50504,true,RCA-SCI-NC,false,,false
+50504140,Loss from Changes in Fair Value Less Cost to Sell of Biological Assets Due to Price Change,EXPENSE,DEBIT,50504,true,RCA-SCI-NC,false,,false
+50504150,Loss on Sale/Redemption/Transfer of Financial Liabilities,EXPENSE,DEBIT,50504,true,RCA-SCI-NC,false,,false
+50504160,Loss on Securitization,EXPENSE,DEBIT,50504,true,RCA-SCI-NC,false,,false
+50504170,Loss from Fair Value Adjustment in Hedge Accounting,EXPENSE,DEBIT,50504,true,RCA-SCI-NC,false,,false
+50504180,Loss from Changes in Fair Value of Investment Property,EXPENSE,DEBIT,50504,true,RCA-SCI-NC,false,,false
+50504190,Loss on Guaranty,EXPENSE,DEBIT,50504,true,RCA-SCI-NC,false,,false
+50504200,Share in the Loss of Joint Ventures,EXPENSE,DEBIT,50504,true,RCA-SCI-NC,false,,false
+50504210,Share in the Loss of Associates/Affiliates,EXPENSE,DEBIT,50504,true,RCA-SCI-NC,false,,false
+50504220,Loss Recoveries Ceded,EXPENSE,DEBIT,50504,true,RCA-SCI-NC,false,,false
+50504230,Loss Adjustment Expenses,EXPENSE,DEBIT,50504,true,RCA-SCI-NC,false,,false
+50504240,Rehabilitation Cost,EXPENSE,DEBIT,50504,true,RCA-SCI-NC,false,,false
+50504250,Loss on Sale of Unserviceable Property,EXPENSE,DEBIT,50504,true,RCA-SCI-NC,false,,false
+50504260,Loss from Contract Implementation,EXPENSE,DEBIT,50504,true,RCA-SCI-NC,false,,false
+50504990,Other Losses,EXPENSE,DEBIT,50504,true,RCA-SCI-NC,false,,false
+50505,Discounts and Rebates,EXPENSE,DEBIT,505,false,RCA-SCI-NC,false,,false
+50505010,Other Discounts,EXPENSE,DEBIT,50505,true,RCA-SCI-NC,false,,false
+50505020,Rebates,EXPENSE,DEBIT,50505,true,RCA-SCI-NC,false,,false

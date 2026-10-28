@@ -32,8 +32,8 @@ test('stock is received and issued at weighted average cost, each posting by acc
   await nav(page, 'Stock on hand');
   await page.getByLabel('Item code').fill(`LAMP-${tag}`);
   await page.getByLabel('Item name').fill('Runway edge lamp');
-  await page.getByLabel('Inventory account').selectOption({ label: 'PLC-1302 — [PLACEHOLDER] Spare parts inventory' });
-  await page.getByLabel('Consumption account').selectOption({ label: 'PLC-5202 — [PLACEHOLDER] Repairs and maintenance' });
+  await page.getByLabel('Inventory account').selectOption({ label: '10404990 — Other Supplies and Materials Inventory' });
+  await page.getByLabel('Consumption account').selectOption({ label: '50213050 — Repairs and Maintenance-Machinery and Equipment' });
   await page.getByRole('button', { name: 'Add item' }).click();
   await expect(page.getByRole('link', { name: `LAMP-${tag}` })).toBeVisible();
 

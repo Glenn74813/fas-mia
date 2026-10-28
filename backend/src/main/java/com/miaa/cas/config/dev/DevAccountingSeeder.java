@@ -31,7 +31,8 @@ import org.springframework.transaction.annotation.Transactional;
 /**
  * DEVELOPMENT ONLY. On an empty database, loads the PLACEHOLDER chart of accounts and cost centres
  * (flagged placeholder, never MIAA-approved), creates the current fiscal year and opens its periods up
- * to the current month, so the accounting engine can be exercised locally.
+ * to the current month, so the accounting engine can be exercised locally. The placeholder setup is then
+ * moved onto COA's Revised Chart of Accounts for Government Corporations ({@link DevOfficialChart}).
  */
 @Component
 @Profile("dev")
@@ -48,10 +49,11 @@ public class DevAccountingSeeder implements ApplicationRunner {
     private final AccountingPeriodRepository periods;
     private final Clock clock;
     private final DevPayablesSeeder payables;
+    private final DevOfficialChart officialChart;
 
     public DevAccountingSeeder(AccountRepository accounts, AccountService accountService, CostCenterRepository costCenters,
             DimensionService dimensions, FiscalYearRepository years, FiscalCalendarService calendar,
-            AccountingPeriodRepository periods, Clock clock, DevPayablesSeeder payables) {
+            AccountingPeriodRepository periods, Clock clock, DevPayablesSeeder payables, DevOfficialChart officialChart) {
         this.accounts = accounts;
         this.accountService = accountService;
         this.costCenters = costCenters;
@@ -61,6 +63,7 @@ public class DevAccountingSeeder implements ApplicationRunner {
         this.periods = periods;
         this.clock = clock;
         this.payables = payables;
+        this.officialChart = officialChart;
     }
 
     @Override
@@ -92,5 +95,6 @@ public class DevAccountingSeeder implements ApplicationRunner {
             log.warn("DEV: created fiscal year {} and opened periods 1-{}", today.getYear(), today.getMonthValue());
         }
         payables.seed();
+        officialChart.apply();
     }
 }

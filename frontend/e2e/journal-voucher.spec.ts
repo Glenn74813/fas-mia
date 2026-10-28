@@ -46,7 +46,8 @@ test('a journal voucher moves from preparation to the posted ledger with four di
 
   // Preparer drafts a balanced voucher, attaches support and submits.
   await signIn(page, preparer);
-  await expect(page.getByText('Placeholder chart of accounts in use.')).toBeVisible();
+  // Development runs on COA's chart for government corporations, so no placeholder warning.
+  await expect(page.getByText('Placeholder chart of accounts in use.')).toHaveCount(0);
   const nav = page.getByRole('navigation', { name: 'Main' });
   await nav.getByRole('link', { name: 'Journal vouchers' }).click();
   await page.getByRole('link', { name: 'New voucher' }).click();
@@ -54,10 +55,10 @@ test('a journal voucher moves from preparation to the posted ledger with four di
   await page.getByLabel('Accounting date').fill(today);
   const bill = `E2E utilities bill ${Date.now().toString(36)}`;
   await page.getByLabel('Description / particulars').fill(`${bill} for the terminal`);
-  await page.getByLabel('Line 1 account').selectOption({ label: 'PLC-5201 — [PLACEHOLDER] Utilities' });
+  await page.getByLabel('Line 1 account').selectOption({ label: '50204020 — Electricity Expenses' });
   await page.getByLabel('Line 1 cost centre').selectOption({ label: 'PLC-CC-FIN' });
   await page.getByLabel('Line 1 debit').fill('1500.75');
-  await page.getByLabel('Line 2 account').selectOption({ label: 'PLC-1102 — [PLACEHOLDER] Cash in bank - current account' });
+  await page.getByLabel('Line 2 account').selectOption({ label: '10102020 — Cash in Bank-Local Currency, Current Account' });
   await page.getByLabel('Line 2 credit').fill('1500.7');
   await expect(page.getByText('Out of balance by 0.05')).toBeVisible();
   await page.getByLabel('Line 2 credit').fill('1500.75');
@@ -98,12 +99,12 @@ test('a journal voucher moves from preparation to the posted ledger with four di
   await page.getByRole('link', { name: 'View posted entry' }).click();
   await expect(page.getByRole('heading', { name: /Journal entry JEV-/ })).toBeVisible();
   await expect(page.getByText('Posted entries are immutable.')).toBeVisible();
-  await expect(page.getByRole('row', { name: /PLC-5201/ })).toContainText('1,500.75');
+  await expect(page.getByRole('row', { name: /50204020/ })).toContainText('1,500.75');
 
   await page.getByRole('navigation', { name: 'Main' }).getByRole('link', { name: 'Trial balance' }).click();
   await expect(page.getByText('BALANCED', { exact: true })).toBeVisible();
   await expect(page.getByText('USES PLACEHOLDER ACCOUNTS')).toBeVisible();
-  await expect(page.getByRole('row', { name: /PLC-5201/ })).toBeVisible();
+  await expect(page.getByRole('row', { name: /50204020/ })).toBeVisible();
   await signOut(page);
 
   // The preparer was told about each step: reviewed, approved and posted.

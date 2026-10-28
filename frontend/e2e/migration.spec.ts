@@ -47,7 +47,7 @@ test('an opening trial balance is posted through the journal workflow and open i
   await page.getByLabel('Cutover date').fill('2026-01-01');
   await page.getByLabel('Batch description').fill(`E2E opening balances ${tag}`);
   await page.getByLabel('CSV file').setInputFiles(csv(`tb-${tag}.csv`, 'account_code,cost_center_code,subsidiary_code,description,debit,credit\n'
-    + `PLC-1201,,${customer.code},Receivable,25000.00,\nPLC-3102,,,Accumulated surplus,,25000.00\n`));
+    + `10301010,,${customer.code},Receivable,25000.00,\n30701010,,,Accumulated surplus,,25000.00\n`));
   await page.getByRole('button', { name: 'Upload and validate' }).click();
   await expect(page).toHaveURL(/\/migration\/[0-9a-f-]{36}$/);
   await expect(page.getByRole('main').getByText('VALIDATED', { exact: true })).toBeVisible();
@@ -117,7 +117,7 @@ test('a migrated asset keeps its legacy accumulated depreciation and depreciates
   const [a, r, c, p] = await Promise.all([client(acct), client(rev), client(chief), client(poster)]);
   const up = await a.post('migration/batches', { multipart: { kind: 'GL_OPENING', description: `E2E asset opening ${tag}`, cutoverDate: '2026-01-01',
     file: csv(`tb-${tag}.csv`, 'account_code,cost_center_code,subsidiary_code,description,debit,credit\n'
-      + `PLC-1402,,,Equipment ${tag},60000.00,\nPLC-1409,,,Accumulated depreciation,,24000.00\nPLC-3102,,,Accumulated surplus,,36000.00\n`) } });
+      + `10605990,,,Equipment ${tag},60000.00,\n10605991,,,Accumulated depreciation,,24000.00\n30701010,,,Accumulated surplus,,36000.00\n`) } });
   expect(up.ok(), await up.text()).toBeTruthy();
   let batch = (await up.json()) as { summary: { id: string; version: number; journalVoucherId: string } };
   batch = await call(a, 'POST', `migration/batches/${batch.summary.id}/apply`, { version: batch.summary.version });

@@ -46,6 +46,20 @@ class ChartOfAccountsIT extends AbstractAccountingIT {
     }
 
     @Test
+    void importReadsQuotedTitles() throws Exception {
+        String suffix = String.valueOf(System.nanoTime() % 100000);
+        String csv = "code,name,type,normalBalance,parentCode,postable,fsLineCode,requiresCostCenter,subsidiaryType,budgetControlled\n"
+                + "Q" + suffix + ",\"Accumulated Depreciation-Machinery, \"\"Other\"\" Equipment\",ASSET,CREDIT,,true,,false,,false\n";
+        mvc.perform(multipart("/api/v1/accounts/import").file(new MockMultipartFile("file", "coa.csv", "text/csv", csv.getBytes()))
+                .header("Authorization", approver.bearer())).andExpect(status().is2xxSuccessful());
+        assertThat(accounts.findByCode("Q" + suffix)).get().satisfies(a -> {
+            assertThat(a.getName()).isEqualTo("Accumulated Depreciation-Machinery, \"Other\" Equipment");
+            assertThat(a.getNormalBalance().name()).isEqualTo("CREDIT");
+        });
+        assertThat(AccountService.splitCsvLine("a,,\"b,c\",")).containsExactly("a", "", "b,c", "");
+    }
+
+    @Test
     void structuralRulesAndPermissions() throws Exception {
         Map<String, Object> req = new HashMap<>();
         req.put("code", "X" + (System.nanoTime() % 100000));

@@ -40,13 +40,13 @@ test('collections are deposited, the statement is imported, reconciled and appro
 
   // Setup through the API: a dedicated cash-in-bank account so each run reconciles from zero, and a posted collection.
   const [acc, ch, ap, ca] = await Promise.all([tokenOf(accountant), tokenOf(chief), tokenOf(approver), tokenOf(cashier)]);
-  const gl = await call<{ id: string }>(ch, 'POST', '/accounts', { code: `PLC-11E${tag}`.slice(0, 30), name: `[PLACEHOLDER] E2E bank ${tag}`,
-    accountType: 'ASSET', parentCode: 'PLC-11', postable: true, fsLineCode: 'PLC-SFP-CASH', requiresCostCenter: false, budgetControlled: false });
+  const gl = await call<{ id: string }>(ch, 'POST', '/accounts', { code: `E2E-BANK-${tag}`.slice(0, 30), name: `E2E bank ${tag}`,
+    accountType: 'ASSET', parentCode: '10102', postable: true, fsLineCode: 'RCA-SFP-CASH', requiresCostCenter: false, budgetControlled: false });
   const bank = await call<{ id: string; code: string }>(ch, 'POST', '/bank-accounts', { code: `E2E-${tag}`, bankName: 'E2E Bank',
     accountName: 'Collections', accountNumberLast4: '4321', glAccountId: gl.id });
   const customer = await call<{ id: string }>(acc, 'POST', '/customers', { code: `T${tag}`, name: `E2E Lessee ${tag}`,
     customerType: 'CONCESSIONAIRE', paymentTermsDays: 30 });
-  const revenue = (await call<{ accounts: { id: string; code: string }[] }>(acc, 'GET', '/accounts')).accounts.find((a) => a.code === 'PLC-4203')!;
+  const revenue = (await call<{ accounts: { id: string; code: string }[] }>(acc, 'GET', '/accounts')).accounts.find((a) => a.code === '40699990')!;
   let inv = await call<{ id: string; version: number }>(acc, 'POST', '/accounts-receivable/billings', { kind: 'INVOICE', customerId: customer.id,
     documentDate: today, description: 'Miscellaneous charges', lines: [{ revenueAccountId: revenue.id, description: 'Charge', netAmount: '12500.00' }] });
   inv = await call(acc, 'POST', `/accounts-receivable/billings/${inv.id}/submit`, { version: inv.version });

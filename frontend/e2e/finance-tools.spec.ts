@@ -48,14 +48,14 @@ test('ad hoc report, overhead allocation preview and a cost vs market review', a
   await nav(page, 'Overhead allocation');
   await main.getByLabel('Code').fill(`E2E${stamp % 100000}`);
   await main.getByLabel('Name').fill('Utilities by floor area');
-  await choose(main.getByLabel('Sender account'), 'PLC-5201');
+  await choose(main.getByLabel('Sender account'), '50204020');
   await choose(main.getByLabel('Sender cost centre'), 'PLC-CC-FIN');
   await main.getByLabel('Key').selectOption('QUANTITY');
-  await choose(main.getByLabel('Receiver'), 'PLC-CC-OPS');
+  await choose(main.getByLabel(/^Receiver/), 'PLC-CC-OPS');
   await main.getByLabel('Quantity').fill('120');
   await main.getByRole('button', { name: 'Create cycle' }).click();
   const cycle = main.locator('section').filter({ hasText: `E2E${stamp % 100000}` });
-  await expect(cycle).toContainText('PLC-5201 / PLC-CC-FIN');
+  await expect(cycle).toContainText('50204020 / PLC-CC-FIN');
   await cycle.getByRole('button', { name: 'Run or preview' }).click();
   await cycle.getByLabel('Period').selectOption({ label: 'October 2026' });
   await expect(cycle.getByRole('table')).toContainText('PLC-CC-OPS');

@@ -16,8 +16,9 @@ test.setTimeout(240_000);
 /** Controls that change financial data. The auditor may still filter, page, export, view and download. */
 const WRITE = /^(\+ ?)?(new|create|add|save|submit|approve|post|import|upload|attach|record|prepare|register|delete|remove|reverse|return|reject|release|pay|soft-close|close period|close…|request reopen|activate|dispose|transfer|run depreciation|clear selected|apply|manage by open item|complete task|generate closing voucher|close year)\b/i;
 
-/** Pages whose write actions the internal-auditor role legitimately has: raising tickets, running access reviews, requesting reports. */
-const SKIP = new Set(['Tickets', 'Service levels', 'Access reviews', 'My reports', 'Inbox']);
+/** Pages whose write actions the internal-auditor role legitimately has: raising tickets, running access reviews, requesting reports
+ * and saving their own ad hoc report definitions. */
+const SKIP = new Set(['Tickets', 'Service levels', 'Access reviews', 'My reports', 'Ad hoc reports', 'Inbox']);
 
 async function writeControls(page: Page): Promise<string[]> {
   // Some pages poll (notifications, SLA timers), so wait for the data rather than for network idle.
@@ -70,7 +71,7 @@ test('the internal auditor can see every financial area but change nothing', asy
   const open = years.flatMap((y) => y.periods).find((p) => p.status === 'OPEN')!;
   const writes: [string, string, unknown][] = [
     ['POST', '/journal-vouchers', { voucherType: 'STANDARD', accountingDate: new Date().toISOString().slice(0, 10), adjustmentPeriod: false,
-      description: 'auditor write', lines: [{ accountId: acct('PLC-5201'), debit: '1.00', credit: '0' }, { accountId: acct('PLC-1102'), debit: '0', credit: '1.00' }] }],
+      description: 'auditor write', lines: [{ accountId: acct('50204020'), debit: '1.00', credit: '0' }, { accountId: acct('10102020'), debit: '0', credit: '1.00' }] }],
     ['POST', '/suppliers', { code: 'AUD-X', name: 'Auditor supplier', vatRegistered: false }],
     ['POST', '/customers', { code: 'AUD-X', name: 'Auditor customer', customerType: 'OTHER', paymentTermsDays: 30 }],
     ['POST', '/budgets', { fiscalYearId: years[0]!.id, name: 'Auditor budget' }],

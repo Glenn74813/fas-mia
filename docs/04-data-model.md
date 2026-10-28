@@ -1573,7 +1573,7 @@ Rules: `approval_workflows_voucher_type_check`: CHECK voucher_type IN (STANDARD,
 
 #### `chart_of_accounts`
 
-Created in `V7__general_ledger.sql`. Hierarchical chart of accounts with attributes (type, normal balance, postable, statement line, cost-centre and sub-ledger requirements, budget control, open-item management). Development uses [PLACEHOLDER] PLC- codes (C-22).
+Created in `V7__general_ledger.sql`. Hierarchical chart of accounts with attributes (type, normal balance, postable, statement line, cost-centre and sub-ledger requirements, budget control, open-item management). Development uses COA's Revised Chart of Accounts for Government Corporations (2019); the former [PLACEHOLDER] PLC- accounts are inactive (C-22).
 
 | Column | Type | Null | Default | Meaning |
 |---|---|---|---|---|

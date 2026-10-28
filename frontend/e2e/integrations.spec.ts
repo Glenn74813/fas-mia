@@ -48,7 +48,7 @@ test('verified bank details feed an ADA payment file, and posted documents go to
   const cc = (await call<{ id: string; code: string }[]>(a, 'GET', 'cost-centers')).find((x) => x.code === 'PLC-CC-OPS')!;
   let inv = await call<{ id: string; version: number; payableAmount: string }>(a, 'POST', 'accounts-payable/invoices', {
     supplierId: supplier.id, invoiceNumber: `SI-${tag}`, invoiceDate: today, dueDate: today, accountingDate: today, description: 'Wiring repairs',
-    lines: [{ accountId: accounts.find((x) => x.code === 'PLC-5202')!.id, costCenterId: cc.id, netAmount: '8000.00' }] });
+    lines: [{ accountId: accounts.find((x) => x.code === '50213050')!.id, costCenterId: cc.id, netAmount: '8000.00' }] });
   await a.post(`accounts-payable/invoices/${inv.id}/documents`, { multipart: { file: PDF } });
   inv = await call(a, 'POST', `accounts-payable/invoices/${inv.id}/submit`, { version: inv.version });
   inv = await call(c, 'POST', `accounts-payable/invoices/${inv.id}/approve`, { version: inv.version });

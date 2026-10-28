@@ -35,15 +35,15 @@ test('a close task is set up, reaches its owner through the inbox and is ticked 
   // GR/IR is the classic clearing account: manage it by open item (once per database) and preview automatic clearing.
   await nav(page, 'Open items');
   const managed = page.getByRole('region', { name: 'Managed accounts' });
-  const grir = managed.getByRole('button', { name: /^PLC-2104 / });
+  const grir = managed.getByRole('button', { name: /^29999990 / });
   // Wait for the list to load before deciding whether GR/IR still has to be added.
   await expect(managed.getByRole('table').getByRole('row').nth(1)).toBeVisible();
   if (await grir.count() === 0) {
-    await managed.getByLabel('Account to manage by open item').selectOption({ label: 'PLC-2104 [PLACEHOLDER] Goods received not yet invoiced (GR/IR)' });
+    await managed.getByLabel('Account to manage by open item').selectOption({ label: '29999990 Other Payables' });
     await managed.getByRole('button', { name: 'Manage by open item' }).click();
   }
   await grir.click();
-  await expect(page.getByRole('heading', { name: /^Open items — PLC-2104/ })).toBeVisible();
+  await expect(page.getByRole('heading', { name: /^Open items — 29999990/ })).toBeVisible();
   await page.getByLabel('Automatic clearing rule').selectOption('AMOUNT');
   await page.getByRole('button', { name: 'Preview' }).click();
   await expect(page.getByRole('list', { name: 'Proposed clearings' })).toBeVisible();

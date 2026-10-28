@@ -57,8 +57,14 @@ public class DevPayablesSeeder {
         this.accountService = accountService;
     }
 
+    /** Once the official chart is loaded the placeholder repairs below stop; {@link DevOfficialChart} owns the settings. */
+    private boolean official;
+
     void seed() {
-        addMissingPlaceholderAccounts();
+        official = accounts.existsByCode(DevOfficialChart.MARKER);
+        if (!official) {
+            addMissingPlaceholderAccounts();
+        }
         Integer existing = jdbc.queryForObject("SELECT count(*) FROM tax_codes", Integer.class);
         if (existing != null && existing == 0) {
             taxCodes.create(new TaxCodeRequest("PLC-EWT-GOODS", "[PLACEHOLDER] Expanded withholding - goods (verify ATC and rate)",
@@ -80,8 +86,10 @@ public class DevPayablesSeeder {
         mapIfDifferent("AR_TRADE_RECEIVABLE", "PLC-1201");
         mapIfDifferent("CASH_ON_HAND", "PLC-1101");
         // Fixed assets (Phase 3d): construction in progress keeps a per-project subsidiary ledger.
-        jdbc.update("UPDATE chart_of_accounts c SET subsidiary_type = 'OTHER' WHERE c.code = 'PLC-1410' AND c.subsidiary_type IS NULL "
-                + "AND NOT EXISTS (SELECT 1 FROM journal_entry_lines l WHERE l.account_id = c.id)");
+        if (!official) {
+            jdbc.update("UPDATE chart_of_accounts c SET subsidiary_type = 'OTHER' WHERE c.code = 'PLC-1410' AND c.subsidiary_type IS NULL "
+                    + "AND NOT EXISTS (SELECT 1 FROM journal_entry_lines l WHERE l.account_id = c.id)");
+        }
         mapIfDifferent("FA_DISPOSAL_GAIN", "PLC-4204");
         mapIfDifferent("FA_DISPOSAL_LOSS", "PLC-5302");
         Integer categories = jdbc.queryForObject("SELECT count(*) FROM asset_categories", Integer.class);
@@ -109,7 +117,7 @@ public class DevPayablesSeeder {
         }
         // Financial reporting (Phase 4a): placeholder statement templates over the placeholder line codes.
         // Created per code, so databases seeded before gap 14 also get the movement statements.
-        for (TemplateRequest t : placeholderTemplates()) {
+        for (TemplateRequest t : official ? List.<TemplateRequest>of() : placeholderTemplates()) {
             if (Boolean.FALSE.equals(jdbc.queryForObject("SELECT EXISTS (SELECT 1 FROM report_templates WHERE code = ?)", Boolean.class, t.code()))) {
                 statementTemplates.activate(statementTemplates.create(t, true, Actor.SYSTEM).id(), Actor.SYSTEM);
                 log.warn("DEV: seeded PLACEHOLDER statement template {}", t.code());
@@ -213,6 +221,9 @@ public class DevPayablesSeeder {
     }
 
     private void mapIfDifferent(String key, String code) {
+        if (official) {
+            return;
+        }
         java.util.UUID target = id(code);
         boolean same = mappings.list().stream().anyMatch(m -> m.key().equals(key) && target.equals(m.accountId()));
         if (!same) {
