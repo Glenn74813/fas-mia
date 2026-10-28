@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
 import { adminToken, nextTotpWindow, onboard } from './team';
 import { totp } from './totp';
-import { act, nav, signIn, signOut, pick } from './ui';
+import { act, nav, signIn, signOut, pick, select } from './ui';
 
 const admin = {
   username: process.env.E2E_ADMIN_USERNAME ?? '',
@@ -44,9 +44,8 @@ test('a concession invoice is billed, collected with tax withheld, reconciled an
 
   await nav(page, 'Billing');
   await page.getByRole('link', { name: 'New invoice or memo' }).click();
-  await page.getByLabel('Search customer').fill(code);
-  await page.getByLabel('Customer', { exact: true }).selectOption({ label: `${code} — ${name}` });
-  await page.getByLabel('Output VAT').selectOption({ label: 'PLC-VAT-OUT (0.1200)' });
+  await pick(page.getByLabel('Customer', { exact: true }), code);
+  await select(page.getByLabel('Output VAT'), { label: 'PLC-VAT-OUT (0.1200)' });
   await page.getByLabel('Description', { exact: true }).fill('Concession rent, retail unit T3-21');
   await pick(page.getByLabel('Line 1 account'), '40202050 — Rent/Lease Income');
   await page.getByLabel('Line 1 description').fill('Monthly rent');
@@ -77,8 +76,7 @@ test('a concession invoice is billed, collected with tax withheld, reconciled an
   await signIn(page, cashier);
   await nav(page, 'Collections');
   await page.getByRole('link', { name: 'Record collection' }).click();
-  await page.getByLabel('Search customer').fill(code);
-  await page.getByLabel('Customer', { exact: true }).selectOption({ label: `${code} — ${name}` });
+  await pick(page.getByLabel('Customer', { exact: true }), code);
   await page.getByLabel('Check number / bank').fill(`CHK-${Date.now() % 1_000_000}`);
   await page.getByLabel('Amount received').fill('55000.00');
   await page.getByLabel('Tax withheld by customer').fill('1000.00');

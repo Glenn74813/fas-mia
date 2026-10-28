@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { Select } from '../../components/Select';
 import { Combobox } from '../../components/Combobox';
 import { useState } from 'react';
 import { useParams } from 'react-router';
@@ -11,7 +12,7 @@ import { Money } from '../../components/Money';
 import { PageHeader } from '../../components/PageHeader';
 import { Spinner } from '../../components/Spinner';
 import { StatusBadge } from '../../components/StatusBadge';
-import { postableAccounts, useChart, useCostCenters } from '../../hooks/useAccounting';
+import { activeCostCenters, accountsFor, useChart, useCostCenters } from '../../hooks/useAccounting';
 import { isValidAmount } from '../../utils/money';
 import { PortalRequestList } from './PortalAccessRequests';
 import { StatementTable } from './StatementTable';
@@ -65,7 +66,7 @@ function Contracts({ customerId, canManage }: { customerId: string; canManage: b
   });
   const status = useMutation({ mutationFn: ({ c, s }: { c: Parameters<typeof customerApi.setContractStatus>[0]; s: string }) =>
     customerApi.setContractStatus(c, s), onSuccess: refresh });
-  const revenue = postableAccounts(chart.data?.accounts).filter((a) => a.accountType === 'REVENUE');
+  const revenue = accountsFor(chart.data?.accounts, 'REVENUE_LINE');
   const vat = (taxCodes.data ?? []).filter((t) => t.taxType === 'VAT_OUTPUT' && t.status === 'ACTIVE');
   const valid = form.contractNumber && form.description && form.startDate && form.revenueAccountId && isValidAmount(form.monthlyAmount) && form.monthlyAmount;
   return (
@@ -83,17 +84,17 @@ function Contracts({ customerId, canManage }: { customerId: string; canManage: b
             <Field label="Monthly amount (net of VAT)" inputMode="decimal" value={form.monthlyAmount}
               onChange={(e) => setForm({ ...form, monthlyAmount: e.target.value.replace(/[^\d.]/g, '') })} />
             <div className="space-y-1.5"><label htmlFor="kvat" className="block text-sm font-medium text-slate-700">Output VAT</label>
-              <select id="kvat" value={form.vatCodeId} onChange={(e) => setForm({ ...form, vatCodeId: e.target.value })}
+              <Select id="kvat" value={form.vatCodeId} onChange={(e) => setForm({ ...form, vatCodeId: e.target.value })}
                 className="block w-full rounded-lg border border-slate-300 px-3 py-2 shadow-xs text-sm"><option value="">No VAT</option>
-                {vat.map((t) => <option key={t.id} value={t.id}>{t.code} ({t.rate})</option>)}</select></div>
+                {vat.map((t) => <option key={t.id} value={t.id}>{t.code} ({t.rate})</option>)}</Select></div>
             <div className="space-y-1 md:col-span-2"><label htmlFor="krev" className="block text-sm font-medium text-slate-700">Revenue account</label>
               <Combobox id="krev" value={form.revenueAccountId} onChange={(v) => setForm({ ...form, revenueAccountId: v })}
                 className="block w-full rounded-lg border border-slate-300 px-3 py-2 shadow-xs text-sm" placeholder="Select…"
               options={revenue.map((a) => ({ value: a.id, label: `${a.code} — ${a.name}` }))} /></div>
             <div className="space-y-1.5"><label htmlFor="kcc" className="block text-sm font-medium text-slate-700">Cost centre</label>
-              <select id="kcc" value={form.costCenterId} onChange={(e) => setForm({ ...form, costCenterId: e.target.value })}
+              <Select id="kcc" value={form.costCenterId} onChange={(e) => setForm({ ...form, costCenterId: e.target.value })}
                 className="block w-full rounded-lg border border-slate-300 px-3 py-2 shadow-xs text-sm"><option value="">—</option>
-                {(costCenters.data ?? []).map((cc) => <option key={cc.id} value={cc.id}>{cc.code}</option>)}</select></div>
+                {activeCostCenters(costCenters.data).map((cc) => <option key={cc.id} value={cc.id}>{cc.code}</option>)}</Select></div>
           </div>
           <p className="text-xs text-slate-500">Contract billing charges the full monthly amount for every month the contract covers.
             Proration, escalation and percentage rent await MIAA's billing rules (clarification C-28).</p>

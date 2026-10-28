@@ -1,4 +1,5 @@
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { Select } from '../../components/Select';
 import { useRef, useState } from 'react';
 import { paymentFileApi, settingsApi } from '../../api/endpoints';
 import type { PaymentBatch } from '../../api/types';
@@ -52,8 +53,8 @@ export function PaymentFilesPage() {
                 <td className="py-1.5 text-right"><Money value={r.amount} /></td></tr>))}
               {rows.length === 0 && <tr><td colSpan={5} className="py-3 text-center text-slate-500">No approved vouchers awaiting payment.</td></tr>}</tbody></table>
           <div className="flex flex-wrap items-end gap-3">
-            <label>Debit account <select value={bankId} onChange={(e) => setBank(e.target.value)} className="ml-1 rounded-md border border-slate-300 px-2 py-1">
-              <option value="">Select…</option>{(banks.data ?? []).filter((b) => b.status === 'ACTIVE').map((b) => <option key={b.id} value={b.id}>{b.code} ****{b.accountNumberLast4}</option>)}</select></label>
+            <label>Debit account <Select value={bankId} onChange={(e) => setBank(e.target.value)} className="ml-1 rounded-md border border-slate-300 px-2 py-1">
+              <option value="">Select…</option>{(banks.data ?? []).filter((b) => b.status === 'ACTIVE').map((b) => <option key={b.id} value={b.id}>{b.code} ****{b.accountNumberLast4}</option>)}</Select></label>
             <Field label="Payment date" type="date" value={date} onChange={(e) => setDate(e.target.value)} />
             <span>Total {fromCents(total)}</span>
             <Button busy={create.isPending} disabled={!bankId || chosen.size === 0} onClick={() => create.mutate()}>Create payment file</Button>

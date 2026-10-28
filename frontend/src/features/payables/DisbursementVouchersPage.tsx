@@ -1,4 +1,5 @@
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { Select } from '../../components/Select';
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router';
 import { dvApi, invoiceApi, supplierApi } from '../../api/endpoints';
@@ -29,11 +30,11 @@ export function DisbursementVouchersPage() {
         actions={hasPermission('DISBURSEMENT_PREPARE') && (
           <Link to="/payables/disbursements/new" className="rounded-md bg-brand-700 px-4 py-2 text-sm font-medium text-white hover:bg-brand-900">New DV</Link>
         )} />
-      <select aria-label="Status" value={status} onChange={(e) => { setStatus(e.target.value); setPage(0); }}
+      <Select aria-label="Status" value={status} onChange={(e) => { setStatus(e.target.value); setPage(0); }}
         className="mb-4 rounded-lg border border-slate-300 px-3 py-2 shadow-xs text-sm">
         {['', 'DRAFT', 'RETURNED', 'SUBMITTED', 'APPROVED', 'PAYMENT_INSTRUCTED', 'PAID', 'POSTED', 'REJECTED', 'CANCELLED'].map((s) =>
           <option key={s} value={s}>{s ? s.replace('_', ' ') : 'All statuses'}</option>)}
-      </select>
+      </Select>
       <ErrorAlert error={list.error} />
       {list.isPending ? <Spinner /> : list.data && (
         <div className="overflow-x-auto rounded-xl border border-slate-200/80 bg-white shadow-xs">

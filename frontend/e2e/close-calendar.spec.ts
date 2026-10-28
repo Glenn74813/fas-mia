@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 import { adminToken, nextTotpWindow, onboard } from './team';
-import { nav, signIn, signOut, pick } from './ui';
+import { nav, signIn, signOut, pick, select } from './ui';
 
 const admin = {
   username: process.env.E2E_ADMIN_USERNAME ?? '',
@@ -26,7 +26,7 @@ test('a close task is set up, reaches its owner through the inbox and is ticked 
   const tasks = page.getByRole('region', { name: 'Close tasks' });
   await tasks.getByLabel('Task code').fill(`E2E-${tag}`);
   await tasks.getByLabel('Task name').fill(name);
-  await tasks.getByLabel('Checklist').selectOption({ label: 'Day end' });
+  await select(tasks.getByLabel('Checklist'), { label: 'Day end' });
   await tasks.getByLabel('Due after (days)').fill('0');
   await tasks.getByLabel('Responsible permission').fill('GL_CLEARING');
   await tasks.getByRole('button', { name: 'Add task' }).click();
@@ -44,7 +44,7 @@ test('a close task is set up, reaches its owner through the inbox and is ticked 
   }
   await grir.click();
   await expect(page.getByRole('heading', { name: /^Open items — 29999990/ })).toBeVisible();
-  await page.getByLabel('Automatic clearing rule').selectOption('AMOUNT');
+  await select(page.getByLabel('Automatic clearing rule'), 'AMOUNT');
   await page.getByRole('button', { name: 'Preview' }).click();
   await expect(page.getByRole('list', { name: 'Proposed clearings' })).toBeVisible();
   await signOut(page);

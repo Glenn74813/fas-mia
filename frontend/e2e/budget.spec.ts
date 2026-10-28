@@ -1,7 +1,7 @@
 import { expect, request, test } from '@playwright/test';
 import { futureYear } from './fiscal';
 import { adminToken, nextTotpWindow, onboard } from './team';
-import { act, nav, signIn, signOut, pick } from './ui';
+import { act, nav, signIn, signOut, pick, select } from './ui';
 
 const admin = {
   username: process.env.E2E_ADMIN_USERNAME ?? '',
@@ -29,7 +29,7 @@ test('a budget is validated, approved by a second person, and realignments may o
 
   await signIn(page, officer);
   await nav(page, 'Budgets');
-  await page.getByLabel('Fiscal year').selectOption({ label: String(fy.fiscalYear) });
+  await select(page.getByLabel('Fiscal year'), { label: String(fy.fiscalYear) });
   await page.getByRole('button', { name: 'Create budget' }).click();
   await expect(page.getByRole('heading', { name: `Corporate Operating Budget ${fy.fiscalYear}` })).toBeVisible();
 
@@ -71,14 +71,14 @@ test('a budget is validated, approved by a second person, and realignments may o
   // A realignment larger than the source's available budget cannot be approved; one within it can.
   await signIn(page, officer);
   await page.goto(budgetUrl);
-  await page.getByLabel('From allocation').selectOption({ label: 'From 50204020 / PLC-CC-FIN' });
-  await page.getByLabel('To allocation').selectOption({ label: 'To 50213050 / PLC-CC-FIN' });
+  await select(page.getByLabel('From allocation'), { label: 'From 50204020 / PLC-CC-FIN' });
+  await select(page.getByLabel('To allocation'), { label: 'To 50213050 / PLC-CC-FIN' });
   await page.getByLabel('Adjustment amount').fill('60000.00');
   await page.getByLabel('Adjustment reason').fill('Move utilities savings to repairs');
   await page.getByRole('button', { name: 'Request' }).click();
   await expect(page.getByText(/60,000\.00/).first()).toBeVisible();
-  await page.getByLabel('From allocation').selectOption({ label: 'From 50204020 / PLC-CC-FIN' });
-  await page.getByLabel('To allocation').selectOption({ label: 'To 50213050 / PLC-CC-FIN' });
+  await select(page.getByLabel('From allocation'), { label: 'From 50204020 / PLC-CC-FIN' });
+  await select(page.getByLabel('To allocation'), { label: 'To 50213050 / PLC-CC-FIN' });
   await page.getByLabel('Adjustment amount').fill('5000.00');
   await page.getByLabel('Adjustment reason').fill('Urgent roof repair in the terminal');
   await page.getByRole('button', { name: 'Request' }).click();
@@ -103,10 +103,10 @@ test('a budget is validated, approved by a second person, and realignments may o
   // Variance analysis of the same budget: nothing is spent yet in this future year, so the full budget to date is favourable.
   await nav(page, 'My reports');
   const panel = page.locator('section').filter({ has: page.getByRole('heading', { name: 'Request a report' }) });
-  await panel.getByLabel('Report').selectOption({ label: 'Variance analysis' });
-  await panel.getByLabel('Fiscal year').selectOption({ label: String(fy.fiscalYear) });
-  await panel.getByLabel('Through period').selectOption('6');
-  await panel.getByLabel('Format').selectOption('CSV');
+  await select(panel.getByLabel('Report'), { label: 'Variance analysis' });
+  await select(panel.getByLabel('Fiscal year'), { label: String(fy.fiscalYear) });
+  await select(panel.getByLabel('Through period'), '6');
+  await select(panel.getByLabel('Format'), 'CSV');
   await panel.getByRole('button', { name: 'Queue report' }).click();
   await expect(page.getByRole('status')).toContainText('Queued');
   const row = page.getByRole('row').filter({ hasText: 'Variance analysis' }).first();

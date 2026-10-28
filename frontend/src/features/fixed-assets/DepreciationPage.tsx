@@ -1,4 +1,5 @@
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { Select } from '../../components/Select';
 import { useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router';
 import { assetApi } from '../../api/endpoints';
@@ -29,8 +30,8 @@ export function DepreciationRunsPage() {
       {hasPermission('FA_MANAGE') && (
         <section className="mb-4 flex flex-wrap items-end gap-3 rounded-xl border border-slate-200/80 bg-white shadow-xs p-5">
           <label className="text-sm">Period
-            <select value={periodId} onChange={(e) => setPeriod(e.target.value)} className="ml-2 rounded-md border border-slate-300 px-2 py-1">
-              <option value="">Select an open period…</option>{periods.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}</select></label>
+            <Select value={periodId} onChange={(e) => setPeriod(e.target.value)} className="ml-2 rounded-md border border-slate-300 px-2 py-1">
+              <option value="">Select an open period…</option>{periods.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}</Select></label>
           <Button busy={prepare.isPending} disabled={!periodId} onClick={() => prepare.mutate()}>Compute depreciation</Button>
           <p className="w-full text-xs text-slate-500">Straight-line, monthly amounts. Months not yet charged are caught up; nothing is charged twice.
             {settings.data?.frequency === 'ANNUAL' ? ' Runs are annual: only the fiscal year\'s last regular period can be run.' : ''} Start convention,

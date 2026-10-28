@@ -1,4 +1,5 @@
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { Select } from '../../components/Select';
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router';
 import { settingsApi, supplierApi } from '../../api/endpoints';
@@ -47,11 +48,11 @@ export function SuppliersPage() {
             <Field label="Address" value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} />
             <div className="space-y-1.5">
               <label htmlFor="ewt" className="block text-sm font-medium text-slate-700">Default withholding tax</label>
-              <select id="ewt" value={form.defaultEwtCodeId} onChange={(e) => setForm({ ...form, defaultEwtCodeId: e.target.value })}
+              <Select id="ewt" value={form.defaultEwtCodeId} onChange={(e) => setForm({ ...form, defaultEwtCodeId: e.target.value })}
                 className="block w-full rounded-lg border border-slate-300 px-3 py-2 shadow-xs text-sm">
                 <option value="">None</option>
-                {(taxCodes.data ?? []).filter((t) => t.taxType === 'EWT').map((t) => <option key={t.id} value={t.id}>{t.code} ({t.rate})</option>)}
-              </select>
+                {(taxCodes.data ?? []).filter((t) => t.taxType === 'EWT' && t.status === 'ACTIVE').map((t) => <option key={t.id} value={t.id}>{t.code} ({t.rate})</option>)}
+              </Select>
             </div>
             <label className="flex items-center gap-2 self-end pb-2 text-sm">
               <input type="checkbox" checked={form.vatRegistered} onChange={(e) => setForm({ ...form, vatRegistered: e.target.checked })} />

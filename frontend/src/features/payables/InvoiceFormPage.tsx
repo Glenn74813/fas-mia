@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { Select } from '../../components/Select';
 import { Combobox } from '../../components/Combobox';
 import { useState, type FormEvent } from 'react';
 import { useNavigate, useParams } from 'react-router';
@@ -10,7 +11,7 @@ import { Field } from '../../components/Field';
 import { PageHeader } from '../../components/PageHeader';
 import { SearchSelect } from '../../components/SearchSelect';
 import { Spinner } from '../../components/Spinner';
-import { postableAccounts, useChart, useCostCenters } from '../../hooks/useAccounting';
+import { activeCostCenters, accountsFor, useChart, useCostCenters } from '../../hooks/useAccounting';
 import { fromCents, isValidAmount, sumCents } from '../../utils/money';
 
 const emptyLine = (): InvoiceLineInput => ({ accountId: '', costCenterId: null, description: null, netAmount: '', ewtCodeId: null });
@@ -41,7 +42,7 @@ function InvoiceForm({ existing }: { existing?: InvoiceView }) {
     : [emptyLine()]);
   const supplierQuery = useQuery({ queryKey: ['supplier', form.supplierId], queryFn: () => supplierApi.get(form.supplierId), enabled: !!form.supplierId });
   const supplier = supplierQuery.data;
-  const accounts = postableAccounts(chart.data?.accounts).filter((a) => a.accountType === 'EXPENSE' || a.accountType === 'ASSET');
+  const accounts = accountsFor(chart.data?.accounts, 'SUPPLIER_INVOICE_LINE');
   const ewtCodes = (taxCodes.data ?? []).filter((t) => t.taxType === 'EWT' && t.status === 'ACTIVE');
   const vatCodes = (taxCodes.data ?? []).filter((t) => t.taxType === 'VAT_INPUT' && t.status === 'ACTIVE');
   const set = (i: number, patch: Partial<InvoiceLineInput>) => setLines(lines.map((l, j) => (j === i ? { ...l, ...patch } : l)));
@@ -66,11 +67,11 @@ function InvoiceForm({ existing }: { existing?: InvoiceView }) {
           <Field label="Supplier invoice number" value={form.invoiceNumber} maxLength={60} onChange={(e) => setForm({ ...form, invoiceNumber: e.target.value })} />
           <div className="space-y-1.5">
             <label htmlFor="vat" className="block text-sm font-medium text-slate-700">Input VAT</label>
-            <select id="vat" value={form.vatCodeId ?? ''} disabled={!supplier?.vatRegistered} onChange={(e) => setForm({ ...form, vatCodeId: e.target.value || null })}
+            <Select id="vat" value={form.vatCodeId ?? ''} disabled={!supplier?.vatRegistered} onChange={(e) => setForm({ ...form, vatCodeId: e.target.value || null })}
               className="block w-full rounded-lg border border-slate-300 px-3 py-2 shadow-xs text-sm">
               <option value="">{supplier?.vatRegistered ? 'No VAT' : 'Supplier not VAT-registered'}</option>
               {vatCodes.map((t) => <option key={t.id} value={t.id}>{t.code} ({t.rate})</option>)}
-            </select>
+            </Select>
           </div>
           <Field label="Invoice date" type="date" value={form.invoiceDate} onChange={(e) => setForm({ ...form, invoiceDate: e.target.value })} />
           <Field label="Due date" type="date" value={form.dueDate} onChange={(e) => setForm({ ...form, dueDate: e.target.value })} />
@@ -93,12 +94,12 @@ function InvoiceForm({ existing }: { existing?: InvoiceView }) {
               options={accounts.map((a) => ({ value: a.id, label: `${a.code} — ${a.name}` }))} /></td>
                   <td className="px-2 py-2"><Combobox aria-label={`Line ${i + 1} cost centre`} value={l.costCenterId ?? ''} onChange={(v) => set(i, { costCenterId: v || null })}
                     className="w-36 rounded-md border border-slate-300 px-2 py-1" placeholder="—"
-              options={(costCenters.data ?? []).map((c) => ({ value: c.id, label: `${c.code} — ${c.name}` }))} /></td>
+              options={activeCostCenters(costCenters.data).map((c) => ({ value: c.id, label: `${c.code} — ${c.name}` }))} /></td>
                   <td className="px-2 py-2"><input aria-label={`Line ${i + 1} description`} value={l.description ?? ''} onChange={(e) => set(i, { description: e.target.value || null })}
                     className="w-48 rounded-md border border-slate-300 px-2 py-1" /></td>
-                  <td className="px-2 py-2"><select aria-label={`Line ${i + 1} withholding`} value={l.ewtCodeId ?? ''} onChange={(e) => set(i, { ewtCodeId: e.target.value || null })}
+                  <td className="px-2 py-2"><Select aria-label={`Line ${i + 1} withholding`} value={l.ewtCodeId ?? ''} onChange={(e) => set(i, { ewtCodeId: e.target.value || null })}
                     className="w-40 rounded-md border border-slate-300 px-2 py-1"><option value="">{supplier?.defaultEwtCode ? `Default (${supplier.defaultEwtCode})` : 'None'}</option>
-                    {ewtCodes.map((t) => <option key={t.id} value={t.id}>{t.code} ({t.rate})</option>)}</select></td>
+                    {ewtCodes.map((t) => <option key={t.id} value={t.id}>{t.code} ({t.rate})</option>)}</Select></td>
                   <td className="px-2 py-2"><input aria-label={`Line ${i + 1} net amount`} inputMode="decimal" value={l.netAmount}
                     onChange={(e) => set(i, { netAmount: e.target.value.replace(/[^\d.]/g, '') })} aria-invalid={!isValidAmount(l.netAmount) || undefined}
                     className={`w-32 rounded border px-2 py-1 text-right ${isValidAmount(l.netAmount) ? 'border-slate-300' : 'border-red-500'}`} /></td>

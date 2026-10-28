@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { Select } from '../../components/Select';
 import { useRef, useState } from 'react';
 import { Link, useParams } from 'react-router';
 import { dvApi, settingsApi } from '../../api/endpoints';
@@ -117,11 +118,11 @@ export function DisbursementDetailPage() {
         confirmDisabled={dialog === 'instruct' && (!payment.bankAccountId || !payment.reference)}>
         {dialog === 'instruct' && (
           <div className="grid gap-3 text-sm sm:grid-cols-2">
-            <label>Mode<select value={payment.mode} onChange={(e) => setPayment({ ...payment, mode: e.target.value })}
-              className="mt-1.5 block w-full rounded-md border border-slate-300 px-2 py-2"><option value="CHECK">Check</option><option value="ADA">ADA / bank transfer</option></select></label>
-            <label>Bank account<select value={payment.bankAccountId} onChange={(e) => setPayment({ ...payment, bankAccountId: e.target.value })}
+            <label>Mode<Select value={payment.mode} onChange={(e) => setPayment({ ...payment, mode: e.target.value })}
+              className="mt-1.5 block w-full rounded-md border border-slate-300 px-2 py-2"><option value="CHECK">Check</option><option value="ADA">ADA / bank transfer</option></Select></label>
+            <label>Bank account<Select value={payment.bankAccountId} onChange={(e) => setPayment({ ...payment, bankAccountId: e.target.value })}
               className="mt-1.5 block w-full rounded-md border border-slate-300 px-2 py-2"><option value="">Select…</option>
-              {(banks.data ?? []).filter((b) => b.status === 'ACTIVE').map((b) => <option key={b.id} value={b.id}>{b.code} ({b.bankName} ****{b.accountNumberLast4})</option>)}</select></label>
+              {(banks.data ?? []).filter((b) => b.status === 'ACTIVE').map((b) => <option key={b.id} value={b.id}>{b.code} ({b.bankName} ****{b.accountNumberLast4})</option>)}</Select></label>
             <label>{payment.mode === 'CHECK' ? 'Check number' : 'ADA reference'}<input value={payment.reference}
               onChange={(e) => setPayment({ ...payment, reference: e.target.value.replace(/[^A-Za-z0-9-]/g, '') })}
               className="mt-1.5 block w-full rounded-md border border-slate-300 px-2 py-2" /></label>

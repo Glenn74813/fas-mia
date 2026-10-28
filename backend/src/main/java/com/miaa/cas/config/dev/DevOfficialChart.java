@@ -120,6 +120,7 @@ public class DevOfficialChart {
                 throw new UncheckedIOException(e);
             }
         }
+        syncSubsidiaryTypes();
         Map<UUID, Account> moves = moves();
         repointMappings(moves);
         repointSettings(moves);
@@ -129,6 +130,31 @@ public class DevOfficialChart {
         // After deactivating: the account service saves whole entities, which would write back the old line codes.
         refileStatementLines(moves);
         deleteUnusedPlaceholders();
+    }
+
+    /**
+     * The chart file's sub-ledger types also reach accounts loaded from an earlier version of it, as long as nothing
+     * has been posted to them yet (a used account keeps its sub-ledger as it is).
+     */
+    private void syncSubsidiaryTypes() {
+        try (InputStream in = new ClassPathResource("seed/coa-rca-gc-2019.csv").getInputStream()) {
+            for (String line : new String(in.readAllBytes(), StandardCharsets.UTF_8).lines()
+                    .filter(l -> !l.isBlank() && !l.startsWith("#") && !l.startsWith("code,")).toList()) {
+                String[] r = AccountService.splitCsvLine(line);
+                String sl = r[8].isBlank() ? null : r[8].trim();
+                int n = jdbc.update("""
+                        UPDATE chart_of_accounts c SET subsidiary_type = ?, version = version + 1, updated_at = now(), updated_by = 'system'
+                        WHERE c.code = ? AND c.subsidiary_type IS DISTINCT FROM ?
+                          AND NOT EXISTS (SELECT 1 FROM journal_entry_lines l WHERE l.account_id = c.id)
+                          AND NOT EXISTS (SELECT 1 FROM journal_voucher_lines l WHERE l.account_id = c.id)""", sl, r[0].trim(), sl);
+                if (n > 0) {
+                    audit.record(Actor.SYSTEM, "ACCOUNT_UPDATED", "ACCOUNT", r[0].trim(), Map.of("subsidiaryType", String.valueOf(sl),
+                            "reason", "Sub-ledger type from the development chart file"));
+                }
+            }
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
     }
 
     /** Placeholder account id to its official account, from seed/plc-to-rca-gc-2019.csv. */

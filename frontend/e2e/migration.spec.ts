@@ -1,6 +1,6 @@
 import { expect, request, test, type APIRequestContext } from '@playwright/test';
 import { adminToken, nextTotpWindow, onboard, type Member } from './team';
-import { nav, signIn, signOut } from './ui';
+import { nav, signIn, signOut, select } from './ui';
 
 const admin = {
   username: process.env.E2E_ADMIN_USERNAME ?? '',
@@ -77,7 +77,7 @@ test('an opening trial balance is posted through the journal workflow and open i
   // Accountant: uploads the customer's open invoices against that entry; they agree, but the uploader cannot apply them.
   await signIn(page, acct);
   await nav(page, 'Opening balances');
-  await page.getByLabel('Batch type', { exact: true }).selectOption('AR_OPEN_ITEMS');
+  await select(page.getByLabel('Batch type', { exact: true }), 'AR_OPEN_ITEMS');
   await page.getByLabel('Opening entry number').fill(entryNumber);
   await page.getByLabel('Batch description').fill(`E2E open invoices ${tag}`);
   await page.getByLabel('CSV file').setInputFiles(csv(`ar-${tag}.csv`, 'customer_code,document_number,document_date,due_date,description,outstanding_amount\n'
@@ -136,7 +136,7 @@ test('a migrated asset keeps its legacy accumulated depreciation and depreciates
   // Accountant: uploads the register; it agrees with the opening entry account by account.
   await signIn(page, acct);
   await nav(page, 'Opening balances');
-  await page.getByLabel('Batch type', { exact: true }).selectOption('FA_REGISTER');
+  await select(page.getByLabel('Batch type', { exact: true }), 'FA_REGISTER');
   await page.getByLabel('Opening entry number').fill(entryNumber);
   await page.getByLabel('Batch description').fill(`E2E asset register ${tag}`);
   await page.getByLabel('CSV file').setInputFiles(csv(`fa-${tag}.csv`, 'asset_number,category_code,description,serial_number,location,custodian,'

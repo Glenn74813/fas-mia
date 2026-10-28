@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 import { adminToken, nextTotpWindow, onboard } from './team';
-import { act, nav, PDF, signIn, signOut } from './ui';
+import { act, nav, PDF, signIn, signOut, select } from './ui';
 
 const admin = {
   username: process.env.E2E_ADMIN_USERNAME ?? '',
@@ -22,9 +22,9 @@ test('an incident is raised, worked against its SLA and closed by the requester'
   await signIn(page, requester);
   await nav(page, 'Tickets');
   await page.getByRole('button', { name: 'New ticket' }).click();
-  await page.getByLabel('Priority').selectOption('P2');
-  await page.getByLabel(/^Severity/).selectOption('S2');
-  await page.getByLabel(/^Category/).selectOption({ label: '[PLACEHOLDER] Reports and printing' });
+  await select(page.getByLabel('Priority'), 'P2');
+  await select(page.getByLabel(/^Severity/), 'S2');
+  await select(page.getByLabel(/^Category/), { label: '[PLACEHOLDER] Reports and printing' });
   await page.getByLabel('Title').fill(title);
   await page.getByLabel('Description').fill('Clicking Export XLSX on the trial balance shows an error for October.');
   await page.getByRole('button', { name: 'Submit ticket' }).click();
@@ -60,7 +60,7 @@ test('an incident is raised, worked against its SLA and closed by the requester'
   await expect(page.getByText('Reproduced; the export job lacks a period parameter.')).toHaveCount(0);
   await expect(page.getByText('Fixed the period parameter; please retry the export.')).toBeVisible();
   await page.getByRole('main').getByRole('button', { name: 'Confirm and close' }).click();
-  await page.getByRole('dialog').getByLabel('Satisfaction (optional)').selectOption('4');
+  await select(page.getByRole('dialog').getByLabel('Satisfaction (optional)'), '4');
   await page.getByRole('dialog').getByRole('button', { name: 'Close ticket', exact: true }).click();
   await expect(page.getByRole('main').getByText('CLOSED', { exact: true }).first()).toBeVisible();
   await expect(page.getByText('CONFIRMED BY REQUESTER')).toBeVisible();
@@ -78,8 +78,8 @@ test('a change request carries a rollback plan, is validated on staging and rele
   await signIn(page, requester);
   await nav(page, 'Tickets');
   await page.getByRole('button', { name: 'New ticket' }).click();
-  await page.getByLabel(/^Type/).selectOption('CHANGE_REQUEST');
-  await page.getByLabel(/^Category/).selectOption({ label: '[PLACEHOLDER] Reports and printing' });
+  await select(page.getByLabel(/^Type/), 'CHANGE_REQUEST');
+  await select(page.getByLabel(/^Category/), { label: '[PLACEHOLDER] Reports and printing' });
   await page.getByLabel('Title').fill(title);
   await page.getByLabel('Description').fill('Show the supplier TIN column on the AP aging report.');
   await page.getByRole('button', { name: 'Submit ticket' }).click();

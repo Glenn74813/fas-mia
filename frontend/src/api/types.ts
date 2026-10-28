@@ -139,6 +139,10 @@ export interface ChainVerification {
 
 // ---------------------------------------------------------------- Phase 2: accounting
 
+export type AccountPurpose = 'JOURNAL_LINE' | 'SUPPLIER_INVOICE_LINE' | 'REVENUE_LINE' | 'BUDGET_LINE' | 'ALLOCATION' | 'CASH'
+  | 'INVENTORY_STOCK' | 'EXPENSE' | 'ASSET_COST' | 'ASSET_ACCUMULATED' | 'ASSET_UNDER_CONSTRUCTION' | 'ASSET_OFFSET' | 'OPEN_ITEM' | 'EQUITY'
+  | 'TAX_ASSET' | 'TAX_LIABILITY' | 'SUPPLIER_CONTROL' | 'SUPPLIER_ADVANCE' | 'CUSTOMER_CONTROL' | 'CUSTOMER_DEPOSIT' | 'LIABILITY' | 'GAIN' | 'LOSS';
+
 export interface Account {
   id: string;
   code: string;
@@ -159,6 +163,8 @@ export interface Account {
   taxCode: string | null;
   placeholder: boolean;
   version: number;
+  /** What the account may be chosen for outside a journal voucher (server-side AccountPurpose). */
+  purposes?: AccountPurpose[];
 }
 
 export interface ChartSummary {
@@ -515,6 +521,8 @@ export interface AccountMapping {
   accountId: string | null;
   accountCode: string | null;
   accountName: string | null;
+  /** The account purpose the mapped account must fit. */
+  purpose?: AccountPurpose;
 }
 
 export interface InvoiceLineInput {

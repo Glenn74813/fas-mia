@@ -13,3 +13,4 @@ frontend/test-results/
 # Cloudflare Wrangler local state and dev secrets
 frontend/.wrangler/
 frontend/.dev.vars
+__pycache__/

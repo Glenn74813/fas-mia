@@ -1,4 +1,5 @@
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { Select } from '../../components/Select';
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router';
 import { budgetApi } from '../../api/endpoints';
@@ -30,8 +31,8 @@ export function BudgetsPage() {
       <PageHeader title="Budgets" crumbs={[{ label: 'Budget' }, { label: 'Corporate Operating Budgets' }]}
         actions={hasPermission('BUDGET_PREPARE') && withoutBudget.length > 0 && (
           <div className="flex gap-2">
-            <select aria-label="Fiscal year" value={fy} onChange={(e) => setFy(e.target.value)} className="rounded-lg border border-slate-300 px-3 py-2 shadow-xs text-sm">
-              <option value="">Fiscal year…</option>{withoutBudget.map((y) => <option key={y.id} value={y.id}>{y.fiscalYear}</option>)}</select>
+            <Select aria-label="Fiscal year" value={fy} onChange={(e) => setFy(e.target.value)} className="rounded-lg border border-slate-300 px-3 py-2 shadow-xs text-sm">
+              <option value="">Fiscal year…</option>{withoutBudget.map((y) => <option key={y.id} value={y.id}>{y.fiscalYear}</option>)}</Select>
             <Button disabled={!fy} busy={create.isPending} onClick={() => create.mutate()}>Create budget</Button>
           </div>
         )} />

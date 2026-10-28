@@ -1,6 +1,6 @@
 import { expect, request, test, type APIRequestContext } from '@playwright/test';
 import { adminToken, nextTotpWindow, onboard, type Member } from './team';
-import { nav, signIn, signOut } from './ui';
+import { nav, signIn, signOut, select } from './ui';
 
 const admin = {
   username: process.env.E2E_ADMIN_USERNAME ?? '',
@@ -48,8 +48,8 @@ test('a legacy trial balance is compared with CAS, every difference explained, a
   // Accountant: uploads and explains both differences.
   await signIn(page, acct);
   await nav(page, 'Parallel run');
-  await page.getByLabel('CAS period').selectOption({ label: period.name });
-  await page.getByLabel('Compare').selectOption('PERIOD');
+  await select(page.getByLabel('CAS period'), { label: period.name });
+  await select(page.getByLabel('Compare'), 'PERIOD');
   await page.getByLabel('Legacy system').fill(`E2E legacy ${tag}`);
   await page.getByLabel('Legacy trial balance (CSV)').setInputFiles({ name: `legacy-${tag}.csv`, mimeType: 'text/csv', buffer: Buffer.from(csv) });
   await page.getByRole('button', { name: 'Compare', exact: true }).click();

@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { Select } from '../../components/Select';
 import { useState } from 'react';
 import { ticketApi } from '../../api/endpoints';
 import { useAuth } from '../../auth/AuthContext';
@@ -48,10 +49,10 @@ export function SlaSettingsPage() {
             <ErrorAlert error={create.error} />
             <div className="flex flex-wrap items-end gap-3">
               <Field label="Contract phase" placeholder={calendar.data?.contractPhase} value={p.contractPhase} onChange={(e) => setP({ ...p, contractPhase: e.target.value.toUpperCase() })} />
-              <label>Type <select value={p.ticketType} onChange={(e) => setP({ ...p, ticketType: e.target.value })} className="ml-1 rounded-md border border-slate-300 px-2 py-1">
-                {Object.entries(TICKET_TYPES).map(([k, v]) => <option key={k} value={k}>{v}</option>)}</select></label>
-              <label>Priority <select value={p.priority} onChange={(e) => setP({ ...p, priority: e.target.value })} className="ml-1 rounded-md border border-slate-300 px-2 py-1">
-                {['P1', 'P2', 'P3', 'P4'].map((x) => <option key={x}>{x}</option>)}</select></label>
+              <label>Type <Select value={p.ticketType} onChange={(e) => setP({ ...p, ticketType: e.target.value })} className="ml-1 rounded-md border border-slate-300 px-2 py-1">
+                {Object.entries(TICKET_TYPES).map(([k, v]) => <option key={k} value={k}>{v}</option>)}</Select></label>
+              <label>Priority <Select value={p.priority} onChange={(e) => setP({ ...p, priority: e.target.value })} className="ml-1 rounded-md border border-slate-300 px-2 py-1">
+                {['P1', 'P2', 'P3', 'P4'].map((x) => <option key={x}>{x}</option>)}</Select></label>
               <Field label="Respond within (min)" inputMode="numeric" value={p.responseMinutes} onChange={(e) => setP({ ...p, responseMinutes: e.target.value.replace(/\D/g, '') })} />
               <Field label="Resolve within (min)" inputMode="numeric" value={p.resolutionMinutes} onChange={(e) => setP({ ...p, resolutionMinutes: e.target.value.replace(/\D/g, '') })} />
               <label className="flex items-center gap-2"><input type="checkbox" checked={p.businessHours} onChange={(e) => setP({ ...p, businessHours: e.target.checked })} />Business hours</label>

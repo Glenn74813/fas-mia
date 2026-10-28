@@ -3,6 +3,7 @@ package com.miaa.cas.treasury;
 import com.miaa.cas.audit.Actor;
 import com.miaa.cas.audit.AuditService;
 import com.miaa.cas.common.error.ApiException;
+import com.miaa.cas.generalledger.AccountPurpose;
 import com.miaa.cas.common.error.ErrorCode;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -65,6 +66,7 @@ public class BankAccountService {
         if (Boolean.TRUE.equals(exists)) {
             throw new ApiException(ErrorCode.DUPLICATE_RESOURCE, "Bank account code already exists.");
         }
+        AccountPurpose.require(jdbc, req.glAccountId(), AccountPurpose.CASH, "Cash GL account");
         UUID id = UUID.randomUUID();
         jdbc.update("INSERT INTO bank_accounts (id, code, bank_name, account_name, account_number_last4, gl_account_id, status, "
                 + "created_at, created_by) VALUES (?, ?, ?, ?, ?, ?, 'ACTIVE', ?, ?)", id, req.code(), req.bankName(),

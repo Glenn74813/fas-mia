@@ -11,7 +11,7 @@ import { ErrorAlert } from '../../components/ErrorAlert';
 import { PageHeader } from '../../components/PageHeader';
 import { Spinner } from '../../components/Spinner';
 import { StatusBadge } from '../../components/StatusBadge';
-import { postableAccounts, useChart, useFiscalYears } from '../../hooks/useAccounting';
+import { accountsFor, useChart, useFiscalYears } from '../../hooks/useAccounting';
 import { formatDateTime } from '../../utils/format';
 
 export function FiscalPeriodsPage() {
@@ -86,7 +86,7 @@ function YearCard({ fy, run }: { fy: FiscalYear; run: (fn: () => Promise<unknown
   const [surplus, setSurplus] = useState('');
   const closeDialog = useRef<HTMLDialogElement>(null);
   const reopenDialog = useRef<HTMLDialogElement>(null);
-  const equity = postableAccounts(chart.data?.accounts).filter((a) => a.accountType === 'EQUITY');
+  const equity = accountsFor(chart.data?.accounts, 'EQUITY');
 
   const openChecklist = async (p: Period) => {
     setChecklist(await periodApi.checklist(p.id));

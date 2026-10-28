@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 import { adminToken, nextTotpWindow, onboard } from './team';
-import { nav, signIn } from './ui';
+import { nav, signIn, select } from './ui';
 
 const admin = {
   username: process.env.E2E_ADMIN_USERNAME ?? '',
@@ -30,7 +30,7 @@ test('an accountant reads the cash-flow forecast by week and by month and drills
   expect(await rows.nth(1).locator('td').nth(1).textContent()).toBe(closing0);
   await expect(main.getByRole('columnheader', { name: 'Budgeted spending' })).toBeVisible();
 
-  await main.getByLabel('Group by').selectOption('MONTH');
+  await select(main.getByLabel('Group by'), 'MONTH');
   await expect(rows).toHaveCount(12);
   await main.getByLabel('Include budgeted spending not yet committed').uncheck();
   await expect(main.getByRole('columnheader', { name: 'Budgeted spending' })).toHaveCount(0);

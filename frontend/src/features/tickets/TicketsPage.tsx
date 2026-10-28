@@ -1,4 +1,5 @@
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { Select } from '../../components/Select';
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router';
 import { ticketApi } from '../../api/endpoints';
@@ -52,18 +53,18 @@ export function TicketsPage() {
           <ErrorAlert error={create.error} />
           <div className="grid gap-3 md:grid-cols-3">
             <label className="block text-sm">Type
-              <select value={form.ticketType} onChange={(e) => setForm({ ...form, ticketType: e.target.value })} className="mt-1.5 block w-full rounded-lg border border-slate-300 px-3 py-2 shadow-xs">
-                {Object.entries(TICKET_TYPES).map(([k, v]) => <option key={k} value={k}>{v}</option>)}</select></label>
+              <Select value={form.ticketType} onChange={(e) => setForm({ ...form, ticketType: e.target.value })} className="mt-1.5 block w-full rounded-lg border border-slate-300 px-3 py-2 shadow-xs">
+                {Object.entries(TICKET_TYPES).map(([k, v]) => <option key={k} value={k}>{v}</option>)}</Select></label>
             <label className="block text-sm">Priority
-              <select value={form.priority} onChange={(e) => setForm({ ...form, priority: e.target.value })} className="mt-1.5 block w-full rounded-lg border border-slate-300 px-3 py-2 shadow-xs">
+              <Select value={form.priority} onChange={(e) => setForm({ ...form, priority: e.target.value })} className="mt-1.5 block w-full rounded-lg border border-slate-300 px-3 py-2 shadow-xs">
                 <option value="P1">P1 — critical, operations stopped</option><option value="P2">P2 — high, major function impaired</option>
-                <option value="P3">P3 — medium, workaround exists</option><option value="P4">P4 — low, cosmetic or question</option></select></label>
+                <option value="P3">P3 — medium, workaround exists</option><option value="P4">P4 — low, cosmetic or question</option></Select></label>
             <label className="block text-sm">Severity
-              <select value={form.severity} onChange={(e) => setForm({ ...form, severity: e.target.value })} className="mt-1.5 block w-full rounded-lg border border-slate-300 px-3 py-2 shadow-xs">
-                {Object.entries(SEVERITIES).map(([k, v]) => <option key={k} value={k}>{v}</option>)}</select></label>
+              <Select value={form.severity} onChange={(e) => setForm({ ...form, severity: e.target.value })} className="mt-1.5 block w-full rounded-lg border border-slate-300 px-3 py-2 shadow-xs">
+                {Object.entries(SEVERITIES).map(([k, v]) => <option key={k} value={k}>{v}</option>)}</Select></label>
             <label className="block text-sm">Category
-              <select value={form.categoryId} onChange={(e) => setForm({ ...form, categoryId: e.target.value })} className="mt-1.5 block w-full rounded-lg border border-slate-300 px-3 py-2 shadow-xs">
-                <option value="">Choose…</option>{active.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}</select></label>
+              <Select value={form.categoryId} onChange={(e) => setForm({ ...form, categoryId: e.target.value })} className="mt-1.5 block w-full rounded-lg border border-slate-300 px-3 py-2 shadow-xs">
+                <option value="">Choose…</option>{active.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}</Select></label>
             <Field label="Module (optional)" value={form.module} onChange={(e) => setForm({ ...form, module: e.target.value })} />
             <div className="md:col-span-3"><Field label="Title" value={form.title} maxLength={200} onChange={(e) => setForm({ ...form, title: e.target.value })} /></div>
             <label className="block text-sm md:col-span-3">Description
@@ -77,15 +78,15 @@ export function TicketsPage() {
       )}
       <div className="mb-3 flex flex-wrap items-center gap-3 text-sm">
         {staff && <label className="flex items-center gap-2"><input type="checkbox" checked={all} onChange={(e) => { setAll(e.target.checked); setPage(0); }} />All tickets</label>}
-        <select aria-label="Filter by type" value={type} onChange={(e) => { setType(e.target.value); setPage(0); }} className="rounded-lg border border-slate-300 px-3 py-2 shadow-xs">
-          <option value="">All types</option>{Object.entries(TICKET_TYPES).map(([k, v]) => <option key={k} value={k}>{v}</option>)}</select>
-        <select aria-label="Filter by status" value={status} onChange={(e) => { setStatus(e.target.value); setPage(0); }} className="rounded-lg border border-slate-300 px-3 py-2 shadow-xs">
+        <Select aria-label="Filter by type" value={type} onChange={(e) => { setType(e.target.value); setPage(0); }} className="rounded-lg border border-slate-300 px-3 py-2 shadow-xs">
+          <option value="">All types</option>{Object.entries(TICKET_TYPES).map(([k, v]) => <option key={k} value={k}>{v}</option>)}</Select>
+        <Select aria-label="Filter by status" value={status} onChange={(e) => { setStatus(e.target.value); setPage(0); }} className="rounded-lg border border-slate-300 px-3 py-2 shadow-xs">
           {['', 'NEW', 'ACKNOWLEDGED', 'PENDING_APPROVAL', 'APPROVED', 'IN_PROGRESS', 'ON_HOLD', 'RESOLVED', 'CLOSED', 'REJECTED', 'CANCELLED']
-            .map((s) => <option key={s} value={s}>{s ? s.replace('_', ' ') : 'All statuses'}</option>)}</select>
-        <select aria-label="Filter by severity" value={severity} onChange={(e) => { setSeverity(e.target.value); setPage(0); }} className="rounded-lg border border-slate-300 px-3 py-2 shadow-xs">
-          <option value="">All severities</option>{Object.keys(SEVERITIES).map((k) => <option key={k} value={k}>{k}</option>)}</select>
-        <select aria-label="Filter by category" value={categoryId} onChange={(e) => { setCategoryId(e.target.value); setPage(0); }} className="rounded-lg border border-slate-300 px-3 py-2 shadow-xs">
-          <option value="">All categories</option>{(categories.data ?? []).map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}</select>
+            .map((s) => <option key={s} value={s}>{s ? s.replace('_', ' ') : 'All statuses'}</option>)}</Select>
+        <Select aria-label="Filter by severity" value={severity} onChange={(e) => { setSeverity(e.target.value); setPage(0); }} className="rounded-lg border border-slate-300 px-3 py-2 shadow-xs">
+          <option value="">All severities</option>{Object.keys(SEVERITIES).map((k) => <option key={k} value={k}>{k}</option>)}</Select>
+        <Select aria-label="Filter by category" value={categoryId} onChange={(e) => { setCategoryId(e.target.value); setPage(0); }} className="rounded-lg border border-slate-300 px-3 py-2 shadow-xs">
+          <option value="">All categories</option>{(categories.data ?? []).map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}</Select>
       </div>
       <ErrorAlert error={list.error} />
       {list.isPending ? <Spinner /> : (

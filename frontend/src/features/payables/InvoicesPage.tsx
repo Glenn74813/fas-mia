@@ -1,4 +1,5 @@
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
+import { Select } from '../../components/Select';
 import { useState } from 'react';
 import { Link } from 'react-router';
 import { invoiceApi } from '../../api/endpoints';
@@ -30,10 +31,10 @@ export function InvoicesPage() {
       <div className="mb-4 flex flex-wrap gap-3">
         <input aria-label="Search invoices" placeholder="Invoice number or description" value={q}
           onChange={(e) => { setQ(e.target.value); setPage(0); }} className="w-72 rounded-lg border border-slate-300 px-3 py-2 shadow-xs text-sm" />
-        <select aria-label="Status" value={status} onChange={(e) => { setStatus(e.target.value); setPage(0); }}
+        <Select aria-label="Status" value={status} onChange={(e) => { setStatus(e.target.value); setPage(0); }}
           className="rounded-lg border border-slate-300 px-3 py-2 shadow-xs text-sm">
           {['', 'DRAFT', 'RETURNED', 'SUBMITTED', 'APPROVED', 'POSTED', 'REJECTED', 'CANCELLED'].map((s) => <option key={s} value={s}>{s || 'All statuses'}</option>)}
-        </select>
+        </Select>
       </div>
       <ErrorAlert error={list.error} />
       {list.isPending ? <Spinner /> : list.data && (

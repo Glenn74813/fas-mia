@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { Select } from '../../components/Select';
 import { useState } from 'react';
 import { useParams } from 'react-router';
 import { ticketApi } from '../../api/endpoints';
@@ -144,17 +145,17 @@ export function TicketDetailPage() {
                 className="w-40 rounded-md border border-slate-300 px-2 py-1" />
                 <Button variant="secondary" disabled={!assignee.trim()} onClick={() => act.mutate({ action: 'ASSIGN', extra: { assignee } }, { onSuccess: () => setAssignee('') })}>Assign</Button></div>
               {can('PRIORITY') && <label className="block">Priority
-                <select value={t.priority} onChange={(e) => { const p = e.target.value; const reason = window.prompt('Reason for the priority change');
+                <Select value={t.priority} onChange={(e) => { const p = e.target.value; const reason = window.prompt('Reason for the priority change');
                   if (reason) act.mutate({ action: 'PRIORITY', extra: { priority: p, comment: reason } }); }} className="ml-2 rounded-md border border-slate-300 px-2 py-1">
-                  {['P1', 'P2', 'P3', 'P4'].map((p) => <option key={p}>{p}</option>)}</select></label>}
+                  {['P1', 'P2', 'P3', 'P4'].map((p) => <option key={p}>{p}</option>)}</Select></label>}
               {can('CLASSIFY') && <>
                 <label className="block">Severity
-                  <select value={t.severity ?? ''} onChange={(e) => classify('severity', e.target.value)} className="ml-2 rounded-md border border-slate-300 px-2 py-1">
-                    {!t.severity && <option value="">—</option>}{Object.keys(SEVERITIES).map((k) => <option key={k}>{k}</option>)}</select></label>
+                  <Select value={t.severity ?? ''} onChange={(e) => classify('severity', e.target.value)} className="ml-2 rounded-md border border-slate-300 px-2 py-1">
+                    {!t.severity && <option value="">—</option>}{Object.keys(SEVERITIES).map((k) => <option key={k}>{k}</option>)}</Select></label>
                 <label className="block">Category
-                  <select value={t.categoryId ?? ''} onChange={(e) => classify('categoryId', e.target.value)} className="ml-2 w-48 rounded-md border border-slate-300 px-2 py-1">
+                  <Select value={t.categoryId ?? ''} onChange={(e) => classify('categoryId', e.target.value)} className="ml-2 w-48 rounded-md border border-slate-300 px-2 py-1">
                     {!t.categoryId && <option value="">—</option>}
-                    {(categories.data ?? []).filter((c) => c.status === 'ACTIVE' || c.id === t.categoryId).map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}</select></label>
+                    {(categories.data ?? []).filter((c) => c.status === 'ACTIVE' || c.id === t.categoryId).map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}</Select></label>
               </>}
             </section>
           )}
@@ -179,9 +180,9 @@ export function TicketDetailPage() {
               className="mt-1.5 block w-full rounded-lg border border-slate-300 px-3 py-2 shadow-xs" /></label>
         </>}
         {dialog === 'CLOSE' && <label className="block text-sm">Satisfaction (optional)
-          <select value={extra.satisfaction} onChange={(e) => setExtra({ ...extra, satisfaction: e.target.value })}
+          <Select value={extra.satisfaction} onChange={(e) => setExtra({ ...extra, satisfaction: e.target.value })}
             className="mt-1.5 block w-full rounded-lg border border-slate-300 px-3 py-2 shadow-xs">
-            <option value="">No rating</option>{[5, 4, 3, 2, 1].map((n) => <option key={n} value={n}>{n} of 5</option>)}</select></label>}
+            <option value="">No rating</option>{[5, 4, 3, 2, 1].map((n) => <option key={n} value={n}>{n} of 5</option>)}</Select></label>}
       </ActionDialog>
     </>
   );

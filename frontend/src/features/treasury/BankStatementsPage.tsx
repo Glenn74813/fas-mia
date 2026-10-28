@@ -1,4 +1,5 @@
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { Select } from '../../components/Select';
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router';
 import { bankApi, settingsApi } from '../../api/endpoints';
@@ -45,13 +46,13 @@ export function BankStatementsPage() {
             {' '}{imp.data.summary.periodStart} to {imp.data.summary.periodEnd}.</p>}
           <div className="grid gap-3 md:grid-cols-4">
             <div className="space-y-1.5"><label htmlFor="sbank" className="block text-sm font-medium text-slate-700">Bank account</label>
-              <select id="sbank" value={form.bankAccountId} onChange={(e) => setForm({ ...form, bankAccountId: e.target.value })}
+              <Select id="sbank" value={form.bankAccountId} onChange={(e) => setForm({ ...form, bankAccountId: e.target.value })}
                 className="block w-full rounded-lg border border-slate-300 px-3 py-2 shadow-xs text-sm"><option value="">Select…</option>
-                {(banks.data ?? []).filter((b) => b.status === 'ACTIVE').map((b) => <option key={b.id} value={b.id}>{b.code} ****{b.accountNumberLast4}</option>)}</select></div>
+                {(banks.data ?? []).filter((b) => b.status === 'ACTIVE').map((b) => <option key={b.id} value={b.id}>{b.code} ****{b.accountNumberLast4}</option>)}</Select></div>
             <div className="space-y-1.5"><label htmlFor="sfmt" className="block text-sm font-medium text-slate-700">Format</label>
-              <select id="sfmt" value={form.format} onChange={(e) => setForm({ ...form, format: e.target.value })}
+              <Select id="sfmt" value={form.format} onChange={(e) => setForm({ ...form, format: e.target.value })}
                 className="block w-full rounded-lg border border-slate-300 px-3 py-2 shadow-xs text-sm">
-                <option value="CAMT053">ISO 20022 camt.053 (XML)</option><option value="MT940">SWIFT MT940</option><option value="CSV">CSV (CAS layout)</option></select></div>
+                <option value="CAMT053">ISO 20022 camt.053 (XML)</option><option value="MT940">SWIFT MT940</option><option value="CSV">CSV (CAS layout)</option></Select></div>
             {csv && <Field label="Opening balance" inputMode="decimal" value={form.openingBalance} onChange={(e) => setForm({ ...form, openingBalance: e.target.value })} />}
             {csv && <Field label="Closing balance" inputMode="decimal" value={form.closingBalance} onChange={(e) => setForm({ ...form, closingBalance: e.target.value })} />}
             <div className="space-y-1 md:col-span-4"><label htmlFor="sfile" className="block text-sm font-medium text-slate-700">Statement file</label>
@@ -62,8 +63,8 @@ export function BankStatementsPage() {
           <p className="text-xs text-slate-500">Bank-specific variants of these formats must be confirmed with MIAA's banks (clarification C-11).</p>
         </section>
       )}
-      <select aria-label="Filter bank account" value={bankFilter} onChange={(e) => { setBankFilter(e.target.value); setPage(0); }} className="mb-3 rounded-lg border border-slate-300 px-3 py-2 shadow-xs text-sm">
-        <option value="">All bank accounts</option>{(banks.data ?? []).map((b) => <option key={b.id} value={b.id}>{b.code}</option>)}</select>
+      <Select aria-label="Filter bank account" value={bankFilter} onChange={(e) => { setBankFilter(e.target.value); setPage(0); }} className="mb-3 rounded-lg border border-slate-300 px-3 py-2 shadow-xs text-sm">
+        <option value="">All bank accounts</option>{(banks.data ?? []).map((b) => <option key={b.id} value={b.id}>{b.code}</option>)}</Select>
       <ErrorAlert error={list.error ?? start.error} />
       {list.isPending ? <Spinner /> : (
         <div className="overflow-x-auto rounded-xl border border-slate-200/80 bg-white shadow-xs">

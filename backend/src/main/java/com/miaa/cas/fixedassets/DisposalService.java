@@ -10,6 +10,7 @@ import com.miaa.cas.fixedassets.FaDtos.CategoryView;
 import com.miaa.cas.fixedassets.FaDtos.DisposalRequest;
 import com.miaa.cas.fixedassets.FaDtos.DisposalView;
 import com.miaa.cas.generalledger.AccountMappingService;
+import com.miaa.cas.generalledger.AccountPurpose;
 import com.miaa.cas.journal.PostingService;
 import com.miaa.cas.journal.domain.LineData;
 import com.miaa.cas.notifications.NotificationService;
@@ -94,11 +95,7 @@ public class DisposalService {
             if (req.proceedsAccountId() == null) {
                 throw new ApiException(ErrorCode.VALIDATION_FAILED, "Select the account that receives the proceeds.");
             }
-            Map<String, Object> acc = jdbc.queryForMap("SELECT code, postable, status, subsidiary_type FROM chart_of_accounts WHERE id = ?",
-                    req.proceedsAccountId());
-            if (!Boolean.TRUE.equals(acc.get("postable")) || !"ACTIVE".equals(acc.get("status")) || acc.get("subsidiary_type") != null) {
-                throw FixedAssetService.rule("Account " + acc.get("code") + " cannot receive the proceeds (postable, active, no subsidiary ledger).");
-            }
+            AccountPurpose.require(jdbc, req.proceedsAccountId(), AccountPurpose.CASH, "Proceeds received in");
         } else if ("SALE".equals(req.method())) {
             throw new ApiException(ErrorCode.VALIDATION_FAILED, "A sale needs the proceeds.");
         }

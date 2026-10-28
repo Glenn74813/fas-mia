@@ -3,6 +3,7 @@ package com.miaa.cas.inventoryaccounting;
 import com.miaa.cas.audit.Actor;
 import com.miaa.cas.audit.AuditService;
 import com.miaa.cas.common.error.ApiException;
+import com.miaa.cas.generalledger.AccountPurpose;
 import com.miaa.cas.common.error.ErrorCode;
 import com.miaa.cas.common.money.Money;
 import com.miaa.cas.common.web.JdbcPaging;
@@ -96,8 +97,8 @@ public class InventorySetupService {
         if (Boolean.TRUE.equals(jdbc.queryForObject("SELECT EXISTS (SELECT 1 FROM inventory_items WHERE code = ?)", Boolean.class, req.code()))) {
             throw new ApiException(ErrorCode.DUPLICATE_RESOURCE, "Item code already exists.");
         }
-        requireAccount(req.inventoryAccountId(), "ASSET", "inventory");
-        requireAccount(req.consumptionAccountId(), "EXPENSE", "consumption (expense)");
+        AccountPurpose.require(jdbc, req.inventoryAccountId(), AccountPurpose.INVENTORY_STOCK, "Inventory account");
+        AccountPurpose.require(jdbc, req.consumptionAccountId(), AccountPurpose.EXPENSE, "Consumption account");
         UUID id = UUID.randomUUID();
         jdbc.update("INSERT INTO inventory_items (id, code, name, unit_of_measure, inventory_account_id, consumption_account_id, status, "
                 + "created_at, created_by) VALUES (?, ?, ?, ?, ?, ?, 'ACTIVE', ?, ?)", id, req.code(), req.name().trim(),
@@ -106,19 +107,5 @@ public class InventorySetupService {
         jdbc.update("INSERT INTO inventory_valuations (item_id, quantity, value) VALUES (?, 0, ?)", id, Money.ZERO);
         audit.record(actor, "INVENTORY_ITEM_CREATED", "INVENTORY_ITEM", req.code(), Map.of("name", req.name().trim()));
         return item(id);
-    }
-
-    private void requireAccount(UUID id, String type, String purpose) {
-        List<Map<String, Object>> rows = jdbc.queryForList("SELECT code, account_type, postable, status, subsidiary_type "
-                + "FROM chart_of_accounts WHERE id = ?", id);
-        if (rows.isEmpty()) {
-            throw ApiException.notFound("Account");
-        }
-        Map<String, Object> a = rows.get(0);
-        if (!type.equals(a.get("account_type")) || !Boolean.TRUE.equals(a.get("postable")) || !"ACTIVE".equals(a.get("status"))
-                || a.get("subsidiary_type") != null) {
-            throw InventoryDocumentService.rule("Account " + a.get("code") + " is not an active, postable " + purpose
-                    + " account without a subsidiary ledger.");
-        }
     }
 }

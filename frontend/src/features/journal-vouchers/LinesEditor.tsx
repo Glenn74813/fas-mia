@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
+import { Select } from '../../components/Select';
 import { Combobox } from '../../components/Combobox';
 import { accountApi } from '../../api/endpoints';
 import type { Account, LineInput } from '../../api/types';
@@ -73,8 +74,8 @@ export function LinesEditor({ lines, onChange }: Props) {
                     {account?.subsidiaryType
                       ? <SubsidiaryPicker n={n} slType={account.subsidiaryType} value={line.subsidiaryAccountId}
                         onChange={(id) => set(i, { subsidiaryAccountId: id })} />
-                      : <select aria-label={`Line ${n} subsidiary account`} value="" disabled className="w-40 rounded-md border border-slate-300 px-2 py-1">
-                        <option value="">n/a</option></select>}
+                      : <Select aria-label={`Line ${n} subsidiary account`} value="" disabled className="w-40 rounded-md border border-slate-300 px-2 py-1">
+                        <option value="">n/a</option></Select>}
                   </td>
                   <td className="px-2 py-2">
                     <input aria-label={`Line ${n} description`} value={line.description ?? ''} maxLength={500}

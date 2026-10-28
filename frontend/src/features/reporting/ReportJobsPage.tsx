@@ -1,4 +1,5 @@
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { Select } from '../../components/Select';
 import { useState } from 'react';
 import { reportingApi } from '../../api/endpoints';
 import type { ReportJob, ReportSchedule } from '../../api/types';
@@ -48,10 +49,10 @@ export function ReportJobsPage() {
       {hasPermission('FINANCIAL_REPORT_EXPORT') && (
         <section className="mb-4 flex flex-wrap items-end gap-3 rounded-xl border border-slate-200/80 bg-white shadow-xs p-5 text-sm">
           <span className="flex h-9 items-center font-medium">Trial balance export</span>
-          <label>Period <select value={periodId || periods[0]?.id || ''} onChange={(e) => setPeriodId(e.target.value)} className="ml-1 rounded-md border border-slate-300 px-2 py-1">
-            {periods.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}</select></label>
-          <label>Format <select value={format} onChange={(e) => setFormat(e.target.value)} className="ml-1 rounded-md border border-slate-300 px-2 py-1">
-            {['XLSX', 'PDF', 'CSV'].map((f) => <option key={f}>{f}</option>)}</select></label>
+          <label>Period <Select value={periodId || periods[0]?.id || ''} onChange={(e) => setPeriodId(e.target.value)} className="ml-1 rounded-md border border-slate-300 px-2 py-1">
+            {periods.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}</Select></label>
+          <label>Format <Select value={format} onChange={(e) => setFormat(e.target.value)} className="ml-1 rounded-md border border-slate-300 px-2 py-1">
+            {['XLSX', 'PDF', 'CSV'].map((f) => <option key={f}>{f}</option>)}</Select></label>
           <Button variant="secondary" busy={tb.isPending} disabled={periods.length === 0} onClick={() => tb.mutate()}>Queue export</Button>
         </section>
       )}

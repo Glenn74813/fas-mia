@@ -886,7 +886,7 @@ code,name,type,normalBalance,parentCode,postable,fsLineCode,requiresCostCenter,s
 29999010,Special Time Deposit,LIABILITY,CREDIT,29999,true,RCA-SFP-OP,false,,false
 29999020,Treasurer/Cashier/Manager's Check,LIABILITY,CREDIT,29999,true,RCA-SFP-OP,false,,false
 29999030,Payment Order Payable,LIABILITY,CREDIT,29999,true,RCA-SFP-OP,false,,false
-29999040,Undistributed Collections,LIABILITY,CREDIT,29999,true,RCA-SFP-OP,false,,false
+29999040,Undistributed Collections,LIABILITY,CREDIT,29999,true,RCA-SFP-OP,false,CUSTOMER,false
 29999050,Unclaimed Balances,LIABILITY,CREDIT,29999,true,RCA-SFP-OP,false,,false
 29999060,Loans by Regional Banking Units from Foreign Currency Deposit Unit/Expanded Foreign Currency Deposit Unit,LIABILITY,CREDIT,29999,true,RCA-SFP-OP,false,,false
 29999070,Liability for Letters of Credit,LIABILITY,CREDIT,29999,true,RCA-SFP-OP,false,,false

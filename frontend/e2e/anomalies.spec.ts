@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 import { adminToken, nextTotpWindow, onboard } from './team';
-import { nav, signIn, signOut } from './ui';
+import { nav, signIn, signOut, select } from './ui';
 
 const admin = {
   username: process.env.E2E_ADMIN_USERNAME ?? '',
@@ -26,7 +26,7 @@ test('an internal auditor runs detection and explains a finding; an accountant h
   await expect(main.getByRole('status')).toContainText('Detection finished');
 
   // Any open finding will do; the new auditor is involved in none of them.
-  await main.getByLabel('Status').selectOption('OPEN');
+  await select(main.getByLabel('Status'), 'OPEN');
   const row = main.getByRole('row').filter({ has: page.getByRole('button', { name: 'Explain' }) }).first();
   await expect(row, 'detection found at least one open finding in the shared data').toBeVisible();
   const title = (await row.locator('td').nth(1).locator('span').first().textContent())?.trim() ?? '';
@@ -39,7 +39,7 @@ test('an internal auditor runs detection and explains a finding; an accountant h
   await dialog.getByRole('button', { name: 'Mark as explained', exact: true }).click();
   await expect(dialog).toBeHidden();
 
-  await main.getByLabel('Status').selectOption('EXPLAINED');
+  await select(main.getByLabel('Status'), 'EXPLAINED');
   const done = main.getByRole('row').filter({ hasText: detail }).filter({ hasText: 'Checked the supporting documents in e2e' });
   await expect(done).toContainText(title);
   await expect(done).toContainText(auditor.username);

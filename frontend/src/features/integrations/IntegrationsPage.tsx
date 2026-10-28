@@ -1,4 +1,5 @@
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { Select } from '../../components/Select';
 import { useState } from 'react';
 import { integrationApi } from '../../api/endpoints';
 import type { Transmission } from '../../api/types';
@@ -55,10 +56,10 @@ export function IntegrationsPage() {
       )}
       <ErrorAlert error={queue.error} />
       <div className="mb-3 flex gap-3">
-        <select aria-label="Channel" value={channel} onChange={(e) => { setChannel(e.target.value); setPage(0); }} className="rounded-lg border border-slate-300 px-3 py-2 shadow-xs text-sm">
-          <option value="">All channels</option>{(channels.data ?? []).map((c) => <option key={c.channel}>{c.channel}</option>)}</select>
-        <select aria-label="Status" value={status} onChange={(e) => { setStatus(e.target.value); setPage(0); }} className="rounded-lg border border-slate-300 px-3 py-2 shadow-xs text-sm">
-          {['', 'PENDING', 'SENDING', 'SENT', 'ACKNOWLEDGED', 'REJECTED', 'DEAD', 'CANCELLED'].map((s) => <option key={s} value={s}>{s || 'All statuses'}</option>)}</select>
+        <Select aria-label="Channel" value={channel} onChange={(e) => { setChannel(e.target.value); setPage(0); }} className="rounded-lg border border-slate-300 px-3 py-2 shadow-xs text-sm">
+          <option value="">All channels</option>{(channels.data ?? []).map((c) => <option key={c.channel}>{c.channel}</option>)}</Select>
+        <Select aria-label="Status" value={status} onChange={(e) => { setStatus(e.target.value); setPage(0); }} className="rounded-lg border border-slate-300 px-3 py-2 shadow-xs text-sm">
+          {['', 'PENDING', 'SENDING', 'SENT', 'ACKNOWLEDGED', 'REJECTED', 'DEAD', 'CANCELLED'].map((s) => <option key={s} value={s}>{s || 'All statuses'}</option>)}</Select>
       </div>
       <ErrorAlert error={list.error} />
       {list.isPending ? <Spinner /> : (

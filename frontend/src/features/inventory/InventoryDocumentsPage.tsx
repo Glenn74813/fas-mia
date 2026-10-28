@@ -1,4 +1,5 @@
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { Select } from '../../components/Select';
 import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router';
 import { inventoryApi, supplierApi } from '../../api/endpoints';
@@ -14,7 +15,7 @@ import { Pagination } from '../../components/Pagination';
 import { SearchSelect } from '../../components/SearchSelect';
 import { Spinner } from '../../components/Spinner';
 import { StatusBadge } from '../../components/StatusBadge';
-import { useCostCenters } from '../../hooks/useAccounting';
+import { activeCostCenters, useCostCenters } from '../../hooks/useAccounting';
 
 export const KIND: Record<InventoryKind, string> = { GOODS_RECEIPT: 'Goods receipt', ISSUE: 'Issue', COUNT: 'Stock count', TRANSFER: 'Transfer',
   REVALUATION: 'Price adjustment' };
@@ -46,16 +47,16 @@ function ImportMovementsPanel() {
   return (
     <section className="mb-4 grid gap-3 rounded-xl border border-slate-200/80 bg-white shadow-xs p-5 md:grid-cols-3" aria-label="Import lines">
       <label className="text-sm font-medium text-slate-700">Document kind
-        <select value={kind} onChange={(e) => setKind(e.target.value as InventoryKind)} className={sel}>
-          {Object.entries(KIND).map(([k, l]) => <option key={k} value={k}>{l}</option>)}</select></label>
+        <Select value={kind} onChange={(e) => setKind(e.target.value as InventoryKind)} className={sel}>
+          {Object.entries(KIND).map(([k, l]) => <option key={k} value={k}>{l}</option>)}</Select></label>
       <Field label="Date" type="date" value={form.documentDate} onChange={(e) => setForm({ ...form, documentDate: e.target.value })} />
       <Field label="Description" value={form.description} maxLength={1000} onChange={(e) => setForm({ ...form, description: e.target.value })} />
       {kind === 'GOODS_RECEIPT' && <SearchSelect id="import-supplier" label="Supplier" value={form.supplierId} queryKey="suppliers" placeholder="Select…"
         search={(q) => supplierApi.list(q, 0, 50)} optionLabel={(x) => `${x.code} — ${x.name}`} filter={(x) => x.status === 'ACTIVE'}
         onChange={(id) => setForm({ ...form, supplierId: id })} />}
       {kind === 'ISSUE' && <label className="text-sm font-medium text-slate-700">Requesting cost centre
-        <select value={form.costCenterId} onChange={(e) => setForm({ ...form, costCenterId: e.target.value })} className={sel}>
-          <option value="">Select…</option>{(costCenters.data ?? []).map((c) => <option key={c.id} value={c.id}>{c.code}</option>)}</select></label>}
+        <Select value={form.costCenterId} onChange={(e) => setForm({ ...form, costCenterId: e.target.value })} className={sel}>
+          <option value="">Select…</option>{activeCostCenters(costCenters.data).map((c) => <option key={c.id} value={c.id}>{c.code}</option>)}</Select></label>}
       <label className="text-sm font-medium text-slate-700 md:col-span-2">CSV file (UTF-8, header row)
         <input type="file" accept=".csv,text/csv" className="mt-1.5 block text-sm" onChange={(e) => setFile(e.target.files?.[0] ?? null)} /></label>
       <p className="text-xs text-slate-500 md:col-span-3">Columns: {IMPORT_COLUMNS[kind]}. Codes are those of active items and warehouses; at most 500
@@ -84,10 +85,10 @@ export function InventoryDocumentsPage() {
         )} />
       {hasPermission('INVENTORY_MANAGE') && <ImportMovementsPanel />}
       <div className="mb-4 flex gap-3">
-        <select aria-label="Kind" value={kind} onChange={(e) => setKind(e.target.value)} className="rounded-lg border border-slate-300 px-3 py-2 shadow-xs text-sm">
-          <option value="">All kinds</option>{Object.entries(KIND).map(([k, l]) => <option key={k} value={k}>{l}</option>)}</select>
-        <select aria-label="Status" value={status} onChange={(e) => setStatus(e.target.value)} className="rounded-lg border border-slate-300 px-3 py-2 shadow-xs text-sm">
-          {['', 'DRAFT', 'POSTED', 'CANCELLED'].map((s) => <option key={s} value={s}>{s || 'All statuses'}</option>)}</select>
+        <Select aria-label="Kind" value={kind} onChange={(e) => setKind(e.target.value)} className="rounded-lg border border-slate-300 px-3 py-2 shadow-xs text-sm">
+          <option value="">All kinds</option>{Object.entries(KIND).map(([k, l]) => <option key={k} value={k}>{l}</option>)}</Select>
+        <Select aria-label="Status" value={status} onChange={(e) => setStatus(e.target.value)} className="rounded-lg border border-slate-300 px-3 py-2 shadow-xs text-sm">
+          {['', 'DRAFT', 'POSTED', 'CANCELLED'].map((s) => <option key={s} value={s}>{s || 'All statuses'}</option>)}</Select>
       </div>
       <ErrorAlert error={list.error} />
       {list.isPending ? <Spinner /> : (
@@ -151,8 +152,8 @@ export function NewInventoryDocumentPage() {
         <ErrorAlert error={save.error} />
         <div className="grid gap-4 rounded-xl border border-slate-200/80 bg-white shadow-xs p-5 md:grid-cols-3">
           <div className="space-y-1.5"><label htmlFor="kind" className="block text-sm font-medium text-slate-700">Document</label>
-            <select id="kind" value={kind} onChange={(e) => { setKind(e.target.value as InventoryKind); setLines([emptyLine()]); }} className={sel}>
-              {Object.entries(KIND).map(([k, l]) => <option key={k} value={k}>{l}</option>)}</select></div>
+            <Select id="kind" value={kind} onChange={(e) => { setKind(e.target.value as InventoryKind); setLines([emptyLine()]); }} className={sel}>
+              {Object.entries(KIND).map(([k, l]) => <option key={k} value={k}>{l}</option>)}</Select></div>
           <Field label="Date" type="date" value={head.documentDate} onChange={(e) => setHead({ ...head, documentDate: e.target.value })} />
           {kind === 'GOODS_RECEIPT' && (
             <SearchSelect id="sup" label="Supplier" value={head.supplierId} queryKey="suppliers" placeholder="Select…"
@@ -161,8 +162,8 @@ export function NewInventoryDocumentPage() {
           )}
           {kind === 'ISSUE' && (
             <div className="space-y-1.5"><label htmlFor="cc" className="block text-sm font-medium text-slate-700">Requesting cost centre</label>
-              <select id="cc" value={head.costCenterId} onChange={(e) => setHead({ ...head, costCenterId: e.target.value })} className={sel}><option value="">Select…</option>
-                {(costCenters.data ?? []).map((c) => <option key={c.id} value={c.id}>{c.code}</option>)}</select></div>
+              <Select id="cc" value={head.costCenterId} onChange={(e) => setHead({ ...head, costCenterId: e.target.value })} className={sel}><option value="">Select…</option>
+                {activeCostCenters(costCenters.data).map((c) => <option key={c.id} value={c.id}>{c.code}</option>)}</Select></div>
           )}
           <Field label={kind === 'GOODS_RECEIPT' ? 'Delivery receipt / PO reference' : 'Reference'} value={head.reference} maxLength={100}
             onChange={(e) => setHead({ ...head, reference: e.target.value })} />
@@ -180,16 +181,16 @@ export function NewInventoryDocumentPage() {
               : `Unit cost${kind === 'COUNT' ? ' (if no stock on record)' : ''}`}</th>}<th /></tr></thead>
           <tbody>{lines.map((l, i) => (
             <tr key={i} className="border-t border-slate-100"><td className="px-2 py-2 text-slate-500">{i + 1}</td>
-              <td className="px-2 py-2"><select aria-label={`Line ${i + 1} item`} value={l.itemId} onChange={(e) => {
+              <td className="px-2 py-2"><Select aria-label={`Line ${i + 1} item`} value={l.itemId} onChange={(e) => {
                 const x = items.data?.items.find((it) => it.id === e.target.value);
                 if (x) setPicked({ ...picked, [x.id]: x });
                 set(i, { itemId: e.target.value });
               }} className="w-64 rounded-md border border-slate-300 px-2 py-1">
-                <option value="">Select…</option>{itemOptions(l.itemId).map((x) => <option key={x.id} value={x.id}>{x.code} — {x.name}</option>)}</select></td>
-              {!reval && <td className="px-2 py-2"><select aria-label={`Line ${i + 1} warehouse`} value={l.warehouseId ?? ''} onChange={(e) => set(i, { warehouseId: e.target.value })} className="w-40 rounded-md border border-slate-300 px-2 py-1">
-                <option value="">Select…</option>{whs.map((w) => <option key={w.id} value={w.id}>{w.code}</option>)}</select></td>}
-              {kind === 'TRANSFER' && <td className="px-2 py-2"><select aria-label={`Line ${i + 1} destination`} value={l.toWarehouseId ?? ''} onChange={(e) => set(i, { toWarehouseId: e.target.value || null })}
-                className="w-40 rounded-md border border-slate-300 px-2 py-1"><option value="">Select…</option>{whs.map((w) => <option key={w.id} value={w.id}>{w.code}</option>)}</select></td>}
+                <option value="">Select…</option>{itemOptions(l.itemId).map((x) => <option key={x.id} value={x.id}>{x.code} — {x.name}</option>)}</Select></td>
+              {!reval && <td className="px-2 py-2"><Select aria-label={`Line ${i + 1} warehouse`} value={l.warehouseId ?? ''} onChange={(e) => set(i, { warehouseId: e.target.value })} className="w-40 rounded-md border border-slate-300 px-2 py-1">
+                <option value="">Select…</option>{whs.map((w) => <option key={w.id} value={w.id}>{w.code}</option>)}</Select></td>}
+              {kind === 'TRANSFER' && <td className="px-2 py-2"><Select aria-label={`Line ${i + 1} destination`} value={l.toWarehouseId ?? ''} onChange={(e) => set(i, { toWarehouseId: e.target.value || null })}
+                className="w-40 rounded-md border border-slate-300 px-2 py-1"><option value="">Select…</option>{whs.map((w) => <option key={w.id} value={w.id}>{w.code}</option>)}</Select></td>}
               {!reval && <td className="px-2 py-2"><input aria-label={`Line ${i + 1} quantity`} inputMode="decimal" value={l.quantity} onChange={(e) => set(i, { quantity: e.target.value.replace(/[^\d.]/g, '') })}
                 className="w-28 rounded-md border border-slate-300 px-2 py-1 text-right" /></td>}
               {(kind === 'GOODS_RECEIPT' || kind === 'COUNT' || reval) && <td className="px-2 py-2"><input aria-label={`Line ${i + 1} unit cost`} inputMode="decimal" value={l.unitCost ?? ''}

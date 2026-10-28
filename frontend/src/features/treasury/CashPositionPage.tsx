@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
+import { Select } from '../../components/Select';
 import { useState } from 'react';
 import { settingsApi, treasuryApi } from '../../api/endpoints';
 import { ErrorAlert } from '../../components/ErrorAlert';
@@ -41,10 +42,10 @@ export function CashPositionPage() {
       )}
       <section className="rounded-xl border border-slate-200/80 bg-white shadow-xs p-5">
         <div className="mb-3 flex flex-wrap items-center gap-3"><h2 className="font-semibold">Check register</h2>
-          <select aria-label="Bank account" value={bank} onChange={(e) => setBank(e.target.value)} className="rounded-md border border-slate-300 px-2 py-1 text-sm">
-            <option value="">All accounts</option>{(banks.data ?? []).map((b) => <option key={b.id} value={b.id}>{b.code}</option>)}</select>
-          <select aria-label="Check status" value={status} onChange={(e) => setStatus(e.target.value)} className="rounded-md border border-slate-300 px-2 py-1 text-sm">
-            {['', 'ISSUED', 'RELEASED', 'CLEARED', 'VOIDED'].map((s) => <option key={s} value={s}>{s || 'All statuses'}</option>)}</select></div>
+          <Select aria-label="Bank account" value={bank} onChange={(e) => setBank(e.target.value)} className="rounded-md border border-slate-300 px-2 py-1 text-sm">
+            <option value="">All accounts</option>{(banks.data ?? []).map((b) => <option key={b.id} value={b.id}>{b.code}</option>)}</Select>
+          <Select aria-label="Check status" value={status} onChange={(e) => setStatus(e.target.value)} className="rounded-md border border-slate-300 px-2 py-1 text-sm">
+            {['', 'ISSUED', 'RELEASED', 'CLEARED', 'VOIDED'].map((s) => <option key={s} value={s}>{s || 'All statuses'}</option>)}</Select></div>
         <ErrorAlert error={checks.error} />
         <div className="overflow-x-auto"><table className="min-w-full text-sm">
           <thead className="border-b border-slate-200 text-left text-[11px] font-semibold uppercase tracking-wider text-slate-500"><tr><th className="py-1 pr-3">Check</th><th className="py-1 pr-3">Account</th>

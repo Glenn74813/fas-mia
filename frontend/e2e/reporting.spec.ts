@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 import { adminToken, nextTotpWindow, onboard } from './team';
-import { nav, signIn } from './ui';
+import { nav, signIn, select } from './ui';
 
 const admin = {
   username: process.env.E2E_ADMIN_USERNAME ?? '',
@@ -18,7 +18,7 @@ test('the statement of financial position balances on screen and exports to XLSX
   await nextTotpWindow();
   await signIn(page, chief);
   await nav(page, 'Financial statements');
-  await page.getByLabel('Statement').selectOption({ label: 'Statement of Financial Position (v1)' });
+  await select(page.getByLabel('Statement'), { label: 'Statement of Financial Position (v1)' });
   await expect(page.getByRole('heading', { name: 'Statement of Financial Position' })).toBeVisible();
   await expect(page.getByText('BALANCED', { exact: true })).toBeVisible();
   await expect(page.getByText('Accounts with balances not shown on this statement')).toHaveCount(0);
@@ -39,12 +39,12 @@ test('the statement of financial position balances on screen and exports to XLSX
   // Movement statements: the cash flow statement reconciles opening and closing cash, and the statement of changes in
   // equity agrees with the equity on the statement of financial position.
   await nav(page, 'Financial statements');
-  await page.getByLabel('Statement').selectOption({ label: 'Statement of Cash Flows (v1)' });
+  await select(page.getByLabel('Statement'), { label: 'Statement of Cash Flows (v1)' });
   await expect(page.getByRole('heading', { name: 'Statement of Cash Flows' })).toBeVisible();
   await expect(page.getByRole('row', { name: /^Collections from customers and other income/ })).toBeVisible();
   await expect(page.getByText('BALANCED', { exact: true })).toBeVisible();
   await expect(page.getByText('Movements not classified by any line of this statement')).toHaveCount(0);
-  await page.getByLabel('Statement').selectOption({ label: 'Statement of Changes in Equity (v1)' });
+  await select(page.getByLabel('Statement'), { label: 'Statement of Changes in Equity (v1)' });
   await expect(page.getByRole('heading', { name: 'Statement of Changes in Equity' })).toBeVisible();
   await expect(page.getByText('BALANCED', { exact: true })).toBeVisible();
 });
@@ -55,8 +55,8 @@ test('an internal auditor exports the audit trail with row hashes and a verified
   await nextTotpWindow();
   await signIn(page, auditor);
   await nav(page, 'My reports');
-  await page.getByLabel('Report').selectOption({ label: 'Audit trail export' });
-  await page.getByLabel('Format').selectOption('CSV');
+  await select(page.getByLabel('Report'), { label: 'Audit trail export' });
+  await select(page.getByLabel('Format'), 'CSV');
   await page.getByRole('button', { name: 'Queue report' }).click();
   await expect(page.getByRole('status')).toContainText('Queued');
   const row = page.getByRole('row').filter({ hasText: 'Audit trail export' }).first();
@@ -81,7 +81,7 @@ test('the chief accountant sees the finance dashboard and schedules a monthly co
   await expect(page.getByRole('figure', { name: 'Payables by age' })).toBeVisible();
 
   await nav(page, 'My reports');
-  await page.getByLabel('Report').selectOption({ label: 'Collection summary' });
+  await select(page.getByLabel('Report'), { label: 'Collection summary' });
   await page.getByLabel('Repeat on a schedule').check();
   const name = `E2E collections ${Date.now().toString(36)}`;
   await page.getByLabel('Schedule name').fill(name);

@@ -1,4 +1,5 @@
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { Select } from '../../components/Select';
 import { useState } from 'react';
 import { portalApi, voucherApi } from '../../api/endpoints';
 import type { PortalInquiry } from '../../api/types';
@@ -50,11 +51,11 @@ export function PortalInquiries() {
       {open && (
         <form className="grid gap-3 rounded-md bg-slate-50 p-4 sm:grid-cols-2" onSubmit={(e) => { e.preventDefault(); if (ready) submit.mutate(); }}>
           <label className="text-sm font-medium text-slate-700">Type
-            <select value={form.kind} onChange={(e) => setForm({ ...form, kind: e.target.value })} className={select}>
-              <option value="QUESTION">A question about my account</option><option value="PAYMENT_REFERENCE">I have made a payment</option></select></label>
+            <Select value={form.kind} onChange={(e) => setForm({ ...form, kind: e.target.value })} className={select}>
+              <option value="QUESTION">A question about my account</option><option value="PAYMENT_REFERENCE">I have made a payment</option></Select></label>
           <label className="text-sm font-medium text-slate-700">Billing (optional)
-            <select value={form.billingId} onChange={(e) => setForm({ ...form, billingId: e.target.value })} className={select}>
-              <option value="">None</option>{(billings.data?.items ?? []).map((b) => <option key={b.id} value={b.id}>{b.documentNumber}</option>)}</select></label>
+            <Select value={form.billingId} onChange={(e) => setForm({ ...form, billingId: e.target.value })} className={select}>
+              <option value="">None</option>{(billings.data?.items ?? []).map((b) => <option key={b.id} value={b.id}>{b.documentNumber}</option>)}</Select></label>
           <div className="sm:col-span-2"><Field label="Subject" maxLength={200} value={form.subject} onChange={(e) => setForm({ ...form, subject: e.target.value })} /></div>
           {payment && <>
             <Field label="Payment date" type="date" max={new Date().toISOString().slice(0, 10)} value={form.paymentDate}
@@ -62,8 +63,8 @@ export function PortalInquiries() {
             <Field label="Amount paid (₱)" inputMode="decimal" value={form.paymentAmount} placeholder="0.00"
               onChange={(e) => setForm({ ...form, paymentAmount: e.target.value.replace(/[^\d.]/g, '') })} />
             <label className="text-sm font-medium text-slate-700">Paid by
-              <select value={form.paymentMethod} onChange={(e) => setForm({ ...form, paymentMethod: e.target.value })} className={select}>
-                {Object.entries(METHOD).map(([k, v]) => <option key={k} value={k}>{v}</option>)}</select></label>
+              <Select value={form.paymentMethod} onChange={(e) => setForm({ ...form, paymentMethod: e.target.value })} className={select}>
+                {Object.entries(METHOD).map(([k, v]) => <option key={k} value={k}>{v}</option>)}</Select></label>
             <Field label="Bank or check reference" maxLength={60} value={form.paymentReference}
               onChange={(e) => setForm({ ...form, paymentReference: e.target.value })} /></>}
           <label className="text-sm font-medium text-slate-700 sm:col-span-2">Message

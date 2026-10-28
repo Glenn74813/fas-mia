@@ -11,7 +11,7 @@ import { Money } from '../../components/Money';
 import { PageHeader } from '../../components/PageHeader';
 import { Pagination } from '../../components/Pagination';
 import { Spinner } from '../../components/Spinner';
-import { postableAccounts, useChart } from '../../hooks/useAccounting';
+import { accountsFor, useChart } from '../../hooks/useAccounting';
 import { formatDateTime } from '../../utils/format';
 import { fromCents, sumCents } from '../../utils/money';
 
@@ -25,7 +25,6 @@ export function InventoryItemsPage() {
   const items = useQuery({ queryKey: ['inventory-items', page], queryFn: () => inventoryApi.items(undefined, page), placeholderData: keepPreviousData });
   const warehouses = useQuery({ queryKey: ['warehouses'], queryFn: inventoryApi.warehouses });
   const chart = useChart();
-  const accounts = postableAccounts(chart.data?.accounts).filter((a) => !a.subsidiaryType);
   const [item, setItem] = useState({ code: '', name: '', unitOfMeasure: 'pc', inventoryAccountId: '', consumptionAccountId: '' });
   const [wh, setWh] = useState({ code: '', name: '' });
   const createItem = useMutation({ mutationFn: () => inventoryApi.createItem(item), onSuccess: () => qc.invalidateQueries({ queryKey: ['inventory-items'] }) });
@@ -68,10 +67,10 @@ export function InventoryItemsPage() {
               <Field label="Unit of measure" value={item.unitOfMeasure} onChange={(e) => setItem({ ...item, unitOfMeasure: e.target.value })} />
               <label className="block text-sm md:col-span-3">Inventory account
                 <Combobox value={item.inventoryAccountId} onChange={(v) => setItem({ ...item, inventoryAccountId: v })} className="mt-1.5 block w-full rounded-lg border border-slate-300 px-3 py-2 shadow-xs" placeholder="Select…"
-              options={accounts.filter((a) => a.accountType === 'ASSET').map((a) => ({ value: a.id, label: `${a.code} — ${a.name}` }))} /></label>
+              options={accountsFor(chart.data?.accounts, 'INVENTORY_STOCK').map((a) => ({ value: a.id, label: `${a.code} — ${a.name}` }))} /></label>
               <label className="block text-sm md:col-span-3">Consumption account
                 <Combobox value={item.consumptionAccountId} onChange={(v) => setItem({ ...item, consumptionAccountId: v })} className="mt-1.5 block w-full rounded-lg border border-slate-300 px-3 py-2 shadow-xs" placeholder="Select…"
-              options={accounts.filter((a) => a.accountType === 'EXPENSE').map((a) => ({ value: a.id, label: `${a.code} — ${a.name}` }))} /></label>
+              options={accountsFor(chart.data?.accounts, 'EXPENSE').map((a) => ({ value: a.id, label: `${a.code} — ${a.name}` }))} /></label>
             </div>
             <Button variant="secondary" busy={createItem.isPending} disabled={!item.code || !item.name || !item.unitOfMeasure || !item.inventoryAccountId
               || !item.consumptionAccountId} onClick={() => createItem.mutate()}>Add item</Button>

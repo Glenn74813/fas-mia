@@ -1,7 +1,7 @@
 import { expect, request, test } from '@playwright/test';
 import { futureYear } from './fiscal';
 import { adminToken, nextTotpWindow, onboard } from './team';
-import { act, nav, signIn, signOut, pick } from './ui';
+import { act, nav, signIn, signOut, pick, select } from './ui';
 
 const admin = {
   username: process.env.E2E_ADMIN_USERNAME ?? '',
@@ -95,7 +95,7 @@ test('an asset is registered, activated, depreciated and disposed of, each contr
   await nextTotpWindow();
   await signIn(page, accountant);
   await nav(page, 'Depreciation');
-  await page.getByLabel('Period').selectOption({ label: period!.name });
+  await select(page.getByLabel('Period'), { label: period!.name });
   await page.getByRole('button', { name: 'Compute depreciation' }).click();
   await expect(page.getByRole('heading', { name: `Depreciation ${period!.name}` })).toBeVisible();
   await expect(page.getByRole('row', { name: new RegExp(assetNumber) })).toContainText('1,000.00');

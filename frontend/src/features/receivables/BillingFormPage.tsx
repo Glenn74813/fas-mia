@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { Select } from '../../components/Select';
 import { Combobox } from '../../components/Combobox';
 import { useState, type FormEvent } from 'react';
 import { useNavigate, useParams } from 'react-router';
@@ -10,7 +11,7 @@ import { Field } from '../../components/Field';
 import { PageHeader } from '../../components/PageHeader';
 import { SearchSelect } from '../../components/SearchSelect';
 import { Spinner } from '../../components/Spinner';
-import { postableAccounts, useChart, useCostCenters } from '../../hooks/useAccounting';
+import { activeCostCenters, accountsFor, useChart, useCostCenters } from '../../hooks/useAccounting';
 import { fromCents, isValidAmount, sumCents } from '../../utils/money';
 import { KIND_LABEL } from './BillingsPage';
 
@@ -43,7 +44,7 @@ function BillingForm({ existing }: { existing?: BillingView }) {
     : [emptyLine()]);
   const openItems = useQuery({ queryKey: ['open-items', form.customerId], enabled: !!form.customerId && form.kind !== 'INVOICE',
     queryFn: () => customerApi.openItems(form.customerId) });
-  const revenue = postableAccounts(chart.data?.accounts).filter((a) => a.accountType === 'REVENUE');
+  const revenue = accountsFor(chart.data?.accounts, 'REVENUE_LINE');
   const vatCodes = (taxCodes.data ?? []).filter((t) => t.taxType === 'VAT_OUTPUT' && t.status === 'ACTIVE');
   const set = (i: number, patch: Partial<BillingLineInput>) => setLines(lines.map((l, j) => (j === i ? { ...l, ...patch } : l)));
   const save = useMutation({
@@ -63,9 +64,9 @@ function BillingForm({ existing }: { existing?: BillingView }) {
         <ErrorAlert error={save.error} />
         <div className="grid gap-4 rounded-xl border border-slate-200/80 bg-white shadow-xs p-5 md:grid-cols-3">
           <div className="space-y-1.5"><label htmlFor="kind" className="block text-sm font-medium text-slate-700">Kind</label>
-            <select id="kind" value={form.kind} disabled={!!existing} className={select}
+            <Select id="kind" value={form.kind} disabled={!!existing} className={select}
               onChange={(e) => setForm({ ...form, kind: e.target.value as BillingKind, relatedInvoiceId: null })}>
-              {Object.entries(KIND_LABEL).map(([k, v]) => <option key={k} value={k}>{v}</option>)}</select></div>
+              {Object.entries(KIND_LABEL).map(([k, v]) => <option key={k} value={k}>{v}</option>)}</Select></div>
           <SearchSelect id="customer" label="Customer" value={form.customerId} disabled={!!existing} queryKey="customers" placeholder="Select…"
             search={(q) => customerApi.list(q, 0, 50)} optionLabel={(c) => `${c.code} — ${c.name}`} filter={(c) => c.status === 'ACTIVE'}
             selected={existingCustomer.data}
@@ -73,19 +74,19 @@ function BillingForm({ existing }: { existing?: BillingView }) {
           {form.kind !== 'INVOICE' && (
             <div className="space-y-1.5"><label htmlFor="related" className="block text-sm font-medium text-slate-700">
               {memo ? 'Invoice to reduce' : 'Related invoice (optional)'}</label>
-              <select id="related" value={form.relatedInvoiceId ?? ''} className={select}
+              <Select id="related" value={form.relatedInvoiceId ?? ''} className={select}
                 onChange={(e) => setForm({ ...form, relatedInvoiceId: e.target.value || null })}>
                 <option value="">{memo ? 'Select…' : 'None'}</option>
-                {(openItems.data ?? []).map((o) => <option key={o.id} value={o.id}>{o.documentNumber} — open {o.openBalance}</option>)}</select></div>
+                {(openItems.data ?? []).map((o) => <option key={o.id} value={o.id}>{o.documentNumber} — open {o.openBalance}</option>)}</Select></div>
           )}
           <Field label="Document date" type="date" value={form.documentDate} onChange={(e) => setForm({ ...form, documentDate: e.target.value })} />
           {!memo && <Field label="Due date" type="date" hint="Blank: document date plus the customer's payment terms" value={form.dueDate ?? ''}
             onChange={(e) => setForm({ ...form, dueDate: e.target.value || null })} />}
           {!memo && (
             <div className="space-y-1.5"><label htmlFor="vat" className="block text-sm font-medium text-slate-700">Output VAT</label>
-              <select id="vat" value={form.vatCodeId ?? ''} className={select} onChange={(e) => setForm({ ...form, vatCodeId: e.target.value || null })}>
+              <Select id="vat" value={form.vatCodeId ?? ''} className={select} onChange={(e) => setForm({ ...form, vatCodeId: e.target.value || null })}>
                 <option value="">No VAT</option>
-                {vatCodes.map((t) => <option key={t.id} value={t.id}>{t.code} ({t.rate})</option>)}</select></div>
+                {vatCodes.map((t) => <option key={t.id} value={t.id}>{t.code} ({t.rate})</option>)}</Select></div>
           )}
           <div className="md:col-span-3"><Field label="Description" value={form.description} maxLength={1000}
             onChange={(e) => setForm({ ...form, description: e.target.value })} /></div>
@@ -106,7 +107,7 @@ function BillingForm({ existing }: { existing?: BillingView }) {
               options={revenue.map((a) => ({ value: a.id, label: `${a.code} — ${a.name}` }))} /></td>
                   <td className="px-2 py-2"><Combobox aria-label={`Line ${i + 1} cost centre`} value={l.costCenterId ?? ''} onChange={(v) => set(i, { costCenterId: v || null })}
                     className="w-36 rounded-md border border-slate-300 px-2 py-1" placeholder="—"
-              options={(costCenters.data ?? []).map((c) => ({ value: c.id, label: `${c.code} — ${c.name}` }))} /></td>
+              options={activeCostCenters(costCenters.data).map((c) => ({ value: c.id, label: `${c.code} — ${c.name}` }))} /></td>
                   <td className="px-2 py-2"><input aria-label={`Line ${i + 1} description`} value={l.description} onChange={(e) => set(i, { description: e.target.value })}
                     className="w-64 rounded-md border border-slate-300 px-2 py-1" /></td>
                   <td className="px-2 py-2"><input aria-label={`Line ${i + 1} net amount`} inputMode="decimal" value={l.netAmount}

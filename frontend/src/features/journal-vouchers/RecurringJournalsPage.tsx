@@ -1,4 +1,5 @@
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { Select } from '../../components/Select';
 import { useState } from 'react';
 import { recurringApi } from '../../api/endpoints';
 import type { LineInput } from '../../api/types';
@@ -50,10 +51,10 @@ export function RecurringJournalsPage() {
             <Field label="Voucher description" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} />
             <div className="space-y-1.5">
               <label htmlFor="freq" className="block text-sm font-medium text-slate-700">Frequency</label>
-              <select id="freq" value={form.frequency} onChange={(e) => setForm({ ...form, frequency: e.target.value })}
+              <Select id="freq" value={form.frequency} onChange={(e) => setForm({ ...form, frequency: e.target.value })}
                 className="block w-full rounded-lg border border-slate-300 px-3 py-2 shadow-xs text-sm">
                 <option value="MONTHLY">Monthly</option><option value="QUARTERLY">Quarterly</option><option value="ANNUALLY">Annually</option>
-              </select>
+              </Select>
             </div>
             <Field label="Day of month (1-28)" value={form.dayOfMonth} onChange={(e) => setForm({ ...form, dayOfMonth: e.target.value.replace(/\D/g, '') })} />
             <Field label="First run" type="date" value={form.firstRunDate} onChange={(e) => setForm({ ...form, firstRunDate: e.target.value })} />

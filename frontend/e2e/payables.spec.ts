@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 import { adminToken, nextTotpWindow, onboard } from './team';
-import { act, nav, PDF, signIn, signOut, pick } from './ui';
+import { act, nav, PDF, signIn, signOut, pick, select } from './ui';
 
 const admin = {
   username: process.env.E2E_ADMIN_USERNAME ?? '',
@@ -32,7 +32,7 @@ test('a supplier invoice is recognised, paid by check and reconciled, each step 
   await page.getByRole('button', { name: 'New supplier' }).click();
   await page.getByLabel('Code').fill(supplierCode);
   await page.getByLabel('Registered name').fill(`E2E Aircon Services ${supplierCode}`);
-  await page.getByLabel('Default withholding tax').selectOption({ label: 'PLC-EWT-SERV (0.0200)' });
+  await select(page.getByLabel('Default withholding tax'), { label: 'PLC-EWT-SERV (0.0200)' });
   await page.getByLabel('VAT-registered').check();
   await page.getByRole('button', { name: 'Save supplier' }).click();
   // The list is paged; search, since earlier runs leave many suppliers.
@@ -41,10 +41,9 @@ test('a supplier invoice is recognised, paid by check and reconciled, each step 
 
   await nav(page, 'Supplier invoices');
   await page.getByRole('link', { name: 'Register invoice' }).click();
-  await page.getByLabel('Search supplier').fill(supplierCode);
-  await page.getByLabel('Supplier', { exact: true }).selectOption({ label: `${supplierCode} — E2E Aircon Services ${supplierCode}` });
+  await pick(page.getByLabel('Supplier', { exact: true }), supplierCode);
   await page.getByLabel('Supplier invoice number').fill(`SI-${supplierCode}`);
-  await page.getByLabel('Input VAT').selectOption({ label: 'PLC-VAT-IN (0.1200)' });
+  await select(page.getByLabel('Input VAT'), { label: 'PLC-VAT-IN (0.1200)' });
   await page.getByLabel('Accounting date').fill(today);
   await page.getByLabel('Description', { exact: true }).fill('Aircon preventive maintenance, terminal 3');
   await pick(page.getByLabel('Line 1 account'), '50213050 — Repairs and Maintenance-Machinery and Equipment');
@@ -75,8 +74,7 @@ test('a supplier invoice is recognised, paid by check and reconciled, each step 
   await signIn(page, dvOfficer);
   await nav(page, 'Disbursement vouchers');
   await page.getByRole('link', { name: 'New DV' }).click();
-  await page.getByLabel('Search payee (supplier)').fill(supplierCode);
-  await page.getByLabel('Payee (supplier)', { exact: true }).selectOption({ label: `${supplierCode} — E2E Aircon Services ${supplierCode}` });
+  await pick(page.getByLabel('Payee (supplier)', { exact: true }), supplierCode);
   await page.getByLabel('Particulars').fill('Payment for aircon maintenance');
   await page.getByRole('button', { name: 'full' }).click();
   await page.getByRole('button', { name: 'Save draft' }).click();
@@ -111,7 +109,7 @@ test('a supplier invoice is recognised, paid by check and reconciled, each step 
   await page.goto(dvUrl);
   await page.getByRole('main').getByRole('button', { name: 'Issue payment' }).click();
   const dialog = page.getByRole('dialog');
-  await dialog.getByLabel('Bank account').selectOption({ index: 1 });
+  await select(dialog.getByLabel('Bank account'), { index: 1 });
   await dialog.getByLabel('Check number').fill(`C${Date.now() % 1_000_000}`);
   await dialog.getByRole('button', { name: 'Issue payment', exact: true }).click();
   await expect(dialog).toBeHidden();

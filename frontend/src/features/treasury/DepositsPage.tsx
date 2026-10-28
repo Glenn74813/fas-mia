@@ -1,4 +1,5 @@
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { Select } from '../../components/Select';
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router';
 import { settingsApi, treasuryApi } from '../../api/endpoints';
@@ -24,10 +25,10 @@ export function DepositsPage() {
         actions={hasPermission('DEPOSIT_PREPARE') && (
           <Link to="/treasury/deposits/new" className="rounded-md bg-brand-700 px-4 py-2 text-sm font-medium text-white hover:bg-brand-900">New deposit</Link>
         )} />
-      <select aria-label="Status" value={status} onChange={(e) => { setStatus(e.target.value); setPage(0); }}
+      <Select aria-label="Status" value={status} onChange={(e) => { setStatus(e.target.value); setPage(0); }}
         className="mb-4 rounded-lg border border-slate-300 px-3 py-2 shadow-xs text-sm">
         {['', 'RECORDED', 'POSTED', 'CANCELLED'].map((s) => <option key={s} value={s}>{s || 'All statuses'}</option>)}
-      </select>
+      </Select>
       <ErrorAlert error={list.error} />
       {list.isPending ? <Spinner /> : (
         <div className="overflow-x-auto rounded-xl border border-slate-200/80 bg-white shadow-xs">
@@ -77,10 +78,10 @@ export function NewDepositPage() {
         <ErrorAlert error={create.error ?? receipts.error} />
         <div className="grid gap-4 rounded-xl border border-slate-200/80 bg-white shadow-xs p-5 md:grid-cols-3">
           <div className="space-y-1.5"><label htmlFor="bank" className="block text-sm font-medium text-slate-700">Bank account</label>
-            <select id="bank" value={bankAccountId} onChange={(e) => setBank(e.target.value)} className="block w-full rounded-lg border border-slate-300 px-3 py-2 shadow-xs text-sm">
+            <Select id="bank" value={bankAccountId} onChange={(e) => setBank(e.target.value)} className="block w-full rounded-lg border border-slate-300 px-3 py-2 shadow-xs text-sm">
               <option value="">Select…</option>
               {(banks.data ?? []).filter((b) => b.status === 'ACTIVE').map((b) => <option key={b.id} value={b.id}>{b.code} — {b.bankName} ****{b.accountNumberLast4}</option>)}
-            </select></div>
+            </Select></div>
           <Field label="Deposit date" type="date" value={depositDate} onChange={(e) => setDate(e.target.value)} />
           <Field label="Deposit slip number" value={bankReference} maxLength={60} onChange={(e) => setRef(e.target.value)} />
         </div>

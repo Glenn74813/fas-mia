@@ -4,6 +4,7 @@ import com.miaa.cas.audit.AuditService;
 import com.miaa.cas.common.error.ApiException;
 import com.miaa.cas.common.error.ErrorCode;
 import com.miaa.cas.common.money.Money;
+import com.miaa.cas.generalledger.AccountPurpose;
 import com.miaa.cas.generalledger.FiscalCalendarService;
 import com.miaa.cas.generalledger.domain.AccountingPeriod;
 import com.miaa.cas.journal.web.JournalDtos.LineRequest;
@@ -242,9 +243,9 @@ public class AllocationService {
         int seq = 1;
         for (RuleInput r : rules) {
             String at = "Rule " + seq + ": ";
-            requirePostable(r.senderAccountId(), at + "sender account");
+            requireExpense(r.senderAccountId(), at + "sender account");
             if (r.receiverAccountId() != null) {
-                requirePostable(r.receiverAccountId(), at + "receiver account");
+                requireExpense(r.receiverAccountId(), at + "receiver account");
             }
             requireCostCenter(r.senderCostCenterId(), at + "sender cost centre");
             if (!Set.of("PERCENT", "QUANTITY").contains(r.keyType())) {
@@ -278,11 +279,11 @@ public class AllocationService {
         }
     }
 
-    private void requirePostable(UUID account, String what) {
-        if (account == null || !Boolean.TRUE.equals(jdbc.queryForList("SELECT postable FROM chart_of_accounts WHERE id = ?", Boolean.class, account)
-                .stream().findFirst().orElse(false))) {
-            throw bad(what + " must be a postable account.");
+    private void requireExpense(UUID account, String what) {
+        if (account == null) {
+            throw bad(what + " is required.");
         }
+        AccountPurpose.require(jdbc, account, AccountPurpose.ALLOCATION, what);
     }
 
     private void requireCostCenter(UUID cc, String what) {

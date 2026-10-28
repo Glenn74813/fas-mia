@@ -1,4 +1,5 @@
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
+import { Select } from '../../components/Select';
 import { useState } from 'react';
 import { Link } from 'react-router';
 import { treasuryApi } from '../../api/endpoints';
@@ -41,18 +42,18 @@ export function CashForecastPage() {
     <>
       <PageHeader title="Cash-flow forecast" crumbs={[{ label: 'Treasury' }, { label: 'Cash-flow forecast' }]} />
       <div className="mb-4 flex flex-wrap items-center gap-3 text-sm">
-        <select aria-label="Group by" value={granularity} className={select} onChange={(e) => {
+        <Select aria-label="Group by" value={granularity} className={select} onChange={(e) => {
           const g = e.target.value as 'WEEK' | 'MONTH';
           setGranularity(g);
           setPeriods(g === 'WEEK' ? 13 : 12);
           setBucket(null);
         }}>
           <option value="WEEK">By week</option><option value="MONTH">By month</option>
-        </select>
-        <select aria-label="Horizon" value={periods} className={select} onChange={(e) => { setPeriods(Number(e.target.value)); setBucket(null); }}>
+        </Select>
+        <Select aria-label="Horizon" value={periods} className={select} onChange={(e) => { setPeriods(Number(e.target.value)); setBucket(null); }}>
           {(granularity === 'WEEK' ? [4, 8, 13, 26, 52] : [3, 6, 12]).map((n) => (
             <option key={n} value={n}>{n} {granularity === 'WEEK' ? 'weeks' : 'months'}</option>))}
-        </select>
+        </Select>
         <label className="flex items-center gap-2">
           <input type="checkbox" checked={includeBudget} onChange={(e) => setIncludeBudget(e.target.checked)} />
           Include budgeted spending not yet committed

@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { Select } from '../../components/Select';
 import { Combobox } from '../../components/Combobox';
 import { useState } from 'react';
 import { useNavigate } from 'react-router';
@@ -8,7 +9,7 @@ import { Button } from '../../components/Button';
 import { ErrorAlert } from '../../components/ErrorAlert';
 import { Field } from '../../components/Field';
 import { PageHeader } from '../../components/PageHeader';
-import { postableAccounts, useChart, useCostCenters } from '../../hooks/useAccounting';
+import { activeCostCenters, accountsFor, useChart, useCostCenters } from '../../hooks/useAccounting';
 import { isValidAmount } from '../../utils/money';
 
 export function AssetFormPage() {
@@ -27,7 +28,7 @@ export function AssetFormPage() {
   const category = categories.data?.find((c) => c.id === f.categoryId);
   const save = useMutation({ mutationFn: () => assetApi.create(f),
     onSuccess: (a) => { qc.invalidateQueries({ queryKey: ['assets'] }); navigate(`/fixed-assets/${a.id}`); } });
-  const offsets = postableAccounts(chart.data?.accounts).filter((a) => !a.subsidiaryType);
+  const offsets = accountsFor(chart.data?.accounts, 'ASSET_OFFSET');
   const sourceOk = f.acquisitionSource === 'INVOICE' ? !!f.supplierInvoiceId : f.acquisitionSource === 'AUC' ? !!f.aucProjectId
     : !!f.offsetAccountId && (f.justification ?? '').trim().length >= 10;
   const valid = f.categoryId && f.description.trim() && f.cost && isValidAmount(f.cost) && (!f.residualValue || isValidAmount(f.residualValue)) && sourceOk;
@@ -47,7 +48,7 @@ export function AssetFormPage() {
           <Field label="Custodian" value={f.custodian ?? ''} onChange={(e) => set({ custodian: e.target.value || null })} />
           <div className="space-y-1.5"><label htmlFor="cc" className="block text-sm font-medium text-slate-700">Cost centre</label>
             <Combobox id="cc" value={f.costCenterId ?? ''} onChange={(v) => set({ costCenterId: v || null })} className={sel} placeholder="—"
-              options={(costCenters.data ?? []).map((c) => ({ value: c.id, label: `${c.code} — ${c.name}` }))} /></div>
+              options={activeCostCenters(costCenters.data).map((c) => ({ value: c.id, label: `${c.code} — ${c.name}` }))} /></div>
           <Field label="Acquisition date" type="date" value={f.acquisitionDate} onChange={(e) => set({ acquisitionDate: e.target.value })} />
           <Field label="In-service date" type="date" value={f.inServiceDate} onChange={(e) => set({ inServiceDate: e.target.value })} />
           <Field label="Cost" inputMode="decimal" value={f.cost} onChange={(e) => set({ cost: e.target.value.replace(/[^\d.]/g, '') })} />
@@ -65,14 +66,14 @@ export function AssetFormPage() {
           </div>
           {f.acquisitionSource === 'INVOICE' && (
             <div className="space-y-1.5"><label htmlFor="inv" className="block text-sm font-medium text-slate-700">Supplier invoice</label>
-              <select id="inv" value={f.supplierInvoiceId ?? ''} onChange={(e) => set({ supplierInvoiceId: e.target.value || null })} className={sel}>
-                <option value="">Select…</option>{(invoices.data?.items ?? []).map((i) => <option key={i.id} value={i.id}>{i.invoiceNumber} — {i.supplierName}</option>)}</select>
+              <Select id="inv" value={f.supplierInvoiceId ?? ''} onChange={(e) => set({ supplierInvoiceId: e.target.value || null })} className={sel}>
+                <option value="">Select…</option>{(invoices.data?.items ?? []).map((i) => <option key={i.id} value={i.id}>{i.invoiceNumber} — {i.supplierName}</option>)}</Select>
               <p className="text-xs text-slate-500">The invoice must have charged the category's asset account; it is already in the ledger, so activation posts nothing new.</p></div>
           )}
           {f.acquisitionSource === 'AUC' && (
             <div className="space-y-1.5"><label htmlFor="proj" className="block text-sm font-medium text-slate-700">AUC project</label>
-              <select id="proj" value={f.aucProjectId ?? ''} onChange={(e) => set({ aucProjectId: e.target.value || null })} className={sel}>
-                <option value="">Select…</option>{(projects.data ?? []).filter((p) => p.status === 'OPEN').map((p) => <option key={p.id} value={p.id}>{p.code} — balance {p.balance}</option>)}</select></div>
+              <Select id="proj" value={f.aucProjectId ?? ''} onChange={(e) => set({ aucProjectId: e.target.value || null })} className={sel}>
+                <option value="">Select…</option>{(projects.data ?? []).filter((p) => p.status === 'OPEN').map((p) => <option key={p.id} value={p.id}>{p.code} — balance {p.balance}</option>)}</Select></div>
           )}
           {f.acquisitionSource === 'OTHER' && (
             <div className="grid gap-3 md:grid-cols-2">

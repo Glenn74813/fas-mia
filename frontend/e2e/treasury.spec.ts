@@ -1,6 +1,6 @@
 import { expect, request, test } from '@playwright/test';
 import { adminToken, nextTotpWindow, onboard, type Member } from './team';
-import { act, nav, signIn, signOut } from './ui';
+import { act, nav, signIn, signOut, select } from './ui';
 
 const admin = {
   username: process.env.E2E_ADMIN_USERNAME ?? '',
@@ -61,7 +61,7 @@ test('collections are deposited, the statement is imported, reconciled and appro
   await signIn(page, cashier);
   await nav(page, 'Deposits');
   await page.getByRole('link', { name: 'New deposit' }).click();
-  await page.getByLabel('Bank account').selectOption({ label: `${bank.code} — E2E Bank ****4321` });
+  await select(page.getByLabel('Bank account'), { label: `${bank.code} — E2E Bank ****4321` });
   await page.getByLabel('Deposit slip number').fill(`SLIP-${tag}`);
   await page.getByLabel(`Include ${rc.receiptNumber}`).check();
   await page.getByRole('button', { name: 'Save deposit' }).click();
@@ -82,14 +82,14 @@ test('collections are deposited, the statement is imported, reconciled and appro
   const csv = `date,description,reference,amount\n${today},Deposit SLIP-${tag},SLIP-${tag},12500.00\n${today},Service charge,,-25.00\n`;
   await signIn(page, accountant);
   await nav(page, 'Bank statements');
-  await page.getByLabel('Bank account', { exact: true }).selectOption({ label: `${bank.code} ****4321` });
-  await page.getByLabel('Format').selectOption('CSV');
+  await select(page.getByLabel('Bank account', { exact: true }), { label: `${bank.code} ****4321` });
+  await select(page.getByLabel('Format'), 'CSV');
   await page.getByLabel('Opening balance').fill('0.00');
   await page.getByLabel('Closing balance').fill('12475.00');
   await page.getByLabel('Statement file').setInputFiles({ name: 'statement.csv', mimeType: 'text/csv', buffer: Buffer.from(csv) });
   await page.getByRole('button', { name: 'Import' }).click();
   await expect(page.getByRole('status')).toContainText('Imported 2 lines');
-  await page.getByLabel('Filter bank account').selectOption({ label: bank.code });
+  await select(page.getByLabel('Filter bank account'), { label: bank.code });
   await page.getByRole('button', { name: 'Reconcile' }).click();
   await expect(page.getByRole('heading', { name: /^Bank reconciliation/ })).toBeVisible();
   await page.getByRole('button', { name: 'Auto-match' }).click();

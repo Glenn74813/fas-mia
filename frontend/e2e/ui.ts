@@ -44,15 +44,32 @@ export async function act(page: Page, button: string | RegExp, confirmLabel: str
 export const PDF = { name: 'support.pdf', mimeType: 'application/pdf', buffer: Buffer.from('%PDF-1.4\n% e2e\n%%EOF\n') };
 
 /**
- * Chooses in a searchable dropdown (Combobox): the option whose label is exactly `text` if the open list shows it
- * (such as the empty choice), otherwise the first option containing `text` after typing it.
+ * Chooses in a searchable dropdown (Combobox) the way Playwright's selectOption does on a native one: an option value,
+ * { label } (the exact label if the open list shows it, otherwise the first option containing it after typing it) or
+ * { index } (counting the "none" choice first, as a native select does).
  */
-export async function pick(field: Locator, text: string) {
+export async function select(field: Locator, choice: string | { label?: string; index?: number }) {
+  if (await field.evaluate((e) => e.tagName === 'SELECT')) {
+    await field.selectOption(choice);
+    return;
+  }
   await field.click();
   const list = field.page().getByRole('listbox');
-  if (!(await list.getByRole('option', { name: text, exact: true }).count())) {
-    await field.fill(text);
+  if (typeof choice === 'string') {
+    await list.locator(`[data-value="${choice}"]`).click();
+  } else if (choice.index !== undefined) {
+    await list.getByRole('option').nth(choice.index).click();
+  } else {
+    const label = choice.label ?? '';
+    if (!(await list.getByRole('option', { name: label, exact: true }).count())) {
+      await field.fill(label);
+    }
+    await list.getByRole('option', { name: label }).first().click();
   }
-  await list.getByRole('option', { name: text }).first().click();
   await expect(list).toBeHidden();
+}
+
+/** Chooses the first option whose label contains `text` (see select). */
+export function pick(field: Locator, text: string) {
+  return select(field, { label: text });
 }

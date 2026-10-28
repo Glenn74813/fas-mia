@@ -10,7 +10,8 @@ import { Field } from '../../components/Field';
 import { Money } from '../../components/Money';
 import { PageHeader } from '../../components/PageHeader';
 import { StatusBadge } from '../../components/StatusBadge';
-import { postableAccounts, useChart, useCostCenters } from '../../hooks/useAccounting';
+import type { Account } from '../../api/types';
+import { activeCostCenters, accountsFor, useChart, useCostCenters } from '../../hooks/useAccounting';
 
 export function AssetSetupPage() {
   const { hasPermission } = useAuth();
@@ -20,7 +21,6 @@ export function AssetSetupPage() {
   const costCenters = useCostCenters();
   const categories = useQuery({ queryKey: ['asset-categories'], queryFn: assetApi.categories });
   const projects = useQuery({ queryKey: ['auc-projects'], queryFn: assetApi.projects });
-  const accounts = postableAccounts(chart.data?.accounts);
   const [cat, setCat] = useState({ code: '', name: '', assetAccountId: '', accumulatedAccountId: '', expenseAccountId: '', life: '60', residual: '' });
   const [proj, setProj] = useState({ code: '', name: '', aucAccountId: '', costCenterId: '' });
   const createCat = useMutation({ mutationFn: () => assetApi.createCategory({ code: cat.code, name: cat.name, assetAccountId: cat.assetAccountId,
@@ -29,7 +29,7 @@ export function AssetSetupPage() {
   const createProj = useMutation({ mutationFn: () => assetApi.createProject({ ...proj, costCenterId: proj.costCenterId || null }),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['auc-projects'] }) });
   const close = useMutation({ mutationFn: assetApi.closeProject, onSuccess: () => qc.invalidateQueries({ queryKey: ['auc-projects'] }) });
-  const pick = (id: string, value: string, onChange: (v: string) => void, list: typeof accounts, label: string) => (
+  const pick = (id: string, value: string, onChange: (v: string) => void, list: Account[], label: string) => (
     <label className="block text-sm">{label}
       <Combobox id={id} value={value} onChange={(v) => onChange(v)} className="mt-1.5 block w-full rounded-lg border border-slate-300 px-3 py-2 shadow-xs" placeholder="Select…"
               options={list.map((a) => ({ value: a.id, label: `${a.code} — ${a.name}` }))} /></label>
@@ -54,9 +54,9 @@ export function AssetSetupPage() {
               <Field label="Category name" value={cat.name} onChange={(e) => setCat({ ...cat, name: e.target.value })} />
               <Field label="Default life (months)" inputMode="numeric" value={cat.life} onChange={(e) => setCat({ ...cat, life: e.target.value.replace(/\D/g, '') })} />
               <Field label="Default residual rate" hint="e.g. 0.0500; blank for none" value={cat.residual} onChange={(e) => setCat({ ...cat, residual: e.target.value })} />
-              {pick('ca', cat.assetAccountId, (v) => setCat({ ...cat, assetAccountId: v }), accounts.filter((a) => a.accountType === 'ASSET' && a.normalBalance === 'DEBIT'), 'Asset account')}
-              {pick('cd', cat.accumulatedAccountId, (v) => setCat({ ...cat, accumulatedAccountId: v }), accounts.filter((a) => a.accountType === 'ASSET' && a.normalBalance === 'CREDIT'), 'Accumulated depreciation')}
-              {pick('ce', cat.expenseAccountId, (v) => setCat({ ...cat, expenseAccountId: v }), accounts.filter((a) => a.accountType === 'EXPENSE'), 'Depreciation expense')}
+              {pick('ca', cat.assetAccountId, (v) => setCat({ ...cat, assetAccountId: v }), accountsFor(chart.data?.accounts, 'ASSET_COST'), 'Asset account')}
+              {pick('cd', cat.accumulatedAccountId, (v) => setCat({ ...cat, accumulatedAccountId: v }), accountsFor(chart.data?.accounts, 'ASSET_ACCUMULATED'), 'Accumulated depreciation')}
+              {pick('ce', cat.expenseAccountId, (v) => setCat({ ...cat, expenseAccountId: v }), accountsFor(chart.data?.accounts, 'EXPENSE'), 'Depreciation expense')}
             </div>
             <Button variant="secondary" busy={createCat.isPending} disabled={!cat.code || !cat.name || !cat.assetAccountId || !cat.accumulatedAccountId
               || !cat.expenseAccountId || !cat.life} onClick={() => createCat.mutate()}>Add category</Button>
@@ -83,10 +83,10 @@ export function AssetSetupPage() {
             <div className="grid gap-3 md:grid-cols-4">
               <Field label="Project code" value={proj.code} onChange={(e) => setProj({ ...proj, code: e.target.value })} />
               <Field label="Project name" value={proj.name} onChange={(e) => setProj({ ...proj, name: e.target.value })} />
-              {pick('pa', proj.aucAccountId, (v) => setProj({ ...proj, aucAccountId: v }), accounts.filter((a) => a.subsidiaryType === 'OTHER' && a.accountType === 'ASSET'), 'AUC account')}
+              {pick('pa', proj.aucAccountId, (v) => setProj({ ...proj, aucAccountId: v }), accountsFor(chart.data?.accounts, 'ASSET_UNDER_CONSTRUCTION'), 'AUC account')}
               <label className="block text-sm">Cost centre
                 <Combobox value={proj.costCenterId} onChange={(v) => setProj({ ...proj, costCenterId: v })} className="mt-1.5 block w-full rounded-lg border border-slate-300 px-3 py-2 shadow-xs" placeholder="—"
-              options={(costCenters.data ?? []).map((c) => ({ value: c.id, label: `${c.code} — ${c.name}` }))} /></label>
+              options={activeCostCenters(costCenters.data).map((c) => ({ value: c.id, label: `${c.code} — ${c.name}` }))} /></label>
             </div>
             <Button variant="secondary" busy={createProj.isPending} disabled={!proj.code || !proj.name || !proj.aucAccountId} onClick={() => createProj.mutate()}>Open project</Button>
           </div>

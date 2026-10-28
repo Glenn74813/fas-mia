@@ -39,7 +39,8 @@ public class AccountMappingService {
             Map.entry("INVENTORY_REVALUATION", "Inventory price adjustments (restating an item's average cost)"),
             Map.entry("SUPPLIER_ADVANCES", "Advances to suppliers and contractors (supplier sub-ledger)"));
 
-    public record Mapping(String key, String description, UUID accountId, String accountCode, String accountName) {
+    /** {@code purpose}: the {@link AccountPurpose} the mapped account must fit, so the screen offers only those. */
+    public record Mapping(String key, String description, UUID accountId, String accountCode, String accountName, String purpose) {
     }
 
     private final JdbcTemplate jdbc;
@@ -62,7 +63,7 @@ public class AccountMappingService {
         return KEYS.keySet().stream().sorted().map(k -> {
             UUID id = current.get(k);
             Account a = id == null ? null : accounts.findById(id).orElse(null);
-            return new Mapping(k, KEYS.get(k), id, a == null ? null : a.getCode(), a == null ? null : a.getName());
+            return new Mapping(k, KEYS.get(k), id, a == null ? null : a.getCode(), a == null ? null : a.getName(), purposeOf(k));
         }).toList();
     }
 
@@ -75,13 +76,21 @@ public class AccountMappingService {
         if (!a.isPostable() || !"ACTIVE".equals(a.getStatus())) {
             throw AccountService.rule("Mapped accounts must be active and postable.");
         }
+        AccountPurpose purpose = AccountPurpose.MAPPINGS.get(key);
+        if (purpose != null && !purpose.fits(a)) {
+            throw AccountService.rule(key + ": account " + a.getCode() + " cannot be used here; it must be " + purpose.requirement() + ".");
+        }
         jdbc.update("""
                 INSERT INTO gl_account_mappings (mapping_key, account_id, description, updated_at, updated_by)
                 VALUES (?, ?, ?, ?, ?) ON CONFLICT (mapping_key) DO UPDATE SET account_id = EXCLUDED.account_id,
                 updated_at = EXCLUDED.updated_at, updated_by = EXCLUDED.updated_by""",
                 key, accountId, KEYS.get(key), Timestamp.from(Instant.now(clock)), actor.username());
         audit.record(actor, "ACCOUNT_MAPPING_SET", "ACCOUNT_MAPPING", key, Map.of("account", a.getCode()));
-        return new Mapping(key, KEYS.get(key), accountId, a.getCode(), a.getName());
+        return new Mapping(key, KEYS.get(key), accountId, a.getCode(), a.getName(), purposeOf(key));
+    }
+
+    private static String purposeOf(String key) {
+        return AccountPurpose.MAPPINGS.getOrDefault(key, AccountPurpose.JOURNAL_LINE).name();
     }
 
     /** The mapped account, or an accounting-rule error telling the user what to configure. */

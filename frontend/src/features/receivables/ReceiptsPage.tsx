@@ -1,4 +1,5 @@
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { Select } from '../../components/Select';
 import { useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router';
 import { customerApi, receiptApi } from '../../api/endpoints';
@@ -31,10 +32,10 @@ export function ReceiptsPage() {
           <Link to="/receivables/receipts/new" className="rounded-md bg-brand-700 px-4 py-2 text-sm font-medium text-white hover:bg-brand-900">Record collection</Link>
         )} />
       <div className="mb-4 flex gap-3">
-        <select aria-label="Status" value={status} onChange={(e) => { setStatus(e.target.value); setPage(0); }}
+        <Select aria-label="Status" value={status} onChange={(e) => { setStatus(e.target.value); setPage(0); }}
           className="rounded-lg border border-slate-300 px-3 py-2 shadow-xs text-sm">
           {['', 'RECORDED', 'POSTED', 'CANCELLED'].map((s) => <option key={s} value={s}>{s || 'All statuses'}</option>)}
-        </select>
+        </Select>
       </div>
       <ErrorAlert error={list.error} />
       {list.isPending ? <Spinner /> : list.data && (
@@ -98,12 +99,12 @@ export function NewReceiptPage() {
         <ErrorAlert error={record.error} />
         <div className="grid gap-4 rounded-xl border border-slate-200/80 bg-white shadow-xs p-5 md:grid-cols-3">
           <SearchSelect id="payer" label="Customer" value={form.customerId} queryKey="customers" placeholder="Select…"
-            search={(q) => customerApi.list(q, 0, 50)} optionLabel={(c) => `${c.code} — ${c.name}`}
+            search={(q) => customerApi.list(q, 0, 50)} optionLabel={(c) => `${c.code} — ${c.name}`} filter={(c) => c.status === 'ACTIVE'}
             onChange={(id) => { setForm({ ...form, customerId: id }); setAmounts({}); }} />
           <Field label="Receipt date" type="date" value={form.receiptDate} onChange={(e) => setForm({ ...form, receiptDate: e.target.value })} />
           <div className="space-y-1.5"><label htmlFor="method" className="block text-sm font-medium text-slate-700">Payment method</label>
-            <select id="method" value={form.paymentMethod} className={select} onChange={(e) => setForm({ ...form, paymentMethod: e.target.value })}>
-              <option value="CASH">Cash</option><option value="CHECK">Check</option><option value="BANK_TRANSFER">Bank transfer</option></select></div>
+            <Select id="method" value={form.paymentMethod} className={select} onChange={(e) => setForm({ ...form, paymentMethod: e.target.value })}>
+              <option value="CASH">Cash</option><option value="CHECK">Check</option><option value="BANK_TRANSFER">Bank transfer</option></Select></div>
           <Field label={form.paymentMethod === 'CHECK' ? 'Check number / bank' : 'Reference'} value={form.paymentReference} maxLength={60}
             onChange={(e) => setForm({ ...form, paymentReference: e.target.value })} />
           <Field label="Amount received" inputMode="decimal" value={form.amount} onChange={(e) => setForm({ ...form, amount: e.target.value.replace(/[^\d.]/g, '') })} />

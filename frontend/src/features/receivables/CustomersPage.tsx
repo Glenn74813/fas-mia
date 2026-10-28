@@ -1,4 +1,5 @@
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { Select } from '../../components/Select';
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router';
 import { customerApi } from '../../api/endpoints';
@@ -51,10 +52,10 @@ export function CustomersPage() {
             <Field label="Registered name" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
             <div className="space-y-1.5">
               <label htmlFor="ctype" className="block text-sm font-medium text-slate-700">Type</label>
-              <select id="ctype" value={form.customerType} onChange={(e) => setForm({ ...form, customerType: e.target.value })}
+              <Select id="ctype" value={form.customerType} onChange={(e) => setForm({ ...form, customerType: e.target.value })}
                 className="block w-full rounded-lg border border-slate-300 px-3 py-2 shadow-xs text-sm">
                 {CUSTOMER_TYPES.map((t) => <option key={t} value={t}>{t}</option>)}
-              </select>
+              </Select>
             </div>
             <Field label="TIN" hint="000-000-000-00000" value={form.tin} onChange={(e) => setForm({ ...form, tin: e.target.value })} />
             <Field label="Address" value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} />

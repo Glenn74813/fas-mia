@@ -21,6 +21,7 @@ import com.miaa.cas.common.web.PageResponse;
 import com.miaa.cas.documents.DocumentOwnerPolicy;
 import com.miaa.cas.documents.DocumentService;
 import com.miaa.cas.generalledger.AccountMappingService;
+import com.miaa.cas.generalledger.AccountPurpose;
 import com.miaa.cas.generalledger.FiscalCalendarService;
 import com.miaa.cas.generalledger.domain.AccountingPeriod;
 import com.miaa.cas.generalledger.domain.PeriodStatus;
@@ -301,6 +302,7 @@ public class ApInvoiceService implements DocumentOwnerPolicy {
             if (ewtCode != null) {
                 lineEwt = TaxCodeService.compute(lineNet, taxCodes.requireActive(ewtCode, "EWT").rate());
             }
+            AccountPurpose.require(jdbc, l.accountId(), AccountPurpose.SUPPLIER_INVOICE_LINE, "Line " + n + " account");
             inv.addLine(n++, l.accountId(), l.costCenterId(), SupplierService.blank(l.description()), lineNet, ewtCode, lineEwt);
             net = net.add(lineNet);
             ewt = ewt.add(lineEwt);

@@ -55,7 +55,9 @@ public final class LedgerDtos {
     public record AccountResponse(UUID id, String code, String name, String description, String accountType,
             String normalBalance, UUID parentId, String parentCode, boolean postable, String status,
             LocalDate effectiveFrom, LocalDate effectiveTo, String fsLineCode, boolean requiresCostCenter,
-            String subsidiaryType, boolean budgetControlled, String taxCode, boolean placeholder, long version) {
+            String subsidiaryType, boolean budgetControlled, String taxCode, boolean placeholder, long version,
+            /** What the account may be chosen for outside a journal voucher ({@code AccountPurpose}). */
+            List<String> purposes) {
     }
 
     public record ChartSummary(List<AccountResponse> accounts, long activePlaceholderAccounts) {

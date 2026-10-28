@@ -1,4 +1,5 @@
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { Select } from '../../components/Select';
 import { useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router';
 import { parallelRunApi, periodApi } from '../../api/endpoints';
@@ -42,13 +43,13 @@ export function ParallelRunsPage() {
           <ErrorAlert error={upload.error} />
           <div className="grid gap-3 md:grid-cols-3">
             <div className="space-y-1.5"><label htmlFor="prperiod" className="block text-sm font-medium text-slate-700">CAS period</label>
-              <select id="prperiod" value={form.periodId} onChange={(e) => setForm({ ...form, periodId: e.target.value })}
+              <Select id="prperiod" value={form.periodId} onChange={(e) => setForm({ ...form, periodId: e.target.value })}
                 className="block w-full rounded-lg border border-slate-300 px-3 py-2 shadow-xs text-sm"><option value="">Select…</option>
-                {periods.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}</select></div>
+                {periods.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}</Select></div>
             <div className="space-y-1.5"><label htmlFor="prbasis" className="block text-sm font-medium text-slate-700">Compare</label>
-              <select id="prbasis" value={form.basis} onChange={(e) => setForm({ ...form, basis: e.target.value })}
+              <Select id="prbasis" value={form.basis} onChange={(e) => setForm({ ...form, basis: e.target.value })}
                 className="block w-full rounded-lg border border-slate-300 px-3 py-2 shadow-xs text-sm">
-                <option value="CLOSING">Closing balances</option><option value="PERIOD">The period's movements</option></select></div>
+                <option value="CLOSING">Closing balances</option><option value="PERIOD">The period's movements</option></Select></div>
             <Field label="Legacy system" value={form.legacySystem} maxLength={100} onChange={(e) => setForm({ ...form, legacySystem: e.target.value })} />
             <div className="space-y-1 md:col-span-3"><label htmlFor="prfile" className="block text-sm font-medium text-slate-700">Legacy trial balance (CSV)</label>
               <input id="prfile" type="file" accept=".csv" onChange={(e) => setFile(e.target.files?.[0] ?? null)} className="text-sm" /></div>

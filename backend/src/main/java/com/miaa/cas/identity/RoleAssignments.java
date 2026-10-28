@@ -44,8 +44,11 @@ public class RoleAssignments {
         return jdbc.queryForList("SELECT user_id FROM user_roles WHERE role_id = ?", UUID.class, roleId);
     }
 
+    /** Active holders of the role (what the roles page shows); deactivated users keep the grant for the record. */
     public long countUsersWithRole(UUID roleId) {
-        Long n = jdbc.queryForObject("SELECT count(*) FROM user_roles WHERE role_id = ?", Long.class, roleId);
+        Long n = jdbc.queryForObject("""
+                SELECT count(*) FROM user_roles ur JOIN users u ON u.id = ur.user_id WHERE ur.role_id = ? AND u.status = 'ACTIVE'""",
+                Long.class, roleId);
         return n == null ? 0 : n;
     }
 

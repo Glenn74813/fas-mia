@@ -1,4 +1,5 @@
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { Select } from '../../components/Select';
 import { useState, type FormEvent } from 'react';
 import { Link } from 'react-router';
 import { interfaceApi } from '../../api/endpoints';
@@ -83,9 +84,9 @@ export function InboundFilesPage() {
         <form onSubmit={submit} className="mb-6 max-w-3xl space-y-3 rounded-xl border border-slate-200/80 bg-white p-4 shadow-xs">
           <div className="grid gap-3 sm:grid-cols-2">
             <label className="text-sm">Interface
-              <select value={type} onChange={(e) => { setType(e.target.value as InterfaceType); setHeaderValue(''); }} className={`mt-1.5 ${input}`}>
+              <Select value={type} onChange={(e) => { setType(e.target.value as InterfaceType); setHeaderValue(''); }} className={`mt-1.5 ${input}`}>
                 {allowed.map((t) => <option key={t} value={t}>{TYPES[t].label}</option>)}
-              </select></label>
+              </Select></label>
             <label className="text-sm">File (.csv, .json or .xml)
               <input type="file" accept=".csv,.json,.xml" onChange={(e) => setFile(e.target.files?.[0] ?? null)} className="mt-1.5 block w-full text-sm" /></label>
             <label className="text-sm">Reference

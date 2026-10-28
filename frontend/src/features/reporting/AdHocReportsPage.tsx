@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { Select } from '../../components/Select';
 import { useState } from 'react';
 import { Link } from 'react-router';
 import { adHocApi } from '../../api/endpoints';
@@ -67,8 +68,8 @@ export function AdHocReportsPage() {
       )}
       {ds && (
         <div className="mb-4 space-y-4 rounded-xl border border-slate-200/80 bg-white p-4 shadow-xs">
-          <label className="block text-sm">Dataset <select aria-label="Dataset" value={ds.code} onChange={(e) => reset(e.target.value)} className={select}>
-            {datasets.data!.map((d) => <option key={d.code} value={d.code}>{d.label}</option>)}</select></label>
+          <label className="block text-sm">Dataset <Select aria-label="Dataset" value={ds.code} onChange={(e) => reset(e.target.value)} className={select}>
+            {datasets.data!.map((d) => <option key={d.code} value={d.code}>{d.label}</option>)}</Select></label>
           <fieldset className="text-sm"><legend className="mb-1 font-medium">Columns (in the order chosen)</legend>
             <div className="flex flex-wrap gap-x-4 gap-y-1">{ds.columns.map((c) => (
               <label key={c.key} className="flex items-center gap-1"><input type="checkbox" checked={columns.includes(c.key)}
@@ -84,11 +85,11 @@ export function AdHocReportsPage() {
               const set = (patch: Partial<AdHocFilter>) => setFilters(filters.map((x, j) => (j === i ? { ...x, ...patch } : x)));
               return (
                 <div key={i} className="flex flex-wrap items-center gap-2">
-                  <select aria-label={`Condition ${i + 1} column`} value={f.column} onChange={(e) => set({ column: e.target.value,
+                  <Select aria-label={`Condition ${i + 1} column`} value={f.column} onChange={(e) => set({ column: e.target.value,
                     op: OPS[ds.columns.find((c) => c.key === e.target.value)!.type]!.ops[0]! })} className={select}>
-                    {ds.columns.map((c) => <option key={c.key} value={c.key}>{c.label}</option>)}</select>
-                  <select aria-label={`Condition ${i + 1} test`} value={f.op} onChange={(e) => set({ op: e.target.value })} className={select}>
-                    {OPS[col?.type ?? 'TEXT']!.ops.map((o) => <option key={o} value={o}>{OP_LABEL[o]}</option>)}</select>
+                    {ds.columns.map((c) => <option key={c.key} value={c.key}>{c.label}</option>)}</Select>
+                  <Select aria-label={`Condition ${i + 1} test`} value={f.op} onChange={(e) => set({ op: e.target.value })} className={select}>
+                    {OPS[col?.type ?? 'TEXT']!.ops.map((o) => <option key={o} value={o}>{OP_LABEL[o]}</option>)}</Select>
                   <input aria-label={`Condition ${i + 1} value`} type={col?.type === 'DATE' ? 'date' : 'text'} value={f.value}
                     onChange={(e) => set({ value: e.target.value })} className={select} />
                   {f.op === 'BETWEEN' && <><span>and</span><input aria-label={`Condition ${i + 1} second value`} type={col?.type === 'DATE' ? 'date' : 'text'}
@@ -100,8 +101,8 @@ export function AdHocReportsPage() {
             <button type="button" className="text-brand-700 hover:underline" onClick={() => setFilters([...filters,
               { column: ds.columns[0]!.key, op: OPS[ds.columns[0]!.type]!.ops[0]!, value: '' }])}>Add condition</button>
           </div>
-          <label className="block text-sm">Sort by <select aria-label="Sort by" value={sort?.column ?? ''} onChange={(e) => setSort(e.target.value ? { column: e.target.value, descending: sort?.descending ?? false } : null)} className={select}>
-            <option value="">First column</option>{columns.map((k) => <option key={k} value={k}>{ds.columns.find((c) => c.key === k)?.label}</option>)}</select>
+          <label className="block text-sm">Sort by <Select aria-label="Sort by" value={sort?.column ?? ''} onChange={(e) => setSort(e.target.value ? { column: e.target.value, descending: sort?.descending ?? false } : null)} className={select}>
+            <option value="">First column</option>{columns.map((k) => <option key={k} value={k}>{ds.columns.find((c) => c.key === k)?.label}</option>)}</Select>
             {sort && <label className="ml-2"><input type="checkbox" checked={sort.descending} onChange={(e) => setSort({ ...sort, descending: e.target.checked })} /> highest first</label>}</label>
           <div className="flex flex-wrap items-center gap-2">
             <Button busy={run.isPending} disabled={columns.length === 0} onClick={() => run.mutate()}>Run</Button>

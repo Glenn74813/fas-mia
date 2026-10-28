@@ -1,6 +1,6 @@
 import { expect, request, test, type APIRequestContext } from '@playwright/test';
 import { adminToken, nextTotpWindow, onboard, type Member } from './team';
-import { nav, signIn, signOut } from './ui';
+import { nav, signIn, signOut, select } from './ui';
 
 const admin = {
   username: process.env.E2E_ADMIN_USERNAME ?? '',
@@ -83,7 +83,7 @@ test('verified bank details feed an ADA payment file, and posted documents go to
   await signIn(page, cashier);
   await nav(page, 'Payment files');
   await page.getByLabel(`Include ${dv.dvNumber}`).check();
-  await page.getByLabel('Debit account').selectOption({ index: 1 });
+  await select(page.getByLabel('Debit account'), { index: 1 });
   await page.getByRole('button', { name: 'Create payment file' }).click();
   // This run's file: earlier runs leave theirs in the list, so pick the row created by this cashier.
   const batchRow = page.getByRole('row', { name: new RegExp(`PAY-\\d{4}-\\d{6}.*${cashier.username}`) });

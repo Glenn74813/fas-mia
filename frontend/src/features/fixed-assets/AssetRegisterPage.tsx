@@ -1,4 +1,5 @@
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
+import { Select } from '../../components/Select';
 import { useState } from 'react';
 import { Link } from 'react-router';
 import { assetApi } from '../../api/endpoints';
@@ -28,10 +29,10 @@ export function AssetRegisterPage() {
       <div className="mb-4 flex flex-wrap gap-3">
         <input aria-label="Search assets" placeholder="Number, description or serial" value={q} onChange={(e) => { setQ(e.target.value); setPage(0); }}
           className="w-72 rounded-lg border border-slate-300 px-3 py-2 shadow-xs text-sm" />
-        <select aria-label="Category" value={categoryId} onChange={(e) => { setCategory(e.target.value); setPage(0); }} className="rounded-lg border border-slate-300 px-3 py-2 shadow-xs text-sm">
-          <option value="">All categories</option>{(categories.data ?? []).map((c) => <option key={c.id} value={c.id}>{c.code}</option>)}</select>
-        <select aria-label="Status" value={status} onChange={(e) => { setStatus(e.target.value); setPage(0); }} className="rounded-lg border border-slate-300 px-3 py-2 shadow-xs text-sm">
-          {['', 'DRAFT', 'ACTIVE', 'FULLY_DEPRECIATED', 'DISPOSED', 'CANCELLED'].map((s) => <option key={s} value={s}>{s ? s.replace('_', ' ') : 'All statuses'}</option>)}</select>
+        <Select aria-label="Category" value={categoryId} onChange={(e) => { setCategory(e.target.value); setPage(0); }} className="rounded-lg border border-slate-300 px-3 py-2 shadow-xs text-sm">
+          <option value="">All categories</option>{(categories.data ?? []).map((c) => <option key={c.id} value={c.id}>{c.code}</option>)}</Select>
+        <Select aria-label="Status" value={status} onChange={(e) => { setStatus(e.target.value); setPage(0); }} className="rounded-lg border border-slate-300 px-3 py-2 shadow-xs text-sm">
+          {['', 'DRAFT', 'ACTIVE', 'FULLY_DEPRECIATED', 'DISPOSED', 'CANCELLED'].map((s) => <option key={s} value={s}>{s ? s.replace('_', ' ') : 'All statuses'}</option>)}</Select>
       </div>
       <ErrorAlert error={list.error} />
       {list.isPending ? <Spinner /> : (

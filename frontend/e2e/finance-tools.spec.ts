@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 import { adminToken, nextTotpWindow, onboard } from './team';
-import { nav, signIn, signOut, pick } from './ui';
+import { nav, signIn, signOut, pick, select } from './ui';
 
 const admin = {
   username: process.env.E2E_ADMIN_USERNAME ?? '',
@@ -24,7 +24,7 @@ test('ad hoc report, overhead allocation preview and a cost vs market review', a
 
   // Ad hoc: ledger lines grouped by account, totals.
   await nav(page, 'Ad hoc reports');
-  await main.getByLabel('Dataset').selectOption('LEDGER_LINES');
+  await select(main.getByLabel('Dataset'), 'LEDGER_LINES');
   const columns = main.getByRole('group', { name: /^Columns/ });
   await columns.getByRole('checkbox', { name: 'Account', exact: true }).check();
   await columns.getByRole('checkbox', { name: 'Debit', exact: true }).check();
@@ -45,14 +45,14 @@ test('ad hoc report, overhead allocation preview and a cost vs market review', a
   await main.getByLabel('Name').fill('Utilities by floor area');
   await pick(main.getByLabel('Sender account'), '50204020');
   await pick(main.getByLabel('Sender cost centre'), 'PLC-CC-FIN');
-  await main.getByLabel('Key').selectOption('QUANTITY');
+  await select(main.getByLabel('Key'), 'QUANTITY');
   await pick(main.getByLabel(/^Receiver/), 'PLC-CC-OPS');
   await main.getByLabel('Quantity').fill('120');
   await main.getByRole('button', { name: 'Create cycle' }).click();
   const cycle = main.locator('section').filter({ hasText: `E2E${stamp % 100000}` });
   await expect(cycle).toContainText('50204020 / PLC-CC-FIN');
   await cycle.getByRole('button', { name: 'Run or preview' }).click();
-  await cycle.getByLabel('Period').selectOption({ label: 'October 2026' });
+  await select(cycle.getByLabel('Period'), { label: 'October 2026' });
   await expect(cycle.getByRole('table')).toContainText('PLC-CC-OPS');
   await signOut(page);
 

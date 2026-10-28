@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
+import { Select } from '../../components/Select';
 import { useState } from 'react';
 import { apReportApi } from '../../api/endpoints';
 import { useAuth } from '../../auth/AuthContext';
@@ -50,8 +51,8 @@ export function PayablesReportsPage() {
         <div className="mb-3 flex flex-wrap items-center justify-between gap-2"><h2 className="font-semibold">Expanded withholding schedule</h2>
           <span className="flex gap-2 text-sm">
             <input aria-label="Year" value={year} onChange={(e) => setYear(Number(e.target.value.replace(/\D/g, '')) || year)} className="w-20 rounded-md border border-slate-300 px-2 py-1" />
-            <select aria-label="Quarter" value={quarter} onChange={(e) => setQuarter(Number(e.target.value))} className="rounded-md border border-slate-300 px-2 py-1">
-              {[1, 2, 3, 4].map((q) => <option key={q} value={q}>Q{q}</option>)}</select></span></div>
+            <Select aria-label="Quarter" value={quarter} onChange={(e) => setQuarter(Number(e.target.value))} className="rounded-md border border-slate-300 px-2 py-1">
+              {[1, 2, 3, 4].map((q) => <option key={q} value={q}>Q{q}</option>)}</Select></span></div>
         {wht.data && <p className="mb-2 text-xs text-amber-800">{wht.data.note}</p>}
         <ErrorAlert error={wht.error} />
         {wht.data && <div className="overflow-x-auto"><table className="min-w-full text-sm">

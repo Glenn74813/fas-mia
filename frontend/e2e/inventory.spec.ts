@@ -1,6 +1,6 @@
 import { expect, request, test } from '@playwright/test';
 import { adminToken, nextTotpWindow, onboard } from './team';
-import { act, nav, signIn, signOut, pick } from './ui';
+import { act, nav, signIn, signOut, pick, select } from './ui';
 
 const admin = {
   username: process.env.E2E_ADMIN_USERNAME ?? '',
@@ -40,13 +40,12 @@ test('stock is received and issued at weighted average cost, each posting by acc
   await nav(page, 'Stock documents');
   await page.getByRole('link', { name: 'New document' }).click();
   await page.getByLabel('Date').fill(today);
-  await page.getByLabel('Search supplier').fill(`S${tag}`);
-  await page.getByLabel('Supplier', { exact: true }).selectOption({ label: `S${tag} — E2E Lighting Supply ${tag}` });
+  await pick(page.getByLabel('Supplier', { exact: true }), `S${tag}`);
   await page.getByLabel('Delivery receipt / PO reference').fill(`DR-${tag}`);
   await page.getByLabel('Description', { exact: true }).fill('Delivery of runway lamps');
   await page.getByPlaceholder('Item code or name').fill(`LAMP-${tag}`);
-  await page.getByLabel('Line 1 item').selectOption({ label: `LAMP-${tag} — Runway edge lamp` });
-  await page.getByLabel('Line 1 warehouse').selectOption({ label: 'PLC-WH-MAIN' });
+  await select(page.getByLabel('Line 1 item'), { label: `LAMP-${tag} — Runway edge lamp` });
+  await select(page.getByLabel('Line 1 warehouse'), { label: 'PLC-WH-MAIN' });
   await page.getByLabel('Line 1 quantity').fill('10');
   await page.getByLabel('Line 1 unit cost').fill('250');
   await page.getByRole('button', { name: 'Save draft' }).click();
@@ -67,13 +66,13 @@ test('stock is received and issued at weighted average cost, each posting by acc
   await signIn(page, clerk);
   await nav(page, 'Stock documents');
   await page.getByRole('link', { name: 'New document' }).click();
-  await page.getByLabel('Document').selectOption('ISSUE');
+  await select(page.getByLabel('Document'), 'ISSUE');
   await page.getByLabel('Date').fill(today);
-  await page.getByLabel('Requesting cost centre').selectOption({ label: 'PLC-CC-OPS' });
+  await select(page.getByLabel('Requesting cost centre'), { label: 'PLC-CC-OPS' });
   await page.getByLabel('Description', { exact: true }).fill('Replacement of failed edge lamps, runway 06/24');
   await page.getByPlaceholder('Item code or name').fill(`LAMP-${tag}`);
-  await page.getByLabel('Line 1 item').selectOption({ label: `LAMP-${tag} — Runway edge lamp` });
-  await page.getByLabel('Line 1 warehouse').selectOption({ label: 'PLC-WH-MAIN' });
+  await select(page.getByLabel('Line 1 item'), { label: `LAMP-${tag} — Runway edge lamp` });
+  await select(page.getByLabel('Line 1 warehouse'), { label: 'PLC-WH-MAIN' });
   await page.getByLabel('Line 1 quantity').fill('4');
   await page.getByRole('button', { name: 'Save draft' }).click();
   await expect(page.getByRole('heading', { name: 'Issue (draft)' })).toBeVisible();

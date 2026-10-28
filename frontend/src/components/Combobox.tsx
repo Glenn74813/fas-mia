@@ -3,6 +3,7 @@ import { useEffect, useId, useLayoutEffect, useMemo, useRef, useState, type CSSP
 export interface ComboOption {
   value: string;
   label: string;
+  disabled?: boolean;
 }
 
 interface Props {
@@ -11,12 +12,20 @@ interface Props {
   options: ComboOption[];
   /** Label of the empty choice (offered while nothing is typed). */
   placeholder?: string;
+  /** Offer the empty choice; off when a value is required and there is no "none" option. */
+  allowEmpty?: boolean;
+  required?: boolean;
+  title?: string;
   id?: string;
   'aria-label'?: string;
   /** Classes for the text box; a `w-full` width makes the whole control a block. */
   className?: string;
   disabled?: boolean;
   invalid?: boolean;
+  /** Server-side search: called with the typed text, and `options` are taken as already matching it. */
+  onSearch?: (text: string) => void;
+  /** Shown under the list, e.g. "first 25 of 3,000". */
+  footer?: string;
 }
 
 /** Rows rendered at once; typing narrows the rest. */
@@ -27,7 +36,8 @@ const LIMIT = 100;
  * "5020 elec" finds "50204020 — Electricity Expenses". For lists already in the browser, such as the chart of
  * accounts; long server-side lists use SearchSelect.
  */
-export function Combobox({ value, onChange, options, placeholder = 'Select…', id, className = '', disabled, invalid, ...rest }: Props) {
+export function Combobox({ value, onChange, options, placeholder = 'Select…', allowEmpty = true, id, className = '', disabled, invalid,
+  onSearch, footer, ...rest }: Props) {
   const listId = useId();
   const [open, setOpen] = useState(false);
   const [text, setText] = useState('');
@@ -39,18 +49,23 @@ export function Combobox({ value, onChange, options, placeholder = 'Select…', 
 
   const matches = useMemo(() => {
     const terms = text.toLowerCase().split(/\s+/).filter(Boolean);
-    return terms.length ? options.filter((o) => { const l = o.label.toLowerCase(); return terms.every((t) => l.includes(t)); }) : options;
-  }, [options, text]);
-  const rows: ComboOption[] = [...(text ? [] : [{ value: '', label: placeholder }]), ...matches.slice(0, LIMIT)];
+    return terms.length && !onSearch ? options.filter((o) => { const l = o.label.toLowerCase(); return terms.every((t) => l.includes(t)); }) : options;
+  }, [options, text, onSearch]);
+  const rows: ComboOption[] = [...(text || !allowEmpty ? [] : [{ value: '', label: placeholder }]), ...matches.slice(0, LIMIT)];
 
   useEffect(() => {
     listRef.current?.querySelector<HTMLElement>(`[data-index="${active}"]`)?.scrollIntoView?.({ block: 'nearest' });
   }, [active, open]);
 
   // The list is placed against the window, so a table's scroll box (overflow) cannot clip it; it opens upwards when
-  // there is more room above the field than below.
+  // there is more room above the field than below. Inside a modal dialog it stays under the field instead: the dialog
+  // is its own layer, where window-fixed placement would move with the dialog's scrolling and never settle.
   useLayoutEffect(() => {
     if (!open) return;
+    if (inputRef.current?.closest('dialog')) {
+      setPlace({ position: 'absolute', left: 0, top: '100%', marginTop: 4, minWidth: '100%', maxHeight: 288 });
+      return;
+    }
     const update = () => {
       const r = inputRef.current?.getBoundingClientRect();
       if (!r) return;
@@ -71,8 +86,9 @@ export function Combobox({ value, onChange, options, placeholder = 'Select…', 
     setActive(Math.max(0, rows.findIndex((r) => r.value === value)));
     setOpen(true);
   };
-  const close = () => { setOpen(false); setText(''); };
+  const close = () => { setOpen(false); setText(''); onSearch?.(''); };
   const choose = (o: ComboOption | undefined) => {
+    if (o?.disabled) return;
     if (o && o.value !== value) onChange(o.value);
     close();
   };
@@ -99,7 +115,7 @@ export function Combobox({ value, onChange, options, placeholder = 'Select…', 
         onFocus={show}
         onClick={() => { if (!open) show(); }}
         onBlur={close}
-        onChange={(e) => { setText(e.target.value); setActive(0); setOpen(true); }}
+        onChange={(e) => { setText(e.target.value); setActive(0); setOpen(true); onSearch?.(e.target.value); }}
         onKeyDown={(e) => {
           if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
             e.preventDefault();
@@ -121,13 +137,15 @@ export function Combobox({ value, onChange, options, placeholder = 'Select…', 
         <ul ref={listRef} id={listId} role="listbox"
           style={place} className="z-50 w-max max-w-[36rem] overflow-auto rounded-md border border-slate-200 bg-white py-1 text-sm shadow-lg">
           {rows.map((o, i) => (
-            <li key={o.value || '__empty'} id={`${listId}-${i}`} data-index={i} role="option" aria-selected={o.value === value}
-              className={`cursor-pointer whitespace-nowrap px-3 py-1.5 ${i === active ? 'bg-brand-50 text-brand-900' : ''} ${o.value ? '' : 'text-slate-500'} ${o.value === value ? 'font-medium' : ''}`}
+            <li key={o.value || '__empty'} id={`${listId}-${i}`} data-index={i} data-value={o.value} role="option" aria-selected={o.value === value}
+              aria-disabled={o.disabled || undefined}
+              className={`cursor-pointer whitespace-nowrap px-3 py-1.5 ${i === active ? 'bg-brand-50 text-brand-900' : ''} ${o.value && !o.disabled ? '' : 'text-slate-500'} ${o.value === value ? 'font-medium' : ''}`}
               onMouseDown={(e) => { e.preventDefault(); choose(o); }} onMouseEnter={() => setActive(i)}>
               {o.label}
             </li>
           ))}
           {text && matches.length === 0 && <li className="px-3 py-1.5 text-slate-500">No match for “{text}”.</li>}
+          {footer && <li className="border-t border-slate-100 px-3 py-1.5 text-xs text-slate-500">{footer}</li>}
           {matches.length > LIMIT && (
             <li className="border-t border-slate-100 px-3 py-1.5 text-xs text-slate-500">
               Showing {LIMIT} of {matches.length}; keep typing to narrow the list.</li>

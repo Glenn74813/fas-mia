@@ -97,15 +97,34 @@ Frontend:
 cd frontend && npm run lint && npm run typecheck && npm test && npm run build
 ```
 
-Browser end-to-end (needs the running stack and an enrolled test administrator):
+Browser end-to-end tests run on their own stack and database, so the users and documents every run creates never
+reach the development or demo database. Set `CAS_E2E_DB_USER` and `CAS_E2E_DB_PASSWORD` in `.env` (the
+`scripts/dev-db.sh` cluster login), build the backend jar, then:
 
 ```bash
-cd frontend && npx playwright install chromium && E2E_ADMIN_USERNAME=... E2E_ADMIN_PASSWORD=... E2E_ADMIN_TOTP_SECRET=... npm run e2e -- e2e/journal-voucher.spec.ts
+scripts/e2e.sh start
 ```
 
-The specs share the administrator's authenticator, and a code works once per 30-second window, so run
-spec files one at a time. `E2E_BASE_URL` (default `http://localhost:5173`) and `E2E_API_URL` (default
-`http://localhost:8080`) point at the running stack.
+```bash
+scripts/e2e.sh test e2e/journal-voucher.spec.ts
+```
+
+`start` creates the `cas_e2e` database, runs the backend on port 8092 (dev profile, MFA bypass off) and the frontend
+on 5175, and onboards the test administrator once (credentials in `.devdata/e2e-admin.env`). `test` runs Playwright
+with one worker (the specs share the administrator's authenticator, and a code works once per 30-second window).
+`stop` stops the stack; `reset` also drops the database. Playwright's browsers: `cd frontend && npx playwright install chromium`.
+
+## Demo users
+
+`scripts/demo-users.py` prepares the demo database's users through the user-administration API: it deactivates every
+account except the administrator, the demo super administrator and the conversion service user, and creates two
+onboarded users per role (`demo.<role>.1` and `.2`; Demo Super Administrator excepted). They share the demo super
+administrator's password (`CAS_DEMO_SUPERADMIN_PASSWORD`); each has its own authenticator. Passwords and authenticator secrets go to `.devdata/demo-users.csv` (gitignored, mode 600); add a secret to an authenticator app to
+sign in. Concessionaire accounts still need linking to a customer under **Receivables → Portal access**.
+
+```bash
+(set -a; . ./.env; set +a; python3 scripts/demo-users.py http://127.0.0.1:8091 .devdata/demo-users.csv)
+```
 
 ## Diagnostics
 

@@ -215,7 +215,7 @@ public class AccountService {
     }
 
     /** One CSV record (RFC 4180 quoting, so titles may contain commas). */
-    static String[] splitCsvLine(String line) {
+    public static String[] splitCsvLine(String line) {
         List<String> fields = new ArrayList<>();
         StringBuilder f = new StringBuilder();
         boolean quoted = false;
@@ -350,7 +350,7 @@ public class AccountService {
                 a.getNormalBalance().name(), a.getParentId(), a.getParentId() == null ? null : codes.get(a.getParentId()),
                 a.isPostable(), a.getStatus(), a.getEffectiveFrom(), a.getEffectiveTo(), a.getFsLineCode(),
                 a.isRequiresCostCenter(), a.getSubsidiaryType(), a.isBudgetControlled(), a.getTaxCode(), a.isPlaceholder(),
-                a.getVersion());
+                a.getVersion(), AccountPurpose.of(a));
     }
 
     static LocalDate today(Clock clock) {

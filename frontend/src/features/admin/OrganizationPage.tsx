@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { Select } from '../../components/Select';
 import { useState } from 'react';
 import { orgApi } from '../../api/endpoints';
 import type { OfficeAssignment, OrgDepartment, OrgOffice } from '../../api/types';
@@ -9,7 +10,7 @@ import { ErrorAlert } from '../../components/ErrorAlert';
 import { Field } from '../../components/Field';
 import { PageHeader } from '../../components/PageHeader';
 import { Spinner } from '../../components/Spinner';
-import { useCostCenters } from '../../hooks/useAccounting';
+import { activeCostCenters, useCostCenters } from '../../hooks/useAccounting';
 
 const sel = 'rounded-md border border-slate-300 px-2 py-1 text-sm';
 
@@ -72,9 +73,9 @@ export function OrganizationPage() {
                       onChange={(e) => setDept({ ...dept, [o.id]: { ...(dept[o.id] ?? { name: '', costCenterId: '' }), code: e.target.value.toUpperCase() } })} />
                     <input aria-label={`New department name for ${o.code}`} placeholder="Department name" value={dept[o.id]?.name ?? ''} className={`${sel} w-64`}
                       onChange={(e) => setDept({ ...dept, [o.id]: { ...(dept[o.id] ?? { code: '', costCenterId: '' }), name: e.target.value } })} />
-                    <select aria-label={`Cost centre for the new department of ${o.code}`} value={dept[o.id]?.costCenterId ?? ''} className={sel}
+                    <Select aria-label={`Cost centre for the new department of ${o.code}`} value={dept[o.id]?.costCenterId ?? ''} className={sel}
                       onChange={(e) => setDept({ ...dept, [o.id]: { ...(dept[o.id] ?? { code: '', name: '' }), costCenterId: e.target.value } })}>
-                      <option value="">No cost centre</option>{(costCenters.data ?? []).map((c) => <option key={c.id} value={c.id}>{c.code}</option>)}</select>
+                      <option value="">No cost centre</option>{activeCostCenters(costCenters.data).map((c) => <option key={c.id} value={c.id}>{c.code}</option>)}</Select>
                     <button className="text-sm text-brand-700 hover:underline disabled:text-slate-400" disabled={!dept[o.id]?.code || !dept[o.id]?.name}
                       onClick={() => addDept.mutate(o)}>Add department</button>
                   </div>
@@ -125,10 +126,10 @@ export function OfficeAssignmentsPanel({ userId, internal }: { userId: string; i
       )}
       {admin && (
         <div className="mt-3 flex flex-wrap items-end gap-2 text-sm">
-          <label>Office <select value={form.officeId} onChange={(e) => setForm({ ...form, officeId: e.target.value, departmentId: '' })} className={sel}>
-            <option value="">Select…</option>{offices.map((o) => <option key={o.id} value={o.id}>{o.code} {o.name}</option>)}</select></label>
-          <label>Department <select value={form.departmentId} onChange={(e) => setForm({ ...form, departmentId: e.target.value })} className={sel}
-            disabled={!form.officeId}><option value="">None</option>{depts.map((d) => <option key={d.id} value={d.id}>{d.code} {d.name}</option>)}</select></label>
+          <label>Office <Select value={form.officeId} onChange={(e) => setForm({ ...form, officeId: e.target.value, departmentId: '' })} className={sel}>
+            <option value="">Select…</option>{offices.map((o) => <option key={o.id} value={o.id}>{o.code} {o.name}</option>)}</Select></label>
+          <label>Department <Select value={form.departmentId} onChange={(e) => setForm({ ...form, departmentId: e.target.value })} className={sel}
+            disabled={!form.officeId}><option value="">None</option>{depts.map((d) => <option key={d.id} value={d.id}>{d.code} {d.name}</option>)}</Select></label>
           <label>From <input type="date" value={form.from} onChange={(e) => setForm({ ...form, from: e.target.value })} className={sel} /></label>
           <button className="inline-flex h-9 items-center text-brand-700 hover:underline disabled:text-slate-400" disabled={!form.officeId || assign.isPending}
             onClick={() => assign.mutate()}>{current ? 'Transfer' : 'Assign'}</button>

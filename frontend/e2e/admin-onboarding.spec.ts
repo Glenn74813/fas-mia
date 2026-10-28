@@ -1,4 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
+import { select } from './ui';
 import { totp } from './totp';
 
 const admin = {
@@ -137,7 +138,7 @@ test('an external auditor is created with an access expiry, which the administra
   await page.getByLabel('Username').fill(username);
   await page.getByLabel('E-mail').fill(`${username}@auditor.test`);
   await page.getByLabel('Display name').fill('E2E COA Auditor');
-  await page.getByLabel('User type').selectOption('EXTERNAL_AUDITOR');
+  await select(page.getByLabel('User type'), 'EXTERNAL_AUDITOR');
   await expect(page.getByLabel('Access expires')).toHaveAttribute('required', '');
   await page.getByLabel('Access expires').fill(day(30));
   await page.getByLabel('Temporary password').fill('Temp-E2E-Passw0rd!');

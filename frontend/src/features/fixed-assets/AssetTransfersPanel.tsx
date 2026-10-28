@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { Select } from '../../components/Select';
 import { useState } from 'react';
 import { assetApi } from '../../api/endpoints';
 import type { AssetTransfer, AssetView } from '../../api/types';
@@ -57,9 +58,9 @@ export function AssetTransfersPanel({ asset }: { asset: AssetView }) {
         <div className="mt-4 grid gap-3 border-t border-slate-100 pt-4 md:grid-cols-3">
           <Field label="Transfer date" type="date" value={form.transferDate} onChange={(e) => setForm({ ...form, transferDate: e.target.value })} />
           <label className="text-sm font-medium text-slate-700">To cost centre
-            <select value={form.toCostCenterId} onChange={(e) => setForm({ ...form, toCostCenterId: e.target.value })}
+            <Select value={form.toCostCenterId} onChange={(e) => setForm({ ...form, toCostCenterId: e.target.value })}
               className="block w-full rounded-lg border border-slate-300 px-3 py-2 shadow-xs text-sm">
-              <option value="">None</option>{(costCenters.data ?? []).filter((c) => c.status === 'ACTIVE').map((c) => <option key={c.id} value={c.id}>{c.code}</option>)}</select></label>
+              <option value="">None</option>{(costCenters.data ?? []).filter((c) => c.status === 'ACTIVE').map((c) => <option key={c.id} value={c.id}>{c.code}</option>)}</Select></label>
           <Field label="To location" value={form.toLocation} maxLength={200} onChange={(e) => setForm({ ...form, toLocation: e.target.value })} />
           <Field label="To custodian" value={form.toCustodian} maxLength={200} onChange={(e) => setForm({ ...form, toCustodian: e.target.value })} />
           <div className="md:col-span-2"><Field label="Reason / authority" value={form.reason} maxLength={1000}

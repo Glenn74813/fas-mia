@@ -1,4 +1,5 @@
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { Select } from '../../components/Select';
 import { useState } from 'react';
 import { Link } from 'react-router';
 import { anomalyApi } from '../../api/endpoints';
@@ -104,17 +105,17 @@ export function AnomaliesPage() {
         </div>
       )}
       <div className="mb-4 flex flex-wrap gap-3">
-        <select aria-label="Status" value={status} onChange={(e) => { setStatus(e.target.value); setPage(0); }} className={select}>
+        <Select aria-label="Status" value={status} onChange={(e) => { setStatus(e.target.value); setPage(0); }} className={select}>
           <option value="OPEN">Open</option><option value="EXPLAINED">Explained</option><option value="ESCALATED">Escalated</option>
           <option value="">Any status</option>
-        </select>
-        <select aria-label="Severity" value={severity} onChange={(e) => { setSeverity(e.target.value); setPage(0); }} className={select}>
+        </Select>
+        <Select aria-label="Severity" value={severity} onChange={(e) => { setSeverity(e.target.value); setPage(0); }} className={select}>
           <option value="">Any severity</option><option value="HIGH">High</option><option value="MEDIUM">Medium</option><option value="LOW">Low</option>
-        </select>
-        <select aria-label="Rule" value={rule} onChange={(e) => { setRule(e.target.value); setPage(0); }} className={select}>
+        </Select>
+        <Select aria-label="Rule" value={rule} onChange={(e) => { setRule(e.target.value); setPage(0); }} className={select}>
           <option value="">Any rule</option>
           {Object.entries(RULES).map(([code, label]) => <option key={code} value={code}>{label}</option>)}
-        </select>
+        </Select>
       </div>
       <ErrorAlert error={findings.error} />
       {findings.isPending ? <Spinner /> : findings.data && (

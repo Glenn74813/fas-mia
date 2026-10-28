@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 import { adminToken, nextTotpWindow, onboard } from './team';
-import { nav, signIn } from './ui';
+import { nav, signIn, select } from './ui';
 
 const admin = {
   username: process.env.E2E_ADMIN_USERNAME ?? '',
@@ -28,7 +28,7 @@ test('the chief accountant sees the retention schedule and places and releases a
   const year = Number((await first.locator('td').first().textContent())?.slice(0, 4));
   await expect(first).toContainText(`${year + 10}-12-31`);
 
-  await main.getByLabel('Records').selectOption({ label: `Fiscal year ${year}` });
+  await select(main.getByLabel('Records'), { label: `Fiscal year ${year}` });
   await main.getByLabel('Reference (optional)').fill('AOM E2E');
   await main.getByLabel('Reason').fill(reason);
   await main.getByRole('button', { name: 'Place hold' }).click();

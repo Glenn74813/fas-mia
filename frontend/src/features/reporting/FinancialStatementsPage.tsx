@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { Select } from '../../components/Select';
 import { useState } from 'react';
 import { Link } from 'react-router';
 import { reportingApi } from '../../api/endpoints';
@@ -41,11 +42,11 @@ export function FinancialStatementsPage() {
       <PageHeader title="Financial statements" crumbs={[{ label: 'Reports' }, { label: 'Financial statements' }]} />
       <div className="mb-4 flex flex-wrap items-end gap-3 text-sm print:hidden">
         <label>Statement
-          <select value={chosenTemplate} onChange={(e) => setTemplate(e.target.value)} className="ml-2 rounded-md border border-slate-300 px-2 py-1">
-            {active.map((t) => <option key={t.id} value={t.code}>{t.name} (v{t.version})</option>)}</select></label>
+          <Select value={chosenTemplate} onChange={(e) => setTemplate(e.target.value)} className="ml-2 rounded-md border border-slate-300 px-2 py-1">
+            {active.map((t) => <option key={t.id} value={t.code}>{t.name} (v{t.version})</option>)}</Select></label>
         <label>Period
-          <select value={chosenPeriod} onChange={(e) => setPeriodId(e.target.value)} className="ml-2 rounded-md border border-slate-300 px-2 py-1">
-            {periods.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}</select></label>
+          <Select value={chosenPeriod} onChange={(e) => setPeriodId(e.target.value)} className="ml-2 rounded-md border border-slate-300 px-2 py-1">
+            {periods.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}</Select></label>
         <label className="flex items-center gap-2"><input type="checkbox" checked={comparative} onChange={(e) => setComparative(e.target.checked)} />Prior-year comparative</label>
         {hasPermission('FINANCIAL_REPORT_EXPORT') && (
           <span className="flex gap-2">{['XLSX', 'PDF', 'CSV'].map((f) => (

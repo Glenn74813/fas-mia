@@ -1,4 +1,5 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
+import { Select } from '../../components/Select';
 import { Combobox } from '../../components/Combobox';
 import { useState } from 'react';
 import { accountApi, bankApi, customerApi, reportingApi, supplierApi } from '../../api/endpoints';
@@ -97,8 +98,8 @@ export function ManagementReportPanel({ onQueued }: { onQueued: () => void }) {
     <section className="mb-4 space-y-3 rounded-xl border border-slate-200/80 bg-white shadow-xs p-5 text-sm">
       <h2 className="font-semibold">Request a report</h2>
       <div className="flex flex-wrap items-end gap-3">
-        <label>Report <select value={def.type} onChange={(e) => setType(e.target.value)} className={select}>
-          {allowed.map((r) => <option key={r.type} value={r.type}>{r.label}</option>)}</select></label>
+        <label>Report <Select value={def.type} onChange={(e) => setType(e.target.value)} className={select}>
+          {allowed.map((r) => <option key={r.type} value={r.type}>{r.label}</option>)}</Select></label>
         {!schedule.on && has('asOf') && <Field label="As of" type="date" value={p.asOf} onChange={(e) => setP({ ...p, asOf: e.target.value })} />}
         {!schedule.on && has('range') && <>
           <Field label="From" type="date" value={p.from} onChange={(e) => setP({ ...p, from: e.target.value })} />
@@ -106,16 +107,16 @@ export function ManagementReportPanel({ onQueued }: { onQueued: () => void }) {
         {!schedule.on && has('date') && <Field label="Collection date" type="date" value={p.date} onChange={(e) => setP({ ...p, date: e.target.value })} />}
         {!schedule.on && has('quarter') && <>
           <Field label="Year" value={p.year} inputMode="numeric" onChange={(e) => setP({ ...p, year: e.target.value.replace(/\D/g, '') })} />
-          <label>Quarter <select value={p.quarter} onChange={(e) => setP({ ...p, quarter: e.target.value })} className={select}>
-            {['1', '2', '3', '4'].map((q) => <option key={q} value={q}>Q{q}</option>)}</select></label></>}
+          <label>Quarter <Select value={p.quarter} onChange={(e) => setP({ ...p, quarter: e.target.value })} className={select}>
+            {['1', '2', '3', '4'].map((q) => <option key={q} value={q}>Q{q}</option>)}</Select></label></>}
         {has('fiscalYear') && (
-          <label>Fiscal year <select value={p.fiscalYearId || years.data?.[0]?.id || ''} onChange={(e) => setP({ ...p, fiscalYearId: e.target.value })}
-            className={select}>{(years.data ?? []).map((y) => <option key={y.id} value={y.id}>{y.fiscalYear}</option>)}</select></label>
+          <label>Fiscal year <Select value={p.fiscalYearId || years.data?.[0]?.id || ''} onChange={(e) => setP({ ...p, fiscalYearId: e.target.value })}
+            className={select}>{(years.data ?? []).map((y) => <option key={y.id} value={y.id}>{y.fiscalYear}</option>)}</Select></label>
         )}
         {has('variance') && <>
-          <label>Through period <select value={p.throughPeriod} onChange={(e) => setP({ ...p, throughPeriod: e.target.value })} className={select}>
+          <label>Through period <Select value={p.throughPeriod} onChange={(e) => setP({ ...p, throughPeriod: e.target.value })} className={select}>
             {Array.from({ length: 13 }, (_, i) => String(i + 1)).map((n) => <option key={n} value={n}>{n === '13' ? '13 (adjustment)' : n}</option>)}
-          </select></label>
+          </Select></label>
           <div className="w-28"><Field label="Threshold %" inputMode="decimal" value={p.thresholdPercent}
             onChange={(e) => setP({ ...p, thresholdPercent: e.target.value.replace(/[^\d.]/g, '') })} /></div></>}
         {has('account') && <label>Account <Combobox value={p.accountId} onChange={(v) => setP({ ...p, accountId: v })} className={select} placeholder="All accounts"
@@ -123,8 +124,8 @@ export function ManagementReportPanel({ onQueued }: { onQueued: () => void }) {
         {has('costCenter') && <label>Cost centre <Combobox value={p.costCenterId} onChange={(v) => setP({ ...p, costCenterId: v })} className={select} placeholder="All"
               options={(costCenters.data ?? []).map((c) => ({ value: c.id, label: `${c.code} — ${c.name}` }))} /></label>}
         {has('subsidiary') && <>
-          <label>Ledger <select value={p.slType} onChange={(e) => setP({ ...p, slType: e.target.value, subsidiaryAccountId: '' })} className={select}>
-            {['CUSTOMER', 'SUPPLIER', 'EMPLOYEE', 'OTHER'].map((t) => <option key={t} value={t}>{t.charAt(0) + t.slice(1).toLowerCase()}</option>)}</select></label>
+          <label>Ledger <Select value={p.slType} onChange={(e) => setP({ ...p, slType: e.target.value, subsidiaryAccountId: '' })} className={select}>
+            {['CUSTOMER', 'SUPPLIER', 'EMPLOYEE', 'OTHER'].map((t) => <option key={t} value={t}>{t.charAt(0) + t.slice(1).toLowerCase()}</option>)}</Select></label>
           <div className="w-80"><SearchSelect id="report-subsidiary" label="Subsidiary account" value={p.subsidiaryAccountId}
             queryKey={`subsidiary-accounts-${p.slType}`} placeholder="All of this type" search={(q) => accountApi.subsidiaryAccounts(p.slType, q)}
             optionLabel={(x) => `${x.code} ${x.name}`} onChange={(id) => setP({ ...p, subsidiaryAccountId: id })} /></div></>}
@@ -134,17 +135,17 @@ export function ManagementReportPanel({ onQueued }: { onQueued: () => void }) {
         {has('supplier') && <div className="w-80"><SearchSelect id="report-supplier" label="Supplier" value={p.supplierId} queryKey="suppliers"
           placeholder="All suppliers" search={(q) => supplierApi.list(q, 0, 50)} optionLabel={(s) => `${s.code} ${s.name}`}
           onChange={(id) => setP({ ...p, supplierId: id })} /></div>}
-        {has('reconciliation') && <label>Reconciliation <select value={p.reconciliationId || recs.data?.items[0]?.id || ''}
+        {has('reconciliation') && <label>Reconciliation <Select value={p.reconciliationId || recs.data?.items[0]?.id || ''}
           onChange={(e) => setP({ ...p, reconciliationId: e.target.value })} className={select}>
-          {(recs.data?.items ?? []).map((r) => <option key={r.id} value={r.id}>{r.bankAccountCode} as of {r.asOfDate} ({r.status.toLowerCase()})</option>)}</select></label>}
+          {(recs.data?.items ?? []).map((r) => <option key={r.id} value={r.id}>{r.bankAccountCode} as of {r.asOfDate} ({r.status.toLowerCase()})</option>)}</Select></label>}
         {has('audit') && <>
           {hasPermission('AUDIT_LOG_VIEW') && hasPermission('SECURITY_EVENT_VIEW') && (
-            <label>Log <select value={p.table} onChange={(e) => setP({ ...p, table: e.target.value })} className={select}>
-              <option value="AUDIT">Audit trail</option><option value="SECURITY">Security events</option></select></label>)}
+            <label>Log <Select value={p.table} onChange={(e) => setP({ ...p, table: e.target.value })} className={select}>
+              <option value="AUDIT">Audit trail</option><option value="SECURITY">Security events</option></Select></label>)}
           <Field label="Action (optional)" value={p.action} onChange={(e) => setP({ ...p, action: e.target.value })} />
           <Field label="Actor username (optional)" value={p.actor} onChange={(e) => setP({ ...p, actor: e.target.value })} /></>}
-        <label>Format <select value={format} onChange={(e) => setFormat(e.target.value)} className={select}>
-          {['XLSX', 'PDF', 'CSV'].map((f) => <option key={f}>{f}</option>)}</select></label>
+        <label>Format <Select value={format} onChange={(e) => setFormat(e.target.value)} className={select}>
+          {['XLSX', 'PDF', 'CSV'].map((f) => <option key={f}>{f}</option>)}</Select></label>
       </div>
 
       {relativeAllowed && !has('reconciliation') && !has('variance') && (
@@ -154,18 +155,18 @@ export function ManagementReportPanel({ onQueued }: { onQueued: () => void }) {
           {schedule.on && (
             <div className="flex flex-wrap items-end gap-3">
               <Field label="Schedule name" value={schedule.name} placeholder={def.label} onChange={(e) => setSchedule({ ...schedule, name: e.target.value })} />
-              <label>Every <select value={schedule.frequency} onChange={(e) => setSchedule({ ...schedule, frequency: e.target.value })} className={select}>
-                <option value="DAILY">Day</option><option value="WEEKLY">Week</option><option value="MONTHLY">Month</option></select></label>
-              {schedule.frequency === 'WEEKLY' && <label>On <select value={schedule.dayOfWeek} onChange={(e) => setSchedule({ ...schedule, dayOfWeek: e.target.value })} className={select}>
-                {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'].map((d, i) => <option key={d} value={String(i + 1)}>{d}</option>)}</select></label>}
-              {schedule.frequency === 'MONTHLY' && <label>On day <select value={schedule.dayOfMonth} onChange={(e) => setSchedule({ ...schedule, dayOfMonth: e.target.value })} className={select}>
-                {Array.from({ length: 28 }, (_, i) => String(i + 1)).map((d) => <option key={d}>{d}</option>)}</select></label>}
-              <label>At <select value={schedule.runHour} onChange={(e) => setSchedule({ ...schedule, runHour: e.target.value })} className={select}>
-                {Array.from({ length: 24 }, (_, i) => String(i)).map((h) => <option key={h} value={h}>{h.padStart(2, '0')}:00</option>)}</select></label>
+              <label>Every <Select value={schedule.frequency} onChange={(e) => setSchedule({ ...schedule, frequency: e.target.value })} className={select}>
+                <option value="DAILY">Day</option><option value="WEEKLY">Week</option><option value="MONTHLY">Month</option></Select></label>
+              {schedule.frequency === 'WEEKLY' && <label>On <Select value={schedule.dayOfWeek} onChange={(e) => setSchedule({ ...schedule, dayOfWeek: e.target.value })} className={select}>
+                {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'].map((d, i) => <option key={d} value={String(i + 1)}>{d}</option>)}</Select></label>}
+              {schedule.frequency === 'MONTHLY' && <label>On day <Select value={schedule.dayOfMonth} onChange={(e) => setSchedule({ ...schedule, dayOfMonth: e.target.value })} className={select}>
+                {Array.from({ length: 28 }, (_, i) => String(i + 1)).map((d) => <option key={d}>{d}</option>)}</Select></label>}
+              <label>At <Select value={schedule.runHour} onChange={(e) => setSchedule({ ...schedule, runHour: e.target.value })} className={select}>
+                {Array.from({ length: 24 }, (_, i) => String(i)).map((h) => <option key={h} value={h}>{h.padStart(2, '0')}:00</option>)}</Select></label>
               <label className="flex h-9 items-center"><input type="checkbox" className="mr-2" checked={schedule.email}
                 onChange={(e) => setSchedule({ ...schedule, email: e.target.checked })} />E-mail me when it is ready</label>
-              {has('range') && <label>Covering <select value={schedule.relative} onChange={(e) => setSchedule({ ...schedule, relative: e.target.value })} className={select}>
-                {Object.entries(RELATIVE).map(([k, v]) => <option key={k} value={k}>{v.label}</option>)}</select></label>}
+              {has('range') && <label>Covering <Select value={schedule.relative} onChange={(e) => setSchedule({ ...schedule, relative: e.target.value })} className={select}>
+                {Object.entries(RELATIVE).map(([k, v]) => <option key={k} value={k}>{v.label}</option>)}</Select></label>}
             </div>
           )}
           {schedule.on && <p className="text-xs text-slate-500">Times are Manila time. {has('asOf') && 'Aging is as of the run date. '}

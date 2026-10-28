@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { Select } from '../../components/Select';
 import { useState } from 'react';
 import { governanceApi, roleApi } from '../../api/endpoints';
 import { useAuth } from '../../auth/AuthContext';
@@ -34,11 +35,11 @@ export function ApprovalLimitsPage() {
       {manage && (
         <section className="mb-4 grid gap-3 rounded-xl border border-slate-200/80 bg-white shadow-xs p-5 md:grid-cols-4 md:items-end">
           <label className="text-sm font-medium text-slate-700">Role
-            <select value={form.roleCode} onChange={(e) => setForm({ ...form, roleCode: e.target.value })} className={sel}>
-              <option value="">Select…</option>{(roles.data ?? []).map((r) => <option key={r.code} value={r.code}>{r.name}</option>)}</select></label>
+            <Select value={form.roleCode} onChange={(e) => setForm({ ...form, roleCode: e.target.value })} className={sel}>
+              <option value="">Select…</option>{(roles.data ?? []).map((r) => <option key={r.code} value={r.code}>{r.name}</option>)}</Select></label>
           <label className="text-sm font-medium text-slate-700">Document type
-            <select value={form.documentType} onChange={(e) => setForm({ ...form, documentType: e.target.value })} className={sel}>
-              <option value="">Select…</option>{(q.data?.documentTypes ?? []).map((t) => <option key={t} value={t}>{humanize(t)}</option>)}</select></label>
+            <Select value={form.documentType} onChange={(e) => setForm({ ...form, documentType: e.target.value })} className={sel}>
+              <option value="">Select…</option>{(q.data?.documentTypes ?? []).map((t) => <option key={t} value={t}>{humanize(t)}</option>)}</Select></label>
           <Field label="Maximum amount (₱)" inputMode="decimal" value={form.maxAmount} placeholder="0.00"
             onChange={(e) => setForm({ ...form, maxAmount: e.target.value.replace(/[^\d.]/g, '') })} />
           <Button busy={save.isPending} disabled={!form.roleCode || !form.documentType || !form.maxAmount || !isValidAmount(form.maxAmount)}

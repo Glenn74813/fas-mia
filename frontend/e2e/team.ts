@@ -18,13 +18,29 @@ async function json<T>(ctx: APIRequestContext, path: string, body: unknown, toke
   return (res.status() === 204 ? undefined : await res.json()) as T;
 }
 
-/** Signs the enrolled test administrator in through the API and returns an access token. */
+let lastAdminWindow = -1;
+
+/**
+ * Signs the enrolled test administrator in through the API and returns an access token. A code is accepted once per
+ * 30-second window, so a second sign-in in the same window (the next spec, or a restarted worker) waits for the next.
+ */
 export async function adminToken(username: string, password: string, secret: string): Promise<string> {
   const ctx = await request.newContext();
-  const step = await json<{ mfaToken: string }>(ctx, '/auth/login', { identifier: username, password });
-  const tokens = await json<{ accessToken: string }>(ctx, '/auth/mfa/verify', { mfaToken: step.mfaToken, code: totp(secret) });
-  await ctx.dispose();
-  return tokens.accessToken;
+  try {
+    for (let attempt = 0; ; attempt++) {
+      if (Math.floor(Date.now() / 30_000) === lastAdminWindow) await nextTotpWindow();
+      const step = await json<{ mfaToken: string }>(ctx, '/auth/login', { identifier: username, password });
+      lastAdminWindow = Math.floor(Date.now() / 30_000);
+      try {
+        const tokens = await json<{ accessToken: string }>(ctx, '/auth/mfa/verify', { mfaToken: step.mfaToken, code: totp(secret) });
+        return tokens.accessToken;
+      } catch (e) {
+        if (attempt > 0 || !String(e).includes('auth-mfa-invalid')) throw e;
+      }
+    }
+  } finally {
+    await ctx.dispose();
+  }
 }
 
 /** Creates a user with the given roles and completes their MFA enrolment and password change. */

@@ -1,4 +1,5 @@
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { Select } from '../../components/Select';
 import { useState } from 'react';
 import { Link } from 'react-router';
 import { billingApi } from '../../api/endpoints';
@@ -36,14 +37,14 @@ export function BillingsPage() {
       <div className="mb-4 flex flex-wrap gap-3">
         <input aria-label="Search billing" placeholder="Number or description" value={q}
           onChange={(e) => { setQ(e.target.value); setPage(0); }} className="w-72 rounded-lg border border-slate-300 px-3 py-2 shadow-xs text-sm" />
-        <select aria-label="Kind" value={kind} onChange={(e) => { setKind(e.target.value); setPage(0); }}
+        <Select aria-label="Kind" value={kind} onChange={(e) => { setKind(e.target.value); setPage(0); }}
           className="rounded-lg border border-slate-300 px-3 py-2 shadow-xs text-sm">
           {['', 'INVOICE', 'CREDIT_MEMO', 'DEBIT_MEMO'].map((k) => <option key={k} value={k}>{k ? KIND_LABEL[k] : 'All kinds'}</option>)}
-        </select>
-        <select aria-label="Status" value={status} onChange={(e) => { setStatus(e.target.value); setPage(0); }}
+        </Select>
+        <Select aria-label="Status" value={status} onChange={(e) => { setStatus(e.target.value); setPage(0); }}
           className="rounded-lg border border-slate-300 px-3 py-2 shadow-xs text-sm">
           {['', 'DRAFT', 'RETURNED', 'SUBMITTED', 'APPROVED', 'POSTED', 'REJECTED', 'CANCELLED'].map((s) => <option key={s} value={s}>{s || 'All statuses'}</option>)}
-        </select>
+        </Select>
       </div>
       <ErrorAlert error={list.error} />
       {list.isPending ? <Spinner /> : list.data && (

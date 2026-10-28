@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { Select } from '../../components/Select';
 import { Combobox } from '../../components/Combobox';
 import { useMemo, useState, type FormEvent } from 'react';
 import { Link } from 'react-router';
@@ -12,6 +13,7 @@ import { Money } from '../../components/Money';
 import { PageHeader } from '../../components/PageHeader';
 import { Spinner } from '../../components/Spinner';
 import { formatDateTime } from '../../utils/format';
+import { activeCostCenters, accountsFor } from '../../hooks/useAccounting';
 
 interface RuleForm { description: string; senderAccountId: string; senderCostCenterId: string; receiverAccountId: string;
   keyType: 'PERCENT' | 'QUANTITY'; receivers: { costCenterId: string; weight: string }[] }
@@ -29,7 +31,7 @@ export function AllocationCyclesPage() {
   const years = useQuery({ queryKey: ['fiscal-years'], queryFn: periodApi.fiscalYears });
   const periods = useMemo(() => (years.data ?? []).flatMap((y) => y.periods).filter((p) => p.status !== 'FUTURE')
     .sort((a, b) => b.endDate.localeCompare(a.endDate)), [years.data]);
-  const accounts = (chart.data?.accounts ?? []).filter((a) => a.postable);
+  const accounts = accountsFor(chart.data?.accounts, 'ALLOCATION');
   const refresh = () => qc.invalidateQueries({ queryKey: ['allocations'] });
 
   const [code, setCode] = useState('');
@@ -79,8 +81,8 @@ export function AllocationCyclesPage() {
               </ul>
               {selected === c.id && (
                 <div className="mt-3 border-t border-slate-200 pt-3">
-                  <label className="text-sm">Period <select aria-label="Period" value={periodId} onChange={(e) => setPeriodId(e.target.value)} className={select}>
-                    <option value="">Choose…</option>{periods.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}</select></label>
+                  <label className="text-sm">Period <Select aria-label="Period" value={periodId} onChange={(e) => setPeriodId(e.target.value)} className={select}>
+                    <option value="">Choose…</option>{periods.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}</Select></label>
                   <ErrorAlert error={preview.error ?? run.error} />
                   {preview.data && (
                     <div className="mt-2 overflow-x-auto">
@@ -124,15 +126,15 @@ export function AllocationCyclesPage() {
                 <label className="text-sm">Sender account<Combobox value={r.senderAccountId} onChange={(v) => setRule(i, { senderAccountId: v })} className={`mt-1.5 block w-full ${select}`} placeholder="Choose…"
               options={accounts.map((a) => ({ value: a.id, label: `${a.code} — ${a.name}` }))} /></label>
                 <label className="text-sm">Sender cost centre<Combobox value={r.senderCostCenterId} onChange={(v) => setRule(i, { senderCostCenterId: v })} className={`mt-1.5 block w-full ${select}`} placeholder="Choose…"
-              options={(costCenters.data ?? []).map((c) => ({ value: c.id, label: `${c.code} — ${c.name}` }))} /></label>
-                <label className="text-sm">Key<select value={r.keyType} onChange={(e) => setRule(i, { keyType: e.target.value as RuleForm['keyType'] })} className={`mt-1.5 block w-full ${select}`}>
-                  <option value="PERCENT">Fixed percentages</option><option value="QUANTITY">Statistical quantities</option></select></label>
+              options={activeCostCenters(costCenters.data).map((c) => ({ value: c.id, label: `${c.code} — ${c.name}` }))} /></label>
+                <label className="text-sm">Key<Select value={r.keyType} onChange={(e) => setRule(i, { keyType: e.target.value as RuleForm['keyType'] })} className={`mt-1.5 block w-full ${select}`}>
+                  <option value="PERCENT">Fixed percentages</option><option value="QUANTITY">Statistical quantities</option></Select></label>
               </div>
               {r.receivers.map((x, k) => (
                 <div key={k} className="flex flex-wrap items-end gap-2">
                   <label className="text-sm">Receiver<Combobox value={x.costCenterId} onChange={(v) => setRule(i, { receivers: r.receivers.map((y, m) => (m === k ? { ...y, costCenterId: v } : y)) })}
                     className={`mt-1.5 block ${select}`} placeholder="Choose…"
-              options={(costCenters.data ?? []).map((c) => ({ value: c.id, label: `${c.code} — ${c.name}` }))} /></label>
+              options={activeCostCenters(costCenters.data).map((c) => ({ value: c.id, label: `${c.code} — ${c.name}` }))} /></label>
                   <label className="text-sm">{r.keyType === 'PERCENT' ? 'Percent' : 'Quantity'}<input inputMode="decimal" value={x.weight}
                     onChange={(e) => setRule(i, { receivers: r.receivers.map((y, m) => (m === k ? { ...y, weight: e.target.value } : y)) })} className={`mt-1.5 block w-28 ${select}`} /></label>
                 </div>

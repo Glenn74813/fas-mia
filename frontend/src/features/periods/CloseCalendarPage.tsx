@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { Select } from '../../components/Select';
 import { useState } from 'react';
 import { Link, useSearchParams } from 'react-router';
 import { closeApi } from '../../api/endpoints';
@@ -49,10 +50,10 @@ function ScopePicker({ frequency, scope, onChange }: { frequency: CloseFrequency
   const years = useFiscalYears();
   const select = (label: string, options: { value: string; label: string }[]) => (
     <label className="text-sm font-medium text-slate-700">{label}
-      <select value={scope} onChange={(e) => onChange(e.target.value)} className="block w-72 rounded-lg border border-slate-300 px-3 py-2 shadow-xs text-sm">
+      <Select value={scope} onChange={(e) => onChange(e.target.value)} className="block w-72 rounded-lg border border-slate-300 px-3 py-2 shadow-xs text-sm">
         <option value="">Choose…</option>
         {options.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
-      </select></label>
+      </Select></label>
   );
   const fys = years.data ?? [];
   return (
@@ -120,9 +121,9 @@ function TaskRow({ task, frequency, scope }: { task: CloseTaskItem; frequency: C
       {task.canComplete && (
         <div className="mt-2 flex flex-wrap items-end gap-2">
           <label className="text-sm font-medium text-slate-700">Outcome
-            <select value={outcome} onChange={(e) => setOutcome(e.target.value as 'DONE' | 'NOT_APPLICABLE')}
+            <Select value={outcome} onChange={(e) => setOutcome(e.target.value as 'DONE' | 'NOT_APPLICABLE')}
               className="block rounded-lg border border-slate-300 px-3 py-2 shadow-xs text-sm">
-              <option value="DONE">Done</option><option value="NOT_APPLICABLE">Not applicable</option></select></label>
+              <option value="DONE">Done</option><option value="NOT_APPLICABLE">Not applicable</option></Select></label>
           <div className="w-96"><Field label="Note" value={note} maxLength={1000} onChange={(e) => setNote(e.target.value)} /></div>
           <Button variant="secondary" disabled={note.trim().length < 3} busy={complete.isPending} onClick={() => complete.mutate()}>Complete task</Button>
         </div>
@@ -206,9 +207,9 @@ function TaskAdmin() {
         <Field label="Task code" value={form.code} maxLength={30} disabled={!!editing} onChange={(e) => setForm({ ...form, code: e.target.value })} />
         <div className="md:col-span-2"><Field label="Task name" value={form.name} maxLength={200} onChange={(e) => setForm({ ...form, name: e.target.value })} /></div>
         <label className="text-sm font-medium text-slate-700">Checklist
-          <select value={form.frequency} onChange={(e) => setForm({ ...form, frequency: e.target.value as CloseFrequency })}
+          <Select value={form.frequency} onChange={(e) => setForm({ ...form, frequency: e.target.value as CloseFrequency })}
             className="mt-1.5 block w-full rounded-lg border border-slate-300 px-3 shadow-xs text-sm">
-            {FREQUENCIES.map((f) => <option key={f.code} value={f.code}>{f.label}</option>)}</select></label>
+            {FREQUENCIES.map((f) => <option key={f.code} value={f.code}>{f.label}</option>)}</Select></label>
         <Field label="Due after (days)" type="number" min={0} max={90} value={String(form.dueOffsetDays)}
           onChange={(e) => setForm({ ...form, dueOffsetDays: Number(e.target.value) })} />
         <Field label="Responsible permission" value={form.responsiblePermission} maxLength={64}

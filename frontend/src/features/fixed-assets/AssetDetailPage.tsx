@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { Select } from '../../components/Select';
 import { Combobox } from '../../components/Combobox';
 import { useState } from 'react';
 import { Link, useParams } from 'react-router';
@@ -11,7 +12,7 @@ import { Money } from '../../components/Money';
 import { PageHeader } from '../../components/PageHeader';
 import { Spinner } from '../../components/Spinner';
 import { StatusBadge } from '../../components/StatusBadge';
-import { postableAccounts, useChart } from '../../hooks/useAccounting';
+import { accountsFor, useChart } from '../../hooks/useAccounting';
 import { isValidAmount } from '../../utils/money';
 import { AssetTransfersPanel } from './AssetTransfersPanel';
 
@@ -49,7 +50,7 @@ export function AssetDetailPage() {
   const can = (x: string) => a.availableActions.includes(x);
   const d = a.disposal;
   const open = (k: Kind) => { act.reset(); setDialog(k); };
-  const cash = postableAccounts(chart.data?.accounts).filter((x) => x.accountType === 'ASSET' && !x.subsidiaryType && x.normalBalance === 'DEBIT');
+  const cash = accountsFor(chart.data?.accounts, 'CASH');
   const dispValid = disp.reason.trim().length >= 5 && isValidAmount(disp.proceeds) && (!disp.proceeds || Number(disp.proceeds) === 0 || disp.proceedsAccountId);
   return (
     <>
@@ -116,8 +117,8 @@ export function AssetDetailPage() {
           <div className="grid gap-3 text-sm">
             <Field label="Disposal date" type="date" value={disp.disposalDate} onChange={(e) => setDisp({ ...disp, disposalDate: e.target.value })} />
             <label className="block">Method
-              <select value={disp.method} onChange={(e) => setDisp({ ...disp, method: e.target.value })} className="mt-1.5 block w-full rounded-lg border border-slate-300 px-3 py-2 shadow-xs">
-                {['SALE', 'SCRAP', 'DONATION', 'TRANSFER', 'LOSS'].map((m) => <option key={m} value={m}>{m.toLowerCase()}</option>)}</select></label>
+              <Select value={disp.method} onChange={(e) => setDisp({ ...disp, method: e.target.value })} className="mt-1.5 block w-full rounded-lg border border-slate-300 px-3 py-2 shadow-xs">
+                {['SALE', 'SCRAP', 'DONATION', 'TRANSFER', 'LOSS'].map((m) => <option key={m} value={m}>{m.toLowerCase()}</option>)}</Select></label>
             <Field label="Proceeds" inputMode="decimal" value={disp.proceeds} onChange={(e) => setDisp({ ...disp, proceeds: e.target.value.replace(/[^\d.]/g, '') })} />
             <label className="block">Proceeds received in
               <Combobox value={disp.proceedsAccountId} onChange={(v) => setDisp({ ...disp, proceedsAccountId: v })} className="mt-1.5 block w-full rounded-lg border border-slate-300 px-3 py-2 shadow-xs" placeholder="—"

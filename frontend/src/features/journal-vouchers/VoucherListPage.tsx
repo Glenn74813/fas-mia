@@ -1,4 +1,5 @@
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
+import { Select } from '../../components/Select';
 import { useState } from 'react';
 import { Link } from 'react-router';
 import { voucherApi } from '../../api/endpoints';
@@ -33,10 +34,10 @@ export function VoucherListPage() {
       <div className="mb-4 flex flex-wrap items-center gap-3">
         <input aria-label="Search vouchers" placeholder="Search number or description" value={q}
           onChange={(e) => { setQ(e.target.value); setPage(0); }} className="w-72 rounded-lg border border-slate-300 px-3 py-2 shadow-xs text-sm" />
-        <select aria-label="Status" value={status} onChange={(e) => { setStatus(e.target.value); setPage(0); }}
+        <Select aria-label="Status" value={status} onChange={(e) => { setStatus(e.target.value); setPage(0); }}
           className="rounded-lg border border-slate-300 px-3 py-2 shadow-xs text-sm">
           {STATUSES.map((s) => <option key={s} value={s}>{s || 'All statuses'}</option>)}
-        </select>
+        </Select>
         {hasPermission('JOURNAL_CREATE') && (
           <label className="flex items-center gap-2 text-sm">
             <input type="checkbox" checked={mine} onChange={(e) => { setMine(e.target.checked); setPage(0); }} /> Prepared by me

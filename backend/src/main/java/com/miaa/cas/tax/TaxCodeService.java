@@ -3,6 +3,7 @@ package com.miaa.cas.tax;
 import com.miaa.cas.audit.Actor;
 import com.miaa.cas.audit.AuditService;
 import com.miaa.cas.common.error.ApiException;
+import com.miaa.cas.generalledger.AccountPurpose;
 import com.miaa.cas.common.error.ErrorCode;
 import com.miaa.cas.common.money.Money;
 import jakarta.validation.constraints.DecimalMax;
@@ -72,6 +73,7 @@ public class TaxCodeService {
         if (Boolean.TRUE.equals(exists)) {
             throw new ApiException(ErrorCode.DUPLICATE_RESOURCE, "Tax code already exists.");
         }
+        AccountPurpose.require(jdbc, req.accountId(), AccountPurpose.forTaxType(req.taxType()), "Tax account");
         UUID id = UUID.randomUUID();
         jdbc.update("INSERT INTO tax_codes (id, code, description, tax_type, rate, account_id, status, placeholder, created_at, "
                 + "created_by) VALUES (?, ?, ?, ?, ?, ?, 'ACTIVE', ?, ?, ?)", id, req.code(), req.description(), req.taxType(),

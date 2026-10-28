@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
+import { Select } from '../../components/Select';
 import { useState } from 'react';
 import { Link } from 'react-router';
 import { ledgerApi } from '../../api/endpoints';
@@ -27,9 +28,9 @@ export function TrialBalancePage() {
       <PageHeader title="Trial balance" crumbs={[{ label: 'General ledger' }, { label: 'Trial balance' }]} />
       <div className="mb-4 flex flex-wrap items-center gap-3">
         <label className="text-sm">Through period{' '}
-          <select value={selected} onChange={(e) => setPeriodId(e.target.value)} className="ml-2 rounded-lg border border-slate-300 px-3 py-2 shadow-xs text-sm">
+          <Select value={selected} onChange={(e) => setPeriodId(e.target.value)} className="ml-2 rounded-lg border border-slate-300 px-3 py-2 shadow-xs text-sm">
             {periods.map((p) => <option key={p.id} value={p.id}>{p.name} ({p.status.replace('_', ' ').toLowerCase()})</option>)}
-          </select>
+          </Select>
         </label>
         {tb.data && <Badge tone={tb.data.balanced ? 'green' : 'red'}>{tb.data.balanced ? 'BALANCED' : 'OUT OF BALANCE'}</Badge>}
         {tb.data?.placeholderAccountsUsed && <Badge tone="amber">USES PLACEHOLDER ACCOUNTS</Badge>}

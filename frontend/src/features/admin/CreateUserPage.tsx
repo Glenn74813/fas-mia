@@ -1,4 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { Select } from '../../components/Select';
 import { useState, type FormEvent } from 'react';
 import { useNavigate } from 'react-router';
 import { userApi } from '../../api/endpoints';
@@ -44,12 +45,12 @@ export function CreateUserPage() {
           <Field label="Display name" required value={form.displayName} onChange={set('displayName')} />
           <div className="space-y-1.5">
             <label htmlFor="userType" className="block text-sm font-medium text-slate-700">User type</label>
-            <select id="userType" value={form.userType} onChange={set('userType')}
+            <Select id="userType" value={form.userType} onChange={set('userType')}
               className="block w-full rounded-lg border border-slate-300 px-3 py-2 shadow-xs text-sm">
               <option value="INTERNAL">Internal</option>
               <option value="EXTERNAL_AUDITOR">External auditor</option>
               <option value="CONCESSIONAIRE">Concessionaire</option>
-            </select>
+            </Select>
           </div>
           <Field label="Access expires" type="date" required={auditor} value={form.accessUntil} onChange={set('accessUntil')}
             min={new Date().toISOString().slice(0, 10)}

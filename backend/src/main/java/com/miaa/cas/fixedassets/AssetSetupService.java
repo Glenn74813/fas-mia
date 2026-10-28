@@ -3,6 +3,7 @@ package com.miaa.cas.fixedassets;
 import com.miaa.cas.audit.Actor;
 import com.miaa.cas.audit.AuditService;
 import com.miaa.cas.common.error.ApiException;
+import com.miaa.cas.generalledger.AccountPurpose;
 import com.miaa.cas.common.error.ErrorCode;
 import com.miaa.cas.common.money.Money;
 import com.miaa.cas.fixedassets.FaDtos.CategoryRequest;
@@ -62,9 +63,9 @@ public class AssetSetupService {
                 req.code()))) {
             throw new ApiException(ErrorCode.DUPLICATE_RESOURCE, "Asset category code already exists.");
         }
-        requireAccount(req.assetAccountId(), "ASSET", "DEBIT", "asset");
-        requireAccount(req.accumulatedAccountId(), "ASSET", "CREDIT", "accumulated depreciation (a contra-asset)");
-        requireAccount(req.expenseAccountId(), "EXPENSE", null, "depreciation expense");
+        AccountPurpose.require(jdbc, req.assetAccountId(), AccountPurpose.ASSET_COST, "Asset account");
+        AccountPurpose.require(jdbc, req.accumulatedAccountId(), AccountPurpose.ASSET_ACCUMULATED, "Accumulated depreciation account");
+        AccountPurpose.require(jdbc, req.expenseAccountId(), AccountPurpose.EXPENSE, "Depreciation expense account");
         UUID id = UUID.randomUUID();
         jdbc.update("""
                 INSERT INTO asset_categories (id, code, name, asset_account_id, accumulated_account_id, expense_account_id,

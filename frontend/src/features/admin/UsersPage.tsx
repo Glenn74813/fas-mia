@@ -1,4 +1,5 @@
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
+import { Select } from '../../components/Select';
 import { useState } from 'react';
 import { Link } from 'react-router';
 import { userApi } from '../../api/endpoints';
@@ -35,10 +36,10 @@ export function UsersPage() {
         <input aria-label="Search users" placeholder="Search name, username or e-mail" value={q}
           onChange={(e) => { setQ(e.target.value); setPage(0); }}
           className="w-72 rounded-lg border border-slate-300 px-3 py-2 shadow-xs text-sm" />
-        <select aria-label="Status filter" value={status} onChange={(e) => { setStatus(e.target.value); setPage(0); }}
+        <Select aria-label="Status filter" value={status} onChange={(e) => { setStatus(e.target.value); setPage(0); }}
           className="rounded-lg border border-slate-300 px-3 py-2 shadow-xs text-sm">
           <option value="">All statuses</option><option value="ACTIVE">Active</option><option value="INACTIVE">Inactive</option>
-        </select>
+        </Select>
       </div>
       <ErrorAlert error={query.error} />
       {query.isPending ? <Spinner /> : query.data && (

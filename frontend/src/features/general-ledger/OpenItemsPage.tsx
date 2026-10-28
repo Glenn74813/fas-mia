@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { Select } from '../../components/Select';
 import { Combobox } from '../../components/Combobox';
 import { useState } from 'react';
 import { clearingApi } from '../../api/endpoints';
@@ -13,7 +14,7 @@ import { PageHeader } from '../../components/PageHeader';
 import { Pagination } from '../../components/Pagination';
 import { Spinner } from '../../components/Spinner';
 import { StatusBadge } from '../../components/StatusBadge';
-import { postableAccounts, useChart } from '../../hooks/useAccounting';
+import { accountsFor, useChart } from '../../hooks/useAccounting';
 import { formatDateTime } from '../../utils/format';
 
 /** Open-item clearing (FR-GL-17): items on clearing, suspense and advance accounts stay open until matched. */
@@ -34,7 +35,7 @@ export function OpenItemsPage() {
   const manage = useMutation({ mutationFn: ({ id, managed }: { id: string; managed: boolean }) => clearingApi.setManaged(id, managed),
     onSuccess: (_d, v) => { setToManage(''); if (!v.managed && v.id === accountId) setAccountId(''); refresh(); } });
   const managedIds = new Set((accounts.data ?? []).map((a) => a.id));
-  const candidates = postableAccounts(chart.data?.accounts).filter((a) => ['ASSET', 'LIABILITY'].includes(a.accountType) && !managedIds.has(a.id));
+  const candidates = accountsFor(chart.data?.accounts, 'OPEN_ITEM').filter((a) => !managedIds.has(a.id));
 
   return (
     <>
@@ -136,11 +137,11 @@ function AccountItems({ accountId, title, onChange }: { accountId: string; title
             </div>
             <div>
               <label className="text-sm font-medium text-slate-700">Automatic clearing rule
-                <select value={rule} onChange={(e) => { setRule(e.target.value as 'REFERENCE' | 'AMOUNT'); setProposals(null); }}
+                <Select value={rule} onChange={(e) => { setRule(e.target.value as 'REFERENCE' | 'AMOUNT'); setProposals(null); }}
                   className="block w-full rounded-lg border border-slate-300 px-3 py-2 shadow-xs text-sm">
                   <option value="REFERENCE">By reference (same description, netting to zero)</option>
                   <option value="AMOUNT">By amount (equal and opposite pair, oldest first)</option>
-                </select></label>
+                </Select></label>
               <div className="mt-2 flex gap-2">
                 <Button variant="secondary" busy={preview.isPending} onClick={() => preview.mutate()}>Preview</Button>
                 {proposals && proposals.length > 0 && <Button busy={apply.isPending} onClick={() => apply.mutate()}>

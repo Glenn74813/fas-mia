@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { Select } from '../../components/Select';
 import { Combobox } from '../../components/Combobox';
 import { useState } from 'react';
 import { useParams } from 'react-router';
@@ -12,7 +13,7 @@ import { Money } from '../../components/Money';
 import { PageHeader } from '../../components/PageHeader';
 import { Spinner } from '../../components/Spinner';
 import { StatusBadge } from '../../components/StatusBadge';
-import { useChart, useCostCenters } from '../../hooks/useAccounting';
+import { activeCostCenters, accountsFor, useChart, useCostCenters } from '../../hooks/useAccounting';
 import { formatDateTime } from '../../utils/format';
 import { isValidAmount } from '../../utils/money';
 
@@ -77,7 +78,7 @@ function Utilisation({ budget }: { budget: BudgetView }) {
 function AllocationEditor({ budget, onSaved }: { budget: BudgetView; onSaved: (b: BudgetView) => void }) {
   const chart = useChart();
   const costCenters = useCostCenters();
-  const accounts = (chart.data?.accounts ?? []).filter((a) => a.postable && a.budgetControlled && a.status === 'ACTIVE');
+  const accounts = accountsFor(chart.data?.accounts, 'BUDGET_LINE');
   const [rows, setRows] = useState<Row[]>(budget.allocations.length
     ? budget.allocations.map((a) => ({ accountId: a.accountId, costCenterId: a.costCenterId, amount: a.allotment }))
     : [{ accountId: '', costCenterId: null, amount: '' }]);
@@ -95,7 +96,7 @@ function AllocationEditor({ budget, onSaved }: { budget: BudgetView; onSaved: (b
               options={accounts.map((a) => ({ value: a.id, label: `${a.code} — ${a.name}` }))} />
           <Combobox aria-label={`Allocation ${i + 1} cost centre`} value={r.costCenterId ?? ''} onChange={(v) => set(i, { costCenterId: v || null })}
             className="w-40 rounded-md border border-slate-300 px-2 py-1" placeholder="All cost centres"
-              options={(costCenters.data ?? []).map((c) => ({ value: c.id, label: `${c.code} — ${c.name}` }))} />
+              options={activeCostCenters(costCenters.data).map((c) => ({ value: c.id, label: `${c.code} — ${c.name}` }))} />
           <input aria-label={`Allocation ${i + 1} amount`} inputMode="decimal" value={r.amount} placeholder="0.00"
             onChange={(e) => set(i, { amount: e.target.value.replace(/[^\d.]/g, '') })}
             className={`w-36 rounded border px-2 py-1 text-right ${isValidAmount(r.amount) ? 'border-slate-300' : 'border-red-500'}`} />
@@ -125,12 +126,12 @@ function Adjustments({ budget, canRequest, canDecide, list, onChange }: { budget
       <ErrorAlert error={request.error ?? decide.error} />
       {canRequest && (
         <div className="flex flex-wrap items-end gap-2 text-sm">
-          <select aria-label="From allocation" value={form.fromAllocationId} onChange={(e) => setForm({ ...form, fromAllocationId: e.target.value })}
+          <Select aria-label="From allocation" value={form.fromAllocationId} onChange={(e) => setForm({ ...form, fromAllocationId: e.target.value })}
             className="rounded-md border border-slate-300 px-2 py-1"><option value="">Supplemental (new money)</option>
-            {budget.allocations.map((a) => <option key={a.id} value={a.id}>From {label(a)}</option>)}</select>
-          <select aria-label="To allocation" value={form.toAllocationId} onChange={(e) => setForm({ ...form, toAllocationId: e.target.value })}
+            {budget.allocations.map((a) => <option key={a.id} value={a.id}>From {label(a)}</option>)}</Select>
+          <Select aria-label="To allocation" value={form.toAllocationId} onChange={(e) => setForm({ ...form, toAllocationId: e.target.value })}
             className="rounded-md border border-slate-300 px-2 py-1"><option value="">To…</option>
-            {budget.allocations.map((a) => <option key={a.id} value={a.id}>To {label(a)}</option>)}</select>
+            {budget.allocations.map((a) => <option key={a.id} value={a.id}>To {label(a)}</option>)}</Select>
           <input aria-label="Adjustment amount" placeholder="Amount" value={form.amount} onChange={(e) => setForm({ ...form, amount: e.target.value.replace(/[^\d.]/g, '') })}
             className="w-32 rounded-md border border-slate-300 px-2 py-1 text-right" />
           <input aria-label="Adjustment reason" placeholder="Reason (min. 10 characters)" value={form.reason} onChange={(e) => setForm({ ...form, reason: e.target.value })}

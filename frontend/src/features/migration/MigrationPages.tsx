@@ -1,4 +1,5 @@
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { Select } from '../../components/Select';
 import { useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router';
 import { migrationApi } from '../../api/endpoints';
@@ -60,9 +61,9 @@ export function MigrationBatchesPage() {
           <ErrorAlert error={upload.error} />
           <div className="grid gap-3 md:grid-cols-3">
             <div className="space-y-1.5"><label htmlFor="mkind" className="block text-sm font-medium text-slate-700">Batch type</label>
-              <select id="mkind" value={form.kind} onChange={(e) => setForm({ ...form, kind: e.target.value as MigrationKind })}
+              <Select id="mkind" value={form.kind} onChange={(e) => setForm({ ...form, kind: e.target.value as MigrationKind })}
                 className="block w-full rounded-lg border border-slate-300 px-3 py-2 shadow-xs text-sm">
-                {KINDS.map((k) => <option key={k.value} value={k.value}>{k.label}</option>)}</select></div>
+                {KINDS.map((k) => <option key={k.value} value={k.value}>{k.label}</option>)}</Select></div>
             {gl ? <Field label="Cutover date" type="date" value={form.cutoverDate} onChange={(e) => setForm({ ...form, cutoverDate: e.target.value })}
               hint="First period of the fiscal year the balances open" />
               : <Field label="Opening entry number" value={form.openingEntryNumber} onChange={(e) => setForm({ ...form, openingEntryNumber: e.target.value })}
@@ -77,8 +78,8 @@ export function MigrationBatchesPage() {
           </div>
         </section>
       )}
-      <select aria-label="Filter batch type" value={filter} onChange={(e) => { setFilter(e.target.value); setPage(0); }} className="mb-3 rounded-lg border border-slate-300 px-3 py-2 shadow-xs text-sm">
-        <option value="">All batch types</option>{KINDS.map((k) => <option key={k.value} value={k.value}>{k.label}</option>)}</select>
+      <Select aria-label="Filter batch type" value={filter} onChange={(e) => { setFilter(e.target.value); setPage(0); }} className="mb-3 rounded-lg border border-slate-300 px-3 py-2 shadow-xs text-sm">
+        <option value="">All batch types</option>{KINDS.map((k) => <option key={k.value} value={k.value}>{k.label}</option>)}</Select>
       <ErrorAlert error={list.error} />
       {list.isPending ? <Spinner /> : (
         <div className="overflow-x-auto rounded-xl border border-slate-200/80 bg-white shadow-xs">
