@@ -54,7 +54,7 @@ export function InboxPage() {
                 <th className="px-3 py-2 text-right">Amount</th><th className="px-3 py-2">Prepared by</th><th /></tr></thead>
               <tbody>
                 {items.map((i) => (
-                  <tr key={`${i.documentType}-${i.id}-${i.task}`} className="border-t border-slate-100">
+                  <tr key={`${i.documentType}-${i.id}-${i.task}-${i.date ?? ''}-${i.link}`} className="border-t border-slate-100">
                     <td className="whitespace-nowrap px-3 py-2">{formatDateTime(i.waitingSince)}</td>
                     <td className="px-3 py-2 font-medium">{i.task}</td>
                     <td className="px-3 py-2">{i.number && <span className="font-mono">{i.number} </span>}{i.description}

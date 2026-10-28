@@ -34,7 +34,10 @@ export function CashForecastPage() {
     queryFn: () => treasuryApi.cashForecast({ granularity, periods, includeBudget }),
     placeholderData: keepPreviousData,
   });
-  const label = (start: string) => (granularity === 'WEEK' ? shortDate(start) : `${MONTHS[Number(start.slice(5, 7)) - 1]} ${start.slice(0, 4)}`);
+  // Label buckets by the grouping the data was computed with: while a new grouping loads, the previous data stays on
+  // screen, and weekly buckets labelled as months would repeat (four "Nov 2026" columns).
+  const shownGranularity = f.data?.granularity ?? granularity;
+  const label = (start: string) => (shownGranularity === 'WEEK' ? shortDate(start) : `${MONTHS[Number(start.slice(5, 7)) - 1]} ${start.slice(0, 4)}`);
   const items = f.data?.items.filter((i) => bucket === null || i.bucket === bucket) ?? [];
   const select = 'rounded-lg border border-slate-300 px-3 py-2 text-sm shadow-xs';
 
@@ -65,7 +68,7 @@ export function CashForecastPage() {
           <div className="mb-4 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
             <StatTile label="Cash now" value={formatPeso(f.data.openingBalance)} hint="Banks and cash on hand, per the books" />
             <StatTile label="Lowest projected balance" value={formatPeso(f.data.lowestClosing)}
-              hint={granularity === 'WEEK' ? `Week ending ${shortDate(f.data.lowestClosingOn)}`
+              hint={shownGranularity === 'WEEK' ? `Week ending ${shortDate(f.data.lowestClosingOn)}`
                 : `End of ${label(f.data.buckets.find((b) => b.end === f.data.lowestClosingOn)?.start ?? f.data.from)}`}
               tone={f.data.lowestClosing.startsWith('-') ? 'warning' : undefined} />
             <StatTile label="Overdue collections" value={formatPeso(f.data.overdueReceivables)} hint="Counted in the first period" />
@@ -73,13 +76,13 @@ export function CashForecastPage() {
           </div>
           <section className="mb-4 rounded-xl border border-slate-200/80 bg-white p-5 shadow-xs">
             <BalanceLine title={`Projected closing balance, ${f.data.from} to ${f.data.to}`} valueName="closing balance"
-              headers={[granularity === 'WEEK' ? 'Week from' : 'Month', 'Closing balance']}
+              headers={[shownGranularity === 'WEEK' ? 'Week from' : 'Month', 'Closing balance']}
               points={f.data.buckets.map((b) => ({ label: label(b.start), value: Number(b.closing), display: formatPeso(b.closing) }))} />
           </section>
           <div className="mb-4 overflow-x-auto rounded-xl border border-slate-200/80 bg-white shadow-xs">
             <table className="min-w-full whitespace-nowrap text-right text-sm">
               <thead className="border-b border-slate-200 bg-slate-50/80 text-[11px] font-semibold uppercase tracking-wider text-slate-500">
-                <tr><th className="px-2 py-2 text-left">{granularity === 'WEEK' ? 'Week' : 'Month'}</th><th className="px-2 py-2">Opening</th>
+                <tr><th className="px-2 py-2 text-left">{shownGranularity === 'WEEK' ? 'Week' : 'Month'}</th><th className="px-2 py-2">Opening</th>
                   <th className="px-2 py-2">Collections</th><th className="px-2 py-2">Approved DVs</th><th className="px-2 py-2">Supplier invoices</th>
                   {f.data.includeBudget && <th className="px-2 py-2">Budgeted spending</th>}
                   <th className="px-2 py-2">Net</th><th className="px-2 py-2">Closing</th></tr>
@@ -90,7 +93,7 @@ export function CashForecastPage() {
                     <td className="whitespace-nowrap px-2 py-1.5 text-left">
                       <button type="button" className="text-brand-700 hover:underline" aria-pressed={bucket === i}
                         onClick={() => setBucket(bucket === i ? null : i)}>
-                        {granularity === 'WEEK' ? `${shortDate(b.start)} – ${shortDate(b.end)}` : label(b.start)}</button></td>
+                        {shownGranularity === 'WEEK' ? `${shortDate(b.start)} – ${shortDate(b.end)}` : label(b.start)}</button></td>
                     <td className="px-2 py-1.5"><Money value={b.opening} /></td>
                     <td className="px-2 py-1.5"><Money value={b.receivables} blankZero /></td>
                     <td className="px-2 py-1.5"><Money value={b.vouchers === '0.00' ? '0' : `-${b.vouchers}`} blankZero /></td>
@@ -108,7 +111,7 @@ export function CashForecastPage() {
           </ul>
           <section className="rounded-xl border border-slate-200/80 bg-white shadow-xs">
             <h2 className="border-b border-slate-200 px-4 py-3 text-sm font-semibold text-slate-800">
-              {bucket === null || !f.data.buckets[bucket] ? 'Expected collections and payments' : `Expected in ${granularity === 'WEEK'
+              {bucket === null || !f.data.buckets[bucket] ? 'Expected collections and payments' : `Expected in ${shownGranularity === 'WEEK'
                 ? `the week from ${shortDate(f.data.buckets[bucket].start)}` : label(f.data.buckets[bucket].start)}`}
               {bucket !== null && <button type="button" className="ml-3 text-xs font-normal text-brand-700 hover:underline"
                 onClick={() => setBucket(null)}>Show all</button>}
