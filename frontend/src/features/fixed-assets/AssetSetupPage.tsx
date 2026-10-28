@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { Combobox } from '../../components/Combobox';
 import { useState } from 'react';
 import { assetApi } from '../../api/endpoints';
 import { useAuth } from '../../auth/AuthContext';
@@ -30,8 +31,8 @@ export function AssetSetupPage() {
   const close = useMutation({ mutationFn: assetApi.closeProject, onSuccess: () => qc.invalidateQueries({ queryKey: ['auc-projects'] }) });
   const pick = (id: string, value: string, onChange: (v: string) => void, list: typeof accounts, label: string) => (
     <label className="block text-sm">{label}
-      <select id={id} value={value} onChange={(e) => onChange(e.target.value)} className="mt-1.5 block w-full rounded-lg border border-slate-300 px-3 py-2 shadow-xs">
-        <option value="">Select…</option>{list.map((a) => <option key={a.id} value={a.id}>{a.code} — {a.name}</option>)}</select></label>
+      <Combobox id={id} value={value} onChange={(v) => onChange(v)} className="mt-1.5 block w-full rounded-lg border border-slate-300 px-3 py-2 shadow-xs" placeholder="Select…"
+              options={list.map((a) => ({ value: a.id, label: `${a.code} — ${a.name}` }))} /></label>
   );
   return (
     <>
@@ -84,8 +85,8 @@ export function AssetSetupPage() {
               <Field label="Project name" value={proj.name} onChange={(e) => setProj({ ...proj, name: e.target.value })} />
               {pick('pa', proj.aucAccountId, (v) => setProj({ ...proj, aucAccountId: v }), accounts.filter((a) => a.subsidiaryType === 'OTHER' && a.accountType === 'ASSET'), 'AUC account')}
               <label className="block text-sm">Cost centre
-                <select value={proj.costCenterId} onChange={(e) => setProj({ ...proj, costCenterId: e.target.value })} className="mt-1.5 block w-full rounded-lg border border-slate-300 px-3 py-2 shadow-xs">
-                  <option value="">—</option>{(costCenters.data ?? []).map((c) => <option key={c.id} value={c.id}>{c.code}</option>)}</select></label>
+                <Combobox value={proj.costCenterId} onChange={(v) => setProj({ ...proj, costCenterId: v })} className="mt-1.5 block w-full rounded-lg border border-slate-300 px-3 py-2 shadow-xs" placeholder="—"
+              options={(costCenters.data ?? []).map((c) => ({ value: c.id, label: `${c.code} — ${c.name}` }))} /></label>
             </div>
             <Button variant="secondary" busy={createProj.isPending} disabled={!proj.code || !proj.name || !proj.aucAccountId} onClick={() => createProj.mutate()}>Open project</Button>
           </div>

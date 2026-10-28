@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { Combobox } from '../../components/Combobox';
 import { useState } from 'react';
 import { useParams } from 'react-router';
 import { customerApi, portalAccessApi, settingsApi } from '../../api/endpoints';
@@ -86,9 +87,9 @@ function Contracts({ customerId, canManage }: { customerId: string; canManage: b
                 className="block w-full rounded-lg border border-slate-300 px-3 py-2 shadow-xs text-sm"><option value="">No VAT</option>
                 {vat.map((t) => <option key={t.id} value={t.id}>{t.code} ({t.rate})</option>)}</select></div>
             <div className="space-y-1 md:col-span-2"><label htmlFor="krev" className="block text-sm font-medium text-slate-700">Revenue account</label>
-              <select id="krev" value={form.revenueAccountId} onChange={(e) => setForm({ ...form, revenueAccountId: e.target.value })}
-                className="block w-full rounded-lg border border-slate-300 px-3 py-2 shadow-xs text-sm"><option value="">Select…</option>
-                {revenue.map((a) => <option key={a.id} value={a.id}>{a.code} — {a.name}</option>)}</select></div>
+              <Combobox id="krev" value={form.revenueAccountId} onChange={(v) => setForm({ ...form, revenueAccountId: v })}
+                className="block w-full rounded-lg border border-slate-300 px-3 py-2 shadow-xs text-sm" placeholder="Select…"
+              options={revenue.map((a) => ({ value: a.id, label: `${a.code} — ${a.name}` }))} /></div>
             <div className="space-y-1.5"><label htmlFor="kcc" className="block text-sm font-medium text-slate-700">Cost centre</label>
               <select id="kcc" value={form.costCenterId} onChange={(e) => setForm({ ...form, costCenterId: e.target.value })}
                 className="block w-full rounded-lg border border-slate-300 px-3 py-2 shadow-xs text-sm"><option value="">—</option>

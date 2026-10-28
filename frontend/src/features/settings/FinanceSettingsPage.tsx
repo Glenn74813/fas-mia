@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { Combobox } from '../../components/Combobox';
 import { useState } from 'react';
 import { settingsApi } from '../../api/endpoints';
 import { useAuth } from '../../auth/AuthContext';
@@ -34,9 +35,9 @@ export function FinanceSettingsPage() {
         <ul className="space-y-2 text-sm">{(mappings.data ?? []).map((m) => (
           <li key={m.key} className="flex flex-wrap items-center gap-3"><span className="w-56 font-mono text-xs">{m.key}</span>
             <span className="w-80 text-slate-600">{m.description}</span>
-            {admin ? <select aria-label={`${m.key} account`} value={m.accountId ?? ''} className={input}
-              onChange={(e) => e.target.value && setMapping.mutate({ key: m.key, accountId: e.target.value })}>
-              <option value="">Not configured</option>{accounts.map((a) => <option key={a.id} value={a.id}>{a.code} — {a.name}</option>)}</select>
+            {admin ? <Combobox aria-label={`${m.key} account`} value={m.accountId ?? ''} className={input}
+              onChange={(v) => v && setMapping.mutate({ key: m.key, accountId: v })} placeholder="Not configured"
+              options={accounts.map((a) => ({ value: a.id, label: `${a.code} — ${a.name}` }))} />
               : <span>{m.accountCode ?? <Badge tone="amber">NOT CONFIGURED</Badge>}</span>}</li>))}</ul>
       </section>
       <section className="mb-4 rounded-xl border border-slate-200/80 bg-white shadow-xs p-5">
@@ -52,8 +53,8 @@ export function FinanceSettingsPage() {
           <select aria-label="Tax type" value={tax.taxType} onChange={(e) => setTax({ ...tax, taxType: e.target.value })} className={input}>
             {['EWT', 'VAT_INPUT', 'VAT_OUTPUT', 'FINAL_VAT'].map((t) => <option key={t}>{t}</option>)}</select>
           <input aria-label="Rate" placeholder="Rate e.g. 0.0200" value={tax.rate} onChange={(e) => setTax({ ...tax, rate: e.target.value })} className={`${input} w-32`} />
-          <select aria-label="Tax account" value={tax.accountId} onChange={(e) => setTax({ ...tax, accountId: e.target.value })} className={input}>
-            <option value="">Account…</option>{accounts.map((a) => <option key={a.id} value={a.id}>{a.code}</option>)}</select>
+          <Combobox aria-label="Tax account" value={tax.accountId} onChange={(v) => setTax({ ...tax, accountId: v })} className={input} placeholder="Account…"
+              options={accounts.map((a) => ({ value: a.id, label: `${a.code} — ${a.name}` }))} />
           <input aria-label="Tax description" placeholder="Description" value={tax.description} onChange={(e) => setTax({ ...tax, description: e.target.value })} className={`${input} w-72`} />
           <Button busy={createTax.isPending} disabled={!tax.code || !tax.rate || !tax.accountId || !tax.description} onClick={() => createTax.mutate()}>Add</Button></div>}
       </section>
@@ -70,8 +71,8 @@ export function FinanceSettingsPage() {
           <input aria-label="Account name" placeholder="Account name" value={bank.accountName} onChange={(e) => setBank({ ...bank, accountName: e.target.value })} className={input} />
           <input aria-label="Last four digits" placeholder="Last 4" maxLength={4} value={bank.accountNumberLast4}
             onChange={(e) => setBank({ ...bank, accountNumberLast4: e.target.value.replace(/\D/g, '') })} className={`${input} w-20`} />
-          <select aria-label="Cash GL account" value={bank.glAccountId} onChange={(e) => setBank({ ...bank, glAccountId: e.target.value })} className={input}>
-            <option value="">Cash account…</option>{accounts.filter((a) => a.accountType === 'ASSET').map((a) => <option key={a.id} value={a.id}>{a.code}</option>)}</select>
+          <Combobox aria-label="Cash GL account" value={bank.glAccountId} onChange={(v) => setBank({ ...bank, glAccountId: v })} className={input} placeholder="Cash account…"
+              options={accounts.filter((a) => a.accountType === 'ASSET').map((a) => ({ value: a.id, label: `${a.code} — ${a.name}` }))} />
           <Button busy={createBank.isPending} disabled={!bank.code || bank.accountNumberLast4.length !== 4 || !bank.glAccountId} onClick={() => createBank.mutate()}>Add</Button></div>}
       </section>
     </>

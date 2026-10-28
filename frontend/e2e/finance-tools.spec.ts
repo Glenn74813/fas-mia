@@ -1,6 +1,6 @@
-import { expect, test, type Locator } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 import { adminToken, nextTotpWindow, onboard } from './team';
-import { nav, signIn, signOut } from './ui';
+import { nav, signIn, signOut, pick } from './ui';
 
 const admin = {
   username: process.env.E2E_ADMIN_USERNAME ?? '',
@@ -12,11 +12,6 @@ test.skip(!admin.username || !admin.password || !admin.totpSecret,
   'Set E2E_ADMIN_USERNAME, E2E_ADMIN_PASSWORD and E2E_ADMIN_TOTP_SECRET for an enrolled test administrator');
 test.setTimeout(180_000);
 
-/** Picks the option whose text starts with the given code. */
-async function choose(select: Locator, code: string) {
-  const value = await select.locator('option').filter({ hasText: new RegExp(`^${code}\\b`) }).first().getAttribute('value');
-  await select.selectOption(value!);
-}
 
 test('ad hoc report, overhead allocation preview and a cost vs market review', async ({ page }) => {
   const token = await adminToken(admin.username, admin.password, admin.totpSecret);
@@ -48,10 +43,10 @@ test('ad hoc report, overhead allocation preview and a cost vs market review', a
   await nav(page, 'Overhead allocation');
   await main.getByLabel('Code').fill(`E2E${stamp % 100000}`);
   await main.getByLabel('Name').fill('Utilities by floor area');
-  await choose(main.getByLabel('Sender account'), '50204020');
-  await choose(main.getByLabel('Sender cost centre'), 'PLC-CC-FIN');
+  await pick(main.getByLabel('Sender account'), '50204020');
+  await pick(main.getByLabel('Sender cost centre'), 'PLC-CC-FIN');
   await main.getByLabel('Key').selectOption('QUANTITY');
-  await choose(main.getByLabel(/^Receiver/), 'PLC-CC-OPS');
+  await pick(main.getByLabel(/^Receiver/), 'PLC-CC-OPS');
   await main.getByLabel('Quantity').fill('120');
   await main.getByRole('button', { name: 'Create cycle' }).click();
   const cycle = main.locator('section').filter({ hasText: `E2E${stamp % 100000}` });

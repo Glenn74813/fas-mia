@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { Combobox } from '../../components/Combobox';
 import { useState } from 'react';
 import { useParams } from 'react-router';
 import { budgetApi } from '../../api/endpoints';
@@ -89,12 +90,12 @@ function AllocationEditor({ budget, onSaved }: { budget: BudgetView; onSaved: (b
       <ErrorAlert error={save.error} />
       {rows.map((r, i) => (
         <div key={i} className="flex flex-wrap items-center gap-2 text-sm">
-          <select aria-label={`Allocation ${i + 1} account`} value={r.accountId} onChange={(e) => set(i, { accountId: e.target.value })}
-            className="w-72 rounded-md border border-slate-300 px-2 py-1"><option value="">Account…</option>
-            {accounts.map((a) => <option key={a.id} value={a.id}>{a.code} — {a.name}</option>)}</select>
-          <select aria-label={`Allocation ${i + 1} cost centre`} value={r.costCenterId ?? ''} onChange={(e) => set(i, { costCenterId: e.target.value || null })}
-            className="w-40 rounded-md border border-slate-300 px-2 py-1"><option value="">All cost centres</option>
-            {(costCenters.data ?? []).map((c) => <option key={c.id} value={c.id}>{c.code}</option>)}</select>
+          <Combobox aria-label={`Allocation ${i + 1} account`} value={r.accountId} onChange={(v) => set(i, { accountId: v })}
+            className="w-72 rounded-md border border-slate-300 px-2 py-1" placeholder="Account…"
+              options={accounts.map((a) => ({ value: a.id, label: `${a.code} — ${a.name}` }))} />
+          <Combobox aria-label={`Allocation ${i + 1} cost centre`} value={r.costCenterId ?? ''} onChange={(v) => set(i, { costCenterId: v || null })}
+            className="w-40 rounded-md border border-slate-300 px-2 py-1" placeholder="All cost centres"
+              options={(costCenters.data ?? []).map((c) => ({ value: c.id, label: `${c.code} — ${c.name}` }))} />
           <input aria-label={`Allocation ${i + 1} amount`} inputMode="decimal" value={r.amount} placeholder="0.00"
             onChange={(e) => set(i, { amount: e.target.value.replace(/[^\d.]/g, '') })}
             className={`w-36 rounded border px-2 py-1 text-right ${isValidAmount(r.amount) ? 'border-slate-300' : 'border-red-500'}`} />

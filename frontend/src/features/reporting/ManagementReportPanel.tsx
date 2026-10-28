@@ -1,4 +1,5 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
+import { Combobox } from '../../components/Combobox';
 import { useState } from 'react';
 import { accountApi, bankApi, customerApi, reportingApi, supplierApi } from '../../api/endpoints';
 import { useAuth } from '../../auth/AuthContext';
@@ -117,10 +118,10 @@ export function ManagementReportPanel({ onQueued }: { onQueued: () => void }) {
           </select></label>
           <div className="w-28"><Field label="Threshold %" inputMode="decimal" value={p.thresholdPercent}
             onChange={(e) => setP({ ...p, thresholdPercent: e.target.value.replace(/[^\d.]/g, '') })} /></div></>}
-        {has('account') && <label>Account <select value={p.accountId} onChange={(e) => setP({ ...p, accountId: e.target.value })} className={select}>
-          <option value="">All accounts</option>{postableAccounts(chart.data?.accounts).map((a) => <option key={a.id} value={a.id}>{a.code} {a.name}</option>)}</select></label>}
-        {has('costCenter') && <label>Cost centre <select value={p.costCenterId} onChange={(e) => setP({ ...p, costCenterId: e.target.value })} className={select}>
-          <option value="">All</option>{(costCenters.data ?? []).map((c) => <option key={c.id} value={c.id}>{c.code}</option>)}</select></label>}
+        {has('account') && <label>Account <Combobox value={p.accountId} onChange={(v) => setP({ ...p, accountId: v })} className={select} placeholder="All accounts"
+              options={postableAccounts(chart.data?.accounts).map((a) => ({ value: a.id, label: `${a.code} — ${a.name}` }))} /></label>}
+        {has('costCenter') && <label>Cost centre <Combobox value={p.costCenterId} onChange={(v) => setP({ ...p, costCenterId: v })} className={select} placeholder="All"
+              options={(costCenters.data ?? []).map((c) => ({ value: c.id, label: `${c.code} — ${c.name}` }))} /></label>}
         {has('subsidiary') && <>
           <label>Ledger <select value={p.slType} onChange={(e) => setP({ ...p, slType: e.target.value, subsidiaryAccountId: '' })} className={select}>
             {['CUSTOMER', 'SUPPLIER', 'EMPLOYEE', 'OTHER'].map((t) => <option key={t} value={t}>{t.charAt(0) + t.slice(1).toLowerCase()}</option>)}</select></label>

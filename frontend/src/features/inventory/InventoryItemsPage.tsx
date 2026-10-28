@@ -1,4 +1,5 @@
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { Combobox } from '../../components/Combobox';
 import { useState } from 'react';
 import { Link, useParams } from 'react-router';
 import { inventoryApi } from '../../api/endpoints';
@@ -66,11 +67,11 @@ export function InventoryItemsPage() {
               <Field label="Item name" value={item.name} onChange={(e) => setItem({ ...item, name: e.target.value })} />
               <Field label="Unit of measure" value={item.unitOfMeasure} onChange={(e) => setItem({ ...item, unitOfMeasure: e.target.value })} />
               <label className="block text-sm md:col-span-3">Inventory account
-                <select value={item.inventoryAccountId} onChange={(e) => setItem({ ...item, inventoryAccountId: e.target.value })} className="mt-1.5 block w-full rounded-lg border border-slate-300 px-3 py-2 shadow-xs">
-                  <option value="">Select…</option>{accounts.filter((a) => a.accountType === 'ASSET').map((a) => <option key={a.id} value={a.id}>{a.code} — {a.name}</option>)}</select></label>
+                <Combobox value={item.inventoryAccountId} onChange={(v) => setItem({ ...item, inventoryAccountId: v })} className="mt-1.5 block w-full rounded-lg border border-slate-300 px-3 py-2 shadow-xs" placeholder="Select…"
+              options={accounts.filter((a) => a.accountType === 'ASSET').map((a) => ({ value: a.id, label: `${a.code} — ${a.name}` }))} /></label>
               <label className="block text-sm md:col-span-3">Consumption account
-                <select value={item.consumptionAccountId} onChange={(e) => setItem({ ...item, consumptionAccountId: e.target.value })} className="mt-1.5 block w-full rounded-lg border border-slate-300 px-3 py-2 shadow-xs">
-                  <option value="">Select…</option>{accounts.filter((a) => a.accountType === 'EXPENSE').map((a) => <option key={a.id} value={a.id}>{a.code} — {a.name}</option>)}</select></label>
+                <Combobox value={item.consumptionAccountId} onChange={(v) => setItem({ ...item, consumptionAccountId: v })} className="mt-1.5 block w-full rounded-lg border border-slate-300 px-3 py-2 shadow-xs" placeholder="Select…"
+              options={accounts.filter((a) => a.accountType === 'EXPENSE').map((a) => ({ value: a.id, label: `${a.code} — ${a.name}` }))} /></label>
             </div>
             <Button variant="secondary" busy={createItem.isPending} disabled={!item.code || !item.name || !item.unitOfMeasure || !item.inventoryAccountId
               || !item.consumptionAccountId} onClick={() => createItem.mutate()}>Add item</Button>

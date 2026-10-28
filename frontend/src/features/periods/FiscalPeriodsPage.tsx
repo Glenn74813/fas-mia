@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { Combobox } from '../../components/Combobox';
 import { useRef, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { periodApi } from '../../api/endpoints';
@@ -102,11 +103,9 @@ function YearCard({ fy, run }: { fy: FiscalYear; run: (fn: () => Promise<unknown
         <h2 className="text-lg font-semibold">Fiscal year {fy.fiscalYear} <StatusBadge status={fy.status} /></h2>
         {fy.status === 'OPEN' && hasPermission('PERIOD_CLOSE') && (
           <div className="flex flex-wrap items-center gap-2 text-sm">
-            <select aria-label="Accumulated surplus account" value={surplus} onChange={(e) => setSurplus(e.target.value)}
-              className="rounded-md border border-slate-300 px-2 py-2">
-              <option value="">Surplus account for closing…</option>
-              {equity.map((a) => <option key={a.id} value={a.id}>{a.code} — {a.name}</option>)}
-            </select>
+            <Combobox aria-label="Accumulated surplus account" value={surplus} onChange={(v) => setSurplus(v)}
+              className="rounded-md border border-slate-300 px-2 py-2" placeholder="Surplus account for closing…"
+              options={equity.map((a) => ({ value: a.id, label: `${a.code} — ${a.name}` }))} />
             <Button variant="secondary" disabled={!surplus} onClick={() => run(async () => {
               const v = await periodApi.closingVoucher(fy.id, surplus);
               navigate(`/journal-vouchers/${v.id}`);

@@ -1,4 +1,5 @@
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
+import { Combobox } from '../../components/Combobox';
 import { useState } from 'react';
 import { Link, useSearchParams } from 'react-router';
 import { ledgerApi } from '../../api/endpoints';
@@ -33,10 +34,8 @@ export function AccountLedgerPage() {
       <PageHeader title="Account ledger" crumbs={[{ label: 'General ledger' }, { label: 'Account ledger' }]} />
       <div className="mb-4 flex flex-wrap items-end gap-3 text-sm">
         <label>Account
-          <select value={account} onChange={(e) => update({ account: e.target.value })} className="ml-2 w-80 rounded-lg border border-slate-300 px-3 py-2 shadow-xs">
-            <option value="">Select…</option>
-            {postableAccounts(chart.data?.accounts).map((a) => <option key={a.id} value={a.id}>{a.code} — {a.name}</option>)}
-          </select>
+          <Combobox value={account} onChange={(v) => update({ account: v })} className="ml-2 w-80 rounded-lg border border-slate-300 px-3 py-2 shadow-xs" placeholder="Select…"
+              options={postableAccounts(chart.data?.accounts).map((a) => ({ value: a.id, label: `${a.code} — ${a.name}` }))} />
         </label>
         <label>From <input type="date" value={from} onChange={(e) => update({ from: e.target.value })} className="ml-1 rounded-md border border-slate-300 px-2 py-2" /></label>
         <label>To <input type="date" value={to} onChange={(e) => update({ to: e.target.value })} className="ml-1 rounded-md border border-slate-300 px-2 py-2" /></label>

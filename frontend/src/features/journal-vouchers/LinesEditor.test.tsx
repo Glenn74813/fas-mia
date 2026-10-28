@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useState } from 'react';
 import { describe, expect, it, vi } from 'vitest';
@@ -34,9 +34,22 @@ describe('LinesEditor', () => {
     render(<Harness />);
     await userEvent.type(screen.getByLabelText('Line 1 debit'), '1.005');
     expect(screen.getByLabelText('Line 1 debit')).toHaveAttribute('aria-invalid', 'true');
-    const options = Array.from(screen.getByLabelText('Line 1 account').querySelectorAll('option')).map((o) => o.textContent);
+    await userEvent.click(screen.getByLabelText('Line 1 account'));
+    const options = screen.getAllByRole('option').map((o) => o.textContent);
     expect(options).toContain('PLC-5201 — Utilities');
     expect(options.join()).not.toContain('Assets');
+  });
+
+  it('finds an account by typing any part of its code or name', async () => {
+    let last: LineInput[] = [];
+    render(<Harness onLines={(l) => { last = l; }} />);
+    const field = screen.getByLabelText('Line 1 account');
+    await userEvent.type(field, 'cash bank');
+    expect(within(screen.getByRole('listbox')).getAllByRole('option').map((o) => o.textContent)).toEqual(['PLC-1102 — Cash in bank']);
+    await userEvent.keyboard('{Enter}');
+    expect(last[0]?.accountId).toBe('a2');
+    expect(field).toHaveValue('PLC-1102 — Cash in bank');
+    expect(screen.queryByRole('listbox')).toBeNull();
   });
 
   it('sends blank amounts as zero', () => {

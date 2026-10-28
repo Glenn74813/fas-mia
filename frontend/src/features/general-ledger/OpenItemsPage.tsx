@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { Combobox } from '../../components/Combobox';
 import { useState } from 'react';
 import { clearingApi } from '../../api/endpoints';
 import type { Clearing, ClearingProposal } from '../../api/types';
@@ -64,11 +65,9 @@ export function OpenItemsPage() {
         {admin && (
           <div className="mt-3 flex flex-wrap items-end gap-2 border-t border-slate-100 pt-3">
             <label className="text-sm font-medium text-slate-700">Account to manage by open item
-              <select value={toManage} onChange={(e) => setToManage(e.target.value)}
-                className="block w-80 rounded-lg border border-slate-300 px-3 py-2 shadow-xs text-sm">
-                <option value="">Choose…</option>
-                {candidates.map((a) => <option key={a.id} value={a.id}>{a.code} {a.name}</option>)}
-              </select></label>
+              <Combobox value={toManage} onChange={(v) => setToManage(v)}
+                className="block w-80 rounded-lg border border-slate-300 px-3 py-2 shadow-xs text-sm" placeholder="Choose…"
+              options={candidates.map((a) => ({ value: a.id, label: `${a.code} — ${a.name}` }))} /></label>
             <Button variant="secondary" disabled={!toManage} busy={manage.isPending}
               onClick={() => manage.mutate({ id: toManage, managed: true })}>Manage by open item</Button>
           </div>

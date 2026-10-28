@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
 import { adminToken, nextTotpWindow, onboard } from './team';
 import { totp } from './totp';
-import { act, nav, signIn, signOut } from './ui';
+import { act, nav, signIn, signOut, pick } from './ui';
 
 const admin = {
   username: process.env.E2E_ADMIN_USERNAME ?? '',
@@ -32,6 +32,8 @@ test('a concession invoice is billed, collected with tax withheld, reconciled an
   await page.getByLabel('Registered name').fill(name);
   await page.getByLabel('TIN').fill('123-456-789-00000');
   await page.getByRole('button', { name: 'Save customer' }).click();
+  // The list is paged; search, since earlier runs leave many customers.
+  await page.getByLabel('Search customers').fill(code);
   await page.getByRole('link', { name: code, exact: true }).click();
   // Linking needs evidence and a second person's approval (C-18): the request alone grants nothing.
   await page.getByLabel('Portal username').fill(tenant.username);
@@ -46,7 +48,7 @@ test('a concession invoice is billed, collected with tax withheld, reconciled an
   await page.getByLabel('Customer', { exact: true }).selectOption({ label: `${code} — ${name}` });
   await page.getByLabel('Output VAT').selectOption({ label: 'PLC-VAT-OUT (0.1200)' });
   await page.getByLabel('Description', { exact: true }).fill('Concession rent, retail unit T3-21');
-  await page.getByLabel('Line 1 account').selectOption({ label: '40202050 — Rent/Lease Income' });
+  await pick(page.getByLabel('Line 1 account'), '40202050 — Rent/Lease Income');
   await page.getByLabel('Line 1 description').fill('Monthly rent');
   await page.getByLabel('Line 1 net amount').fill('50000.00');
   await page.getByRole('button', { name: 'Save draft' }).click();

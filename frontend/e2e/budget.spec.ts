@@ -1,7 +1,7 @@
 import { expect, request, test } from '@playwright/test';
 import { futureYear } from './fiscal';
 import { adminToken, nextTotpWindow, onboard } from './team';
-import { act, nav, signIn, signOut } from './ui';
+import { act, nav, signIn, signOut, pick } from './ui';
 
 const admin = {
   username: process.env.E2E_ADMIN_USERNAME ?? '',
@@ -36,21 +36,21 @@ test('a budget is validated, approved by a second person, and realignments may o
   // Validation: the same account and cost centre twice is refused, with the reason shown.
   const utilities = '50204020 — Electricity Expenses';
   const repairs = '50213050 — Repairs and Maintenance-Machinery and Equipment';
-  await page.getByLabel('Allocation 1 account').selectOption({ label: utilities });
-  await page.getByLabel('Allocation 1 cost centre').selectOption({ label: 'PLC-CC-FIN' });
+  await pick(page.getByLabel('Allocation 1 account'), utilities);
+  await pick(page.getByLabel('Allocation 1 cost centre'), 'PLC-CC-FIN');
   await page.getByLabel('Allocation 1 amount').fill('50000.00');
   await page.getByRole('button', { name: '+ Add allocation' }).click();
-  await page.getByLabel('Allocation 2 account').selectOption({ label: utilities });
-  await page.getByLabel('Allocation 2 cost centre').selectOption({ label: 'PLC-CC-FIN' });
+  await pick(page.getByLabel('Allocation 2 account'), utilities);
+  await pick(page.getByLabel('Allocation 2 cost centre'), 'PLC-CC-FIN');
   await page.getByLabel('Allocation 2 amount').fill('1000.00');
   await page.getByRole('button', { name: 'Save allocations' }).click();
   await expect(page.getByText(/allocated twice for the same cost centre/)).toBeVisible();
   // Mixing an account-level and a cost-centre allocation is refused too.
-  await page.getByLabel('Allocation 2 cost centre').selectOption({ label: 'All cost centres' });
+  await pick(page.getByLabel('Allocation 2 cost centre'), 'All cost centres');
   await page.getByRole('button', { name: 'Save allocations' }).click();
   await expect(page.getByText(/mixes account-level and cost-centre allocations/)).toBeVisible();
-  await page.getByLabel('Allocation 2 account').selectOption({ label: repairs });
-  await page.getByLabel('Allocation 2 cost centre').selectOption({ label: 'PLC-CC-FIN' });
+  await pick(page.getByLabel('Allocation 2 account'), repairs);
+  await pick(page.getByLabel('Allocation 2 cost centre'), 'PLC-CC-FIN');
   await page.getByLabel('Allocation 2 amount').fill('30000.00');
   await page.getByRole('button', { name: 'Save allocations' }).click();
   await expect(page.getByRole('row', { name: /50213050.*30,000\.00/ }).first()).toBeVisible();

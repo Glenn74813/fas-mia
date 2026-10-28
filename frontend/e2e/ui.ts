@@ -1,4 +1,4 @@
-import { expect, type Page } from '@playwright/test';
+import { expect, type Locator, type Page } from '@playwright/test';
 import type { Member } from './team';
 import { totp } from './totp';
 
@@ -42,3 +42,17 @@ export async function act(page: Page, button: string | RegExp, confirmLabel: str
 }
 
 export const PDF = { name: 'support.pdf', mimeType: 'application/pdf', buffer: Buffer.from('%PDF-1.4\n% e2e\n%%EOF\n') };
+
+/**
+ * Chooses in a searchable dropdown (Combobox): the option whose label is exactly `text` if the open list shows it
+ * (such as the empty choice), otherwise the first option containing `text` after typing it.
+ */
+export async function pick(field: Locator, text: string) {
+  await field.click();
+  const list = field.page().getByRole('listbox');
+  if (!(await list.getByRole('option', { name: text, exact: true }).count())) {
+    await field.fill(text);
+  }
+  await list.getByRole('option', { name: text }).first().click();
+  await expect(list).toBeHidden();
+}

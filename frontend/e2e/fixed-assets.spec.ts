@@ -1,7 +1,7 @@
 import { expect, request, test } from '@playwright/test';
 import { futureYear } from './fiscal';
 import { adminToken, nextTotpWindow, onboard } from './team';
-import { act, nav, signIn, signOut } from './ui';
+import { act, nav, signIn, signOut, pick } from './ui';
 
 const admin = {
   username: process.env.E2E_ADMIN_USERNAME ?? '',
@@ -69,14 +69,14 @@ test('an asset is registered, activated, depreciated and disposed of, each contr
   await signIn(page, accountant);
   await nav(page, 'Asset register');
   await page.getByRole('link', { name: 'Register asset' }).click();
-  await page.getByLabel('Category').selectOption({ label: 'PLC-FA-EQPT — [PLACEHOLDER] Machinery and equipment (verify useful life, C-30)' });
+  await pick(page.getByLabel('Category'), 'PLC-FA-EQPT — [PLACEHOLDER] Machinery and equipment (verify useful life, C-30)');
   await page.getByLabel('Description', { exact: true }).fill(`E2E generator set ${tag}`);
   await page.getByLabel('Serial number').fill(`SN-${tag}`);
   await page.getByLabel('Acquisition date').fill(inService);
   await page.getByLabel('In-service date').fill(inService);
   await page.getByLabel('Cost', { exact: true }).fill('60000.00');
   await page.getByLabel('Other (donation, transfer-in, found)').check();
-  await page.getByLabel('Offset account').selectOption({ label: '40699990 — Miscellaneous Income' });
+  await pick(page.getByLabel('Offset account'), '40699990 — Miscellaneous Income');
   await page.getByLabel('Justification').fill('Donated by an airline partner, deed of donation attached');
   await page.getByRole('button', { name: 'Save draft' }).click();
   await expect(page.getByRole('heading', { name: 'Asset (draft)' })).toBeVisible();

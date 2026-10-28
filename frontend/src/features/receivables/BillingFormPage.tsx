@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { Combobox } from '../../components/Combobox';
 import { useState, type FormEvent } from 'react';
 import { useNavigate, useParams } from 'react-router';
 import { billingApi, customerApi, settingsApi } from '../../api/endpoints';
@@ -100,12 +101,12 @@ function BillingForm({ existing }: { existing?: BillingView }) {
               {lines.map((l, i) => (
                 <tr key={i} className="border-t border-slate-100">
                   <td className="px-2 py-2 text-slate-500">{i + 1}</td>
-                  <td className="px-2 py-2"><select aria-label={`Line ${i + 1} account`} value={l.revenueAccountId} onChange={(e) => set(i, { revenueAccountId: e.target.value })}
-                    className="w-64 rounded-md border border-slate-300 px-2 py-1"><option value="">Select…</option>
-                    {revenue.map((a) => <option key={a.id} value={a.id}>{a.code} — {a.name}</option>)}</select></td>
-                  <td className="px-2 py-2"><select aria-label={`Line ${i + 1} cost centre`} value={l.costCenterId ?? ''} onChange={(e) => set(i, { costCenterId: e.target.value || null })}
-                    className="w-36 rounded-md border border-slate-300 px-2 py-1"><option value="">—</option>
-                    {(costCenters.data ?? []).map((c) => <option key={c.id} value={c.id}>{c.code}</option>)}</select></td>
+                  <td className="px-2 py-2"><Combobox aria-label={`Line ${i + 1} account`} value={l.revenueAccountId} onChange={(v) => set(i, { revenueAccountId: v })}
+                    className="w-64 rounded-md border border-slate-300 px-2 py-1" placeholder="Select…"
+              options={revenue.map((a) => ({ value: a.id, label: `${a.code} — ${a.name}` }))} /></td>
+                  <td className="px-2 py-2"><Combobox aria-label={`Line ${i + 1} cost centre`} value={l.costCenterId ?? ''} onChange={(v) => set(i, { costCenterId: v || null })}
+                    className="w-36 rounded-md border border-slate-300 px-2 py-1" placeholder="—"
+              options={(costCenters.data ?? []).map((c) => ({ value: c.id, label: `${c.code} — ${c.name}` }))} /></td>
                   <td className="px-2 py-2"><input aria-label={`Line ${i + 1} description`} value={l.description} onChange={(e) => set(i, { description: e.target.value })}
                     className="w-64 rounded-md border border-slate-300 px-2 py-1" /></td>
                   <td className="px-2 py-2"><input aria-label={`Line ${i + 1} net amount`} inputMode="decimal" value={l.netAmount}

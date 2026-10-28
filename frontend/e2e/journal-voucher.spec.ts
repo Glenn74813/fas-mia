@@ -1,6 +1,7 @@
 import { expect, test, type Page } from '@playwright/test';
 import { adminToken, nextTotpWindow, onboard, type Member } from './team';
 import { totp } from './totp';
+import { pick } from './ui';
 
 const admin = {
   username: process.env.E2E_ADMIN_USERNAME ?? '',
@@ -55,10 +56,10 @@ test('a journal voucher moves from preparation to the posted ledger with four di
   await page.getByLabel('Accounting date').fill(today);
   const bill = `E2E utilities bill ${Date.now().toString(36)}`;
   await page.getByLabel('Description / particulars').fill(`${bill} for the terminal`);
-  await page.getByLabel('Line 1 account').selectOption({ label: '50204020 — Electricity Expenses' });
-  await page.getByLabel('Line 1 cost centre').selectOption({ label: 'PLC-CC-FIN' });
+  await pick(page.getByLabel('Line 1 account'), '50204020 — Electricity Expenses');
+  await pick(page.getByLabel('Line 1 cost centre'), 'PLC-CC-FIN');
   await page.getByLabel('Line 1 debit').fill('1500.75');
-  await page.getByLabel('Line 2 account').selectOption({ label: '10102020 — Cash in Bank-Local Currency, Current Account' });
+  await pick(page.getByLabel('Line 2 account'), '10102020 — Cash in Bank-Local Currency, Current Account');
   await page.getByLabel('Line 2 credit').fill('1500.7');
   await expect(page.getByText('Out of balance by 0.05')).toBeVisible();
   await page.getByLabel('Line 2 credit').fill('1500.75');

@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { Combobox } from '../../components/Combobox';
 import { useState } from 'react';
 import { useNavigate } from 'react-router';
 import { assetApi, invoiceApi } from '../../api/endpoints';
@@ -38,15 +39,15 @@ export function AssetFormPage() {
         <ErrorAlert error={save.error} />
         <div className="grid gap-4 rounded-xl border border-slate-200/80 bg-white shadow-xs p-5 md:grid-cols-3">
           <div className="space-y-1.5"><label htmlFor="cat" className="block text-sm font-medium text-slate-700">Category</label>
-            <select id="cat" value={f.categoryId} onChange={(e) => set({ categoryId: e.target.value })} className={sel}><option value="">Select…</option>
-              {(categories.data ?? []).filter((c) => c.status === 'ACTIVE').map((c) => <option key={c.id} value={c.id}>{c.code} — {c.name}</option>)}</select></div>
+            <Combobox id="cat" value={f.categoryId} onChange={(v) => set({ categoryId: v })} className={sel} placeholder="Select…"
+              options={(categories.data ?? []).filter((c) => c.status === 'ACTIVE').map((c) => ({ value: c.id, label: `${c.code} — ${c.name}` }))} /></div>
           <div className="md:col-span-2"><Field label="Description" value={f.description} maxLength={500} onChange={(e) => set({ description: e.target.value })} /></div>
           <Field label="Serial number" value={f.serialNumber ?? ''} onChange={(e) => set({ serialNumber: e.target.value || null })} />
           <Field label="Location" value={f.location ?? ''} onChange={(e) => set({ location: e.target.value || null })} />
           <Field label="Custodian" value={f.custodian ?? ''} onChange={(e) => set({ custodian: e.target.value || null })} />
           <div className="space-y-1.5"><label htmlFor="cc" className="block text-sm font-medium text-slate-700">Cost centre</label>
-            <select id="cc" value={f.costCenterId ?? ''} onChange={(e) => set({ costCenterId: e.target.value || null })} className={sel}><option value="">—</option>
-              {(costCenters.data ?? []).map((c) => <option key={c.id} value={c.id}>{c.code}</option>)}</select></div>
+            <Combobox id="cc" value={f.costCenterId ?? ''} onChange={(v) => set({ costCenterId: v || null })} className={sel} placeholder="—"
+              options={(costCenters.data ?? []).map((c) => ({ value: c.id, label: `${c.code} — ${c.name}` }))} /></div>
           <Field label="Acquisition date" type="date" value={f.acquisitionDate} onChange={(e) => set({ acquisitionDate: e.target.value })} />
           <Field label="In-service date" type="date" value={f.inServiceDate} onChange={(e) => set({ inServiceDate: e.target.value })} />
           <Field label="Cost" inputMode="decimal" value={f.cost} onChange={(e) => set({ cost: e.target.value.replace(/[^\d.]/g, '') })} />
@@ -76,8 +77,8 @@ export function AssetFormPage() {
           {f.acquisitionSource === 'OTHER' && (
             <div className="grid gap-3 md:grid-cols-2">
               <div className="space-y-1.5"><label htmlFor="off" className="block text-sm font-medium text-slate-700">Offset account</label>
-                <select id="off" value={f.offsetAccountId ?? ''} onChange={(e) => set({ offsetAccountId: e.target.value || null })} className={sel}>
-                  <option value="">Select…</option>{offsets.map((a) => <option key={a.id} value={a.id}>{a.code} — {a.name}</option>)}</select></div>
+                <Combobox id="off" value={f.offsetAccountId ?? ''} onChange={(v) => set({ offsetAccountId: v || null })} className={sel} placeholder="Select…"
+              options={offsets.map((a) => ({ value: a.id, label: `${a.code} — ${a.name}` }))} /></div>
               <Field label="Justification" value={f.justification ?? ''} maxLength={1000} onChange={(e) => set({ justification: e.target.value || null })} />
             </div>
           )}

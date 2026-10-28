@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 import { adminToken, nextTotpWindow, onboard } from './team';
-import { act, nav, PDF, signIn, signOut } from './ui';
+import { act, nav, PDF, signIn, signOut, pick } from './ui';
 
 const admin = {
   username: process.env.E2E_ADMIN_USERNAME ?? '',
@@ -35,6 +35,8 @@ test('a supplier invoice is recognised, paid by check and reconciled, each step 
   await page.getByLabel('Default withholding tax').selectOption({ label: 'PLC-EWT-SERV (0.0200)' });
   await page.getByLabel('VAT-registered').check();
   await page.getByRole('button', { name: 'Save supplier' }).click();
+  // The list is paged; search, since earlier runs leave many suppliers.
+  await page.getByLabel('Search suppliers').fill(supplierCode);
   await expect(page.getByRole('cell', { name: supplierCode, exact: true })).toBeVisible();
 
   await nav(page, 'Supplier invoices');
@@ -45,8 +47,8 @@ test('a supplier invoice is recognised, paid by check and reconciled, each step 
   await page.getByLabel('Input VAT').selectOption({ label: 'PLC-VAT-IN (0.1200)' });
   await page.getByLabel('Accounting date').fill(today);
   await page.getByLabel('Description', { exact: true }).fill('Aircon preventive maintenance, terminal 3');
-  await page.getByLabel('Line 1 account').selectOption({ label: '50213050 — Repairs and Maintenance-Machinery and Equipment' });
-  await page.getByLabel('Line 1 cost centre').selectOption({ label: 'PLC-CC-OPS' });
+  await pick(page.getByLabel('Line 1 account'), '50213050 — Repairs and Maintenance-Machinery and Equipment');
+  await pick(page.getByLabel('Line 1 cost centre'), 'PLC-CC-OPS');
   await page.getByLabel('Line 1 net amount').fill('20000.00');
   await page.getByRole('button', { name: 'Save draft' }).click();
   // Net 20,000 + 12% VAT 2,400 - 2% EWT 400 = 22,000 payable.

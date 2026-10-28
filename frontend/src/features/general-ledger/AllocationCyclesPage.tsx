@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { Combobox } from '../../components/Combobox';
 import { useMemo, useState, type FormEvent } from 'react';
 import { Link } from 'react-router';
 import { accountApi, allocationApi, periodApi } from '../../api/endpoints';
@@ -120,17 +121,18 @@ export function AllocationCyclesPage() {
             <fieldset key={i} className="space-y-2 rounded-lg border border-slate-200 p-3">
               <legend className="px-1 text-sm font-medium">Rule {i + 1}</legend>
               <div className="grid gap-2 sm:grid-cols-3">
-                <label className="text-sm">Sender account<select value={r.senderAccountId} onChange={(e) => setRule(i, { senderAccountId: e.target.value })} className={`mt-1.5 block w-full ${select}`}>
-                  <option value="">Choose…</option>{accounts.map((a) => <option key={a.id} value={a.id}>{a.code} {a.name}</option>)}</select></label>
-                <label className="text-sm">Sender cost centre<select value={r.senderCostCenterId} onChange={(e) => setRule(i, { senderCostCenterId: e.target.value })} className={`mt-1.5 block w-full ${select}`}>
-                  <option value="">Choose…</option>{(costCenters.data ?? []).map((c) => <option key={c.id} value={c.id}>{c.code} {c.name}</option>)}</select></label>
+                <label className="text-sm">Sender account<Combobox value={r.senderAccountId} onChange={(v) => setRule(i, { senderAccountId: v })} className={`mt-1.5 block w-full ${select}`} placeholder="Choose…"
+              options={accounts.map((a) => ({ value: a.id, label: `${a.code} — ${a.name}` }))} /></label>
+                <label className="text-sm">Sender cost centre<Combobox value={r.senderCostCenterId} onChange={(v) => setRule(i, { senderCostCenterId: v })} className={`mt-1.5 block w-full ${select}`} placeholder="Choose…"
+              options={(costCenters.data ?? []).map((c) => ({ value: c.id, label: `${c.code} — ${c.name}` }))} /></label>
                 <label className="text-sm">Key<select value={r.keyType} onChange={(e) => setRule(i, { keyType: e.target.value as RuleForm['keyType'] })} className={`mt-1.5 block w-full ${select}`}>
                   <option value="PERCENT">Fixed percentages</option><option value="QUANTITY">Statistical quantities</option></select></label>
               </div>
               {r.receivers.map((x, k) => (
                 <div key={k} className="flex flex-wrap items-end gap-2">
-                  <label className="text-sm">Receiver<select value={x.costCenterId} onChange={(e) => setRule(i, { receivers: r.receivers.map((y, m) => (m === k ? { ...y, costCenterId: e.target.value } : y)) })}
-                    className={`mt-1.5 block ${select}`}><option value="">Choose…</option>{(costCenters.data ?? []).map((c) => <option key={c.id} value={c.id}>{c.code} {c.name}</option>)}</select></label>
+                  <label className="text-sm">Receiver<Combobox value={x.costCenterId} onChange={(v) => setRule(i, { receivers: r.receivers.map((y, m) => (m === k ? { ...y, costCenterId: v } : y)) })}
+                    className={`mt-1.5 block ${select}`} placeholder="Choose…"
+              options={(costCenters.data ?? []).map((c) => ({ value: c.id, label: `${c.code} — ${c.name}` }))} /></label>
                   <label className="text-sm">{r.keyType === 'PERCENT' ? 'Percent' : 'Quantity'}<input inputMode="decimal" value={x.weight}
                     onChange={(e) => setRule(i, { receivers: r.receivers.map((y, m) => (m === k ? { ...y, weight: e.target.value } : y)) })} className={`mt-1.5 block w-28 ${select}`} /></label>
                 </div>

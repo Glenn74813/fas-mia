@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 import { adminToken, nextTotpWindow, onboard } from './team';
-import { nav, signIn, signOut } from './ui';
+import { nav, signIn, signOut, pick } from './ui';
 
 const admin = {
   username: process.env.E2E_ADMIN_USERNAME ?? '',
@@ -39,7 +39,7 @@ test('a close task is set up, reaches its owner through the inbox and is ticked 
   // Wait for the list to load before deciding whether GR/IR still has to be added.
   await expect(managed.getByRole('table').getByRole('row').nth(1)).toBeVisible();
   if (await grir.count() === 0) {
-    await managed.getByLabel('Account to manage by open item').selectOption({ label: '29999990 Other Payables' });
+    await pick(managed.getByLabel('Account to manage by open item'), '29999990');
     await managed.getByRole('button', { name: 'Manage by open item' }).click();
   }
   await grir.click();

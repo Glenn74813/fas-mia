@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
+import { Combobox } from '../../components/Combobox';
 import { accountApi } from '../../api/endpoints';
 import type { Account, LineInput } from '../../api/types';
 import { SearchSelect } from '../../components/SearchSelect';
@@ -58,19 +59,15 @@ export function LinesEditor({ lines, onChange }: Props) {
                 <tr key={i} className="border-t border-slate-100 align-top">
                   <td className="px-2 py-2 text-slate-500">{n}</td>
                   <td className="px-2 py-2">
-                    <select aria-label={`Line ${n} account`} value={line.accountId} className="w-64 rounded-md border border-slate-300 px-2 py-1"
-                      onChange={(e) => set(i, { accountId: e.target.value, costCenterId: null, subsidiaryAccountId: null })}>
-                      <option value="">Select account…</option>
-                      {accounts.map((a) => <option key={a.id} value={a.id}>{a.code} — {a.name}</option>)}
-                    </select>
+                    <Combobox aria-label={`Line ${n} account`} value={line.accountId} className="w-64 rounded-md border border-slate-300 px-2 py-1"
+                      onChange={(v) => set(i, { accountId: v, costCenterId: null, subsidiaryAccountId: null })} placeholder="Select account…"
+              options={accounts.map((a) => ({ value: a.id, label: `${a.code} — ${a.name}` }))} />
                   </td>
                   <td className="px-2 py-2">
-                    <select aria-label={`Line ${n} cost centre`} value={line.costCenterId ?? ''}
+                    <Combobox aria-label={`Line ${n} cost centre`} value={line.costCenterId ?? ''}
                       className={`w-40 rounded border px-2 py-1 ${account?.requiresCostCenter && !line.costCenterId ? 'border-amber-500' : 'border-slate-300'}`}
-                      onChange={(e) => set(i, { costCenterId: e.target.value || null })}>
-                      <option value="">{account?.requiresCostCenter ? 'Required…' : '—'}</option>
-                      {(costCenters.data ?? []).filter((c) => c.status === 'ACTIVE').map((c) => <option key={c.id} value={c.id}>{c.code}</option>)}
-                    </select>
+                      onChange={(v) => set(i, { costCenterId: v || null })} placeholder={account?.requiresCostCenter ? 'Required…' : '—'}
+              options={(costCenters.data ?? []).filter((c) => c.status === 'ACTIVE').map((c) => ({ value: c.id, label: `${c.code} — ${c.name}` }))} />
                   </td>
                   <td className="px-2 py-2">
                     {account?.subsidiaryType

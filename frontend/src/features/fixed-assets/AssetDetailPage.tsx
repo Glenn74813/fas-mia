@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { Combobox } from '../../components/Combobox';
 import { useState } from 'react';
 import { Link, useParams } from 'react-router';
 import { assetApi } from '../../api/endpoints';
@@ -119,8 +120,8 @@ export function AssetDetailPage() {
                 {['SALE', 'SCRAP', 'DONATION', 'TRANSFER', 'LOSS'].map((m) => <option key={m} value={m}>{m.toLowerCase()}</option>)}</select></label>
             <Field label="Proceeds" inputMode="decimal" value={disp.proceeds} onChange={(e) => setDisp({ ...disp, proceeds: e.target.value.replace(/[^\d.]/g, '') })} />
             <label className="block">Proceeds received in
-              <select value={disp.proceedsAccountId} onChange={(e) => setDisp({ ...disp, proceedsAccountId: e.target.value })} className="mt-1.5 block w-full rounded-lg border border-slate-300 px-3 py-2 shadow-xs">
-                <option value="">—</option>{cash.map((x) => <option key={x.id} value={x.id}>{x.code} — {x.name}</option>)}</select></label>
+              <Combobox value={disp.proceedsAccountId} onChange={(v) => setDisp({ ...disp, proceedsAccountId: v })} className="mt-1.5 block w-full rounded-lg border border-slate-300 px-3 py-2 shadow-xs" placeholder="—"
+              options={cash.map((x) => ({ value: x.id, label: `${x.code} — ${x.name}` }))} /></label>
             <Field label="Reason / authority" value={disp.reason} onChange={(e) => setDisp({ ...disp, reason: e.target.value })} />
           </div>
         )}
