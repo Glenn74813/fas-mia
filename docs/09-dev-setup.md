@@ -112,7 +112,11 @@ scripts/e2e.sh test e2e/journal-voucher.spec.ts
 `start` creates the `cas_e2e` database, runs the backend on port 8092 (dev profile, MFA bypass off) and the frontend
 on 5175, and onboards the test administrator once (credentials in `.devdata/e2e-admin.env`). `test` runs Playwright
 with one worker (the specs share the administrator's authenticator, and a code works once per 30-second window).
-`stop` stops the stack; `reset` also drops the database. Playwright's browsers: `cd frontend && npx playwright install chromium`.
+`stop` stops the stack; `reset` also drops the database. The backend runs from a copy of the jar
+(`.devdata/cas-backend-e2e.jar`, as `run-backend-dev.sh` and `run-backend-demo.sh` do): Spring Boot loads classes from
+the jar file as they are first used, so rebuilding `backend/target` under a running backend makes later requests die
+without a response. The frontend is a production build served by `vite preview` on 5175 (no hot reload can
+reload a page mid-test). Both are built or copied at `start`, so after changing code, `stop` and `start` again to test it. Playwright's browsers: `cd frontend && npx playwright install chromium`.
 
 ## Demo users
 

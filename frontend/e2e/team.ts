@@ -43,6 +43,32 @@ export async function adminToken(username: string, password: string, secret: str
   }
 }
 
+/** Signs a member in through the API (once per 30-second window per member) and returns an access token. */
+export async function tokenFor(m: Member): Promise<string> {
+  const ctx = await request.newContext();
+  try {
+    const step = await json<{ mfaToken: string }>(ctx, '/auth/login', { identifier: m.username, password: m.password });
+    return (await json<{ accessToken: string }>(ctx, '/auth/mfa/verify', { mfaToken: step.mfaToken, code: totp(m.secret) })).accessToken;
+  } finally {
+    await ctx.dispose();
+  }
+}
+
+/** GET and POST as the holder of {@code token}, failing loudly on any error status. */
+export async function apiAs(token: string) {
+  const ctx = await request.newContext({ extraHTTPHeaders: { Authorization: `Bearer ${token}` } });
+  const check = async (res: Awaited<ReturnType<APIRequestContext['get']>>, what: string) => {
+    if (!res.ok()) throw new Error(`${what} -> ${res.status()} ${await res.text()}`);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return (res.status() === 204 ? undefined : await res.json()) as any;
+  };
+  return {
+    get: async (path: string) => check(await ctx.get(`${API}/api/v1${path}`), `GET ${path}`),
+    post: async (path: string, body: unknown) => check(await ctx.post(`${API}/api/v1${path}`, { data: body }), `POST ${path}`),
+    dispose: () => ctx.dispose(),
+  };
+}
+
 /** Creates a user with the given roles and completes their MFA enrolment and password change. */
 export async function onboard(admin: string, prefix: string, roles: string[], userType = 'INTERNAL'): Promise<Member> {
   const ctx = await request.newContext();

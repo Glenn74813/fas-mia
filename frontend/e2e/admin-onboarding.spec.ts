@@ -10,6 +10,8 @@ const admin = {
 
 test.skip(!admin.username || !admin.password || !admin.totpSecret,
   'Set E2E_ADMIN_USERNAME, E2E_ADMIN_PASSWORD and E2E_ADMIN_TOTP_SECRET for an enrolled test administrator');
+// Several waits for a fresh 30-second code window.
+test.setTimeout(180_000);
 
 async function signIn(page: Page, username: string, password: string) {
   await page.goto('/login');
@@ -34,6 +36,8 @@ test('administrator onboards a user who enrols MFA and sets a password', async (
   const welcome = page.getByRole('heading', { name: /Welcome/ });
   await expect(mfa.or(welcome)).toBeVisible();
   if (await mfa.isVisible()) {
+    // A code works once: a fresh window, so an earlier run's or spec's sign-in cannot have used it.
+    await waitForFreshStep();
     await page.getByLabel('6-digit code').fill(totp(admin.totpSecret));
     await page.getByRole('button', { name: 'Verify' }).click();
   }
@@ -129,6 +133,8 @@ test('an external auditor is created with an access expiry, which the administra
   const welcome = page.getByRole('heading', { name: /Welcome/ });
   await expect(mfa.or(welcome)).toBeVisible();
   if (await mfa.isVisible()) {
+    // A code works once: a fresh window, so an earlier run's or spec's sign-in cannot have used it.
+    await waitForFreshStep();
     await page.getByLabel('6-digit code').fill(totp(admin.totpSecret));
     await page.getByRole('button', { name: 'Verify' }).click();
   }

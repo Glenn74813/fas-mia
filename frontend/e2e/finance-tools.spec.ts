@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { adminToken, nextTotpWindow, onboard } from './team';
+import { adminToken, apiAs, nextTotpWindow, onboard, tokenFor, type Member } from './team';
 import { nav, signIn, signOut, pick, select } from './ui';
 
 const admin = {
@@ -17,7 +17,10 @@ test('ad hoc report, overhead allocation preview and a cost vs market review', a
   const token = await adminToken(admin.username, admin.password, admin.totpSecret);
   const accountant = await onboard(token, 'ftacct', ['ACCOUNTANT']);
   const clerk = await onboard(token, 'ftclerk', ['INVENTORY_CLERK']);
+  const chief = await onboard(token, 'ftchief', ['CHIEF_ACCOUNTANT']);
   await nextTotpWindow();
+  await stockOneItem(accountant, clerk, chief);
+  await nextTotpWindow(); // the set-up used this window's codes
   await signIn(page, accountant);
   const main = page.getByRole('main');
   const stamp = Date.now();
@@ -68,3 +71,24 @@ test('ad hoc report, overhead allocation preview and a cost vs market review', a
   await main.getByRole('button', { name: 'Save prices' }).click();
   await expect(main.getByRole('heading', { name: /Review as of 2026-10-27/ })).not.toContainText('write-down ₱0.00');
 });
+
+/** The cost vs market review lists items with stock on hand: receive one item, so the test needs no other spec's data. */
+async function stockOneItem(accountant: Member, clerk: Member, chief: Member) {
+  const tag = Date.now().toString(36).toUpperCase();
+  const acct = await apiAs(await tokenFor(accountant));
+  const supplier = await acct.post('/suppliers', { code: `S${tag}`, name: `E2E Market Test Supply ${tag}`, vatRegistered: false });
+  await acct.dispose();
+  const store = await apiAs(await tokenFor(clerk));
+  const accounts: { id: string; code: string }[] = (await store.get('/accounts')).accounts;
+  const id = (code: string) => accounts.find((a) => a.code === code)!.id;
+  const warehouse = (await store.get('/inventory/warehouses') as { id: string; code: string }[]).find((w) => w.code === 'PLC-WH-MAIN')!;
+  const item = await store.post('/inventory/items', { code: `NRV-${tag}`, name: 'Market test item', unitOfMeasure: 'pc',
+    inventoryAccountId: id('10404990'), consumptionAccountId: id('50213050') });
+  const grn = await store.post('/inventory/documents', { kind: 'GOODS_RECEIPT', documentDate: '2026-10-20', // before the review date below
+    supplierId: supplier.id, reference: `DR-${tag}`, costCenterId: null, description: 'Stock for the cost vs market review',
+    lines: [{ itemId: item.id, warehouseId: warehouse.id, toWarehouseId: null, quantity: '5', unitCost: '100' }] });
+  await store.dispose();
+  const poster = await apiAs(await tokenFor(chief));
+  await poster.post(`/inventory/documents/${grn.id}/post`, { version: grn.version });
+  await poster.dispose();
+}

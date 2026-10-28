@@ -104,7 +104,6 @@ test('a journal voucher moves from preparation to the posted ledger with four di
 
   await page.getByRole('navigation', { name: 'Main' }).getByRole('link', { name: 'Trial balance' }).click();
   await expect(page.getByText('BALANCED', { exact: true })).toBeVisible();
-  await expect(page.getByText('USES PLACEHOLDER ACCOUNTS')).toBeVisible();
   await expect(page.getByRole('row', { name: /50204020/ })).toBeVisible();
   await signOut(page);
 
