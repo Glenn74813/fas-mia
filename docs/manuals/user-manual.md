@@ -124,6 +124,16 @@ then choose:
 **Post.** On an approved voucher choose **Post**. CAS creates the journal entry with the next gap-free number;
 the numbering format is interim (C-23). **Reverse** creates a reversing entry; an entry can be reversed once.
 
+**Date range, Excel export and import.**
+* **From** and **To** limit the voucher list to that span of accounting dates; **Clear dates** shows all again.
+* **Export Excel** (needs both dates) downloads every line of the vouchers in the span, also filtered by the search,
+  status and **Prepared by me**. One file holds at most 50,000 lines; choose a shorter span for more.
+* **Import Excel** (`JOURNAL_CREATE`) creates draft vouchers from a workbook in the **Template** layout: rows with
+  the same **Voucher reference** form one voucher, accounts, cost centres and subsidiary accounts are given by code,
+  and each voucher must balance. If any row has a problem nothing is imported and every problem is listed by row.
+  The drafts are yours and go through attachment, submission, review, approval and posting as usual. An exported
+  file can be imported again as new drafts. At most 200 vouchers and 5,000 rows per file.
+
 Budget control: on budget-controlled accounts, posting is refused if no approved budget allocation covers the
 amount ("Insufficient budget for …").
 

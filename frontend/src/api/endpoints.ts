@@ -227,6 +227,8 @@ export interface VoucherQuery {
   status?: string;
   type?: string;
   q?: string;
+  from?: string;
+  to?: string;
   mine?: boolean;
   page: number;
   size: number;
@@ -250,7 +252,19 @@ export const voucherApi = {
   download: (doc: DocumentInfo) => downloadFile(`/documents/${doc.id}/content`, doc.fileName),
   reverse: (entryId: string, accountingDate: string, reason: string) =>
     api.post<VoucherDetail>(`/journal-entries/${entryId}/reversal`, { accountingDate, adjustmentPeriod: false, reason }),
+  /** Excel of every voucher line in the date range, filtered like the list; its columns match the import. */
+  exportExcel: (q: Omit<VoucherQuery, 'page' | 'size' | 'sort'> & { from: string; to: string }) =>
+    downloadFile(`/journal-vouchers/export${qs({ ...q, mine: q.mine ? 'true' : undefined })}`, `journal-vouchers-${q.from}-to-${q.to}.xlsx`),
+  importTemplate: () => downloadFile('/journal-vouchers/import-template', 'journal-voucher-import-template.xlsx'),
+  /** Creates draft vouchers; all or nothing, with every problem listed by row. */
+  importExcel: (file: File) => api.upload<VoucherImportResult>('/journal-vouchers/import', file),
 };
+
+export interface VoucherImportResult {
+  vouchers: number;
+  lines: number;
+  voucherIds: string[];
+}
 
 export const ledgerApi = {
   trialBalance: (periodId: string) => api.get<TrialBalance>(`/general-ledger/trial-balance?periodId=${periodId}`),

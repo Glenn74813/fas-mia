@@ -9,6 +9,7 @@ import com.miaa.cas.journal.DecisionLog;
 import com.miaa.cas.journal.JournalVoucherService;
 import com.miaa.cas.journal.PostingService;
 import com.miaa.cas.journal.VoucherQueryService;
+import com.miaa.cas.journal.VoucherSpreadsheet;
 import com.miaa.cas.journal.web.JournalDtos.ActionRequest;
 import com.miaa.cas.journal.web.JournalDtos.ClosingVoucherRequest;
 import com.miaa.cas.journal.web.JournalDtos.ReversalRequest;
@@ -24,8 +25,10 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -49,9 +52,11 @@ public class JournalVoucherController {
     private final PostingService posting;
     private final VoucherQueryService queries;
     private final DocumentService documents;
+    private final VoucherSpreadsheet spreadsheet;
 
     public JournalVoucherController(JournalVoucherService commands, PostingService posting, VoucherQueryService queries,
-            DocumentService documents) {
+            DocumentService documents, VoucherSpreadsheet spreadsheet) {
+        this.spreadsheet = spreadsheet;
         this.commands = commands;
         this.posting = posting;
         this.queries = queries;
@@ -69,6 +74,39 @@ public class JournalVoucherController {
             @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "25") int size,
             @RequestParam(required = false) String sort) {
         return queries.list(status, type, from, to, q, mine, page, size, sort);
+    }
+
+    private static final MediaType XLSX = MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+
+    @GetMapping("/journal-vouchers/export")
+    @PreAuthorize("hasAuthority('PERM_LEDGER_VIEW') or hasAuthority('PERM_JOURNAL_CREATE')")
+    @Operation(summary = "Excel (.xlsx) of every voucher line dated from..to, filtered like the list; the columns match the import")
+    public ResponseEntity<byte[]> export(@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to,
+            @RequestParam(required = false) String status, @RequestParam(required = false) String type,
+            @RequestParam(required = false) String q, @RequestParam(defaultValue = "false") boolean mine) {
+        return ResponseEntity.ok().contentType(XLSX)
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"journal-vouchers-" + from + "-to-" + to + ".xlsx\"")
+                .body(spreadsheet.export(from, to, status, type, q, mine));
+    }
+
+    @GetMapping("/journal-vouchers/import-template")
+    @PreAuthorize("hasAuthority('PERM_JOURNAL_CREATE')")
+    @Operation(summary = "The Excel import template: header row, an example voucher and column instructions")
+    public ResponseEntity<byte[]> importTemplate() {
+        return ResponseEntity.ok().contentType(XLSX)
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"journal-voucher-import-template.xlsx\"")
+                .body(spreadsheet.template());
+    }
+
+    @PostMapping(value = "/journal-vouchers/import", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PreAuthorize("hasAuthority('PERM_JOURNAL_CREATE')")
+    @Operation(summary = "Create draft vouchers from an Excel file; all or nothing, every problem listed with its row")
+    public VoucherSpreadsheet.ImportResult importVouchers(@RequestPart("file") MultipartFile file) throws IOException {
+        if (file == null || file.isEmpty()) {
+            throw new ApiException(ErrorCode.FILE_REJECTED, "No file was uploaded.");
+        }
+        return spreadsheet.importDrafts(file.getBytes());
     }
 
     @GetMapping("/journal-vouchers/approval-queue")
