@@ -85,7 +85,7 @@ class InboundInterfacesIT extends AbstractAccountingIT {
     void assetsInXmlBecomeDraftAssetsAndHostileXmlIsRefused() throws Exception {
         String cat = "T-IF-" + System.nanoTime() % 100000;
         tx.executeWithoutResult(s -> assetSetup.createCategory(new CategoryRequest(cat, "Interface test equipment", account("PLC-1402"),
-                account("PLC-1409"), account("PLC-5301"), 36, null), true, Actor.SYSTEM));
+                account("PLC-1409"), account("PLC-5301"), 36, null, null), true, Actor.SYSTEM));
         Session accountant = login(createUser("ifassets", "ACCOUNTANT"));
         String xml = "<assets reference=\"PROP-" + cat + "\"><offsetAccountCode>PLC-4203</offsetAccountCode>"
                 + "<asset><categoryCode>" + cat + "</categoryCode><description>Baggage scanner</description><serialNumber>SN-1</serialNumber>"

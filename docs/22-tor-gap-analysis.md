@@ -110,7 +110,7 @@ All open items are sent to MIAA, grouped by office, in [25-miaa-decision-request
 | BIR CAS registration, PTU, e-receipts/e-invoices, EIS transmission (RR 9-2009, 8-2022, 11-2025), 2307 | §2.2.1, §3.10, A, B.10 | C-06: EIS schema and Permit to Transmit; registration with BIR. The sandbox adapter and transmission log are ready |
 | BIR monthly VAT, withholding and income tax reports; quarterly COA, annual DBM, GCG reports | §4.5, A, B.5 | C-06, C-07: official formats |
 | MIAA's sub-accounts and confirmation of the proposed account flags | §2.2.1 | C-22, C-07. The framework is settled (PFRS) and COA's Revised Chart of Accounts for Government Corporations (2019) is loaded in development (§8) |
-| PPE lapsing schedule format; revaluation and impairment | A, B.2 | C-07, C-30 |
+| PPE lapsing schedule format; whether MIAA uses the revaluation model (impairment and revaluation are built, 29 Oct 2026; revaluation is off until decided) | A, B.2 | C-07, C-30 |
 | Bank file formats and payment channels | B.3, D | C-11 |
 | Legacy data, volumes and migration plan | §3.7, F | C-12 |
 | Hosting provider with two Philippine regions | §3.4, §4.1 | C-04 |

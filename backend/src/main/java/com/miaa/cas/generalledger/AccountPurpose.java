@@ -53,7 +53,8 @@ public enum AccountPurpose {
             Map.entry("AP_TRADE_PAYABLE", SUPPLIER_CONTROL), Map.entry("INPUT_VAT", TAX_ASSET),
             Map.entry("AR_TRADE_RECEIVABLE", CUSTOMER_CONTROL), Map.entry("OUTPUT_VAT", TAX_LIABILITY),
             Map.entry("UNAPPLIED_COLLECTIONS", CUSTOMER_DEPOSIT), Map.entry("CASH_ON_HAND", CASH), Map.entry("CREDITABLE_WHT", TAX_ASSET),
-            Map.entry("FA_DISPOSAL_GAIN", GAIN), Map.entry("FA_DISPOSAL_LOSS", LOSS), Map.entry("INVENTORY_GRIR", LIABILITY),
+            Map.entry("FA_DISPOSAL_GAIN", GAIN), Map.entry("FA_DISPOSAL_LOSS", LOSS),
+            Map.entry("FA_IMPAIRMENT_LOSS", LOSS), Map.entry("FA_IMPAIRMENT_REVERSAL", GAIN), Map.entry("FA_REVALUATION_SURPLUS", EQUITY), Map.entry("INVENTORY_GRIR", LIABILITY),
             Map.entry("INVENTORY_VARIANCE", EXPENSE), Map.entry("INVENTORY_REVALUATION", EXPENSE),
             Map.entry("SUPPLIER_ADVANCES", SUPPLIER_ADVANCE));
 

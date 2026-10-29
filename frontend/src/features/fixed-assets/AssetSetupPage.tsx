@@ -21,11 +21,16 @@ export function AssetSetupPage() {
   const costCenters = useCostCenters();
   const categories = useQuery({ queryKey: ['asset-categories'], queryFn: assetApi.categories });
   const projects = useQuery({ queryKey: ['auc-projects'], queryFn: assetApi.projects });
-  const [cat, setCat] = useState({ code: '', name: '', assetAccountId: '', accumulatedAccountId: '', expenseAccountId: '', life: '60', residual: '' });
+  const [cat, setCat] = useState({ code: '', name: '', assetAccountId: '', accumulatedAccountId: '', expenseAccountId: '', impairmentAccountId: '',
+    life: '60', residual: '' });
   const [proj, setProj] = useState({ code: '', name: '', aucAccountId: '', costCenterId: '' });
   const createCat = useMutation({ mutationFn: () => assetApi.createCategory({ code: cat.code, name: cat.name, assetAccountId: cat.assetAccountId,
     accumulatedAccountId: cat.accumulatedAccountId, expenseAccountId: cat.expenseAccountId, defaultUsefulLifeMonths: Number(cat.life),
-    defaultResidualRate: cat.residual || null }), onSuccess: () => qc.invalidateQueries({ queryKey: ['asset-categories'] }) });
+    defaultResidualRate: cat.residual || null, accumulatedImpairmentAccountId: cat.impairmentAccountId || null }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['asset-categories'] }) });
+  const setImpairment = useMutation({ mutationFn: ({ categoryId, accountId }: { categoryId: string; accountId: string }) =>
+    assetApi.setImpairmentAccount(categoryId, accountId), onSuccess: () => qc.invalidateQueries({ queryKey: ['asset-categories'] }) });
+  const accumulatedAccounts = accountsFor(chart.data?.accounts, 'ASSET_ACCUMULATED');
   const createProj = useMutation({ mutationFn: () => assetApi.createProject({ ...proj, costCenterId: proj.costCenterId || null }),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['auc-projects'] }) });
   const close = useMutation({ mutationFn: assetApi.closeProject, onSuccess: () => qc.invalidateQueries({ queryKey: ['auc-projects'] }) });
@@ -40,15 +45,21 @@ export function AssetSetupPage() {
       <section className="mb-4 rounded-xl border border-slate-200/80 bg-white shadow-xs p-5">
         <h2 className="mb-3 font-semibold">Asset categories</h2>
         <table className="mb-4 min-w-full text-sm"><thead className="border-b border-slate-200 text-left text-[11px] font-semibold uppercase tracking-wider text-slate-500"><tr><th className="py-1 pr-3">Code</th><th className="py-1 pr-3">Name</th>
-          <th className="py-1 pr-3">Asset / accum. / expense</th><th className="py-1 pr-3">Life (months)</th><th className="py-1 pr-3">Residual rate</th><th /></tr></thead>
+          <th className="py-1 pr-3">Asset / accum. / expense</th><th className="py-1 pr-3">Accum. impairment</th><th className="py-1 pr-3">Life (months)</th><th className="py-1 pr-3">Residual rate</th><th /></tr></thead>
           <tbody>{(categories.data ?? []).map((c) => (
             <tr key={c.id} className="border-t border-slate-100"><td className="py-1.5 pr-3 font-mono">{c.code}</td><td className="py-1.5 pr-3">{c.name}</td>
               <td className="py-1.5 pr-3 font-mono">{c.assetAccountCode} / {c.accumulatedAccountCode} / {c.expenseAccountCode}</td>
+              <td className="py-1.5 pr-3">{manage
+                ? <Combobox aria-label={`Accumulated impairment account of ${c.code}`} value={c.accumulatedImpairmentAccountId ?? ''}
+                    onChange={(v) => v && setImpairment.mutate({ categoryId: c.id, accountId: v })} placeholder="Not set"
+                    className="block w-56 rounded-lg border border-slate-300 px-2 py-1 font-mono shadow-xs"
+                    options={accumulatedAccounts.filter((x) => x.id !== c.accumulatedAccountId).map((x) => ({ value: x.id, label: `${x.code} — ${x.name}` }))} />
+                : <span className="font-mono">{c.accumulatedImpairmentAccountCode ?? '—'}</span>}</td>
               <td className="py-1.5 pr-3">{c.defaultUsefulLifeMonths}</td><td className="py-1.5 pr-3">{c.defaultResidualRate ?? '—'}</td>
               <td className="py-1.5">{c.placeholder && <Badge tone="amber">PLACEHOLDER</Badge>}</td></tr>))}</tbody></table>
         {manage && (
           <div className="space-y-3 rounded-md border border-slate-200 p-4">
-            <ErrorAlert error={createCat.error} />
+            <ErrorAlert error={createCat.error ?? setImpairment.error} />
             <div className="grid gap-3 md:grid-cols-4">
               <Field label="Category code" value={cat.code} onChange={(e) => setCat({ ...cat, code: e.target.value })} />
               <Field label="Category name" value={cat.name} onChange={(e) => setCat({ ...cat, name: e.target.value })} />
@@ -57,6 +68,7 @@ export function AssetSetupPage() {
               {pick('ca', cat.assetAccountId, (v) => setCat({ ...cat, assetAccountId: v }), accountsFor(chart.data?.accounts, 'ASSET_COST'), 'Asset account')}
               {pick('cd', cat.accumulatedAccountId, (v) => setCat({ ...cat, accumulatedAccountId: v }), accountsFor(chart.data?.accounts, 'ASSET_ACCUMULATED'), 'Accumulated depreciation')}
               {pick('ce', cat.expenseAccountId, (v) => setCat({ ...cat, expenseAccountId: v }), accountsFor(chart.data?.accounts, 'EXPENSE'), 'Depreciation expense')}
+              {pick('ci', cat.impairmentAccountId, (v) => setCat({ ...cat, impairmentAccountId: v }), accumulatedAccounts, 'Accumulated impairment (optional)')}
             </div>
             <Button variant="secondary" busy={createCat.isPending} disabled={!cat.code || !cat.name || !cat.assetAccountId || !cat.accumulatedAccountId
               || !cat.expenseAccountId || !cat.life} onClick={() => createCat.mutate()}>Add category</Button>

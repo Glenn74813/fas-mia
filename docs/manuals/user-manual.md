@@ -328,7 +328,7 @@ reference is information for the cashier; it is not a receipt.
 
 | Task | Who |
 |---|---|
-| Register, activate, transfer, dispose | Accountant (`FA_MANAGE`) prepares; a second person activates or posts |
+| Register, activate, transfer, impair, revalue, dispose | Accountant (`FA_MANAGE`) prepares; a second person activates or posts |
 | Depreciation runs | Prepared by one person, posted by another |
 
 * **Asset register** → **Register asset**:
@@ -346,9 +346,25 @@ reference is information for the cashier; it is not a receipt.
 * **Depreciation**:
   1. **Compute depreciation** for a period; review the lines.
   2. A second person posts the run. One run per period; in annual mode, only in the year's last period.
+* **Impairment** (PAS 36): **Impair** with the **Date**, the **Recoverable amount** (below the carrying amount), an
+  optional reassessed **Remaining useful life**, the **Basis** and **Reason**. A second person chooses **Post**.
+  The loss is charged first against any revaluation surplus of the asset, then to impairment loss; accumulated
+  impairment is credited. The category needs its accumulated impairment account (**Asset setup**).
+* **Revaluation** (PAS 16, only where MIAA uses the revaluation model; switched off otherwise, C-07, C-30):
+  **Revalue** with the **Date**, **Fair value**, **Appraisal report** and **Reason**; a second person posts it.
+  Accumulated depreciation and impairment are eliminated against cost and the asset is restated at fair value. An
+  increase first reverses decreases earlier charged to profit or loss, then goes to revaluation surplus; a decrease
+  first reduces the asset's surplus, then is a loss.
+* For both, depreciation must be posted through the month before, and none yet for that month. Depreciation then
+  continues from the new carrying amount over the remaining (or reassessed) useful life; the asset page shows each
+  impairment and revaluation, and a draft shows what posting it will record. Reversing an impairment of an asset
+  carried at cost is not built.
 * **Disposal**: **Dispose** with the **Disposal date**, **Proceeds** and **Reason / authority**. A second person
-  chooses **Post disposal**. A pending transfer blocks a disposal and the other way round.
-* **Asset setup**: categories and assets-under-construction projects. **PPE reports**: the PPE schedule.
+  chooses **Post disposal**; it also clears accumulated impairment. A pending transfer, impairment or revaluation
+  blocks a disposal and the other way round.
+* **Asset setup**: categories (with their accumulated impairment account) and assets-under-construction projects.
+  **PPE reports**: the PPE schedule (revaluation and impairment columns appear when there are any) and the
+  register-to-ledger reconciliation, including accumulated impairment.
 
 ## 8. Inventory
 

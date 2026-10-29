@@ -169,7 +169,7 @@ public class DepreciationService {
         int full = jdbc.update("""
                 UPDATE fixed_assets a SET status = 'FULLY_DEPRECIATED', version = version + 1, updated_at = ?, updated_by = ?
                 WHERE a.id IN (SELECT asset_id FROM depreciation_lines WHERE run_id = ?) AND a.status = 'ACTIVE'
-                  AND """ + " " + FixedAssetService.ACCUMULATED + " >= a.cost - a.residual_value", now, CurrentActor.username(), id);
+                  AND """ + " " + FixedAssetService.ACCUMULATED + " + a.accumulated_impairment >= a.cost + a.cost_adjustment - a.residual_value", now, CurrentActor.username(), id);
         notifications.notify((UUID) r.get("prepared_by_id"), "DOCUMENT_POSTED", "Depreciation for " + period.getName() + " was posted by "
                 + CurrentActor.username(), "Journal entry " + entry.entryNumber() + ".", "/fixed-assets/depreciation/" + id);
         audit.record("DEPRECIATION_RUN_POSTED", "DEPRECIATION_RUN", id, Map.of("entryNumber", entry.entryNumber(),
@@ -194,8 +194,16 @@ public class DepreciationService {
         return view(id);
     }
 
-    /** Expected accumulated depreciation of an asset at the end of a month (migrated assets from their cutover basis). */
+    /**
+     * Expected accumulated depreciation of an asset at the end of a month: from its latest impairment or revaluation
+     * when there is one, migrated assets from their cutover basis, others from the in-service date.
+     */
     BigDecimal expected(Map<String, Object> asset, YearMonth month) {
+        Date remeasured = (Date) asset.get("basis_month");
+        if (remeasured != null) {
+            return DepreciationMath.expectedFromBasis((BigDecimal) asset.get("basis_accumulated"), (BigDecimal) asset.get("basis_depreciable"),
+                    ((Number) asset.get("basis_remaining_months")).intValue(), YearMonth.from(remeasured.toLocalDate()), month);
+        }
         Date basis = (Date) asset.get("depreciation_basis_date");
         if (basis != null) {
             return DepreciationMath.expectedFromOpening((BigDecimal) asset.get("cost"), (BigDecimal) asset.get("residual_value"),

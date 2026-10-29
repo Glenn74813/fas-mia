@@ -66,16 +66,38 @@ public class AssetSetupService {
         AccountPurpose.require(jdbc, req.assetAccountId(), AccountPurpose.ASSET_COST, "Asset account");
         AccountPurpose.require(jdbc, req.accumulatedAccountId(), AccountPurpose.ASSET_ACCUMULATED, "Accumulated depreciation account");
         AccountPurpose.require(jdbc, req.expenseAccountId(), AccountPurpose.EXPENSE, "Depreciation expense account");
+        if (req.accumulatedImpairmentAccountId() != null) {
+            requireImpairmentAccount(req.accumulatedImpairmentAccountId(), req.accumulatedAccountId());
+        }
         UUID id = UUID.randomUUID();
         jdbc.update("""
                 INSERT INTO asset_categories (id, code, name, asset_account_id, accumulated_account_id, expense_account_id,
-                    default_useful_life_months, default_residual_rate, status, placeholder, created_at, created_by)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'ACTIVE', ?, ?, ?)""", id, req.code(), req.name().trim(), req.assetAccountId(),
+                    default_useful_life_months, default_residual_rate, status, placeholder, created_at, created_by,
+                    accumulated_impairment_account_id)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'ACTIVE', ?, ?, ?, ?)""", id, req.code(), req.name().trim(), req.assetAccountId(),
                 req.accumulatedAccountId(), req.expenseAccountId(), req.defaultUsefulLifeMonths(), req.defaultResidualRate(),
-                placeholder, Timestamp.from(Instant.now(clock)), actor.username());
+                placeholder, Timestamp.from(Instant.now(clock)), actor.username(), req.accumulatedImpairmentAccountId());
         audit.record(actor, "ASSET_CATEGORY_CREATED", "ASSET_CATEGORY", req.code(), Map.of("lifeMonths", req.defaultUsefulLifeMonths(),
                 "placeholder", placeholder));
         return category(id);
+    }
+
+    /** Sets the accumulated impairment account of a category, needed before its assets are impaired or revalued. */
+    @Transactional
+    public CategoryView setImpairmentAccount(UUID id, UUID accountId, Actor actor) {
+        CategoryView c = category(id);
+        requireImpairmentAccount(accountId, c.accumulatedAccountId());
+        jdbc.update("UPDATE asset_categories SET accumulated_impairment_account_id = ?, version = version + 1 WHERE id = ?", accountId, id);
+        audit.record(actor, "ASSET_CATEGORY_IMPAIRMENT_ACCOUNT_SET", "ASSET_CATEGORY", c.code(), Map.of("account", category(id)
+                .accumulatedImpairmentAccountCode(), "previous", String.valueOf(c.accumulatedImpairmentAccountCode())));
+        return category(id);
+    }
+
+    private void requireImpairmentAccount(UUID accountId, UUID accumulatedDepreciationAccountId) {
+        AccountPurpose.require(jdbc, accountId, AccountPurpose.ASSET_ACCUMULATED, "Accumulated impairment account");
+        if (accountId.equals(accumulatedDepreciationAccountId)) {
+            throw FixedAssetService.rule("Use an accumulated impairment account, not the category's accumulated depreciation account.");
+        }
     }
 
     @Transactional(readOnly = true)
@@ -144,16 +166,16 @@ public class AssetSetupService {
     }
 
     private static final String CATEGORY_SQL = """
-            SELECT c.*, a.code AS a_code, d.code AS d_code, e.code AS e_code FROM asset_categories c
+            SELECT c.*, a.code AS a_code, d.code AS d_code, e.code AS e_code, i.code AS i_code FROM asset_categories c
             JOIN chart_of_accounts a ON a.id = c.asset_account_id JOIN chart_of_accounts d ON d.id = c.accumulated_account_id
-            JOIN chart_of_accounts e ON e.id = c.expense_account_id""";
+            JOIN chart_of_accounts e ON e.id = c.expense_account_id LEFT JOIN chart_of_accounts i ON i.id = c.accumulated_impairment_account_id""";
 
     private static CategoryView category(java.sql.ResultSet rs) throws java.sql.SQLException {
         return new CategoryView(rs.getObject("id", UUID.class), rs.getString("code"), rs.getString("name"),
                 rs.getObject("asset_account_id", UUID.class), rs.getString("a_code"), rs.getObject("accumulated_account_id", UUID.class),
                 rs.getString("d_code"), rs.getObject("expense_account_id", UUID.class), rs.getString("e_code"),
                 rs.getInt("default_useful_life_months"), rs.getBigDecimal("default_residual_rate"), rs.getString("status"),
-                rs.getBoolean("placeholder"));
+                rs.getBoolean("placeholder"), rs.getObject("accumulated_impairment_account_id", UUID.class), rs.getString("i_code"));
     }
 
     private static final String PROJECT_SQL = """

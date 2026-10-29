@@ -58,6 +58,49 @@ public final class DepreciationMath {
         return Money.of(opening.add(monthly.multiply(BigDecimal.valueOf(n))).min(base));
     }
 
+    /**
+     * Accumulated depreciation at the end of {@code month} of an asset remeasured by an impairment or revaluation: the
+     * accumulated depreciation at the remeasurement, plus the new depreciable amount spread straight-line over the
+     * remaining life from the remeasurement month. Before that month the basis amount stands (earlier months were
+     * settled before posting). The final month absorbs rounding.
+     */
+    public static BigDecimal expectedFromBasis(BigDecimal basisAccumulated, BigDecimal depreciable, int remainingMonths,
+            YearMonth basisMonth, YearMonth month) {
+        BigDecimal opening = Money.of(basisAccumulated);
+        BigDecimal end = Money.of(opening.add(depreciable));
+        if (month.isBefore(basisMonth)) {
+            return opening;
+        }
+        long n = basisMonth.until(month, ChronoUnit.MONTHS) + 1;
+        if (remainingMonths <= 0 || n >= remainingMonths) {
+            return end;
+        }
+        return Money.of(opening.add(monthlyFromBasis(depreciable, remainingMonths).multiply(BigDecimal.valueOf(n))).min(end));
+    }
+
+    /** Monthly charge after a remeasurement. */
+    public static BigDecimal monthlyFromBasis(BigDecimal depreciable, int remainingMonths) {
+        if (remainingMonths <= 0) {
+            return Money.ZERO;
+        }
+        return depreciable.divide(BigDecimal.valueOf(remainingMonths), 2, RoundingMode.HALF_EVEN);
+    }
+
+    /**
+     * The last month of an asset's depreciation schedule: from the latest remeasurement when there is one, else from
+     * the migration basis, else from the in-service date.
+     */
+    public static YearMonth lastMonth(LocalDate inService, int lifeMonths, Start start, LocalDate migrationBasis,
+            Integer migrationRemaining, LocalDate remeasuredBasis, Integer remeasuredRemaining) {
+        if (remeasuredBasis != null) {
+            return YearMonth.from(remeasuredBasis).plusMonths(remeasuredRemaining - 1L);
+        }
+        if (migrationBasis != null) {
+            return YearMonth.from(migrationBasis).plusMonths(migrationRemaining - 1L);
+        }
+        return YearMonth.from(inService).plusMonths((start == Start.NEXT_MONTH ? 1 : 0) + lifeMonths - 1L);
+    }
+
     /** Monthly charge of a migrated asset over its remaining life. */
     public static BigDecimal monthlyFromOpening(BigDecimal cost, BigDecimal residual, BigDecimal openingAccumulated, int remainingMonths) {
         if (remainingMonths <= 0) {

@@ -57,11 +57,14 @@ public class FixedAssetService {
     private final Clock clock;
     private final DepreciationMath.Start start;
     private final org.springframework.beans.factory.ObjectProvider<DisposalService> disposals;
+    private final org.springframework.beans.factory.ObjectProvider<RemeasurementService> remeasurements;
 
     public FixedAssetService(AssetSetupService setup, NumberingService numbering, PostingService posting, AuditService audit, NotificationService notifications,
             JdbcTemplate jdbc, Clock clock, @Value("${cas.fixed-assets.depreciation-start:NEXT_MONTH}") DepreciationMath.Start start,
-            org.springframework.beans.factory.ObjectProvider<DisposalService> disposals) {
+            org.springframework.beans.factory.ObjectProvider<DisposalService> disposals,
+            org.springframework.beans.factory.ObjectProvider<RemeasurementService> remeasurements) {
         this.disposals = disposals;
+        this.remeasurements = remeasurements;
         this.setup = setup;
         this.numbering = numbering;
         this.posting = posting;
@@ -85,11 +88,12 @@ public class FixedAssetService {
                   AND (?::text IS NULL OR lower(coalesce(a.asset_number, '') || ' ' || a.description || ' ' || coalesce(a.serial_number, ''))
                        LIKE ?::text)
                 ORDER BY a.asset_number NULLS FIRST, a.created_at DESC, a.id""", (rs, i) -> {
-            BigDecimal cost = rs.getBigDecimal("cost");
+            BigDecimal cost = Money.of(rs.getBigDecimal("cost").add(rs.getBigDecimal("cost_adjustment")));
             BigDecimal acc = Money.of(rs.getBigDecimal("acc"));
+            BigDecimal impairment = rs.getBigDecimal("accumulated_impairment");
             return new AssetSummary(rs.getObject("id", UUID.class), rs.getString("asset_number"), rs.getString("description"),
                     rs.getString("cat_code"), rs.getString("location"), rs.getString("custodian"),
-                    rs.getDate("in_service_date").toLocalDate(), cost, acc, Money.of(cost.subtract(acc)), rs.getString("status"),
+                    rs.getDate("in_service_date").toLocalDate(), cost, acc, Money.of(cost.subtract(acc).subtract(impairment)), rs.getString("status"),
                     rs.getLong("version"));
         }, page, size, st, st, categoryId, categoryId, like, like);
     }
@@ -224,9 +228,13 @@ public class FixedAssetService {
     // ------------------------------------------------------------------ helpers shared by depreciation and disposal
 
     /** Accumulated depreciation of an asset: migrated opening amount plus posted runs (SQL fragment over alias {@code a}). */
+    /** Accumulated depreciation of asset {@code a}: opening, plus posted depreciation, less what revaluations eliminated. */
     static final String ACCUMULATED = """
-            (a.opening_accumulated + coalesce((SELECT sum(dl.amount) FROM depreciation_lines dl JOIN depreciation_runs dr ON dr.id = dl.run_id
-                      WHERE dl.asset_id = a.id AND dl.live AND dr.status = 'POSTED'), 0))""";
+            (a.opening_accumulated - a.depreciation_eliminated + coalesce((SELECT sum(dl.amount) FROM depreciation_lines dl
+                      JOIN depreciation_runs dr ON dr.id = dl.run_id WHERE dl.asset_id = a.id AND dl.live AND dr.status = 'POSTED'), 0))""";
+
+    /** Gross carrying amount of asset {@code a}: cost as revalued. */
+    static final String GROSS = "(a.cost + a.cost_adjustment)";
 
     BigDecimal accumulated(UUID assetId) {
         return Money.of(jdbc.queryForObject("SELECT " + ACCUMULATED + " FROM fixed_assets a WHERE a.id = ?", BigDecimal.class, assetId));
@@ -296,6 +304,13 @@ public class FixedAssetService {
         BigDecimal residual = (BigDecimal) a.get("residual_value");
         int life = ((Number) a.get("useful_life_months")).intValue();
         BigDecimal acc = accumulated(id);
+        BigDecimal gross = Money.of(cost.add((BigDecimal) a.get("cost_adjustment")));
+        BigDecimal impairment = (BigDecimal) a.get("accumulated_impairment");
+        BigDecimal monthly = a.get("basis_month") != null
+                ? DepreciationMath.monthlyFromBasis((BigDecimal) a.get("basis_depreciable"), ((Number) a.get("basis_remaining_months")).intValue())
+                : a.get("depreciation_basis_date") == null ? DepreciationMath.monthly(cost, residual, life)
+                        : DepreciationMath.monthlyFromOpening(cost, residual, (BigDecimal) a.get("opening_accumulated"),
+                                ((Number) a.get("remaining_life_months")).intValue());
         List<DepreciationHistory> history = jdbc.query("""
                 SELECT p.name, p.end_date, dl.amount, dr.status, e.entry_number FROM depreciation_lines dl
                 JOIN depreciation_runs dr ON dr.id = dl.run_id JOIN accounting_periods p ON p.id = dl.period_id
@@ -315,9 +330,17 @@ public class FixedAssetService {
                 actions.add("CANCEL");
             }
         }
+        boolean pendingRemeasurement = Boolean.TRUE.equals(jdbc.queryForObject(
+                "SELECT EXISTS (SELECT 1 FROM asset_remeasurements WHERE asset_id = ? AND status = 'DRAFT')", Boolean.class, id));
         if (("ACTIVE".equals(status) || "FULLY_DEPRECIATED".equals(status)) && disposalIds.isEmpty()
                 && CurrentActor.hasPermission("FA_MANAGE")) {
-            actions.add("DISPOSE");
+            if (!pendingRemeasurement) {
+                actions.add("DISPOSE");
+                actions.add("IMPAIR");
+                if (remeasurements.getObject().revaluationEnabled()) {
+                    actions.add("REVALUE");
+                }
+            }
         }
         Timestamp activatedAt = (Timestamp) a.get("activated_at");
         return new AssetView(id, (String) a.get("asset_number"), (String) a.get("description"), (String) a.get("serial_number"),
@@ -326,12 +349,12 @@ public class FixedAssetService {
                 (UUID) a.get("supplier_invoice_id"), (String) a.get("invoice_number"), (UUID) a.get("auc_project_id"),
                 (String) a.get("project_code"), (String) a.get("offset_code"), (String) a.get("justification"),
                 ((Date) a.get("acquisition_date")).toLocalDate(), ((Date) a.get("in_service_date")).toLocalDate(), cost, residual,
-                life, a.get("depreciation_basis_date") == null ? DepreciationMath.monthly(cost, residual, life)
-                        : DepreciationMath.monthlyFromOpening(cost, residual, (BigDecimal) a.get("opening_accumulated"),
-                                ((Number) a.get("remaining_life_months")).intValue()), acc, Money.of(cost.subtract(acc)), status,
+                life, monthly, acc, Money.of(gross.subtract(acc).subtract(impairment)), gross, impairment,
+                (BigDecimal) a.get("revaluation_surplus"), status,
                 (String) a.get("prepared_by"), (String) a.get("activated_by"), activatedAt == null ? null : activatedAt.toInstant(),
                 (UUID) a.get("acquisition_entry_id"), (String) a.get("entry_number"), history,
-                disposalIds.isEmpty() ? null : disposals.getObject().view(disposalIds.get(0)), actions, ((Number) a.get("version")).longValue());
+                disposalIds.isEmpty() ? null : disposals.getObject().view(disposalIds.get(0)), remeasurements.getObject().forAsset(id), actions,
+                ((Number) a.get("version")).longValue());
     }
 
     /** The configured depreciation start convention (C-30). */

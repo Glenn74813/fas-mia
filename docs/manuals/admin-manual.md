@@ -85,7 +85,7 @@ MIAA's structure is entered here; none is seeded.
 |---|---|---|---|
 | Chart of accounts | **Chart of accounts** → **Import approved chart (CSV)**; edit accounts | `ACCOUNT_ADMINISTER` | Development uses a [PLACEHOLDER] chart (PLC- codes). Import MIAA's approved chart before go-live (C-22). Accounts can be deactivated, not deleted, once used |
 | Cost centres | **Chart of accounts** / cost centres | `ACCOUNT_ADMINISTER` | |
-| Control-account mappings | **Finance settings** → **Control-account mappings** | `ACCOUNT_ADMINISTER` | Accounts used by automatic postings, for example AP trade payable, input VAT, GR/IR, inventory revaluation. Every key must be mapped before the module can post |
+| Control-account mappings | **Finance settings** → **Control-account mappings** | `ACCOUNT_ADMINISTER` | Accounts used by automatic postings, for example AP trade payable, input VAT, GR/IR, inventory revaluation, and for fixed assets the impairment loss, reversal of impairment loss and revaluation surplus. Every key must be mapped before the module can post |
 | Tax codes | **Finance settings** → **Tax codes**: **Tax code**, **Tax description**, **Tax type**, **Rate**, **Tax account** | `ACCOUNT_ADMINISTER` | Seeded codes are [PLACEHOLDER] pending BIR confirmation (C-06) |
 | Bank accounts | **Finance settings** → **Bank accounts**: **Bank account code**, **Bank name**, **Account name**, **Last four digits**, **Cash GL account** | `BANK_ACCOUNT_MANAGE` | Only the last four digits are stored |
 | Open-item managed accounts | **Open items** → **Account to manage by open item** → **Manage by open item**; **Stop managing** | `ACCOUNT_ADMINISTER` | Postable asset or liability accounts only, such as GR/IR, suspense and advances |

@@ -13,7 +13,7 @@ import type {
   PortalAccount, PortalBilling, PortalUser, ReceiptInput, ReceiptSummary, ReceiptView, Statement,
   CashForecast, CashPosition, CheckRow, DailyCollectionReport, DepositSummary, DepositView, ReconciliationView, StatementLine,
   StatementSummary, UndepositedReceipt,
-  AssetCategory, AssetInput, AssetSummary, AssetView, AucProject, DepreciationRun, DepreciationRunSummary, DisposalView, PpeRow,
+  AssetCategory, AssetInput, AssetSummary, AssetView, AucProject, DepreciationRun, DepreciationRunSummary, DisposalView, PpeRow, Remeasurement,
   ReportJob, StatementResult, StatementTemplate, PortalLinkRequest, Dashboard, Inbox, AppNotification, RoleGrant, AssetTransfer, Organization, OfficeAssignment, AccessReviewCycle, AccessReviewCycleDetail, AccessReviewItem, ApprovalLimit, PortalInquiry, ReportSchedule, ParallelRunDetail, ParallelRunSummary, MigrationBatchDetail, MigrationBatchSummary, MigrationKind, BusinessCalendar, SlaPolicy, TicketSummary, TicketView, EligibleDv, IntegrationChannel, PaymentBatch, SupplierBankAccount, Transmission,
   GrIrStatus, InventoryDocument, InventoryDocumentSummary, InventoryItem, InventoryKind, InventoryLineInput, InventoryMovement, Warehouse,
 } from './types';
@@ -503,7 +503,7 @@ export const bankApi = {
 export const assetApi = {
   categories: () => api.get<AssetCategory[]>('/asset-categories'),
   createCategory: (body: { code: string; name: string; assetAccountId: string; accumulatedAccountId: string; expenseAccountId: string;
-    defaultUsefulLifeMonths: number; defaultResidualRate: string | null }) => api.post<AssetCategory>('/asset-categories', body),
+    defaultUsefulLifeMonths: number; defaultResidualRate: string | null; accumulatedImpairmentAccountId: string | null }) => api.post<AssetCategory>('/asset-categories', body),
   projects: () => api.get<AucProject[]>('/auc-projects'),
   createProject: (body: { code: string; name: string; aucAccountId: string; costCenterId: string | null }) =>
     api.post<AucProject>('/auc-projects', body),
@@ -527,6 +527,12 @@ export const assetApi = {
   depreciationSettings: () => api.get<{ frequency: 'MONTHLY' | 'ANNUAL' }>('/depreciation-settings'),
   disposalAction: (id: string, action: 'post' | 'cancel', version: number) =>
     api.post<DisposalView>(`/asset-disposals/${id}/${action}`, { version }),
+  setImpairmentAccount: (categoryId: string, accountId: string) =>
+    api.put<AssetCategory>(`/asset-categories/${categoryId}/impairment-account`, { accountId }),
+  prepareRemeasurement: (body: { assetId: string; kind: 'IMPAIRMENT' | 'REVALUATION'; remeasuredOn: string; newCarryingAmount: string;
+    remainingLifeMonths: number | null; basisReference: string | null; reason: string }) => api.post<Remeasurement>('/asset-remeasurements', body),
+  remeasurementAction: (r: Remeasurement, action: 'post' | 'cancel') =>
+    api.post<Remeasurement>(`/asset-remeasurements/${r.id}/${action}`, { version: r.version }),
   schedule: (from: string, to: string) =>
     api.get<{ from: string; to: string; rows: PpeRow[]; totals: PpeRow; note: string }>(`/fixed-assets/reports/ppe-schedule${qs({ from, to })}`),
   reconciliation: () => api.get<{ rows: { accountCode: string; accountName: string; side: string; register: string; generalLedger: string;

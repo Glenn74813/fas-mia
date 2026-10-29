@@ -87,6 +87,10 @@ public class DisposalService {
                 Boolean.class, req.assetId()))) {
             throw FixedAssetService.rule("The asset has a transfer waiting to be posted; post or cancel it first.");
         }
+        if (Boolean.TRUE.equals(jdbc.queryForObject("SELECT EXISTS (SELECT 1 FROM asset_remeasurements WHERE asset_id = ? AND status = 'DRAFT')",
+                Boolean.class, req.assetId()))) {
+            throw FixedAssetService.rule("The asset has an impairment or revaluation waiting to be posted; post or cancel it first.");
+        }
         if (req.disposalDate().isBefore(((Date) a.get("in_service_date")).toLocalDate())) {
             throw new ApiException(ErrorCode.VALIDATION_FAILED, "The disposal date cannot precede the in-service date.");
         }
@@ -142,14 +146,23 @@ public class DisposalService {
             throw FixedAssetService.rule("A draft depreciation run for " + pending.get(0) + " includes this asset; post or cancel it first.");
         }
         CategoryView cat = setup.category((UUID) a.get("category_id"));
-        BigDecimal cost = (BigDecimal) a.get("cost");
+        BigDecimal cost = Money.of(((BigDecimal) a.get("cost")).add((BigDecimal) a.get("cost_adjustment")));
+        BigDecimal impairment = (BigDecimal) a.get("accumulated_impairment");
         BigDecimal proceeds = (BigDecimal) d.get("proceeds");
-        BigDecimal gainLoss = Money.of(proceeds.subtract(cost.subtract(acc)));
+        BigDecimal gainLoss = Money.of(proceeds.subtract(cost.subtract(acc).subtract(impairment)));
         String number = (String) a.get("asset_number");
         List<LineData> lines = new ArrayList<>();
         if (acc.signum() > 0) {
             lines.add(new LineData(cat.accumulatedAccountId(), assets.costCenterFor(cat.accumulatedAccountId(), (UUID) a.get("cost_center_id")), null,
                     "Accumulated depreciation " + number, acc, Money.ZERO));
+        }
+        if (impairment.signum() > 0) {
+            UUID imp = cat.accumulatedImpairmentAccountId();
+            if (imp == null) {
+                throw FixedAssetService.rule("Set the accumulated impairment account of category " + cat.code() + " first (Fixed assets > Setup).");
+            }
+            lines.add(new LineData(imp, assets.costCenterFor(imp, (UUID) a.get("cost_center_id")), null, "Accumulated impairment " + number,
+                    impairment, Money.ZERO));
         }
         if (proceeds.signum() > 0) {
             UUID pa = (UUID) d.get("proceeds_account_id");
@@ -172,8 +185,9 @@ public class DisposalService {
                 "Disposal (" + ((String) d.get("method")).toLowerCase() + ") of " + number + " " + a.get("description"), lines,
                 (UUID) d.get("prepared_by_id"), (String) d.get("prepared_by"), false));
         Timestamp now = Timestamp.from(Instant.now(clock));
-        jdbc.update("UPDATE asset_disposals SET status = 'POSTED', cost = ?, accumulated = ?, gain_loss = ?, posted_entry_id = ?, "
-                + "version = version + 1, updated_at = ?, updated_by = ? WHERE id = ?", cost, acc, gainLoss, entry.entryId(), now,
+        jdbc.update("UPDATE asset_disposals SET status = 'POSTED', cost = ?, accumulated = ?, accumulated_impairment = ?, gain_loss = ?, "
+                + "posted_entry_id = ?, version = version + 1, updated_at = ?, updated_by = ? WHERE id = ?", cost, acc, impairment, gainLoss,
+                entry.entryId(), now,
                 CurrentActor.username(), id);
         jdbc.update("UPDATE fixed_assets SET status = 'DISPOSED', version = version + 1, updated_at = ?, updated_by = ? WHERE id = ?",
                 now, CurrentActor.username(), assetId);
@@ -220,7 +234,8 @@ public class DisposalService {
 
     public DisposalView view(UUID id) {
         List<Map<String, Object>> rows = jdbc.queryForList("""
-                SELECT d.*, a.asset_number, a.description, a.cost AS asset_cost, pa.code AS pa_code, e.entry_number
+                SELECT d.*, a.asset_number, a.description, a.cost + a.cost_adjustment AS asset_cost, a.accumulated_impairment AS asset_impairment,
+                       pa.code AS pa_code, e.entry_number
                 FROM asset_disposals d JOIN fixed_assets a ON a.id = d.asset_id LEFT JOIN chart_of_accounts pa ON pa.id = d.proceeds_account_id
                 LEFT JOIN journal_entries e ON e.id = d.posted_entry_id WHERE d.id = ?""", id);
         if (rows.isEmpty()) {
@@ -230,7 +245,9 @@ public class DisposalService {
         String status = (String) d.get("status");
         BigDecimal cost = d.get("cost") != null ? (BigDecimal) d.get("cost") : (BigDecimal) d.get("asset_cost");
         BigDecimal acc = d.get("accumulated") != null ? (BigDecimal) d.get("accumulated") : assets.accumulated((UUID) d.get("asset_id"));
-        BigDecimal nbv = Money.of(cost.subtract(acc));
+        BigDecimal impairment = d.get("accumulated_impairment") != null ? (BigDecimal) d.get("accumulated_impairment")
+                : (BigDecimal) d.get("asset_impairment");
+        BigDecimal nbv = Money.of(cost.subtract(acc).subtract(impairment));
         BigDecimal gl = d.get("gain_loss") != null ? (BigDecimal) d.get("gain_loss") : Money.of(((BigDecimal) d.get("proceeds")).subtract(nbv));
         boolean preparer = CurrentActor.userId().equals(d.get("prepared_by_id"));
         List<String> actions = new ArrayList<>();
@@ -244,7 +261,7 @@ public class DisposalService {
         }
         return new DisposalView(id, (UUID) d.get("asset_id"), (String) d.get("asset_number"), (String) d.get("description"),
                 ((Date) d.get("disposal_date")).toLocalDate(), (String) d.get("method"), (BigDecimal) d.get("proceeds"),
-                (String) d.get("pa_code"), (String) d.get("reason"), status, cost, acc, nbv, gl, (String) d.get("prepared_by"),
+                (String) d.get("pa_code"), (String) d.get("reason"), status, cost, acc, impairment, nbv, gl, (String) d.get("prepared_by"),
                 (UUID) d.get("posted_entry_id"), (String) d.get("entry_number"), actions, ((Number) d.get("version")).longValue());
     }
 }

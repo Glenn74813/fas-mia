@@ -95,9 +95,9 @@ public class DevPayablesSeeder {
         Integer categories = jdbc.queryForObject("SELECT count(*) FROM asset_categories", Integer.class);
         if (categories != null && categories == 0) {
             assetSetup.createCategory(new CategoryRequest("PLC-FA-BLDG", "[PLACEHOLDER] Buildings (verify useful life, C-30)",
-                    id("PLC-1401"), id("PLC-1409"), id("PLC-5301"), 360, null), true, Actor.SYSTEM);
+                    id("PLC-1401"), id("PLC-1409"), id("PLC-5301"), 360, null, null), true, Actor.SYSTEM);
             assetSetup.createCategory(new CategoryRequest("PLC-FA-EQPT", "[PLACEHOLDER] Machinery and equipment (verify useful life, C-30)",
-                    id("PLC-1402"), id("PLC-1409"), id("PLC-5301"), 60, null), true, Actor.SYSTEM);
+                    id("PLC-1402"), id("PLC-1409"), id("PLC-5301"), 60, null, null), true, Actor.SYSTEM);
             log.warn("DEV: seeded PLACEHOLDER asset categories");
         }
         // Inventory (Phase 3e).

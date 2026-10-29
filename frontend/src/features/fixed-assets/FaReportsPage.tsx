@@ -9,9 +9,14 @@ import { PageHeader } from '../../components/PageHeader';
 import { Spinner } from '../../components/Spinner';
 import type { PpeRow } from '../../api/types';
 
-const COLS: [keyof PpeRow, string][] = [['openingCost', 'Cost, opening'], ['additions', 'Additions'], ['disposalsCost', 'Disposals'],
-  ['closingCost', 'Cost, closing'], ['openingAccumulated', 'Accum., opening'], ['depreciation', 'Depreciation'],
-  ['disposalsAccumulated', 'Disposals'], ['closingAccumulated', 'Accum., closing'], ['netBookValue', 'Net book value']];
+const COLS: [keyof PpeRow, string][] = [['openingCost', 'Cost, opening'], ['additions', 'Additions'], ['revaluations', 'Revaluations'],
+  ['disposalsCost', 'Disposals'], ['closingCost', 'Cost, closing'], ['openingAccumulated', 'Accum., opening'], ['depreciation', 'Depreciation'],
+  ['eliminatedAccumulated', 'Eliminated on revaluation'], ['disposalsAccumulated', 'Disposals'], ['closingAccumulated', 'Accum., closing'],
+  ['openingImpairment', 'Impairment, opening'], ['impairment', 'Impairment'], ['disposalsImpairment', 'Disposals'],
+  ['closingImpairment', 'Impairment, closing'], ['netBookValue', 'Net book value']];
+/** Shown only when some category has an amount in them: most periods have no impairment or revaluation. */
+const OPTIONAL = new Set<keyof PpeRow>(['revaluations', 'eliminatedAccumulated', 'openingImpairment', 'impairment', 'disposalsImpairment',
+  'closingImpairment']);
 
 export function FaReportsPage() {
   const { hasPermission } = useAuth();
@@ -42,17 +47,20 @@ export function FaReportsPage() {
             <label>From <input type="date" value={from} onChange={(e) => setFrom(e.target.value)} className="ml-1 rounded-md border border-slate-300 px-2 py-1" /></label>
             <label>To <input type="date" value={to} onChange={(e) => setTo(e.target.value)} className="ml-1 rounded-md border border-slate-300 px-2 py-1" /></label></span></div>
         <ErrorAlert error={sched.error} />
-        {sched.isPending ? <Spinner /> : sched.data && (
+        {sched.isPending ? <Spinner /> : sched.data && (() => {
+          const cols = COLS.filter(([k]) => !OPTIONAL.has(k) || sched.data.rows.some((r) => Number(r[k]) !== 0));
+          return (
           <div className="overflow-x-auto"><table className="min-w-full text-sm">
             <thead className="border-b border-slate-200 text-left text-[11px] font-semibold uppercase tracking-wider text-slate-500"><tr><th className="py-1 pr-3">Category</th>
-              {COLS.map(([k, l]) => <th key={k} className="py-1 pl-2 text-right">{l}</th>)}</tr></thead>
+              {cols.map(([k, l]) => <th key={k} className="py-1 pl-2 text-right">{l}</th>)}</tr></thead>
             <tbody>{sched.data.rows.map((r) => (
               <tr key={r.categoryCode} className="border-t border-slate-100"><td className="py-1.5 pr-3">{r.categoryCode}</td>
-                {COLS.map(([k]) => <td key={k} className="py-1.5 pl-2 text-right"><Money value={r[k] as string} blankZero /></td>)}</tr>))}</tbody>
+                {cols.map(([k]) => <td key={k} className="py-1.5 pl-2 text-right"><Money value={r[k] as string} blankZero /></td>)}</tr>))}</tbody>
             <tfoot className="border-t-2 border-slate-300 font-medium"><tr><td className="py-1.5">Total</td>
-              {COLS.map(([k]) => <td key={k} className="py-1.5 pl-2 text-right"><Money value={sched.data.totals[k] as string} /></td>)}</tr></tfoot>
+              {cols.map(([k]) => <td key={k} className="py-1.5 pl-2 text-right"><Money value={sched.data.totals[k] as string} /></td>)}</tr></tfoot>
           </table></div>
-        )}
+          );
+        })()}
         {sched.data && <p className="mt-2 text-xs text-slate-500">{sched.data.note}</p>}
       </section>
     </>

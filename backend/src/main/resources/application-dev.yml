@@ -12,6 +12,9 @@ cas:
   budget:
     # No budget is seeded in development, so spending is only flagged in the audit trail.
     enforcement: WARN
+  fixed-assets:
+    # Development shows revaluation; production keeps it off until MIAA adopts the revaluation model (C-07, C-30).
+    revaluation-enabled: ${CAS_FA_REVALUATION_ENABLED:true}
   integrations:
     bir-eis:
       # Development only: deliveries are simulated and marked SIMULATED; refused with the prod profile.

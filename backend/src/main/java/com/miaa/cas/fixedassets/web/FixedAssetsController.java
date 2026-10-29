@@ -5,6 +5,7 @@ import com.miaa.cas.common.web.PageResponse;
 import com.miaa.cas.fixedassets.AssetSetupService;
 import com.miaa.cas.fixedassets.DepreciationService;
 import com.miaa.cas.fixedassets.DisposalService;
+import com.miaa.cas.fixedassets.RemeasurementService;
 import com.miaa.cas.fixedassets.FaDtos.AssetRequest;
 import com.miaa.cas.fixedassets.FaDtos.AssetSummary;
 import com.miaa.cas.fixedassets.FaDtos.AssetView;
@@ -13,6 +14,9 @@ import com.miaa.cas.fixedassets.FaDtos.CategoryRequest;
 import com.miaa.cas.fixedassets.FaDtos.CategoryView;
 import com.miaa.cas.fixedassets.FaDtos.DisposalRequest;
 import com.miaa.cas.fixedassets.FaDtos.DisposalView;
+import com.miaa.cas.fixedassets.FaDtos.ImpairmentAccountRequest;
+import com.miaa.cas.fixedassets.FaDtos.RemeasurementRequest;
+import com.miaa.cas.fixedassets.FaDtos.RemeasurementView;
 import com.miaa.cas.fixedassets.FaDtos.FaReconciliation;
 import com.miaa.cas.fixedassets.FaDtos.PpeSchedule;
 import com.miaa.cas.fixedassets.FaDtos.ProjectRequest;
@@ -35,6 +39,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -51,9 +56,11 @@ public class FixedAssetsController {
     private final DepreciationService depreciation;
     private final DisposalService disposals;
     private final FaReportService reports;
+    private final RemeasurementService remeasurements;
 
     public FixedAssetsController(AssetSetupService setup, FixedAssetService assets, DepreciationService depreciation,
-            DisposalService disposals, FaReportService reports) {
+            DisposalService disposals, FaReportService reports, RemeasurementService remeasurements) {
+        this.remeasurements = remeasurements;
         this.setup = setup;
         this.assets = assets;
         this.depreciation = depreciation;
@@ -73,6 +80,13 @@ public class FixedAssetsController {
     @PreAuthorize("hasAuthority('PERM_FA_MANAGE')")
     public CategoryView createCategory(@Valid @RequestBody CategoryRequest request) {
         return setup.createCategory(request, false, Actor.current());
+    }
+
+    @PutMapping("/asset-categories/{id}/impairment-account")
+    @PreAuthorize("hasAuthority('PERM_FA_MANAGE')")
+    @Operation(summary = "Set the category's accumulated impairment account, needed before its assets are impaired or revalued")
+    public CategoryView setImpairmentAccount(@PathVariable UUID id, @Valid @RequestBody ImpairmentAccountRequest request) {
+        return setup.setImpairmentAccount(id, request.accountId(), Actor.current());
     }
 
     @GetMapping("/auc-projects")
@@ -180,6 +194,27 @@ public class FixedAssetsController {
     @PreAuthorize("hasAnyAuthority('PERM_FA_MANAGE', 'PERM_JOURNAL_POST')")
     public DisposalView disposalAction(@PathVariable UUID id, @PathVariable String action, @Valid @RequestBody VersionRequest request) {
         return "post".equals(action) ? disposals.post(id, request.version()) : disposals.cancel(id, request.version());
+    }
+
+    // ---------------------------------------------------------------- impairments and revaluations
+    @GetMapping("/asset-remeasurements/{id}")
+    @PreAuthorize("hasAuthority('PERM_FA_VIEW')")
+    public RemeasurementView remeasurement(@PathVariable UUID id) {
+        return remeasurements.get(id);
+    }
+
+    @PostMapping("/asset-remeasurements")
+    @ResponseStatus(HttpStatus.CREATED)
+    @PreAuthorize("hasAuthority('PERM_FA_MANAGE')")
+    @Operation(summary = "Prepare an impairment at the recoverable amount, or a revaluation at fair value (when revaluation is on)")
+    public RemeasurementView prepareRemeasurement(@Valid @RequestBody RemeasurementRequest request) {
+        return remeasurements.prepare(request);
+    }
+
+    @PostMapping("/asset-remeasurements/{id}/{action:post|cancel}")
+    @PreAuthorize("hasAnyAuthority('PERM_FA_MANAGE', 'PERM_JOURNAL_POST')")
+    public RemeasurementView remeasurementAction(@PathVariable UUID id, @PathVariable String action, @Valid @RequestBody VersionRequest request) {
+        return "post".equals(action) ? remeasurements.post(id, request.version()) : remeasurements.cancel(id, request.version());
     }
 
     // ---------------------------------------------------------------- reports

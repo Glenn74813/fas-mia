@@ -917,6 +917,7 @@ export interface AssetCategory {
   id: string; code: string; name: string; assetAccountId: string; assetAccountCode: string; accumulatedAccountId: string;
   accumulatedAccountCode: string; expenseAccountId: string; expenseAccountCode: string; defaultUsefulLifeMonths: number;
   defaultResidualRate: string | null; status: string; placeholder: boolean;
+  accumulatedImpairmentAccountId: string | null; accumulatedImpairmentAccountCode: string | null;
 }
 
 export interface AucProject {
@@ -940,7 +941,7 @@ export interface AssetInput {
 export interface DisposalView {
   id: string; assetId: string; assetNumber: string | null; assetDescription: string; disposalDate: string; method: string;
   proceeds: string; proceedsAccountCode: string | null; reason: string; status: string; cost: string; accumulated: string;
-  netBookValue: string; gainLoss: string; preparedBy: string; postedEntryId: string | null; postedEntryNumber: string | null;
+  accumulatedImpairment: string; netBookValue: string; gainLoss: string; preparedBy: string; postedEntryId: string | null; postedEntryNumber: string | null;
   availableActions: string[]; version: number;
 }
 
@@ -950,10 +951,22 @@ export interface AssetView {
   costCenterCode: string | null; acquisitionSource: string; supplierInvoiceId: string | null; supplierInvoiceNumber: string | null;
   aucProjectId: string | null; aucProjectCode: string | null; offsetAccountCode: string | null; justification: string | null;
   acquisitionDate: string; inServiceDate: string; cost: string; residualValue: string; usefulLifeMonths: number;
-  monthlyDepreciation: string; accumulatedDepreciation: string; netBookValue: string; status: string; preparedBy: string;
+  monthlyDepreciation: string; accumulatedDepreciation: string; netBookValue: string;
+  /** Cost as revalued, accumulated impairment, and this asset's share of the revaluation surplus. */
+  grossCarryingAmount: string; accumulatedImpairment: string; revaluationSurplus: string; status: string; preparedBy: string;
   activatedBy: string | null; activatedAt: string | null; acquisitionEntryId: string | null; acquisitionEntryNumber: string | null;
   depreciation: { periodName: string; periodEnd: string; amount: string; runStatus: string; entryNumber: string | null }[];
-  disposal: DisposalView | null; availableActions: string[]; version: number;
+  disposal: DisposalView | null; remeasurements: Remeasurement[]; availableActions: string[]; version: number;
+}
+
+/** An impairment (at the recoverable amount) or a revaluation (at fair value). Amounts are as posted, or a preview for a draft. */
+export interface Remeasurement {
+  id: string; assetId: string; assetNumber: string | null; assetDescription: string; kind: 'IMPAIRMENT' | 'REVALUATION';
+  remeasuredOn: string; carryingBefore: string | null; newCarryingAmount: string; remainingLifeMonths: number | null;
+  basisReference: string | null; reason: string; status: string; costChange: string | null; depreciationEliminated: string | null;
+  impairmentChange: string | null; surplusChange: string | null; lossInProfit: string | null; reversalInProfit: string | null;
+  basisRemainingMonths: number | null; preparedBy: string; postedEntryId: string | null; postedEntryNumber: string | null;
+  availableActions: string[]; version: number;
 }
 
 export interface DepreciationRunSummary {
@@ -970,8 +983,10 @@ export interface DepreciationRun {
 }
 
 export interface PpeRow {
-  categoryCode: string | null; categoryName: string; openingCost: string; additions: string; disposalsCost: string; closingCost: string;
-  openingAccumulated: string; depreciation: string; disposalsAccumulated: string; closingAccumulated: string; netBookValue: string;
+  categoryCode: string | null; categoryName: string; openingCost: string; additions: string; revaluations: string; disposalsCost: string;
+  closingCost: string; openingAccumulated: string; depreciation: string; eliminatedAccumulated: string; disposalsAccumulated: string;
+  closingAccumulated: string; openingImpairment: string; impairment: string; disposalsImpairment: string; closingImpairment: string;
+  netBookValue: string;
 }
 
 // ---------------------------------------------------------------- Phase 3e: inventory

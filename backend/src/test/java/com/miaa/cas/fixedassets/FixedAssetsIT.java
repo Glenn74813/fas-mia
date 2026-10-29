@@ -37,7 +37,7 @@ class FixedAssetsIT extends AbstractPayablesIT {
             mappings.set("FA_DISPOSAL_GAIN", account("PLC-4204"), Actor.SYSTEM);
             mappings.set("FA_DISPOSAL_LOSS", account("PLC-5302"), Actor.SYSTEM);
             return setup.createCategory(new CategoryRequest(catCode, "Test equipment", account("PLC-1402"), account("PLC-1409"),
-                    account("PLC-5301"), 36, null), true, Actor.SYSTEM).id();
+                    account("PLC-5301"), 36, null, null), true, Actor.SYSTEM).id();
         });
         JsonNode reconBefore = recon();
 
@@ -134,7 +134,7 @@ class FixedAssetsIT extends AbstractPayablesIT {
             accountService.create(new AccountRequest(tc + "-A", "Test accumulated depreciation", null, "ASSET", "CREDIT", "PLC-14", true, null,
                     null, "PLC-SFP-PPE", true, null, false, null)).id()});
         UUID ccCategory = tx.execute(s -> setup.createCategory(new CategoryRequest("CC" + catCode, "Cost-centre equipment", ccAccounts[0],
-                ccAccounts[1], account("PLC-5301"), 12, null), true, Actor.SYSTEM).id());
+                ccAccounts[1], account("PLC-5301"), 12, null, null), true, Actor.SYSTEM).id());
         Map<String, Object> a3Body = asset(ccCategory, "OTHER", null, null, "1200.00", year + "-03-01");
         a3Body.put("offsetAccountId", account("PLC-1102"));
         a3Body.put("justification", "Donated equipment received in March");

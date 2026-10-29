@@ -80,6 +80,9 @@ public class AssetTransferService {
         if (count("SELECT count(*) FROM asset_transfers WHERE asset_id = ? AND status = 'DRAFT'", assetId) > 0) {
             throw FixedAssetService.rule("The asset already has a transfer waiting to be posted.");
         }
+        if (count("SELECT count(*) FROM asset_remeasurements WHERE asset_id = ? AND status = 'DRAFT'", assetId) > 0) {
+            throw FixedAssetService.rule("The asset has an impairment or revaluation waiting to be posted.");
+        }
         if (transferDate == null || transferDate.isBefore(((Date) a.get("in_service_date")).toLocalDate())) {
             throw FixedAssetService.rule("The transfer date cannot be before the asset was placed in service.");
         }
@@ -126,12 +129,16 @@ public class AssetTransferService {
         UUID to = (UUID) t.get("to_cost_center_id");
         LocalDate date = ((Date) t.get("transfer_date")).toLocalDate();
         CategoryView cat = setup.category((UUID) a.get("category_id"));
-        BigDecimal cost = (BigDecimal) a.get("cost");
+        BigDecimal cost = Money.of(((BigDecimal) a.get("cost")).add((BigDecimal) a.get("cost_adjustment")));
         BigDecimal acc = assets.accumulated(assetId);
+        BigDecimal impairment = (BigDecimal) a.get("accumulated_impairment");
         String number = (String) a.get("asset_number");
         List<LineData> lines = new ArrayList<>();
         reclass(lines, cat.assetAccountId(), from, to, cost, true, number);
         reclass(lines, cat.accumulatedAccountId(), from, to, acc, false, number);
+        if (impairment.signum() > 0 && cat.accumulatedImpairmentAccountId() != null) {
+            reclass(lines, cat.accumulatedImpairmentAccountId(), from, to, impairment, false, number);
+        }
         UUID entryId = null;
         if (!lines.isEmpty()) {
             entryId = posting.postSubledger(new PostingService.SubledgerEntry(SOURCE, id.toString(), date, "Transfer of asset " + number

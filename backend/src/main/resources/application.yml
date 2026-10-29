@@ -105,6 +105,10 @@ cas:
     protocols: ${CAS_TLS_PROTOCOLS:TLSv1.3}
     legacy-justification: ${CAS_TLS_LEGACY_JUSTIFICATION:}
   frontend-base-url: ${CAS_FRONTEND_BASE_URL:http://localhost:5173}
+  fixed-assets:
+    # Revaluation of assets (PAS 16 revaluation model) stays off until MIAA confirms it carries assets at revalued
+    # amounts (C-07, C-30). Impairment is always available.
+    revaluation-enabled: ${CAS_FA_REVALUATION_ENABLED:false}
   access:
     # Maker-checker for roles carrying financial permissions (C-19). Cannot be switched off in production.
     financial-grant-approval: ${CAS_FINANCIAL_GRANT_APPROVAL:true}

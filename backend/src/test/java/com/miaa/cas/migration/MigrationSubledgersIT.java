@@ -36,7 +36,7 @@ class MigrationSubledgersIT extends AbstractReceivablesIT {
         tx.executeWithoutResult(s -> {
             mappings.set("SUPPLIER_ADVANCES", account("PLC-1206"), Actor.SYSTEM);
             setup.createCategory(new CategoryRequest(catCode, "Migrated equipment", account("PLC-1402"), account("PLC-1409"),
-                    account("PLC-5301"), 120, null), true, Actor.SYSTEM);
+                    account("PLC-5301"), 120, null, null), true, Actor.SYSTEM);
         });
         Session clerk = login(createUser("mstore", "INVENTORY_CLERK"));
         String w1 = "MW1" + tag;

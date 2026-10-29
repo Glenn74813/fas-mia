@@ -130,6 +130,31 @@ public class DevOfficialChart {
         // After deactivating: the account service saves whole entities, which would write back the old line codes.
         refileStatementLines(moves);
         deleteUnusedPlaceholders();
+        fillAssetImpairmentSettings();
+    }
+
+    /**
+     * Impairment and revaluation settings on the official chart, where still unset: each category's accumulated impairment
+     * account (the asset account's code + 2, beside accumulated depreciation at + 1), and the impairment loss, reversal
+     * and revaluation surplus mappings. Proposals for MIAA to confirm, like the other settings (C-22).
+     */
+    private void fillAssetImpairmentSettings() {
+        int categories = jdbc.update("""
+                UPDATE asset_categories c SET accumulated_impairment_account_id = imp.id
+                FROM chart_of_accounts asset, chart_of_accounts imp
+                WHERE asset.id = c.asset_account_id AND asset.code ~ '^[0-9]{8}$' AND c.accumulated_impairment_account_id IS NULL
+                  AND imp.code = lpad((asset.code::bigint + 2)::text, 8, '0') AND imp.postable AND imp.status = 'ACTIVE'""");
+        if (categories > 0) {
+            audit.record(Actor.SYSTEM, "SETTINGS_ACCOUNTS_REPOINTED", "CHART_OF_ACCOUNTS", "asset_categories.accumulated_impairment_account_id",
+                    Map.of("rows", categories, "chart", "RCA-GC-2019"));
+        }
+        Map<String, String> defaults = Map.of("FA_IMPAIRMENT_LOSS", "50503090", "FA_IMPAIRMENT_REVERSAL", "40602010",
+                "FA_REVALUATION_SURPLUS", "30201010");
+        for (var d : defaults.entrySet()) {
+            boolean unset = Boolean.FALSE.equals(jdbc.queryForObject("SELECT EXISTS (SELECT 1 FROM gl_account_mappings WHERE mapping_key = ?)",
+                    Boolean.class, d.getKey()));
+            accounts.findByCode(d.getValue()).filter(a -> unset).ifPresent(a -> mappings.set(d.getKey(), a.getId(), Actor.SYSTEM));
+        }
     }
 
     /**
