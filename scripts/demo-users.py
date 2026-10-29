@@ -3,11 +3,11 @@ checked and audited like a manual one):
 
   1. deactivates every active account except the administrator, the demo super administrator, the chart-conversion
      service user and the demo.* users (end-to-end, performance and review runs leave thousands behind);
-  2. creates two onboarded demo users for every role (demo.<role>.1 and .2) except DEMO_SUPERADMIN, which user
-     administration never grants: password changed, authenticator enrolled.
+  2. creates two demo users for every role (demo.<role>.1 and .2) except DEMO_SUPERADMIN, which user administration
+     never grants: password set, authenticator reset, so each shows its own QR code to scan at its first sign-in.
 
-Credentials of the new users are written to the file given (mode 600, under the gitignored .devdata/), never printed;
-add a user's TOTP secret to an authenticator app to sign in. Concessionaire accounts still need linking to a customer
+Usernames and passwords of the new users are written to the file given (mode 600, under the gitignored .devdata/),
+never printed. Concessionaire accounts still need linking to a customer
 (Receivables -> Portal access), which a second person approves. Re-running skips users that already exist.
 
 Usage: python3 scripts/demo-users.py <api-base-url> <credentials-out-file>
@@ -93,14 +93,17 @@ def main():
             # Same password as the demo super administrator when it is set, so one password opens every demo account.
             password = os.environ.get('CAS_DEMO_SUPERADMIN_PASSWORD') or 'Demo-' + secrets.token_urlsafe(12) + '-1a!'
             call('POST', '/auth/password/change', {'currentPassword': temporary, 'newPassword': password}, tokens['accessToken'])
-            lines.append(f'{username},{role},{password},{secret}')
+            # The enrolment above only let the password be set; reset it so the person using the account scans a QR code.
+            user_id = next(u['id'] for u in all_users(token) if u['username'] == username)
+            call('POST', f'/users/{user_id}/mfa/reset', None, token)
+            lines.append(f'{username},{role},{password}')
             created += 1
     if lines:
         new = not os.path.exists(out_file)
         fd = os.open(out_file, os.O_WRONLY | os.O_CREAT | os.O_APPEND, 0o600)
         with os.fdopen(fd, 'a') as f:
             if new:
-                f.write('username,role,password,totp_secret\n')
+                f.write('username,role,password\n')
             f.write('\n'.join(lines) + '\n')
     print(f'Created {created} demo users ({len(roles)} roles x 2, existing ones skipped); credentials in {out_file}')
 

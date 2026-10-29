@@ -122,9 +122,10 @@ reload a page mid-test). Both are built or copied at `start`, so after changing 
 
 `scripts/demo-users.py` prepares the demo database's users through the user-administration API: it deactivates every
 account except the administrator, the demo super administrator and the conversion service user, and creates two
-onboarded users per role (`demo.<role>.1` and `.2`; Demo Super Administrator excepted). They share the demo super
-administrator's password (`CAS_DEMO_SUPERADMIN_PASSWORD`); each has its own authenticator. Passwords and authenticator secrets go to `.devdata/demo-users.csv` (gitignored, mode 600); add a secret to an authenticator app to
-sign in. Concessionaire accounts still need linking to a customer under **Receivables → Portal access**.
+users per role (`demo.<role>.1` and `.2`; Demo Super Administrator excepted). They share the demo super
+administrator's password (`CAS_DEMO_SUPERADMIN_PASSWORD`); each sets up its own authenticator by scanning the QR code CAS
+shows at its first sign-in. Usernames and passwords go to `.devdata/demo-users.csv` (gitignored, mode 600).
+Concessionaire accounts still need linking to a customer under **Receivables → Portal access**.
 
 ```bash
 (set -a; . ./.env; set +a; python3 scripts/demo-users.py http://127.0.0.1:8091 .devdata/demo-users.csv)
