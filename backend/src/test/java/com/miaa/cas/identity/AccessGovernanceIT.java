@@ -41,6 +41,8 @@ class AccessGovernanceIT extends AbstractReceivablesIT {
 
         // The approver sees it in the inbox; the administrator can neither approve nor see approve actions.
         assertThat(body(mvc.perform(get("/api/v1/inbox").header("Authorization", approver.bearer())).andReturn()).toString()).contains(grantId);
+        assertThat(body(mvc.perform(get("/api/v1/notifications").header("Authorization", approver.bearer())).andReturn()).toString())
+                .contains("A role grant for " + username + " needs approval");
         decide(admin, grantId, "approve", grant.get("version").asLong(), null).andExpect(status().isForbidden());
         JsonNode approved = ok(decide(approver, grantId, "approve", grant.get("version").asLong(), "Matches the HR appointment"));
         assertThat(approved.get("status").asText()).isEqualTo("APPROVED");

@@ -105,6 +105,12 @@ public class RoleGrantService {
                 join(financial), CurrentActor.userId(), CurrentActor.username(), Timestamp.from(Instant.now(clock)));
         audit.record("ROLE_GRANT_REQUESTED", "USER", userId, Map.of("requestId", id.toString(), "before", before, "requested", requested,
                 "financialAdded", financial));
+        for (UUID approver : jdbc.queryForList("""
+                SELECT DISTINCT u.id FROM users u JOIN user_roles ur ON ur.user_id = u.id JOIN role_permissions rp ON rp.role_id = ur.role_id
+                WHERE rp.permission_code = 'ACCESS_GRANT_APPROVE' AND u.status = 'ACTIVE' AND u.id <> ?""", UUID.class, userId)) {
+            notifications.notify(approver, "ACCESS_GRANT", "A role grant for " + username(userId) + " needs approval",
+                    CurrentActor.username() + " asked to add " + String.join(", ", financial) + ".", "/admin/access-grants");
+        }
         return view(id);
     }
 
