@@ -78,6 +78,7 @@ export function DisbursementDetailPage() {
             <dt className="text-slate-500">Payee</dt><dd>{dv.supplierCode} — {dv.supplierName}</dd>
             <dt className="text-slate-500">Amount</dt><dd className="font-semibold"><Money value={dv.amount} /></dd>
             <dt className="text-slate-500">Prepared by</dt><dd>{dv.preparedBy}</dd>
+            {dv.rfpReference && <><dt className="text-slate-500">Request for Payment</dt><dd>{dv.rfpReference}</dd></>}
             <dt className="text-slate-500">Payment</dt><dd>{dv.paymentMode ? `${dv.paymentMode} ${dv.paymentReference} · ${dv.bankAccountCode} · ${dv.paymentDate}` : '—'}</dd>
             {dv.instructedBy && <><dt className="text-slate-500">Issued by</dt><dd>{dv.instructedBy} · {formatDateTime(dv.instructedAt)}</dd></>}
             {dv.confirmedBy && <><dt className="text-slate-500">Release confirmed</dt><dd>{dv.confirmedBy} · {formatDateTime(dv.confirmedAt)}</dd></>}

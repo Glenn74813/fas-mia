@@ -542,6 +542,9 @@ export interface InvoiceInput {
   description: string;
   vatCodeId: string | null;
   lines: InvoiceLineInput[];
+  /** Request for Payment and RIAR numbers from the offices that prepared them (C-32). */
+  rfpReference: string | null;
+  riarReference: string | null;
 }
 
 export interface InvoiceSummary {
@@ -572,6 +575,8 @@ export interface InvoiceView {
   accountingDate: string;
   periodName: string;
   description: string;
+  rfpReference: string | null;
+  riarReference: string | null;
   status: string;
   currentStep: string | null;
   vatCodeId: string | null;
@@ -615,6 +620,7 @@ export interface DvView {
   supplierCode: string;
   supplierName: string;
   particulars: string;
+  rfpReference: string | null;
   status: string;
   currentStep: string | null;
   amount: string;

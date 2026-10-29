@@ -72,7 +72,7 @@ three groups:
 | C-14 Warranty | Model unclear | One-year warranty included; post-warranty annual maintenance optional (Annex G) | **Resolved** |
 | C-15 SLA values | Values unknown | Warranty: Critical 1 h / 24 h, High 4 h / 1 business day, Medium 8 h / 3 business days, Low 1 business day / by priority. Post-warranty (Annex G): 2 h / 8 h / 24 h / 48 h | **Resolved**: configure the SLA policies with these values |
 | C-16 MFA | E-mail/SMS OTP "where approved" | MFA must support OTP via SMS/e-mail, authenticator apps, and biometric login if applicable | **Requirement confirmed**: e-mail OTP and passkeys are buildable (§4); SMS needs a gateway provider |
-| C-32 RFP / RIAR | Undefined | Request for Payment and RIAR/Supplier Invoice are AP *source documents* from other offices (Annex A); the CAS takes approved inputs only (R2R, §3.2) | **Narrowed**: record their references and attachments on invoices and DVs; no RFP workflow inside CAS |
+| C-32 RFP / RIAR | Undefined | Request for Payment and RIAR/Supplier Invoice are AP *source documents* from other offices (Annex A); the CAS takes approved inputs only (R2R, §3.2) | **Narrowed and built** (V58, 29 Oct 2026): invoices record the Request for Payment and RIAR numbers and DVs the Request for Payment number, searchable on the invoice list; scans go in as attachments; no RFP workflow inside CAS (`PaymentRequestReferencesIT`) |
 | C-34 Tickets | Categories unknown | Incident, Service Request, Change Request, System Enhancement; severities Critical/High/Medium/Low with the definitions above | **Resolved** (CAS already uses these four types) |
 | C-02 Performance | Sub-second vs 5 s | Still both: §8.1 says 5 s per entry, 60 s per batch and report; Annex A says "within 1 second" and "sub-second" | **Still open** |
 | C-01 Laptops | 12 vs 15 | Still both: §5.3 and the notes say 15; Annex D says twelve | **Still open** |
@@ -97,7 +97,7 @@ three groups:
 | T13 | A (Billing) | Abstract of Bills | **Built** (V54): the **Abstract of bills** report job lists every posted invoice, debit memo and credit memo dated in a period by customer, with subtotals per customer and totals per kind (credit memos negative), as CSV, XLSX or PDF. Layout marked PLACEHOLDER until the Billing Section confirms its form. `OperationalReportsIT` |
 | T14 | H | Privacy Impact Assessment | **Drafted**: [23-privacy-impact-assessment.md](23-privacy-impact-assessment.md) from the system as built: data subjects, a personal-data inventory (13 categories, with tables, purpose, access, retention and protection), a data-flow diagram, the privacy principles, 11 risks with controls and proposed actions, and the decisions left to MIAA's DPO (lawful basis, retention, TIN masking, breach procedure, hosting). Completion and sign-off are MIAA's |
 
-Smaller items: record **Request for Payment and RIAR references** on invoices and DVs (C-32); SMS as a ticket
+Smaller items: ~~record **Request for Payment and RIAR references** on invoices and DVs (C-32)~~ (built 29 Oct 2026); SMS as a ticket
 notification channel when a gateway exists (Annex E); **company code and currency** dimensions on reports (B.5:
 CAS is single-company and PHP-only; FX is C-21).
 

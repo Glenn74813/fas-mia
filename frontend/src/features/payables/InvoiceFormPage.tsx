@@ -35,6 +35,7 @@ function InvoiceForm({ existing }: { existing?: InvoiceView }) {
     supplierId: existing?.supplierId ?? '', invoiceNumber: existing?.invoiceNumber ?? '',
     invoiceDate: existing?.invoiceDate ?? today, dueDate: existing?.dueDate ?? today,
     accountingDate: existing?.accountingDate ?? today, description: existing?.description ?? '', vatCodeId: existing?.vatCodeId ?? null,
+    rfpReference: existing?.rfpReference ?? null, riarReference: existing?.riarReference ?? null,
   });
   const [lines, setLines] = useState<InvoiceLineInput[]>(existing
     ? existing.lines.map((l) => ({ accountId: l.accountId, costCenterId: l.costCenterId, description: l.description,
@@ -78,6 +79,10 @@ function InvoiceForm({ existing }: { existing?: InvoiceView }) {
           <Field label="Accounting date" type="date" value={form.accountingDate} onChange={(e) => setForm({ ...form, accountingDate: e.target.value })} />
           <div className="md:col-span-3"><Field label="Description" value={form.description} maxLength={1000}
             onChange={(e) => setForm({ ...form, description: e.target.value })} /></div>
+          <Field label="Request for Payment no. (optional)" value={form.rfpReference ?? ''} maxLength={60}
+            hint="From the office that asked for the payment" onChange={(e) => setForm({ ...form, rfpReference: e.target.value || null })} />
+          <Field label="RIAR no. (optional)" value={form.riarReference ?? ''} maxLength={60}
+            hint="Inspection and acceptance report for the delivery" onChange={(e) => setForm({ ...form, riarReference: e.target.value || null })} />
         </div>
         <div className="overflow-x-auto rounded-xl border border-slate-200/80 bg-white shadow-xs">
           <table className="min-w-full text-sm">

@@ -31,6 +31,8 @@ public class DisbursementVoucher {
     private UUID supplierId;
     @Column(nullable = false, length = 1000)
     private String particulars;
+    @Column(name = "rfp_reference", length = 60)
+    private String rfpReference;
     @Column(nullable = false, length = 20)
     private String status;
     @Column(name = "current_step_order")
@@ -85,6 +87,11 @@ public class DisbursementVoucher {
         this.createdAt = now;
         this.updatedAt = now;
         this.updatedBy = preparedBy;
+    }
+
+    /** The Request for Payment number from the requesting office (C-32); may be null. */
+    public void setRfpReference(String rfpReference) {
+        this.rfpReference = rfpReference;
     }
 
     public void setParticulars(String particulars) {
@@ -158,6 +165,7 @@ public class DisbursementVoucher {
     public String getDvNumber() { return dvNumber; }
     public UUID getSupplierId() { return supplierId; }
     public String getParticulars() { return particulars; }
+    public String getRfpReference() { return rfpReference; }
     public String getStatus() { return status; }
     public Short getCurrentStepOrder() { return currentStepOrder; }
     public BigDecimal getAmount() { return amount; }

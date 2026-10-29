@@ -196,13 +196,13 @@ public class PayablesController {
     @ResponseStatus(HttpStatus.CREATED)
     @PreAuthorize("hasAuthority('PERM_DISBURSEMENT_PREPARE')")
     public DvView createDv(@Valid @RequestBody DvRequest request) {
-        return disbursements.create(request.supplierId(), request.particulars(), request.allocations());
+        return disbursements.create(request.supplierId(), request.particulars(), request.allocations(), request.rfpReference());
     }
 
     @PutMapping("/disbursement-vouchers/{id}")
     @PreAuthorize("hasAuthority('PERM_DISBURSEMENT_PREPARE')")
     public DvView updateDv(@PathVariable UUID id, @Valid @RequestBody DvUpdateRequest request) {
-        return disbursements.update(id, request.version(), request.particulars(), request.allocations());
+        return disbursements.update(id, request.version(), request.particulars(), request.allocations(), request.rfpReference());
     }
 
     @PostMapping("/disbursement-vouchers/{id}/{action:submit|approve|return|reject|cancel|post}")

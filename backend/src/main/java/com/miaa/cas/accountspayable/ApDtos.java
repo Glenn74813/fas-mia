@@ -53,7 +53,10 @@ public final class ApDtos {
             @NotNull LocalDate accountingDate,
             @NotBlank @Size(max = 1000) String description,
             UUID vatCodeId,
-            @NotNull @Size(min = 1, max = 200) List<@Valid @NotNull InvoiceLineRequest> lines) {
+            @NotNull @Size(min = 1, max = 200) List<@Valid @NotNull InvoiceLineRequest> lines,
+            /** Request for Payment and RIAR numbers from the offices that prepared them (C-32); optional. */
+            @Size(max = 60) String rfpReference,
+            @Size(max = 60) String riarReference) {
     }
 
     public record ActionRequest(@NotNull Long version, @Size(max = 1000) String comment) {
@@ -71,7 +74,8 @@ public final class ApDtos {
 
     public record InvoiceView(UUID id, UUID supplierId, String supplierCode, String supplierName, String supplierTin,
             String invoiceNumber, LocalDate invoiceDate, LocalDate dueDate, LocalDate accountingDate, String periodName,
-            String description, String status, String currentStep, UUID vatCodeId, String vatCode, BigDecimal netAmount,
+            String description, String rfpReference, String riarReference, String status, String currentStep, UUID vatCodeId,
+            String vatCode, BigDecimal netAmount,
             BigDecimal vatAmount, BigDecimal ewtAmount, BigDecimal payableAmount, BigDecimal paidAmount,
             BigDecimal openBalance, String preparedBy, UUID postedEntryId, String postedEntryNumber,
             List<InvoiceLineView> lines, List<Decision> decisions, List<DocumentInfo> documents,
@@ -82,11 +86,13 @@ public final class ApDtos {
     }
 
     public record DvRequest(@NotNull UUID supplierId, @NotBlank @Size(max = 1000) String particulars,
-            @NotNull @Size(min = 1, max = 200) List<@Valid @NotNull AllocationRequest> allocations) {
+            @NotNull @Size(min = 1, max = 200) List<@Valid @NotNull AllocationRequest> allocations,
+            @Size(max = 60) String rfpReference) {
     }
 
     public record DvUpdateRequest(@NotNull Long version, @NotBlank @Size(max = 1000) String particulars,
-            @NotNull @Size(min = 1, max = 200) List<@Valid @NotNull AllocationRequest> allocations) {
+            @NotNull @Size(min = 1, max = 200) List<@Valid @NotNull AllocationRequest> allocations,
+            @Size(max = 60) String rfpReference) {
     }
 
     public record PaymentInstructionRequest(@NotNull Long version, @NotNull @Pattern(regexp = "CHECK|ADA") String mode,
@@ -122,7 +128,7 @@ public final class ApDtos {
     }
 
     public record DvView(UUID id, String dvNumber, UUID supplierId, String supplierCode, String supplierName,
-            String particulars, String status, String currentStep, BigDecimal amount, String paymentMode,
+            String particulars, String rfpReference, String status, String currentStep, BigDecimal amount, String paymentMode,
             UUID bankAccountId, String bankAccountCode, String paymentReference, LocalDate paymentDate, String instructedBy,
             Instant instructedAt, String confirmedBy, Instant confirmedAt, String preparedBy, UUID postedEntryId,
             String postedEntryNumber, List<DvLineView> lines, List<DvBudgetLine> budget, DvCheck check, List<Decision> decisions,

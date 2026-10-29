@@ -333,7 +333,7 @@ export const invoiceApi = {
 export const dvApi = {
   list: (q: { status?: string; page: number; size: number; sort?: string }) => api.get<Page<DvSummary>>(`/disbursement-vouchers${qs({ ...q })}`),
   get: (id: string) => api.get<DvView>(`/disbursement-vouchers/${id}`),
-  create: (body: { supplierId: string; particulars: string; allocations: { invoiceId: string; amount: string }[] }) =>
+  create: (body: { supplierId: string; particulars: string; allocations: { invoiceId: string; amount: string }[]; rfpReference: string | null }) =>
     api.post<DvView>('/disbursement-vouchers', body),
   act: (id: string, action: Act, version: number, comment?: string) =>
     api.post<DvView>(`/disbursement-vouchers/${id}/${action}`, { version, comment: comment || null }),

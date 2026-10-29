@@ -37,6 +37,10 @@ public class SupplierInvoice {
     private UUID periodId;
     @Column(nullable = false, length = 1000)
     private String description;
+    @Column(name = "rfp_reference", length = 60)
+    private String rfpReference;
+    @Column(name = "riar_reference", length = 60)
+    private String riarReference;
     @Column(nullable = false, length = 12)
     private String status;
     @Column(name = "current_step_order")
@@ -102,6 +106,12 @@ public class SupplierInvoice {
         this.vatCodeId = vatCodeId;
     }
 
+    /** The Request for Payment and RIAR numbers from the offices that prepared them (C-32); either may be null. */
+    public void setReferences(String rfpReference, String riarReference) {
+        this.rfpReference = rfpReference;
+        this.riarReference = riarReference;
+    }
+
     /** Callers must flush between clearing and adding lines (unique line numbers). */
     public void clearLines() {
         lines.clear();
@@ -151,6 +161,8 @@ public class SupplierInvoice {
     public LocalDate getAccountingDate() { return accountingDate; }
     public UUID getPeriodId() { return periodId; }
     public String getDescription() { return description; }
+    public String getRfpReference() { return rfpReference; }
+    public String getRiarReference() { return riarReference; }
     public String getStatus() { return status; }
     public Short getCurrentStepOrder() { return currentStepOrder; }
     public UUID getVatCodeId() { return vatCodeId; }

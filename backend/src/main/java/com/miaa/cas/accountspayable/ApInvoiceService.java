@@ -107,7 +107,8 @@ public class ApInvoiceService implements DocumentOwnerPolicy {
         if (q != null && !q.isBlank()) {
             String p = "%" + q.trim().toLowerCase().replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_") + "%";
             spec = spec.and((root, query, cb) -> cb.or(cb.like(cb.lower(root.get("invoiceNumber")), p, '\\'),
-                    cb.like(cb.lower(root.get("description")), p, '\\')));
+                    cb.like(cb.lower(root.get("description")), p, '\\'), cb.like(cb.lower(root.get("rfpReference")), p, '\\'),
+                    cb.like(cb.lower(root.get("riarReference")), p, '\\')));
         }
         return PageResponse.of(invoices.findAll(spec, pageable), this::summary);
     }
@@ -292,6 +293,7 @@ public class ApInvoiceService implements DocumentOwnerPolicy {
         }
         inv.setHeader(req.invoiceNumber().trim(), req.invoiceDate(), req.dueDate(), req.accountingDate(), period.getId(),
                 req.description().trim(), req.vatCodeId());
+        inv.setReferences(SupplierService.blank(req.rfpReference()), SupplierService.blank(req.riarReference()));
         BigDecimal net = BigDecimal.ZERO;
         BigDecimal ewt = BigDecimal.ZERO;
         int n = 1;
@@ -430,7 +432,7 @@ public class ApInvoiceService implements DocumentOwnerPolicy {
         String vatCode = inv.getVatCodeId() == null ? null : taxCodes.get(inv.getVatCodeId()).code();
         return new InvoiceView(inv.getId(), s.getId(), s.getCode(), s.getName(), s.getTin(), inv.getInvoiceNumber(),
                 inv.getInvoiceDate(), inv.getDueDate(), inv.getAccountingDate(), calendar.period(inv.getPeriodId()).getName(),
-                inv.getDescription(), inv.getStatus(), workflow.currentStepCode(DOCUMENT, inv.getPayableAmount(),
+                inv.getDescription(), inv.getRfpReference(), inv.getRiarReference(), inv.getStatus(), workflow.currentStepCode(DOCUMENT, inv.getPayableAmount(),
                 toInt(inv.getCurrentStepOrder())), inv.getVatCodeId(), vatCode, inv.getNetAmount(), inv.getVatAmount(),
                 inv.getEwtAmount(), inv.getPayableAmount(), inv.getPaidAmount(), inv.openBalance(), inv.getPreparedBy(),
                 inv.getPostedEntryId(), entryNumber, lines, workflow.history(DOCUMENT, inv.getId()),

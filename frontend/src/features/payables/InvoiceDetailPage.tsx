@@ -52,6 +52,8 @@ export function InvoiceDetailPage() {
             <dt className="text-slate-500">Invoice / due</dt><dd>{inv.invoiceDate} / {inv.dueDate}</dd>
             <dt className="text-slate-500">Accounting date</dt><dd>{inv.accountingDate} ({inv.periodName})</dd>
             <dt className="text-slate-500">Prepared by</dt><dd>{inv.preparedBy}</dd>
+            {inv.rfpReference && <><dt className="text-slate-500">Request for Payment</dt><dd>{inv.rfpReference}</dd></>}
+            {inv.riarReference && <><dt className="text-slate-500">RIAR</dt><dd>{inv.riarReference}</dd></>}
             {inv.postedEntryId && <><dt className="text-slate-500">Ledger entry</dt>
               <dd><Link className="text-brand-700 hover:underline" to={`/general-ledger/entries/${inv.postedEntryId}`}>{inv.postedEntryNumber}</Link></dd></>}
           </dl>

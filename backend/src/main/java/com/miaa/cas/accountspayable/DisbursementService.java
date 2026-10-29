@@ -113,7 +113,7 @@ public class DisbursementService implements DocumentOwnerPolicy {
     }
 
     @Transactional
-    public DvView create(UUID supplierId, String particulars, List<AllocationRequest> allocations) {
+    public DvView create(UUID supplierId, String particulars, List<AllocationRequest> allocations, String rfpReference) {
         CurrentActor.requirePermission("DISBURSEMENT_PREPARE");
         Supplier s = suppliers.load(supplierId);
         if (!s.isActive()) {
@@ -121,6 +121,7 @@ public class DisbursementService implements DocumentOwnerPolicy {
         }
         DisbursementVoucher dv = new DisbursementVoucher(UUID.randomUUID(), supplierId, particulars.trim(),
                 CurrentActor.userId(), CurrentActor.username(), Instant.now(clock));
+        dv.setRfpReference(SupplierService.blank(rfpReference));
         allocate(dv, allocations);
         vouchers.saveAndFlush(dv);
         audit.record("DV_CREATED", DOCUMENT, dv.getId(), Map.of("supplier", s.getCode(), "amount", dv.getAmount().toPlainString()));
@@ -128,13 +129,14 @@ public class DisbursementService implements DocumentOwnerPolicy {
     }
 
     @Transactional
-    public DvView update(UUID id, long version, String particulars, List<AllocationRequest> allocations) {
+    public DvView update(UUID id, long version, String particulars, List<AllocationRequest> allocations, String rfpReference) {
         DisbursementVoucher dv = lockVersioned(id, version);
         requirePreparer(dv);
         if (!dv.isEditable()) {
             throw ApInvoiceService.state("Only draft or returned vouchers can be edited.");
         }
         dv.setParticulars(particulars.trim());
+        dv.setRfpReference(SupplierService.blank(rfpReference));
         dv.clearLines();
         vouchers.flush();
         allocate(dv, allocations);
@@ -527,7 +529,7 @@ public class DisbursementService implements DocumentOwnerPolicy {
         if ("PAID".equals(dv.getStatus()) && !preparer && CurrentActor.hasPermission("JOURNAL_POST")) {
             actions.add("POST");
         }
-        return new DvView(dv.getId(), dv.getDvNumber(), s.getId(), s.getCode(), s.getName(), dv.getParticulars(), dv.getStatus(),
+        return new DvView(dv.getId(), dv.getDvNumber(), s.getId(), s.getCode(), s.getName(), dv.getParticulars(), dv.getRfpReference(), dv.getStatus(),
                 workflow.currentStepCode(DOCUMENT, dv.getAmount(), ApInvoiceService.toInt(dv.getCurrentStepOrder())),
                 dv.getAmount(), dv.getPaymentMode(), dv.getBankAccountId(), bankCode, dv.getPaymentReference(),
                 dv.getPaymentDate(), dv.getInstructedBy(), dv.getInstructedAt(), dv.getConfirmedBy(), dv.getConfirmedAt(),

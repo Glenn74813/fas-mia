@@ -229,15 +229,16 @@ are MIAA's to set (C-10).
 **Supplier invoices.**
 1. **Supplier invoices** → new invoice: **Supplier**, **Supplier invoice number**, **Invoice date**, **Due date**,
    **Accounting date**, **Description**, and lines with tax codes (VAT and withholding are [PLACEHOLDER] codes
-   pending BIR confirmation).
-2. **Save draft**, attach the invoice, then **Submit**.
+   pending BIR confirmation). Optionally record the **Request for Payment no.** and the **RIAR no.** (inspection and
+   acceptance report) prepared by the other offices; the invoice list search finds an invoice by either.
+2. **Save draft**, attach the invoice (and the request for payment and RIAR scans), then **Submit**.
 3. The approver chooses **Approve**, **Return** or **Reject**; a poster chooses **Post**.
 
 Submitting reserves budget on budget-controlled accounts.
 
 **Disbursement vouchers.**
-1. **Disbursement vouchers** → **New**: **Payee (supplier)**, **Particulars** and the invoices to pay.
-   **Save draft**, attach, then **Submit**.
+1. **Disbursement vouchers** → **New**: **Payee (supplier)**, **Particulars**, an optional **Request for Payment
+   no.** and the invoices to pay. **Save draft**, attach, then **Submit**.
 2. The voucher passes three steps, each by a different person:
    * **Certify budget** (Budget Division). The **Budget** panel shows, for each budget line the voucher pays, this
      voucher's share and the Corporate Operating Budget position: allotment, used (the invoices already reserved

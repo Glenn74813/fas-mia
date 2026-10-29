@@ -70,13 +70,15 @@ export function NewDisbursementPage() {
   const qc = useQueryClient();
   const [supplierId, setSupplierId] = useState('');
   const [particulars, setParticulars] = useState('');
+  const [rfpReference, setRfpReference] = useState('');
   const [amounts, setAmounts] = useState<Record<string, string>>({});
   const open = useQuery({ queryKey: ['invoices', 'open', supplierId], enabled: !!supplierId,
     queryFn: () => invoiceApi.list({ status: 'POSTED', supplierId, page: 0, size: 200 }) });
   const invoices = (open.data?.items ?? []).filter((i) => (toCents(i.openBalance) ?? 0n) > 0n);
   const chosen = Object.entries(amounts).filter(([, v]) => v.trim() !== '');
   const create = useMutation({
-    mutationFn: () => dvApi.create({ supplierId, particulars, allocations: chosen.map(([invoiceId, amount]) => ({ invoiceId, amount })) }),
+    mutationFn: () => dvApi.create({ supplierId, particulars, allocations: chosen.map(([invoiceId, amount]) => ({ invoiceId, amount })),
+      rfpReference: rfpReference.trim() || null }),
     onSuccess: (dv) => { qc.invalidateQueries({ queryKey: ['dvs'] }); navigate(`/payables/disbursements/${dv.id}`); },
   });
   const valid = supplierId && particulars.trim() && chosen.length > 0 && chosen.every(([, v]) => isValidAmount(v));
@@ -90,6 +92,8 @@ export function NewDisbursementPage() {
             search={(q) => supplierApi.list(q, 0, 50)} optionLabel={(s) => `${s.code} — ${s.name}`} filter={(s) => s.status === 'ACTIVE'}
             onChange={(id) => { setSupplierId(id); setAmounts({}); }} />
           <Field label="Particulars" value={particulars} maxLength={1000} onChange={(e) => setParticulars(e.target.value)} />
+          <Field label="Request for Payment no. (optional)" value={rfpReference} maxLength={60}
+            hint="From the office that asked for the payment" onChange={(e) => setRfpReference(e.target.value)} />
         </div>
         {supplierId && (
           <div className="overflow-x-auto rounded-xl border border-slate-200/80 bg-white shadow-xs">
