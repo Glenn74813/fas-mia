@@ -103,6 +103,8 @@ CAS is single-company and PHP-only; FX is C-21).
 
 ## 5. Still blocked on MIAA decisions
 
+All open items are sent to MIAA, grouped by office, in [25-miaa-decision-request.md](25-miaa-decision-request.md).
+
 | Item | TOR reference | Decision needed |
 |---|---|---|
 | BIR CAS registration, PTU, e-receipts/e-invoices, EIS transmission (RR 9-2009, 8-2022, 11-2025), 2307 | §2.2.1, §3.10, A, B.10 | C-06: EIS schema and Permit to Transmit; registration with BIR. The sandbox adapter and transmission log are ready |
@@ -120,9 +122,9 @@ CAS is single-company and PHP-only; FX is C-21).
 
 **Not applicable as written:** Annex B.8 asks for work-in-progress calculations and settlement of *production* cost
 variances, and B.5 for "company code" filtering. These are manufacturing and multi-company functions of a general
-ERP; MIAA is a single regulatory GOCC with no production. Ask MIAA to confirm they can be dropped (proposed C-35).
+ERP; MIAA is a single regulatory GOCC with no production. Ask MIAA to confirm they can be dropped (C-35).
 The same applies to "machine learning" for remittance extraction and cash application (B.6, B.11): the rule-based
-matching in CAS covers the outcome; confirm whether a learning component is required (proposed C-36).
+matching in CAS covers the outcome; confirm whether a learning component is required (C-36).
 
 ## 6. Contract and MIAA activities
 

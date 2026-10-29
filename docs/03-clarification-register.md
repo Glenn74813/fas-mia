@@ -1,6 +1,7 @@
 # 03 — TOR Conflicts and Clarification Register
 
-Each item must be decided in writing by the responsible office before the gate shown.
+Each item must be decided in writing by the responsible office before the gate shown. The open items are sent to MIAA,
+grouped by office, in [25-miaa-decision-request.md](25-miaa-decision-request.md).
 Until decided, the system implements the **configurable interim behaviour** listed and the
 item stays open in the progress tracker. None of these are resolved silently in code.
 
@@ -42,6 +43,8 @@ item stays open in the progress tracker. None of these are resolved silently in 
 | C-33 | §5.4 | The close calendar: which day-end, month-end, quarter-end and year-end tasks MIAA performs, who owns each (role), and how many days after the day, month, quarter or year each is due; whether public holidays shift day-end tasks. | Close checklists and the closing schedule. | Four [PLACEHOLDER] tasks are seeded; the calendar is maintained in the application (Close tasks), so the real one is entered, not coded. Automatic checks are fixed. | Chief Accountant | Before UAT |
 | C-34 | §11.11, §22 | Ticket severity levels and categories: MIAA's definitions of S1–S4 (business impact) and its service catalogue of ticket categories, and whether severity should influence the SLA as well as priority. | Ticket classification and reporting. | Severity S1–S4 with [PLACEHOLDER] wording and six [PLACEHOLDER] categories, maintained in the application; only priority drives the SLA. | MISD + Chief Accountant | Before UAT |
 | C-37 | TOR §4.6.2, Annex D | Field layouts, file formats and transfer method of the payroll, FMIS and asset-system files CAS imports (T9). | Import mappings and validation rules. | CAS accepts CSV, JSON and XML with proposed field names ([manual](manuals/admin-manual.md) §8.2); replace them with each system's layout and account mapping. | HR/Payroll, Budget Division (FMIS), Property and Supply | Before interface testing |
+| C-35 | Annex B.5, B.8 | B.8 asks for work-in-progress calculations and settlement of production cost variances, and B.5 for "company code" filtering: manufacturing and multi-company functions of a general ERP. | MIAA is a single GOCC with no production; building them adds nothing. | Drop them from scope. Not built. | Chief Accountant | UAT |
+| C-36 | Annex B.6, B.11 | "Machine learning" for remittance extraction and cash application. | Rule-based matching already applies receipts and bank lines. | Keep rule-based matching unless MIAA requires a learning component. | Chief Accountant + Treasury | UAT |
 | C-38 | Whole TOR (AR, billing, FMIS) | Since 14 September 2024 New NAIA Infra Corp. (NNIC) operates NAIA under a concession; MIAA stays as regulator and receives ₱30 billion upfront, ₱2 billion a year and 82.16% of gross revenues covered by the revenue share (sources differ on whether passenger service charges are excluded). | Who bills airlines and concessionaires now; whether CAS billing, concessionaire portal and FMIS interfaces are still MIAA's; how the revenue share and fixed payments are billed, received and accounted for. | Confirm whether the TOR was written before or after the concession and restate the AR, billing, portal and FMIS scope; model the concession receipts (upfront, annual fixed, revenue share) as their own billing and receivable type. See *Public sources checked* below. | Chief Accountant + MIAA management + PMO | Before UAT scripts are finalised |
 
 ## Public sources checked (27 October 2026)
