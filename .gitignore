@@ -14,3 +14,8 @@ frontend/test-results/
 frontend/.wrangler/
 frontend/.dev.vars
 __pycache__/
+
+# MIAA source documents (TOR, budget and procurement details) never go into this public repository.
+docs/*.docx
+# LibreOffice lock files
+.~lock.*#
