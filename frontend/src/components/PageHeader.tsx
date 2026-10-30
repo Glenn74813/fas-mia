@@ -1,6 +1,7 @@
 import { ChevronRight } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { Link } from 'react-router';
+import { ModuleHelpButton } from './ModuleHelpButton';
 
 export interface Crumb {
   label: string;
@@ -23,7 +24,10 @@ export function PageHeader({ title, crumbs = [], actions }: { title: string; cru
             </ol>
           </nav>
         )}
-        <h1 className="text-[1.65rem] font-semibold leading-tight tracking-tight text-slate-900">{title}</h1>
+        <div className="flex items-center gap-1.5">
+          <h1 className="text-[1.65rem] font-semibold leading-tight tracking-tight text-slate-900">{title}</h1>
+          <ModuleHelpButton />
+        </div>
       </div>
       {actions && <div className="flex flex-wrap items-center gap-2">{actions}</div>}
     </header>

@@ -6,6 +6,7 @@ import { portalApi } from '../../api/endpoints';
 import { useAuth } from '../../auth/AuthContext';
 import { Button } from '../../components/Button';
 import { ErrorAlert } from '../../components/ErrorAlert';
+import { ModuleHelpButton } from '../../components/ModuleHelpButton';
 import { Money } from '../../components/Money';
 import { Pagination } from '../../components/Pagination';
 import { Spinner } from '../../components/Spinner';
@@ -36,7 +37,10 @@ export function PortalHomePage() {
   return (
     <div className="space-y-4">
       <section className="rounded-xl border border-slate-200/80 bg-white shadow-xs p-6">
-        <h1 className="text-xl font-semibold">{a.customerName}</h1>
+        <div className="flex items-center gap-1.5">
+          <h1 className="text-xl font-semibold">{a.customerName}</h1>
+          <ModuleHelpButton />
+        </div>
         <p className="text-sm text-slate-500">Account {a.customerCode}{a.tin ? ` · TIN ${a.tin}` : ''} · terms {a.paymentTermsDays} days</p>
         <dl className="mt-4 grid gap-4 sm:grid-cols-3">
           <div><dt className="text-xs uppercase text-slate-500">Outstanding balance</dt><dd className="text-2xl font-semibold"><Money value={a.openBalance} /></dd></div>
