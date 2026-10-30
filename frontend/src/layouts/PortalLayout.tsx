@@ -11,7 +11,7 @@ export function PortalLayout() {
         <div className="flex h-16 items-center justify-between gap-3 px-4 sm:px-6 lg:px-8">
           <div className="flex items-center gap-3">
             <BrandMark />
-            <p className="font-semibold text-slate-900">MIAA Concessionaire Portal</p>
+            <p className="font-semibold text-slate-900">AVTECH Concessionaire Portal</p>
           </div>
           <div className="flex items-center gap-3">
             <NotificationBell />

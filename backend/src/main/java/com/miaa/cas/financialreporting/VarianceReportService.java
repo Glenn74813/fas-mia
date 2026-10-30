@@ -20,7 +20,7 @@ import org.springframework.stereotype.Service;
  * Variance analysis (MS §11.4, §11.8): budget to date against posted actuals to the end of a chosen period, per budget
  * allocation, with the variance, its percentage and an assessment against a threshold.
  *
- * <p>Proposed layout until MIAA confirms its budget definitions (C-10):
+ * <p>Proposed layout until AVTECH confirms its budget definitions (C-10):
  * <ul>
  * <li>Budget to date spreads the annual allotment evenly over the twelve regular periods (no phasing is recorded).
  * Through the adjustment period (13) it is the whole allotment.</li>
@@ -36,7 +36,7 @@ import org.springframework.stereotype.Service;
 public class VarianceReportService {
 
     static final String TYPE = "VARIANCE_ANALYSIS";
-    private static final String ORG = "Manila International Airport Authority";
+    private static final String ORG = "Avtech Information Technology Solutions, Inc.";
     private static final BigDecimal HUNDRED = BigDecimal.valueOf(100);
     private static final BigDecimal DEFAULT_THRESHOLD = BigDecimal.TEN;
     private static final int REGULAR_PERIODS = 12;
@@ -139,7 +139,7 @@ public class VarianceReportService {
         return new Rendered(new ReportTable("Variance analysis: budget against actual", subtitles, "Account / cost centre",
                 List.of("Annual allotment", "Budget to date", "Actual to date", "Variance", "Variance %", "Allotment left", "Assessment"),
                 rows, List.of(
-                        "Proposed layout until MIAA confirms its budget definitions (C-10). Budget to date spreads the allotment evenly "
+                        "Proposed layout until AVTECH confirms its budget definitions (C-10). Budget to date spreads the allotment evenly "
                                 + "over 12 periods; through period 13 it is the whole allotment.",
                         "Actual = posted entries on the account (and cost centre) in periods 1–" + through + ". A positive variance is "
                                 + "favourable: spending below budget, or revenue above it. Within ±" + pct + " % is shown as within threshold.",

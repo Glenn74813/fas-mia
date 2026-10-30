@@ -25,7 +25,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Tax codes (withholding and VAT) are configuration, not code: MIAA's tax team maintains codes, rates
+ * Tax codes (withholding and VAT) are configuration, not code: AVTECH's tax team maintains codes, rates
  * and the accounts they post to. Rates are applied with HALF_EVEN rounding to centavos per line.
  */
 @Service

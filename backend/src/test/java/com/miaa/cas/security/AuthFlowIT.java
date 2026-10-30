@@ -31,7 +31,7 @@ class AuthFlowIT extends AbstractIntegrationTest {
 
         JsonNode enrol = body(mvc.perform(post("/api/v1/auth/mfa/totp/enroll").contentType(MediaType.APPLICATION_JSON)
                 .content(toJson(Map.of("mfaToken", mfaToken)))).andExpect(status().isOk()).andReturn());
-        assertThat(enrol.get("otpauthUri").asText()).startsWith("otpauth://totp/MIAA%20CAS:" + user.username());
+        assertThat(enrol.get("otpauthUri").asText()).startsWith("otpauth://totp/AVTECH%20CAS:" + user.username());
         byte[] secret = new Base32().decode(enrol.get("secret").asText());
 
         MvcResult activated = mvc.perform(post("/api/v1/auth/mfa/totp/activate").contentType(MediaType.APPLICATION_JSON)

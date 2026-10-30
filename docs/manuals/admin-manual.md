@@ -51,7 +51,7 @@ schema V57, October 2026. Installation and releases are in [19-deployment-and-ro
 
 ## 2. Roles and permissions (`ROLE_VIEW`, `ROLE_ADMINISTER`)
 
-**Roles & permissions** lists the 14 seeded roles. They are proposals until MIAA signs off the role matrix
+**Roles & permissions** lists the 14 seeded roles. They are proposals until AVTECH signs off the role matrix
 (C-08). Open a role, tick or untick permissions and **Save permissions**. CAS re-checks every holder of the role
 against the SoD rules and refuses the change if a holder would end up with a conflict.
 
@@ -65,7 +65,7 @@ against the SoD rules and refuses the change if a holder would end up with a con
      outcome is carried out through the user's roles (**Change roles**), then marked **Record as applied**.
   3. **Close cycle** succeeds only when every review, and every change it led to, is done.
 
-  The review frequency is MIAA's choice.
+  The review frequency is AVTECH's choice.
 * **Approval limits** (`APPROVAL_LIMIT_MANAGE`): the **Maximum amount (₱)** a role may approve on one document of a
   type; **Save limit**. No limits are seeded (C-24). With none set, approvals are unlimited by amount and still
   follow the workflow.
@@ -77,13 +77,13 @@ against the SoD rules and refuses the change if a holder would end up with a con
 * add departments under an office, with the cost centre their work is usually charged to;
 * activate or deactivate offices and departments.
 
-MIAA's structure is entered here; none is seeded.
+AVTECH's structure is entered here; none is seeded.
 
 ## 5. Finance configuration
 
 | Area | Page | Permission | Notes |
 |---|---|---|---|
-| Chart of accounts | **Chart of accounts** → **Import approved chart (CSV)**; edit accounts | `ACCOUNT_ADMINISTER` | Development uses a [PLACEHOLDER] chart (PLC- codes). Import MIAA's approved chart before go-live (C-22). Accounts can be deactivated, not deleted, once used |
+| Chart of accounts | **Chart of accounts** → **Import approved chart (CSV)**; edit accounts | `ACCOUNT_ADMINISTER` | Development uses a [PLACEHOLDER] chart (PLC- codes). Import AVTECH's approved chart before go-live (C-22). Accounts can be deactivated, not deleted, once used |
 | Cost centres | **Chart of accounts** / cost centres | `ACCOUNT_ADMINISTER` | |
 | Control-account mappings | **Finance settings** → **Control-account mappings** | `ACCOUNT_ADMINISTER` | Accounts used by automatic postings, for example AP trade payable, input VAT, GR/IR, inventory revaluation, and for fixed assets the impairment loss, reversal of impairment loss and revaluation surplus. Every key must be mapped before the module can post |
 | Tax codes | **Finance settings** → **Tax codes**: **Tax code**, **Tax description**, **Tax type**, **Rate**, **Tax account** | `ACCOUNT_ADMINISTER` | Seeded codes are [PLACEHOLDER] pending BIR confirmation (C-06) |
@@ -107,7 +107,7 @@ On **Close calendar** → **Close tasks**, set each task's:
 
 Choose **Add task**, or **Edit** then **Save task**. **Deactivate** retires a task without losing its history.
 
-Four [PLACEHOLDER] tasks are seeded until MIAA supplies its close calendar (C-33). Day-end tasks fall on weekdays;
+Four [PLACEHOLDER] tasks are seeded until AVTECH supplies its close calendar (C-33). Day-end tasks fall on weekdays;
 public holidays are not considered for close tasks.
 
 ## 7. Tickets and service levels (`TICKET_ADMIN`)
@@ -195,7 +195,7 @@ element with attributes or child elements. Other systems send the same files wit
 `POST /api/v1/interfaces/{PAYROLL|FMIS_BUDGET|ASSETS}/batches` (Content-Type `text/csv`, `application/json` or
 `application/xml`, header values as query parameters) using an API client with the `INTERFACE_SUBMIT` scope;
 holders of the permission are notified, and only a person can accept the batch. The same file (by SHA-256) is
-taken once. **These layouts are proposals until MIAA supplies each system's own (C-37).**
+taken once. **These layouts are proposals until AVTECH supplies each system's own (C-37).**
 
 ## 9. Audit trail and security events
 
@@ -220,7 +220,7 @@ taken once. **These layouts are proposals until MIAA supplies each system's own 
 
 ## 10. Data export (`DATA_EXPORT`: system administrators and finance managers)
 
-**Administration → Data export** produces a full copy of the system's data for MIAA (TOR §3.6), for example a
+**Administration → Data export** produces a full copy of the system's data for AVTECH (TOR §3.6), for example a
 year-end copy for the Records Office or the hand-back at the end of the contract.
 
 1. Enter the **Purpose** and choose **Request full export**. Other holders of `DATA_EXPORT` are notified.
@@ -261,13 +261,13 @@ statements and reconciliations, budgets, depreciation, asset and inventory docum
 decisions and supporting documents, the year's audit trail, and the reference data needed to read them (accounts,
 cost centres, suppliers, customers, users without sign-in secrets). Supplier bank numbers keep only their last
 four digits. When it is built, its SHA-256 is written to the audit trail as `FISCAL_YEAR_ARCHIVED`, so any copy
-can later be checked against the chain. Keep archives on write-once storage **[MIAA infrastructure]**.
+can later be checked against the chain. Keep archives on write-once storage **[AVTECH infrastructure]**.
 
 **Legal holds** (`RECORDS_RETENTION_MANAGE`, the chief accountant): place a hold on one fiscal year or on every
 year with a reason and an optional reference (for example an audit observation memo), and release it with a note.
 Both are audited.
 
-**Disposal**: there is no purge. Posted records and the audit trail are kept until MIAA decides how lawful disposal
+**Disposal**: there is no purge. Posted records and the audit trail are kept until AVTECH decides how lawful disposal
 works (C-05, C-13).
 
 ## 12. Background work and operations

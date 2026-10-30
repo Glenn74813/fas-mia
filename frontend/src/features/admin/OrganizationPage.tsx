@@ -14,7 +14,7 @@ import { activeCostCenters, useCostCenters } from '../../hooks/useAccounting';
 
 const sel = 'rounded-md border border-slate-300 px-2 py-1 text-sm';
 
-/** Organisations, offices and departments (FR-ORG-01). MIAA's structure is entered here; none is seeded. */
+/** Organisations, offices and departments (FR-ORG-01). AVTECH's structure is entered here; none is seeded. */
 export function OrganizationPage() {
   const { hasPermission } = useAuth();
   const admin = hasPermission('ORGANIZATION_ADMINISTER');

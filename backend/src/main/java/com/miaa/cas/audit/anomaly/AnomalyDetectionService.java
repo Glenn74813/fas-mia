@@ -38,7 +38,7 @@ import org.springframework.transaction.annotation.Transactional;
  * <li>OFF_HOURS_POSTING (LOW): posted at night, on a weekend or on a business holiday (Manila time);</li>
  * <li>ROUND_AMOUNT (LOW): a manual entry of at least {@code round-amount-min} in exact multiples of 10,000.</li>
  * </ul>
- * Findings are signals for review, not conclusions; the thresholds are proposals for MIAA's internal audit to tune.
+ * Findings are signals for review, not conclusions; the thresholds are proposals for AVTECH's internal audit to tune.
  */
 @Service
 public class AnomalyDetectionService {

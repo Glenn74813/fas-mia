@@ -175,7 +175,7 @@ public class WebhookDispatcher {
             long t = Instant.now(clock).getEpochSecond();
             HttpRequest req = HttpRequest.newBuilder(URI.create((String) d.get("url"))).timeout(Duration.ofSeconds(15))
                     .header("Content-Type", "application/json")
-                    .header("User-Agent", "MIAA-CAS-Webhooks/1")
+                    .header("User-Agent", "AVTECH-CAS-Webhooks/1")
                     .header("X-CAS-Event", (String) d.get("event_type"))
                     .header("X-CAS-Delivery", id.toString())
                     .header("X-CAS-Attempt", Integer.toString(attempt))

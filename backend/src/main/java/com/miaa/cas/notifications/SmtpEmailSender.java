@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 
 /**
  * Production e-mail delivery over SMTP with mandatory STARTTLS (settings under {@code spring.mail}, credentials from
- * the environment). Active only when {@code cas.mail.smtp-enabled=true}; which relay MIAA uses is C-16. Subjects are
+ * the environment). Active only when {@code cas.mail.smtp-enabled=true}; which relay AVTECH uses is C-16. Subjects are
  * stripped of line breaks and addresses parsed strictly, so model values cannot add headers or recipients.
  */
 @Component

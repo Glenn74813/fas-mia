@@ -74,7 +74,7 @@ public class TreasuryReportService {
         return new DailyCollectionReport(date, who, lines.isEmpty() ? null : lines.get(0).receiptNumber(),
                 lines.isEmpty() ? null : lines.get(lines.size() - 1).receiptNumber(), lines, totals, Money.of(total), Money.of(tax),
                 Money.of(undeposited), cancelled, "Receipt numbers are the interim CAS series pending the BIR-registered official "
-                        + "receipt series (C-29); the official DCR form layout awaits MIAA's template.");
+                        + "receipt series (C-29); the official DCR form layout awaits AVTECH's template.");
     }
 
     /** Ledger balances of cash accounts as of a date, plus collections not yet deposited. */

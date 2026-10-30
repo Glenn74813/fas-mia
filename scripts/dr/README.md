@@ -40,7 +40,7 @@ The restored stack is stopped afterwards unless `--keep` is given. Verifying the
 
 * The RTO measured here is restore plus start-up plus verification. A real failover also needs detection, the
   decision to fail over, DNS or gateway changes and communication, all within the 4-hour budget.
-* The RPO is bounded by `archive_timeout` (5 minutes) only while the archive is off-site. On MIAA's
+* The RPO is bounded by `archive_timeout` (5 minutes) only while the archive is off-site. On AVTECH's
   infrastructure the archive goes to separate, immutable object storage (C-04); here it is a local folder.
 * Twice-yearly exercises, the restore approval ticket and the weekly automated restore test are operational
   procedures for MISD (07-infrastructure-dr).

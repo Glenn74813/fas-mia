@@ -31,7 +31,7 @@ import org.springframework.transaction.annotation.Transactional;
  * percentages that add up to 100, or statistical quantities). A run creates one draft journal voucher dated the period's
  * last day: the sender is credited and the receivers debited (on the rule's receiver account, or the same account).
  * Cents left over by rounding go to the receiver with the largest weight. A cycle runs once per period unless the
- * earlier voucher was cancelled or rejected. The cycles and keys are MIAA's (C-10).
+ * earlier voucher was cancelled or rejected. The cycles and keys are AVTECH's (C-10).
  */
 @Service
 public class AllocationService {

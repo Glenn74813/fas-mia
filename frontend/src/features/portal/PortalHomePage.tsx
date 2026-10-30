@@ -28,7 +28,7 @@ export function PortalHomePage() {
       <section className="rounded-xl border border-slate-200/80 bg-white shadow-xs p-6">
         <h1 className="text-xl font-semibold">Welcome, {user?.displayName}</h1>
         <p className="mt-2 text-sm text-slate-600">Your sign-in is active, but your portal account is not yet linked to a
-          concessionaire account. Please contact MIAA Finance.</p>
+          concessionaire account. Please contact AVTECH Finance.</p>
       </section>
     );
   }
@@ -48,7 +48,7 @@ export function PortalHomePage() {
             <Money value={a.overdueBalance} /></dd></div>
           <div><dt className="text-xs uppercase text-slate-500">Unapplied payments</dt><dd className="text-2xl font-semibold"><Money value={a.unappliedCollections} /></dd></div>
         </dl>
-        <p className="mt-3 text-xs text-slate-500">As of {a.asOf}. Only posted documents are shown; payments appear once MIAA Finance has posted them.</p>
+        <p className="mt-3 text-xs text-slate-500">As of {a.asOf}. Only posted documents are shown; payments appear once AVTECH Finance has posted them.</p>
       </section>
       <nav aria-label="Portal sections" className="flex gap-2">
         {(Object.keys(TAB_LABEL) as Tab[]).map((t) => (

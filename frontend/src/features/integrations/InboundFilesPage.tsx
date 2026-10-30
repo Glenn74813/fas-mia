@@ -79,7 +79,7 @@ export function InboundFilesPage() {
       <p className="mb-4 max-w-3xl text-sm text-slate-600">Payroll summaries, FMIS budget data and asset information from other systems,
         as CSV, JSON or XML. Each file is checked when it arrives; accepting it creates <strong>drafts</strong> (a journal voucher,
         budget allocations or fixed assets) that go through the usual review and approval. Nothing is posted by an import. Other
-        systems can send files through the API. The field names are proposals until MIAA confirms each system's layout (C-37).</p>
+        systems can send files through the API. The field names are proposals until AVTECH confirms each system's layout (C-37).</p>
       {allowed.length > 0 && (
         <form onSubmit={submit} className="mb-6 max-w-3xl space-y-3 rounded-xl border border-slate-200/80 bg-white p-4 shadow-xs">
           <div className="grid gap-3 sm:grid-cols-2">

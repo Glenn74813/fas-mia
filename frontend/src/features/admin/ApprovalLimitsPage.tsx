@@ -30,7 +30,7 @@ export function ApprovalLimitsPage() {
     <>
       <PageHeader title="Approval limits" crumbs={[{ label: 'Administration' }, { label: 'Approval limits' }]} />
       <p className="mb-4 text-sm text-slate-600">The most a holder of a role may approve on one document of a type. A user's limit is the
-        highest among their roles that have one; users none of whose roles has a limit are not limited. The amounts are MIAA's decision (C-24);
+        highest among their roles that have one; users none of whose roles has a limit are not limited. The amounts are AVTECH's decision (C-24);
         none are set by default. Every change is recorded in the audit trail.</p>
       {manage && (
         <section className="mb-4 grid gap-3 rounded-xl border border-slate-200/80 bg-white shadow-xs p-5 md:grid-cols-4 md:items-end">

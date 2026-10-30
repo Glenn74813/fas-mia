@@ -1,6 +1,6 @@
 # CAS User Manual
 
-For MIAA finance staff, approvers, auditors and support staff (version for schema V41, October 2026). The
+For AVTECH finance staff, approvers, auditors and support staff (version for schema V41, October 2026). The
 concessionaire portal has its own chapter (§14). Administrators also read the [administrator manual](admin-manual.md).
 
 ## 1. Basics
@@ -11,7 +11,7 @@ You need your username (or e-mail), your password and an authenticator app on yo
 Authenticator or Microsoft Authenticator.
 
 1. Open CAS and enter your **Username or e-mail** and **Password**; choose **Continue**.
-2. Enter the **6-digit code** shown for **MIAA CAS** in your authenticator app; choose **Verify**.
+2. Enter the **6-digit code** shown for **AVTECH CAS** in your authenticator app; choose **Verify**.
 
 **First sign-in.** Your administrator gives you a temporary password.
 1. Sign in with it. CAS shows a QR code: in your authenticator app add an account (Microsoft Authenticator:
@@ -31,7 +31,7 @@ Authenticator or Microsoft Authenticator.
 code and choose **Add a passkey**; your device asks you to confirm. You can add one per device and **Remove** any of
 them. Your password is still needed at every sign-in.
 
-**Lost authenticator.** If you lose your phone or remove MIAA CAS from the app:
+**Lost authenticator.** If you lose your phone or remove AVTECH CAS from the app:
 1. Sign in with your password. On the code screen choose **Lost your authenticator? Use a recovery code**.
 2. Enter one of your saved codes (for example `ABCDE-23456`) and choose **Continue**. Each code works once.
 3. CAS asks you to set up your authenticator again, then shows a new set of recovery codes. The old codes stop
@@ -72,7 +72,7 @@ Passwords:
   * tickets assigned to you and those past their SLA;
   * **Waiting for you**, a count of items you may act on.
 
-  The indicators are proposals until MIAA approves its KPIs.
+  The indicators are proposals until AVTECH approves its KPIs.
 * **Inbox.** Every document waiting for a step *you* may take, oldest first, in one list: vouchers to review,
   approve or post; invoices, disbursement vouchers, billings, budgets, reconciliations, asset transfers and
   others; close tasks due. Use **Filter by queue** or the search box, then **Open** to act on the item's own page.
@@ -195,7 +195,7 @@ Clearing posts nothing. Items open more than 90 days appear on the month-end che
    * payments released but not posted;
    * dead or rejected integrations.
 3. **Tasks** are the manual steps of the close calendar. Each shows its due date and owner. Tasks are
-   [PLACEHOLDER] until MIAA supplies its calendar (C-33).
+   [PLACEHOLDER] until AVTECH supplies its calendar (C-33).
 4. To tick off a task you own, choose the **Outcome** (Done or Not applicable), write a **Note** and choose
    **Complete task**. Only holders of the task's responsible permission can complete it.
 5. The **Closing schedule** lists what falls due between two dates. Tasks due in the last week also appear in
@@ -209,7 +209,7 @@ add up to 100, or statistical quantities such as floor area or headcount) and th
 their percentage or quantity. Choose **Run or preview** and a **Period** to see the lines; **Create draft voucher**
 makes one draft journal voucher dated the period's last day, which you then submit for review, approval and
 posting as usual. A cycle runs once per period, unless its voucher is cancelled or rejected. The cycles and keys
-are MIAA's to set (C-10).
+are AVTECH's to set (C-10).
 
 ## 4. Payables
 
@@ -350,7 +350,7 @@ reference is information for the cashier; it is not a receipt.
   optional reassessed **Remaining useful life**, the **Basis** and **Reason**. A second person chooses **Post**.
   The loss is charged first against any revaluation surplus of the asset, then to impairment loss; accumulated
   impairment is credited. The category needs its accumulated impairment account (**Asset setup**).
-* **Revaluation** (PAS 16, only where MIAA uses the revaluation model; switched off otherwise, C-07, C-30):
+* **Revaluation** (PAS 16, only where AVTECH uses the revaluation model; switched off otherwise, C-07, C-30):
   **Revalue** with the **Date**, **Fair value**, **Appraisal report** and **Reason**; a second person posts it.
   Accumulated depreciation and impairment are eliminated against cost and the asset is restated at fair value. An
   increase first reverses decreases earlier charged to profit or loss, then goes to revaluation surplus; a decrease
@@ -393,7 +393,7 @@ reference is information for the cashier; it is not a receipt.
   **SLOW-MOVING**. Enter each item's market value per unit (or **Import prices** from a CSV of `item_code`,
   `market_unit_value` and optionally the source) and **Save prices**; the write-down is the quantity times the
   amount by which market value is below cost. **Propose write-down** creates a draft price adjustment, posted
-  like any stock document. The basis and the 24-month rule are proposals for MIAA's policy (C-07).
+  like any stock document. The basis and the 24-month rule are proposals for AVTECH's policy (C-07).
 
 ## 9. Budgets
 
@@ -452,7 +452,7 @@ pending (C-10).
   * **Within threshold**: closer to budget than the threshold;
   * **No allocation**: spending on a budget-controlled account that no allocation covers.
 
-  Rows are grouped by account type with subtotals. The layout is proposed until MIAA confirms its budget
+  Rows are grouped by account type with subtotals. The layout is proposed until AVTECH confirms its budget
   definitions (C-10). It is not available as a scheduled report, because the period is chosen when you queue it.
 
   **Ad hoc reports** (`LEDGER_VIEW`, `AP_VIEW` or `AR_VIEW` for their datasets): choose a **Dataset** (posted
@@ -547,11 +547,11 @@ send reviewers a notification.
 
 ## 14. Concessionaire portal
 
-For concessionaire users linked to their company by MIAA.
+For concessionaire users linked to their company by AVTECH.
 * **Home**: account summary, open invoices and recent payments; **Download PDF** of a billing document.
 * **Billing** and **Payments**: your posted billings and receipts only. You never see other companies' data.
 * **Inquiries**: **New inquiry** with a **Subject** and message, or report a payment with the
   **Amount paid (₱)**, **Payment date** and **Bank or check reference**; **Send**.
 
-  MIAA staff answer in CAS. A reported payment is not a receipt until MIAA records it.
-* Portal accounts are linked by MIAA after checking your identity and authority; there is no self-registration.
+  AVTECH staff answer in CAS. A reported payment is not a receipt until AVTECH records it.
+* Portal accounts are linked by AVTECH after checking your identity and authority; there is no self-registration.

@@ -185,7 +185,7 @@ public class AdHocReportService {
             notes.add("Only the first " + rows.size() + " rows are included.");
         }
         notes.add("Generated " + at + " by " + by + ".");
-        return new ReportTable((String) row.get("name"), List.of("Manila International Airport Authority"), r.columns().get(0).label(),
+        return new ReportTable((String) row.get("name"), List.of("Avtech Information Technology Solutions, Inc."), r.columns().get(0).label(),
                 r.columns().subList(1, r.columns().size()).stream().map(ColumnInfo::label).toList(), rows, notes);
     }
 

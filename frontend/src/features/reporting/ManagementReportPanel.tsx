@@ -176,7 +176,7 @@ export function ManagementReportPanel({ onQueued }: { onQueued: () => void }) {
       )}
       <Button variant="secondary" busy={queue.isPending} onClick={() => queue.mutate()}>{schedule.on ? 'Save schedule' : 'Queue report'}</Button>
       {def.type === 'VARIANCE_ANALYSIS' && <p className="text-xs text-slate-500">Budget to date is the allotment spread evenly over 12
-        periods, against posted actuals to the end of the chosen period. A positive variance is favourable. The layout is proposed until MIAA
+        periods, against posted actuals to the end of the chosen period. A positive variance is favourable. The layout is proposed until AVTECH
         confirms its budget definitions.</p>}
       {def.type === 'AUDIT_TRAIL' && <p className="text-xs text-slate-500">Each exported event carries its row hash, and the export records whether the
         whole hash chain verified intact. The export request is itself recorded in the audit trail.</p>}

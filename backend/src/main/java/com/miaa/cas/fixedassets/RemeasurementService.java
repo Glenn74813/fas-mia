@@ -42,7 +42,7 @@ import org.springframework.transaction.annotation.Transactional;
  * rest goes to revaluation surplus; a decrease first reduces this asset's surplus, the rest is a loss.</li>
  * </ul>
  *
- * Whether MIAA uses the revaluation model is its policy (C-07, C-30): revaluation is refused unless
+ * Whether AVTECH uses the revaluation model is its policy (C-07, C-30): revaluation is refused unless
  * {@code cas.fixed-assets.revaluation-enabled} is on. Impairment applies under either model. Reversing an impairment
  * of an asset carried at cost is not supported.
  */
@@ -97,7 +97,7 @@ public class RemeasurementService {
     public RemeasurementView prepare(RemeasurementRequest req) {
         CurrentActor.requirePermission("FA_MANAGE");
         if ("REVALUATION".equals(req.kind()) && !revaluationEnabled) {
-            throw FixedAssetService.rule("Revaluation is turned off until MIAA confirms it carries assets at revalued amounts (C-07, C-30).");
+            throw FixedAssetService.rule("Revaluation is turned off until AVTECH confirms it carries assets at revalued amounts (C-07, C-30).");
         }
         Map<String, Object> a = lockAsset(req.assetId());
         requireInService(a);
@@ -137,7 +137,7 @@ public class RemeasurementService {
         }
         String kind = (String) r.get("kind");
         if ("REVALUATION".equals(kind) && !revaluationEnabled) {
-            throw FixedAssetService.rule("Revaluation is turned off until MIAA confirms it carries assets at revalued amounts (C-07, C-30).");
+            throw FixedAssetService.rule("Revaluation is turned off until AVTECH confirms it carries assets at revalued amounts (C-07, C-30).");
         }
         UUID assetId = (UUID) r.get("asset_id");
         Map<String, Object> a = lockAsset(assetId);

@@ -36,7 +36,7 @@ import org.springframework.transaction.annotation.Transactional;
 /**
  * The signed-in user's dashboard (MS §11.3, §11.8, §12): each section appears only when the user holds the
  * permission behind it, so a cashier, an accountant, a budget officer and a finance manager each see their own
- * view. The indicators are proposed until MIAA approves its KPIs; each is computed from posted records, never stored.
+ * view. The indicators are proposed until AVTECH approves its KPIs; each is computed from posted records, never stored.
  */
 @Service
 public class DashboardService {
@@ -102,7 +102,7 @@ public class DashboardService {
     @Transactional(readOnly = true)
     public Dashboard mine() {
         LocalDate today = LocalDate.now(clock.withZone(MANILA));
-        List<String> notes = new ArrayList<>(List.of("Indicators are proposed until MIAA approves its key performance indicators. "
+        List<String> notes = new ArrayList<>(List.of("Indicators are proposed until AVTECH approves its key performance indicators. "
                 + "All figures come from posted records."));
         CashSection cash = null;
         if (CurrentActor.hasPermission("TREASURY_VIEW")) {

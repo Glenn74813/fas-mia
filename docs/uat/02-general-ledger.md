@@ -1,6 +1,6 @@
 # UAT: general ledger and journal vouchers
 
-Placeholder accounts (`PLC-` codes) are used until MIAA's approved chart is loaded (C-22). Account codes in the
+Placeholder accounts (`PLC-` codes) are used until AVTECH's approved chart is loaded (C-22). Account codes in the
 steps are examples; use the UAT chart's equivalents.
 
 ### UAT-GL-001 Maintaining the chart of accounts

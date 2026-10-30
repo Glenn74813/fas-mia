@@ -27,7 +27,7 @@ export function AccessReviewsPage() {
       <PageHeader title="Access reviews" crumbs={[{ label: 'Administration' }, { label: 'Access reviews' }]} />
       <p className="mb-4 text-sm text-slate-600">A review cycle lists every active internal user with their roles. Reviewers confirm or ask for
         changes (never for their own access), user administrators apply the changes, and the cycle closes when all are done. How often
-        cycles run is MIAA's decision (C-08, C-19).</p>
+        cycles run is AVTECH's decision (C-08, C-19).</p>
       {hasPermission('ACCESS_REVIEW_MANAGE') && !open && (
         <section className="mb-4 flex flex-wrap items-end gap-3 rounded-xl border border-slate-200/80 bg-white shadow-xs p-5">
           <Field label="Cycle name" value={form.name} maxLength={200} placeholder="e.g. 2026 Q4 access review" onChange={(e) => setForm({ ...form, name: e.target.value })} />

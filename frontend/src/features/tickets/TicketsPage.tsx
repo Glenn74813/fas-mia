@@ -17,7 +17,7 @@ import { formatDateTime } from '../../utils/format';
 export const TICKET_TYPES: Record<string, string> = { INCIDENT: 'Incident', SERVICE_REQUEST: 'Service request', CHANGE_REQUEST: 'Change request',
   ENHANCEMENT: 'Enhancement' };
 
-/** Business impact, separate from the priority that drives the SLA. [PLACEHOLDER] definitions until MIAA agrees them (C-34). */
+/** Business impact, separate from the priority that drives the SLA. [PLACEHOLDER] definitions until AVTECH agrees them (C-34). */
 export const SEVERITIES: Record<string, string> = { S1: 'S1 — finance operations stopped', S2: 'S2 — a key function impaired',
   S3: 'S3 — limited impact, workaround exists', S4: 'S4 — minimal or none' };
 

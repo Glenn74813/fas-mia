@@ -17,7 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Control accounts used by automatic sub-ledger postings, configured by mapping key so MIAA's approved
+ * Control accounts used by automatic sub-ledger postings, configured by mapping key so AVTECH's approved
  * chart can be wired in without code changes.
  */
 @Service

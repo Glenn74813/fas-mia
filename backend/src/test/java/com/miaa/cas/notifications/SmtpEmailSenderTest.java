@@ -27,7 +27,7 @@ class SmtpEmailSenderTest {
     private final CapturingSender relay = new CapturingSender();
 
     private SmtpEmailSender sender() throws Exception {
-        return new SmtpEmailSender(relay, "MIAA CAS <no-reply@cas.miaa.gov.ph>", TestProperties.defaults());
+        return new SmtpEmailSender(relay, "AVTECH CAS <no-reply@cas.miaa.gov.ph>", TestProperties.defaults());
     }
 
     @Test
@@ -35,9 +35,9 @@ class SmtpEmailSenderTest {
         sender().send("chief@miaa.gov.ph", AlertService.EMAIL_TEMPLATE,
                 Map.of("title", "Integration BIR_EIS needs attention", "body", "A transmission failed.", "link", "/integrations"));
         MimeMessage m = relay.sent.get(0);
-        assertThat(m.getFrom()[0].toString()).isEqualTo("MIAA CAS <no-reply@cas.miaa.gov.ph>");
+        assertThat(m.getFrom()[0].toString()).isEqualTo("AVTECH CAS <no-reply@cas.miaa.gov.ph>");
         assertThat(m.getRecipients(Message.RecipientType.TO)[0].toString()).isEqualTo("chief@miaa.gov.ph");
-        assertThat(m.getSubject()).isEqualTo("[MIAA CAS alert] Integration BIR_EIS needs attention");
+        assertThat(m.getSubject()).isEqualTo("[AVTECH CAS alert] Integration BIR_EIS needs attention");
         assertThat(m.getContentType()).startsWith("text/plain");
         assertThat((String) m.getContent()).contains("http://localhost:5173/integrations").contains("Do not reply");
     }

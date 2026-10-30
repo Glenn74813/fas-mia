@@ -71,7 +71,7 @@ export function PortalInquiries() {
             <textarea rows={4} maxLength={4000} value={form.message} onChange={(e) => setForm({ ...form, message: e.target.value })} className={select} /></label>
           <label className="text-sm text-slate-700 sm:col-span-2">{payment ? 'Proof of payment' : 'Attachment'} (optional, PDF or image)
             <input type="file" accept=".pdf,.png,.jpg,.jpeg" className="ml-2 text-xs" onChange={(e) => setFile(e.target.files?.[0] ?? null)} /></label>
-          {payment && <p className="text-xs text-slate-600 sm:col-span-2">This tells MIAA Finance about your payment. Your balance changes only
+          {payment && <p className="text-xs text-slate-600 sm:col-span-2">This tells AVTECH Finance about your payment. Your balance changes only
             when Finance has checked the payment and posted the official receipt.</p>}
           <div className="flex gap-2 sm:col-span-2">
             <Button type="submit" busy={submit.isPending} disabled={!ready}>Send</Button>
@@ -93,7 +93,7 @@ export function PortalInquiries() {
               <p className="mt-1 whitespace-pre-wrap">{i.message}</p>
               {i.documents.length > 0 && <p className="mt-1 text-xs">Attachments: {i.documents.map((d) => (
                 <button key={d.id} className="mr-2 text-brand-700 hover:underline" onClick={() => voucherApi.download(d)}>{d.fileName}</button>))}</p>}
-              {i.response && <div className="mt-2 rounded bg-slate-50 p-2"><p className="text-xs text-slate-500">MIAA Finance replied {formatDateTime(i.respondedAt)}</p>
+              {i.response && <div className="mt-2 rounded bg-slate-50 p-2"><p className="text-xs text-slate-500">AVTECH Finance replied {formatDateTime(i.respondedAt)}</p>
                 <p className="whitespace-pre-wrap">{i.response}</p></div>}
               {i.availableActions.includes('UPLOAD') && <label className="mt-2 block text-xs">Add a file
                 <input type="file" accept=".pdf,.png,.jpg,.jpeg" className="ml-2 text-xs"

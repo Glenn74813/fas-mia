@@ -5,7 +5,7 @@ cas:
   budget:
     enforcement: "OFF"
   fixed-assets:
-    # RemeasurementIT revalues assets; production keeps revaluation off until MIAA adopts the model (C-07, C-30).
+    # RemeasurementIT revalues assets; production keeps revaluation off until AVTECH adopts the model (C-07, C-30).
     revaluation-enabled: true
   accounting:
     allow-placeholder-accounts: true

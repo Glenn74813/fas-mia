@@ -1,6 +1,6 @@
-# PLACEHOLDER CHART OF ACCOUNTS - NOT MIAA-APPROVED, NOT A COA/GAM ACCOUNT LIST.
+# PLACEHOLDER CHART OF ACCOUNTS - NOT AVTECH-APPROVED, NOT A COA/GAM ACCOUNT LIST.
 # Generic five-class structure used only to exercise the accounting engine in development and testing.
-# Replace with the MIAA-approved Chart of Accounts (clarification C-07) before UAT. Codes deliberately use the PLC- prefix.
+# Replace with the AVTECH-approved Chart of Accounts (clarification C-07) before UAT. Codes deliberately use the PLC- prefix.
 code,name,type,normalBalance,parentCode,postable,fsLineCode,requiresCostCenter,subsidiaryType,budgetControlled
 PLC-1,[PLACEHOLDER] Assets,ASSET,DEBIT,,false,,false,,false
 PLC-11,[PLACEHOLDER] Cash and cash equivalents,ASSET,DEBIT,PLC-1,false,PLC-SFP-CASH,false,,false

@@ -104,7 +104,7 @@ public class ApReportService {
             rec = new ApReconciliation(account, code, sub, Money.of(gl), diff, diff.signum() == 0);
         }
         return new AdvanceRegister(rows, sub, rec, "Advances carried over from the legacy system at cutover. Paying and liquidating "
-                + "advances in CAS awaits MIAA's policy (clarification C-31).");
+                + "advances in CAS awaits AVTECH's policy (clarification C-31).");
     }
 
     /**
@@ -134,7 +134,7 @@ public class ApReportService {
                 Money.of(rs.getBigDecimal("m3")), Money.of(rs.getBigDecimal("base")), Money.of(rs.getBigDecimal("tax"))),
                 m1, m1 + 1, m1 + 2, Date.valueOf(start), Date.valueOf(end));
         return new WithholdingSchedule(year, quarter, "Data for BIR Form 2307. Print layout pending the approved template; "
-                + "tax codes and rates are MIAA configuration and must be validated by the tax team.", rows);
+                + "tax codes and rates are AVTECH configuration and must be validated by the tax team.", rows);
     }
 
     private static BigDecimal sum(List<AgingRow> rows, int col) {

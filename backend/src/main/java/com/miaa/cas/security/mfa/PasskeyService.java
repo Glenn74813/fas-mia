@@ -69,7 +69,7 @@ public class PasskeyService {
     private final String rpName;
 
     public PasskeyService(JdbcTemplate jdbc, @Value("${cas.webauthn.origins:${cas.frontend-base-url}}") String origins,
-            @Value("${cas.webauthn.rp-id:}") String rpId, @Value("${cas.webauthn.rp-name:MIAA CAS}") String rpName) {
+            @Value("${cas.webauthn.rp-id:}") String rpId, @Value("${cas.webauthn.rp-name:AVTECH CAS}") String rpName) {
         this.jdbc = jdbc;
         List<String> list = Arrays.stream(origins.split(",")).map(String::trim).filter(s -> !s.isEmpty())
                 .map(s -> s.replaceAll("/+$", "")).toList();

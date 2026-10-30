@@ -58,7 +58,7 @@ export function CashPositionPage() {
               <td className="py-1.5 text-right"><Money value={c.amount} /></td></tr>))}
             {checks.data?.length === 0 && <tr><td colSpan={8} className="py-4 text-center text-slate-500">No checks.</td></tr>}</tbody>
         </table></div>
-        <p className="mt-2 text-xs text-slate-500">Checks become CLEARED when matched on an approved bank reconciliation. The stale-check period is MIAA policy and is not applied automatically.</p>
+        <p className="mt-2 text-xs text-slate-500">Checks become CLEARED when matched on an approved bank reconciliation. The stale-check period is AVTECH policy and is not applied automatically.</p>
       </section>
     </>
   );

@@ -6,7 +6,7 @@
 //   node perf/seed.mjs [--customers 100] [--suppliers 50] [--ar-items 30] [--ap-items 20] [--vouchers 1000]
 //                      [--receipts 2] [--concurrency 6]
 //
-// Volumes default to a laptop-sized set. MIAA's actual volumes are not yet known (C-12); pass larger figures for the
+// Volumes default to a laptop-sized set. AVTECH's actual volumes are not yet known (C-12); pass larger figures for the
 // target environment.
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { dirname } from 'node:path';

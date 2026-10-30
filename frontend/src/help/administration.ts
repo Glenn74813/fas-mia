@@ -102,7 +102,7 @@ export const ADMINISTRATION_HELP: Record<string, ModuleHelp> = {
 
   '/admin/roles': {
     title: 'Roles & permissions',
-    summary: 'Shows each role, the permissions it carries and how many active users hold it. Roles are the unit of access in CAS; the seeded matrix is a proposal pending MIAA sign-off.',
+    summary: 'Shows each role, the permissions it carries and how many active users hold it. Roles are the unit of access in CAS; the seeded matrix is a proposal pending AVTECH sign-off.',
     steps: [
       'Read the table of Code, Name, Permissions and Active users.',
       'Click a role code to see its permissions grouped on the role page.',
@@ -157,7 +157,7 @@ export const ADMINISTRATION_HELP: Record<string, ModuleHelp> = {
 
   '/admin/access-reviews': {
     title: 'Access reviews',
-    summary: 'Periodic review of who has what access. A cycle lists every active internal user with their roles so reviewers can confirm them or ask for changes. How often cycles run is for MIAA to decide.',
+    summary: 'Periodic review of who has what access. A cycle lists every active internal user with their roles so reviewers can confirm them or ask for changes. How often cycles run is for AVTECH to decide.',
     steps: [
       'To start a cycle, enter a Cycle name and Due date and click Start review cycle. Only one cycle can be open at a time.',
       'Open the cycle and use Waiting for me to see the users you review; Everyone shows all of them.',
@@ -183,7 +183,7 @@ export const ADMINISTRATION_HELP: Record<string, ModuleHelp> = {
       'Review the table of limits already set.',
       'Click Remove, and confirm, to lift a limit.',
     ],
-    roles: 'Finance Manager sets and removes limits. Auditors and role viewers can read them. The amounts are MIAA’s decision: none are set by default, and every change is recorded in the audit trail.',
+    roles: 'Finance Manager sets and removes limits. Auditors and role viewers can read them. The amounts are AVTECH’s decision: none are set by default, and every change is recorded in the audit trail.',
     connections: [
       { to: '/admin/roles', how: 'Limits attach to roles, so they apply to every user holding that role.' },
       { to: '/journal-vouchers', how: 'A limit on a document type caps what an approver can approve on that type of document.' },
@@ -194,7 +194,7 @@ export const ADMINISTRATION_HELP: Record<string, ModuleHelp> = {
 
   '/admin/data-exports': {
     title: 'Data export',
-    summary: 'A full copy of MIAA’s data in open formats: every table as CSV with a data dictionary, supporting documents, the audit-chain check and a SHA-256 manifest, in one ZIP. Sign-in secrets are left out.',
+    summary: 'A full copy of AVTECH’s data in open formats: every table as CSV with a data dictionary, supporting documents, the audit-chain check and a SHA-256 manifest, in one ZIP. Sign-in secrets are left out.',
     steps: [
       'Enter a Purpose of at least 10 characters and click Request full export.',
       'A different holder of the export permission opens the request and clicks Approve, or Reject with a reason.',

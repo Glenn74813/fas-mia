@@ -1,6 +1,6 @@
 # Where each development placeholder account goes in the Revised Chart of Accounts for Government Corporations (2019).
 # Used to move the CAS settings (account mappings, tax codes, bank accounts, asset categories, stock items) off the
-# placeholders. confirm=true marks a nearest match that MIAA's Accounting Department should confirm (C-22): the COA
+# placeholders. confirm=true marks a nearest match that AVTECH's Accounting Department should confirm (C-22): the COA
 # chart has no account with that exact meaning.
 plcCode,officialCode,confirm,note
 PLC-1101,10101010,false,Cash on hand of collecting officers
@@ -10,7 +10,7 @@ PLC-1201,10301010,false,
 PLC-1202,19901040,false,
 PLC-1203,10399990,false,
 PLC-1204,19902060,false,
-PLC-1205,19902080,true,Creditable withholding tax on MIAA's income: Withholding Tax at Source
+PLC-1205,19902080,true,Creditable withholding tax on AVTECH's income: Withholding Tax at Source
 PLC-1206,19902010,false,
 PLC-1301,10404010,false,
 PLC-1302,10404990,true,Spare parts: no separate COA account; Other Supplies and Materials Inventory
@@ -28,7 +28,7 @@ PLC-2301,20401040,false,
 PLC-2302,20502990,false,
 PLC-2303,29999040,true,Unapplied collections: Undistributed Collections
 PLC-3101,30101020,false,
-PLC-3102,30701010,false,MIAA reports under PFRS: Retained Earnings/(Deficit)
+PLC-3102,30701010,false,AVTECH reports under PFRS: Retained Earnings/(Deficit)
 PLC-4101,40202120,false,
 PLC-4102,40202120,false,
 PLC-4103,40202990,true,Passenger service charges: no separate COA account; Other Business Income

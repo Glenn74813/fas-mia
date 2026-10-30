@@ -53,7 +53,7 @@ export function NrvReviewPage() {
         many months of stock that is; items with no issues or more than the threshold's months of stock are flagged slow-moving.
         Enter or import each item's market value per unit; where it is below cost, <strong>Propose write-down</strong> creates a draft
         price adjustment that is reviewed and posted like any stock document. The measurement basis and slow-moving rule are
-        proposals for MIAA's accounting policy (C-07).</p>
+        proposals for AVTECH's accounting policy (C-07).</p>
       {canManage && (
         <div className="mb-4 flex flex-wrap items-end gap-2">
           <label className="text-sm">Review date<input type="date" value={asOf} onChange={(e) => setAsOf(e.target.value)}

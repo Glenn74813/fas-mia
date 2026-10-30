@@ -47,7 +47,7 @@ export function MfaPage() {
     return (
       <AuthLayout title="Save your recovery codes">
         <div className="space-y-4 text-sm text-slate-700">
-          <p>If you lose your phone or remove MIAA CAS from your authenticator app, each of these codes lets you sign in
+          <p>If you lose your phone or remove AVTECH CAS from your authenticator app, each of these codes lets you sign in
             once and set up the authenticator again. <strong>They are shown only now.</strong></p>
           <p>Print them, download them, or save them in a password manager. Keep them away from your phone.</p>
           <RecoveryCodes codes={newRecoveryCodes} />
@@ -172,7 +172,7 @@ export function MfaPage() {
             <ol className="list-decimal space-y-1 pl-5">
               <li>In the app, add an account (in Microsoft Authenticator: <strong>+ → Other account</strong>).</li>
               <li>Scan this QR code, or type the setup key below.</li>
-              <li>Enter the 6-digit code the app shows for <strong>MIAA CAS</strong>.</li>
+              <li>Enter the 6-digit code the app shows for <strong>AVTECH CAS</strong>.</li>
             </ol>
             {qr ? <img src={qr} alt="Authenticator enrolment QR code" className="mx-auto h-48 w-48" /> : <Spinner label="Preparing" />}
             {enrollment && (
@@ -184,7 +184,7 @@ export function MfaPage() {
             next 5 minutes. <button type="button" className="text-brand-700 hover:underline" disabled={busy} onClick={sendCode}>Send a new code</button></p>
         ) : (
           <p className="text-sm text-slate-700">Open your authenticator app and enter the 6-digit code shown for
-            <strong> MIAA CAS</strong>. The code changes every 30 seconds.</p>
+            <strong> AVTECH CAS</strong>. The code changes every 30 seconds.</p>
         )}
         <Field label="6-digit code" name="code" inputMode="numeric" autoComplete="one-time-code" pattern="\d{6}"
           maxLength={6} required value={code} onChange={(e) => setCode(e.target.value.replace(/\D/g, ''))} />

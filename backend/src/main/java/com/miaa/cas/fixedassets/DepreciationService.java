@@ -72,7 +72,7 @@ public class DepreciationService {
         this.clock = clock;
     }
 
-    /** MONTHLY (default) or ANNUAL, from {@code cas.fixed-assets.depreciation-frequency}; MIAA's policy is C-30. */
+    /** MONTHLY (default) or ANNUAL, from {@code cas.fixed-assets.depreciation-frequency}; AVTECH's policy is C-30. */
     public String frequency() {
         return frequency;
     }

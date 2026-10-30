@@ -309,8 +309,8 @@ public class DataExportService {
             }
             Files.move(partial, target, java.nio.file.StandardCopyOption.REPLACE_EXISTING, java.nio.file.StandardCopyOption.ATOMIC_MOVE);
             String sha = HexFormat.of().formatHex(zipDigest.digest());
-            String fileName = (manifest.get("fiscalYear") != null ? "miaa-cas-archive-FY" + manifest.get("fiscalYear")
-                    : "miaa-cas-export-" + Instant.now(clock).toString().substring(0, 10)) + "-" + id.toString().substring(0, 8) + ".zip";
+            String fileName = (manifest.get("fiscalYear") != null ? "avtech-cas-archive-FY" + manifest.get("fiscalYear")
+                    : "avtech-cas-export-" + Instant.now(clock).toString().substring(0, 10)) + "-" + id.toString().substring(0, 8) + ".zip";
             Instant done = Instant.now(clock);
             tx.executeWithoutResult(s -> {
                 jdbc.update("UPDATE data_exports SET status = 'DONE', finished_at = ?, file_name = ?, size_bytes = ?, sha256 = ?, "

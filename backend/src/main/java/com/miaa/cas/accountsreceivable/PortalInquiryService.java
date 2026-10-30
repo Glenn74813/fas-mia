@@ -143,7 +143,7 @@ public class PortalInquiryService implements DocumentOwnerPolicy {
                 + "WHERE id = ?", response.trim(), CurrentActor.username(), Timestamp.from(Instant.now(clock)), id);
         String email = jdbc.queryForObject("SELECT email FROM users WHERE id = ?", String.class, r.get("submitted_by_id"));
         outbox.enqueueEmail(email, "portal-inquiry-answered", Map.of("reference", r.get("reference"), "subject", r.get("subject")));
-        notifications.notify((UUID) r.get("submitted_by_id"), "INQUIRY_ANSWERED", "MIAA Finance answered inquiry " + r.get("reference"),
+        notifications.notify((UUID) r.get("submitted_by_id"), "INQUIRY_ANSWERED", "AVTECH Finance answered inquiry " + r.get("reference"),
                 (String) r.get("subject"), "/portal");
         audit.record("PORTAL_INQUIRY_ANSWERED", OWNER, id, Map.of("reference", r.get("reference")));
         return view(id);
@@ -198,7 +198,7 @@ public class PortalInquiryService implements DocumentOwnerPolicy {
                 UUID.class, CurrentActor.userId());
         if (ids.isEmpty()) {
             throw new ApiException(ErrorCode.ACCESS_DENIED, "Your portal account is not yet linked to a customer account. "
-                    + "Please contact MIAA Finance.");
+                    + "Please contact AVTECH Finance.");
         }
         return ids.get(0);
     }

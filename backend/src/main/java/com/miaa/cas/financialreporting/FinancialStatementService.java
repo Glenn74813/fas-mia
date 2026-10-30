@@ -83,7 +83,7 @@ public class FinancialStatementService {
         if (Boolean.FALSE.equals(balanced)) {
             notes.add("The balance check " + t.balanceCheck() + " does not agree.");
         }
-        notes.add("Template " + t.code() + " version " + t.version() + ". Presentation follows MIAA's approved framework once configured (C-07).");
+        notes.add("Template " + t.code() + " version " + t.version() + ". Presentation follows AVTECH's approved framework once configured (C-07).");
         return new StatementResult(t.id(), t.code(), t.version(), t.name(), t.statementType(), period.getName(), period.getEndDate(),
                 prior == null ? null : prior.getName(), lines, balanced, unmapped, unclassified, placeholder, notes);
     }
@@ -269,7 +269,7 @@ public class FinancialStatementService {
                     + u.amount().toPlainString());
         }
         notes.add("Generated " + generatedAt + " by " + generatedBy + ".");
-        return new ReportTable(s.title(), List.of("Manila International Airport Authority", "As of / for the period ended " + s.periodEnd()),
+        return new ReportTable(s.title(), List.of("Avtech Information Technology Solutions, Inc.", "As of / for the period ended " + s.periodEnd()),
                 "Line", columns, rows, notes);
     }
 }

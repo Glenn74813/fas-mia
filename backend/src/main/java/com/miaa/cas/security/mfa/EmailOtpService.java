@@ -22,7 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
  * id), valid for at most {@link #LIFETIME} and that step's own lifetime, stored as an Argon2 hash, and allows
  * {@link #MAX_ATTEMPTS} tries. Sending is limited to one code a minute and {@link #MAX_PER_HOUR} an hour per user; a new
  * code withdraws the previous one. Delivery goes through the notification outbox (SMTP in production). Off unless
- * {@code cas.mfa.email-otp.enabled} is true, because it needs MIAA's mail relay.
+ * {@code cas.mfa.email-otp.enabled} is true, because it needs AVTECH's mail relay.
  */
 @Service
 public class EmailOtpService {

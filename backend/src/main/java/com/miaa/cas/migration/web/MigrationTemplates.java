@@ -34,7 +34,7 @@ final class MigrationTemplates {
             case AP_ADVANCES -> """
                     # CAS template: advances paid to suppliers or contractors and not yet liquidated at cutover. outstanding_amount is the
                     # balance still to be recovered (positive, two decimals). The items must equal each supplier's balance on the account
-                    # mapped to SUPPLIER_ADVANCES in the posted opening entry. Liquidating advances in CAS awaits MIAA policy (C-31).
+                    # mapped to SUPPLIER_ADVANCES in the posted opening entry. Liquidating advances in CAS awaits AVTECH policy (C-31).
                     """;
             case FA_REGISTER -> """
                     # CAS template: the fixed-asset register at cutover. asset_number is the property number (unique). Dates yyyy-MM-dd;

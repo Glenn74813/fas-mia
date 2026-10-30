@@ -66,7 +66,7 @@ export function SlaSettingsPage() {
         <h2 className="mb-2 font-semibold">Holidays (not counted on business-hours clocks)</h2>
         <ul className="mb-2">{(calendar.data?.holidays ?? []).map((x) => <li key={x.date}>{x.date} {x.name}
           {admin && <button className="ml-2 text-xs text-red-700" onClick={() => removeHoliday.mutate(x.date)}>Remove</button>}</li>)}
-          {calendar.data?.holidays.length === 0 && <li className="text-slate-500">None entered. Enter the holidays MIAA observes.</li>}</ul>
+          {calendar.data?.holidays.length === 0 && <li className="text-slate-500">None entered. Enter the holidays AVTECH observes.</li>}</ul>
         {admin && <div className="flex flex-wrap items-end gap-3"><Field label="Date" type="date" value={h.date} onChange={(e) => setH({ ...h, date: e.target.value })} />
           <Field label="Holiday name" value={h.name} onChange={(e) => setH({ ...h, name: e.target.value })} />
           <Button variant="secondary" disabled={!h.date || !h.name} onClick={() => addHoliday.mutate()}>Add holiday</Button></div>}

@@ -26,7 +26,7 @@ export function AccessGrantsPage() {
     <>
       <PageHeader title="Financial access grants" crumbs={[{ label: 'Administration' }, { label: 'Access grants' }]} />
       <p className="mb-4 text-sm text-slate-600">Adding a role that carries financial permissions waits here until a second person approves it.
-        Neither the administrator who asked nor the user concerned can decide it. Approval rules are proposed pending MIAA sign-off (C-19).</p>
+        Neither the administrator who asked nor the user concerned can decide it. Approval rules are proposed pending AVTECH sign-off (C-19).</p>
       <div className="mb-3 flex gap-2 text-sm">
         {[['PENDING', 'Waiting'], ['APPROVED', 'Approved'], ['REJECTED', 'Rejected'], ['CANCELLED', 'Withdrawn'], ['', 'All']].map(([v, l]) => (
           <button key={v} aria-pressed={status === v} onClick={() => { setStatus(v!); setPage(0); }}

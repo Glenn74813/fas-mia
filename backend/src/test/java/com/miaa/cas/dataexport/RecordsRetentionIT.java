@@ -47,7 +47,7 @@ class RecordsRetentionIT extends AbstractAccountingIT {
         assertThat(done.get("kind").asText()).isEqualTo("ARCHIVE");
         assertThat(done.get("fiscalYear").asInt()).isEqualTo(year);
         assertThat(done.get("status").asText()).isEqualTo("DONE");
-        assertThat(done.get("fileName").asText()).startsWith("miaa-cas-archive-FY" + year + "-");
+        assertThat(done.get("fileName").asText()).startsWith("avtech-cas-archive-FY" + year + "-");
 
         Map<String, byte[]> zip = unzip(mvc.perform(get("/api/v1/data-exports/" + id + "/download").header("Authorization", admin.bearer()))
                 .andExpect(status().isOk()).andReturn().getResponse().getContentAsByteArray());

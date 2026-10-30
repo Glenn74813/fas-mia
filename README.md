@@ -1,4 +1,4 @@
-# MIAA Computerized Accounting System (CAS)
+# AVTECH Computerized Accounting System (CAS)
 
 Independently deployable **Spring Boot 3.5 / Java 17** API and **React 19 + TypeScript** SPA backed by
 **PostgreSQL**, built in phases against the CAS development specification.
@@ -8,7 +8,7 @@ Independently deployable **Spring Boot 3.5 / Java 17** API and **React 19 + Type
 [2](docs/11-phase-2-report.md), [3](docs/12-phase-3-report.md), [4](docs/14-phase-4-report.md). What the
 specification asks for against what is built: [docs/16-specification-compliance.md](docs/16-specification-compliance.md).
 The chart of accounts loaded in
-development is a clearly labelled **placeholder** until MIAA supplies the approved chart.
+development is a clearly labelled **placeholder** until AVTECH supplies the approved chart.
 
 | Path | Contents |
 |---|---|

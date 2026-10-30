@@ -47,7 +47,7 @@ import org.springframework.transaction.annotation.Transactional;
 /**
  * Inbound interfaces (TOR §4.6.2, Annex D). A file is validated into a batch; accepting it creates drafts through the
  * same services a person would use, so every rule, approval and audit of those documents applies. Field layouts are
- * proposals until MIAA supplies each system's (C-37):
+ * proposals until AVTECH supplies each system's (C-37):
  * <ul>
  * <li>PAYROLL, a payroll summary: header {@code reference}, {@code accountingDate} (or {@code period} YYYY-MM, its
  * last day) and {@code description}; rows {@code accountCode}, {@code costCenterCode}, {@code description},

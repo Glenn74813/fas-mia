@@ -35,7 +35,7 @@ export function DepreciationRunsPage() {
           <Button busy={prepare.isPending} disabled={!periodId} onClick={() => prepare.mutate()}>Compute depreciation</Button>
           <p className="w-full text-xs text-slate-500">Straight-line, monthly amounts. Months not yet charged are caught up; nothing is charged twice.
             {settings.data?.frequency === 'ANNUAL' ? ' Runs are annual: only the fiscal year\'s last regular period can be run.' : ''} Start convention,
-            useful lives and run frequency are MIAA policy (C-30).</p>
+            useful lives and run frequency are AVTECH policy (C-30).</p>
           <div className="w-full"><ErrorAlert error={prepare.error} /></div>
         </section>
       )}

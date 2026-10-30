@@ -1,7 +1,7 @@
 # Revised Chart of Accounts for Government Corporations (2019), prescribed under COA Circular No. 2020-002 dated
 # January 28, 2020, as listed in Annex A of COA Circular No. 2021-005 dated July 22, 2021 (right-hand column).
-# Codes and titles are COA's. fsLineCode groups accounts on the statement lines of MIAA's audited statements; the
-# cost-centre, subsidiary-ledger and budget-control flags are CAS proposals for MIAA to confirm (C-07, C-10, C-22).
+# Codes and titles are COA's. fsLineCode groups accounts on the statement lines of AVTECH's audited statements; the
+# cost-centre, subsidiary-ledger and budget-control flags are CAS proposals for AVTECH to confirm (C-07, C-10, C-22).
 code,name,type,normalBalance,parentCode,postable,fsLineCode,requiresCostCenter,subsidiaryType,budgetControlled
 1,Assets,ASSET,DEBIT,,false,,false,,false
 101,Cash and Cash Equivalents,ASSET,DEBIT,1,false,RCA-SFP-CASH,false,,false

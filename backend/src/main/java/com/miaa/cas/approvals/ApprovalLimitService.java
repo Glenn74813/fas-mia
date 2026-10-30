@@ -22,7 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 /**
  * Per-role approval limits by document type (MS §9.3, FR-RBAC-07). A user may approve a document only up to the
  * highest limit among their roles that have one for its type; a user none of whose roles has a limit is not limited.
- * No limits are seeded: the amounts are MIAA's decision (C-24). Limits bind approval steps, not posting.
+ * No limits are seeded: the amounts are AVTECH's decision (C-24). Limits bind approval steps, not posting.
  */
 @Service
 public class ApprovalLimitService {

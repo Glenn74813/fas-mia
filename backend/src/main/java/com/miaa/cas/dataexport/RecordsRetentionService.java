@@ -23,14 +23,14 @@ import org.springframework.transaction.annotation.Transactional;
 /**
  * Records retention (TOR §4.5, Annex A.9): the retention schedule per fiscal year, its archives, and legal holds. Every
  * fiscal year is kept at least {@code cas.records.retention-years} (10) after it ends. Disposal is not offered: posted
- * records and the audit trail stay immutable until MIAA decides how lawful disposal works (C-05, C-13), and a year
+ * records and the audit trail stay immutable until AVTECH decides how lawful disposal works (C-05, C-13), and a year
  * under a legal hold could not be disposed of in any case.
  */
 @Service
 public class RecordsRetentionService {
 
     public static final String MANAGE = "RECORDS_RETENTION_MANAGE";
-    static final String DISPOSAL = "Disposal is not available: posted records and the audit trail are kept until MIAA decides how lawful "
+    static final String DISPOSAL = "Disposal is not available: posted records and the audit trail are kept until AVTECH decides how lawful "
             + "disposal works (C-05, C-13).";
 
     public record Hold(UUID id, UUID fiscalYearId, Integer fiscalYear, String reason, String reference, String placedBy, Instant placedAt,

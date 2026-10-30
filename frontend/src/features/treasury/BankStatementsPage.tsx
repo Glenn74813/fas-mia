@@ -60,7 +60,7 @@ export function BankStatementsPage() {
           </div>
           {csv && <p className="text-xs text-slate-500">CSV header: date,description,reference,amount (signed) or date,description,reference,debit,credit; optional balance column; dates yyyy-MM-dd.</p>}
           <Button busy={imp.isPending} disabled={!valid} onClick={() => imp.mutate()}>Import</Button>
-          <p className="text-xs text-slate-500">Bank-specific variants of these formats must be confirmed with MIAA's banks (clarification C-11).</p>
+          <p className="text-xs text-slate-500">Bank-specific variants of these formats must be confirmed with AVTECH's banks (clarification C-11).</p>
         </section>
       )}
       <Select aria-label="Filter bank account" value={bankFilter} onChange={(e) => { setBankFilter(e.target.value); setPage(0); }} className="mb-3 rounded-lg border border-slate-300 px-3 py-2 shadow-xs text-sm">

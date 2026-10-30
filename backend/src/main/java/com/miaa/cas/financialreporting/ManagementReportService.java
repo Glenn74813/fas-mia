@@ -45,7 +45,7 @@ public class ManagementReportService {
 
     private static final ZoneId MANILA = ZoneId.of("Asia/Manila");
     private static final DateTimeFormatter TS = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").withZone(MANILA);
-    private static final String ORG = "Manila International Airport Authority";
+    private static final String ORG = "Avtech Information Technology Solutions, Inc.";
 
     private final JdbcTemplate jdbc;
     private final BudgetControl budget;
@@ -181,7 +181,7 @@ public class ManagementReportService {
                 b.get("name") + " — fiscal year " + b.get("fiscal_year") + " (" + b.get("status") + ")"), "Account / cost centre",
                 List.of("Allotment", "Reserved", "Actual", "Available", "Utilised %"), rows, List.of(
                         "Actual = posted expenditure on the account and cost centre in the fiscal year. Reserved = submitted documents "
-                                + "not yet posted. Budget presentation follows MIAA's budget definitions once confirmed (C-10).",
+                                + "not yet posted. Budget presentation follows AVTECH's budget definitions once confirmed (C-10).",
                         generated(by, at))), "budget_vs_actual_" + b.get("fiscal_year"));
     }
 

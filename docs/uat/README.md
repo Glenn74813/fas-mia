@@ -1,12 +1,12 @@
 # User acceptance testing (UAT)
 
-Scripts for MIAA's testers, traced to the requirements traceability matrix
+Scripts for AVTECH's testers, traced to the requirements traceability matrix
 ([02-requirements-traceability.md](../02-requirements-traceability.md)). The master specification's §18 acceptance
 conditions include:
 * 100 % of required functional test cases passed, with no critical defects;
 * at least a 95 % UAT pass rate;
 * no unexplained financial reconciliation discrepancies (see UAT-MIG-004, the parallel-run sign-off);
-* formal MIAA approval of outstanding non-critical defects.
+* formal AVTECH approval of outstanding non-critical defects.
 
 | File | Area |
 |---|---|

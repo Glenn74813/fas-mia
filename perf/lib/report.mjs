@@ -35,7 +35,7 @@ export function report(r) {
   lines.push(`# CAS performance run: ${r.scenario} (${overall})`, '');
   lines.push(`Started ${r.startedAt}. Phases: ${r.phases.map((p) => `${p.phase} ${p.seconds} s`).join(', ')}.`, '');
   lines.push('> Results on a developer workstation are indicative only. Acceptance requires the documented target environment, '
-    + 'MIAA-agreed volumes (C-12) and the measurement definition and thresholds marked PROPOSED below (C-02, C-17).', '');
+    + 'AVTECH-agreed volumes (C-12) and the measurement definition and thresholds marked PROPOSED below (C-02, C-17).', '');
   lines.push('## Verdict against the MS §17 targets', '', '| Kind | Requests | p95 | Measured | Limit | Errors (rate) | 5xx | Result | Basis |', '|---|---|---|---|---|---|---|---|---|');
   for (const x of rows) {
     lines.push(`| ${x.kind} | ${x.count} | ${ms(x.p95)} | ${x.basis} | ${ms(x.limit)} | ${x.errors} (${(x.errorRate * 100).toFixed(2)} %) | ${x.serverErrors} | `

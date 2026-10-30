@@ -36,7 +36,7 @@ import org.springframework.transaction.annotation.Transactional;
  * Operational reports as background jobs (MS §11.4, §11.8): Cash Disbursement Journal, collection summary, general and
  * subsidiary ledgers, daily collection report, bank reconciliation statement and the expanded-withholding schedule.
  * They render in the report worker, which has no signed-in user, so they read data directly and never through
- * methods that compute a viewer's actions. Layouts are CAS layouts until MIAA's approved formats are confirmed (C-07,
+ * methods that compute a viewer's actions. Layouts are CAS layouts until AVTECH's approved formats are confirmed (C-07,
  * C-29).
  */
 @Service
@@ -45,7 +45,7 @@ public class OperationalReportService {
     static final Set<String> TYPES = Set.of("CASH_DISBURSEMENT_JOURNAL", "COLLECTION_SUMMARY", "GENERAL_LEDGER", "SUBSIDIARY_LEDGER",
             "DAILY_COLLECTION_REPORT", "BANK_RECONCILIATION_STATEMENT", "WITHHOLDING_SCHEDULE", "ABSTRACT_OF_BILLS");
 
-    private static final String ORG = "Manila International Airport Authority";
+    private static final String ORG = "Avtech Information Technology Solutions, Inc.";
 
     private final JdbcTemplate jdbc;
     private final TreasuryReportService treasury;
@@ -250,7 +250,7 @@ public class OperationalReportService {
         return new Rendered(new ReportTable("Abstract of bills", List.of(ORG, "Bills dated " + from + " to " + to), "Customer / bill",
                 List.of("Kind", "Date", "Billing period", "Due", "Net", "VAT", "Gross"), rows,
                 List.of("Posted invoices, debit memos and credit memos (credit memos as negative amounts).",
-                        "PLACEHOLDER layout: to be confirmed by the Billing Section against MIAA's abstract of bills form.",
+                        "PLACEHOLDER layout: to be confirmed by the Billing Section against AVTECH's abstract of bills form.",
                         generated(by, at))), "abstract_of_bills_" + from + "_" + to);
     }
 

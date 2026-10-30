@@ -11,7 +11,7 @@ export function RolesPage() {
   return (
     <>
       <PageHeader title="Roles & permissions" crumbs={[{ label: 'Administration' }, { label: 'Roles' }]} />
-      <p className="mb-4 max-w-3xl text-sm text-slate-600">Seeded roles are proposals pending MIAA sign-off of the
+      <p className="mb-4 max-w-3xl text-sm text-slate-600">Seeded roles are proposals pending AVTECH sign-off of the
         role–permission matrix. Every change is checked against segregation-of-duties rules for all holders of the role.</p>
       <ErrorAlert error={roles.error} />
       {roles.isPending ? <Spinner /> : (

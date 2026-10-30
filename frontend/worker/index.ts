@@ -84,7 +84,7 @@ export function tlsVersion(request: Request): string | undefined {
 
 function tooOldTls(): Response {
   const body = '<!doctype html><meta charset="utf-8"><title>Update your browser</title><body style="font-family:sans-serif;max-width:36rem;'
-    + 'margin:4rem auto;line-height:1.5"><h1>Update your browser</h1><p>MIAA CAS accepts only secure connections using TLS 1.3, '
+    + 'margin:4rem auto;line-height:1.5"><h1>Update your browser</h1><p>AVTECH CAS accepts only secure connections using TLS 1.3, '
     + 'as required for government systems. Please update your browser or use a current version of Chrome, Edge, Firefox or Safari.</p>';
   return new Response(body, { status: 426, headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store', Upgrade: 'TLS/1.3',
     ...SECURITY_HEADERS } });

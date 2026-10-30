@@ -11,9 +11,9 @@ How they relate to the other documents:
 * Installation, configuration and releases are in [19-deployment-and-rollback.md](../19-deployment-and-rollback.md),
   not here.
 * Screen names, buttons and fields are quoted as the application shows them (bold in the text).
-* Items marked **[PLACEHOLDER]** depend on a pending MIAA decision listed in the
+* Items marked **[PLACEHOLDER]** depend on a pending AVTECH decision listed in the
   [clarification register](../03-clarification-register.md). Examples are the chart of accounts (C-22), the role
   matrix (C-08), official forms and numbering (C-23, C-29), the close calendar (C-33) and ticket classification
-  (C-34). The manuals describe how the system works today; those details will change when MIAA decides.
+  (C-34). The manuals describe how the system works today; those details will change when AVTECH decides.
 * Roles named here are the proposed ones (C-08). What a user can do is governed by permissions, which the
   manuals name for each task.

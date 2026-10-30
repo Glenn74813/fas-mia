@@ -14,7 +14,7 @@ public class OpenApiConfig {
     @Bean
     public OpenAPI casOpenApi() {
         return new OpenAPI()
-                .info(new Info().title("MIAA Computerized Accounting System API").version("v1")
+                .info(new Info().title("AVTECH Computerized Accounting System API").version("v1")
                         .description("Versioned REST API of the CAS. All endpoints except sign-in steps require a "
                                 + "Bearer access token. Errors use RFC 9457 problem documents with a stable 'code'."))
                 .components(new Components().addSecuritySchemes("bearer",

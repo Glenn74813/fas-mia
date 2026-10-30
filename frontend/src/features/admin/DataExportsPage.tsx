@@ -59,7 +59,7 @@ export function DataExportsPage() {
   return (
     <>
       <PageHeader title="Data export" crumbs={[{ label: 'Administration' }, { label: 'Data export' }]} />
-      <p className="mb-4 max-w-3xl text-sm text-slate-600">A full copy of MIAA's data in open formats: every table as CSV with a data
+      <p className="mb-4 max-w-3xl text-sm text-slate-600">A full copy of AVTECH's data in open formats: every table as CSV with a data
         dictionary, every supporting document, the audit-chain check and a manifest of SHA-256 checksums, in one ZIP. Sign-in
         secrets are left out. Two people are needed: one asks, with the purpose, and another approves. Only the person who
         asked can download the file, for 7 days. Every step is recorded in the audit trail.</p>

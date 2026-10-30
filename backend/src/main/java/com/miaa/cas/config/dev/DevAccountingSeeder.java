@@ -30,7 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 /**
  * DEVELOPMENT ONLY. On an empty database, loads the PLACEHOLDER chart of accounts and cost centres
- * (flagged placeholder, never MIAA-approved), creates the current fiscal year and opens its periods up
+ * (flagged placeholder, never AVTECH-approved), creates the current fiscal year and opens its periods up
  * to the current month, so the accounting engine can be exercised locally. The placeholder setup is then
  * moved onto COA's Revised Chart of Accounts for Government Corporations ({@link DevOfficialChart}).
  */
@@ -72,7 +72,7 @@ public class DevAccountingSeeder implements ApplicationRunner {
         if (accounts.count() == 0) {
             try (InputStream in = new ClassPathResource("seed/placeholder-chart-of-accounts.csv").getInputStream()) {
                 var result = accountService.importCsv(in, true, Actor.SYSTEM);
-                log.warn("DEV: loaded {} PLACEHOLDER accounts (not MIAA-approved)", result.created());
+                log.warn("DEV: loaded {} PLACEHOLDER accounts (not AVTECH-approved)", result.created());
             }
         }
         if (costCenters.count() == 0) {

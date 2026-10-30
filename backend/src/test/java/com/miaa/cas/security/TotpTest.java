@@ -40,7 +40,7 @@ class TotpTest {
 
     @Test
     void buildsOtpauthUri() {
-        assertThat(Totp.otpauthUri("MIAA CAS", "j.cruz", "ABC"))
-                .isEqualTo("otpauth://totp/MIAA%20CAS:j.cruz?secret=ABC&issuer=MIAA%20CAS&algorithm=SHA1&digits=6&period=30");
+        assertThat(Totp.otpauthUri("AVTECH CAS", "j.cruz", "ABC"))
+                .isEqualTo("otpauth://totp/AVTECH%20CAS:j.cruz?secret=ABC&issuer=AVTECH%20CAS&algorithm=SHA1&digits=6&period=30");
     }
 }

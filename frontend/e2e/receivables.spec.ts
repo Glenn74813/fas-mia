@@ -104,7 +104,7 @@ test('a concession invoice is billed, collected with tax withheld, reconciled an
   await page.getByLabel('6-digit code').fill(totp(tenant.secret));
   await page.getByRole('button', { name: 'Verify' }).click();
   await expect(page.getByRole('heading', { name })).toBeVisible();
-  await expect(page.getByText('MIAA Concessionaire Portal')).toBeVisible();
+  await expect(page.getByText('AVTECH Concessionaire Portal')).toBeVisible();
   await expect(page.getByRole('navigation', { name: 'Main' })).toHaveCount(0);
   await page.getByRole('link', { name: /^BI-\d{4}-\d{6}$/ }).click();
   await expect(page.getByRole('main')).toContainText('56,000.00');

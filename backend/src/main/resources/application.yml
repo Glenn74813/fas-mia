@@ -106,7 +106,7 @@ cas:
     legacy-justification: ${CAS_TLS_LEGACY_JUSTIFICATION:}
   frontend-base-url: ${CAS_FRONTEND_BASE_URL:http://localhost:5173}
   fixed-assets:
-    # Revaluation of assets (PAS 16 revaluation model) stays off until MIAA confirms it carries assets at revalued
+    # Revaluation of assets (PAS 16 revaluation model) stays off until AVTECH confirms it carries assets at revalued
     # amounts (C-07, C-30). Impairment is always available.
     revaluation-enabled: ${CAS_FA_REVALUATION_ENABLED:false}
   access:
@@ -151,7 +151,7 @@ cas:
     api-requests-per-minute: ${CAS_API_REQUESTS_PER_MINUTE:600}
     anonymous-requests-per-minute: ${CAS_ANONYMOUS_REQUESTS_PER_MINUTE:120}
   mfa:
-    issuer-label: MIAA CAS
+    issuer-label: AVTECH CAS
     # Codes by e-mail as an alternative second factor (TOR §4.2). Needs the SMTP relay (cas.mail), so it is off unless set.
     email-otp:
       enabled: ${CAS_MFA_EMAIL_OTP_ENABLED:false}
@@ -162,7 +162,7 @@ cas:
     # BLOCK refuses expenditure beyond the available allotment (C-10); WARN only records an audit warning.
     enforcement: ${CAS_BUDGET_ENFORCEMENT:BLOCK}
   accounting:
-    # Never true in production: placeholder accounts are not MIAA-approved (docs/03 C-07).
+    # Never true in production: placeholder accounts are not AVTECH-approved (docs/03 C-07).
     allow-placeholder-accounts: false
     recurring-enabled: true
     recurring-cron: "0 0 1 * * *"

@@ -51,7 +51,7 @@ class VarianceReportIT extends AbstractPayablesIT {
         assertThat(csv).contains(",1200.00,300.00,290.00,10.00,3.3,910.00,\"Within threshold\"");
         assertThat(csv).containsPattern("PLC-5203 [^\"]*/ PLC-CC-OPS\",0.00,0.00,700.00,-700.00,,-700.00,\"No allocation\"");
         assertThat(csv).contains("\"Total expenses\",19200.00,4800.00,5990.00,-1190.00,-24.8,13210.00,\"Unfavourable\"");
-        assertThat(csv).contains("Periods 1–3").contains("Proposed layout until MIAA confirms its budget definitions (C-10)");
+        assertThat(csv).contains("Periods 1–3").contains("Proposed layout until AVTECH confirms its budget definitions (C-10)");
 
         // Through period 2, with a 30 % threshold and Finance only: 2,000 budgeted, 2,500 spent is -25 %, within threshold.
         String fin = csv(financeManager, Map.of("fiscalYearId", fy.toString(), "throughPeriod", "2", "thresholdPercent", "30",

@@ -34,7 +34,7 @@ public class EisDocumentService {
     private final String sellerTin;
 
     public EisDocumentService(TransmissionService transmissions, JdbcTemplate jdbc,
-            @Value("${cas.organization.name:Manila International Airport Authority}") String sellerName,
+            @Value("${cas.organization.name:Avtech Information Technology Solutions, Inc.}") String sellerName,
             @Value("${cas.integrations.bir-eis.seller-tin:}") String sellerTin) {
         this.transmissions = transmissions;
         this.jdbc = jdbc;

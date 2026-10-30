@@ -2,7 +2,7 @@ import { Circle, Clock, Menu, X } from 'lucide-react';
 import { useState } from 'react';
 import { NavLink, Outlet } from 'react-router';
 import { useAuth } from '../auth/AuthContext';
-import miaaLogo from '../assets/miaa-logo.png';
+import avtechLogo from '../assets/avtech-logo.png';
 import { NotificationBell } from '../components/NotificationBell';
 import { PlaceholderBanner } from '../components/PlaceholderBanner';
 import { formatDateTime } from '../utils/format';
@@ -11,13 +11,13 @@ import { visibleNav } from './navigation';
 import { UserMenu } from './UserMenu';
 
 /**
- * The MIAA logo (docs/logo.png, resized). It sits on a white tile so its dark blue and black stay visible on the dark
- * sidebar. Decorative: the organisation's name is always written next to it.
+ * The AVTECH symbol (cropped from docs/logo.png and resized; its wordmark is unreadable at this size). It sits on a white
+ * tile so it stays visible on the dark sidebar. Decorative: the organisation's name is always written next to it.
  */
 export function BrandMark({ className = 'h-10 w-10' }: { className?: string }) {
   return (
     <span aria-hidden className={`flex shrink-0 items-center justify-center rounded-xl bg-white p-0.5 shadow-sm ring-1 ring-black/5 ${className}`}>
-      <img src={miaaLogo} alt="" className="h-full w-full object-contain" draggable={false} />
+      <img src={avtechLogo} alt="" className="h-full w-full object-contain" draggable={false} />
     </span>
   );
 }
@@ -36,7 +36,7 @@ export function InternalLayout() {
           <div className="flex items-center gap-3">
             <BrandMark />
             <div className="leading-tight">
-              <p className="text-sm font-semibold tracking-tight text-white">MIAA CAS</p>
+              <p className="text-sm font-semibold tracking-tight text-white">AVTECH CAS</p>
               <p className="text-[11px] text-slate-400">Computerized Accounting System</p>
             </div>
           </div>

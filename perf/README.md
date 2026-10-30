@@ -71,7 +71,7 @@ generator stays under the per-address authentication rate limit; real users come
 
 * A developer workstation, with the load generator, backend and database on one host, gives indicative figures
   only. Acceptance needs the documented target environment.
-* Volumes are placeholders until MIAA's are known (C-12). Raise them with the seeder options on the target
+* Volumes are placeholders until AVTECH's are known (C-12). Raise them with the seeder options on the target
   environment.
 * Concurrent budget reservations are proven by `BudgetConcurrencyIT`, not by this kit, because no budgets are
   seeded in development. Failover and recovery are 5d's DR exercise.

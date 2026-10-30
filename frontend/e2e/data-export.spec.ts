@@ -44,7 +44,7 @@ test('a full data export is requested by one person, approved by another and dow
   await nav(page, 'Data export');
   await expect(row).toContainText('DONE', { timeout: 120_000 });
   const [download] = await Promise.all([page.waitForEvent('download'), row.getByRole('button', { name: 'Download' }).click()]);
-  expect(download.suggestedFilename()).toMatch(/^miaa-cas-export-.*\.zip$/);
+  expect(download.suggestedFilename()).toMatch(/^avtech-cas-export-.*\.zip$/);
   const path = await download.path();
   const { statSync } = await import('node:fs');
   expect(statSync(path).size).toBeGreaterThan(1000);

@@ -60,7 +60,7 @@ export function AllocationCyclesPage() {
       <PageHeader title="Overhead allocation" crumbs={[{ label: 'General ledger' }, { label: 'Overhead allocation' }]} />
       <p className="mb-4 max-w-3xl text-sm text-slate-600">A cycle moves the period's balance of an account in a sending cost centre to
         receiving cost centres, by fixed percentages or by quantities such as floor area or headcount. Running it creates a draft
-        journal voucher dated the period's last day, reviewed and posted like any other. The cycles and keys are MIAA's to set (C-10).</p>
+        journal voucher dated the period's last day, reviewed and posted like any other. The cycles and keys are AVTECH's to set (C-10).</p>
       <ErrorAlert error={cycles.error ?? status.error} />
       {cycles.isPending ? <Spinner /> : cycles.data && (
         <div className="mb-6 space-y-3">

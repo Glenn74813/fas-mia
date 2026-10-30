@@ -4,7 +4,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
  * Budget control policy ({@code cas.budget.enforcement}): BLOCK refuses expenditure beyond the
- * available allotment, WARN allows it and records an audit warning, OFF disables the check. MIAA
+ * available allotment, WARN allows it and records an audit warning, OFF disables the check. AVTECH
  * policy decides the production value (clarification C-10); the default is BLOCK.
  */
 @ConfigurationProperties(prefix = "cas.budget")

@@ -23,7 +23,7 @@ class OrganizationIT extends AbstractAccountingIT {
     void officesDepartmentsAndAssignmentsKeepTheirHistory() throws Exception {
         Session admin = login(createUser("org.admin", "SYSTEM_ADMINISTRATOR"));
         String tag = UUID.randomUUID().toString().substring(0, 6).toUpperCase();
-        String orgId = jdbc.queryForObject("SELECT id::text FROM organizations WHERE code = 'MIAA'", String.class);
+        String orgId = jdbc.queryForObject("SELECT id::text FROM organizations WHERE code = 'AVTECH'", String.class);
 
         // Only organisation administrators change the structure; codes are validated and unique.
         send(preparer, post("/api/v1/organizations/" + orgId + "/offices"), Map.of("code", "X" + tag, "name", "Nope")).andExpect(status().isForbidden());

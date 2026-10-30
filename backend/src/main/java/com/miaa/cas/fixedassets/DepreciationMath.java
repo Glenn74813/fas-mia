@@ -10,7 +10,7 @@ import java.time.temporal.ChronoUnit;
 /**
  * Straight-line depreciation, monthly. The monthly charge is (cost - residual) / life rounded half-even to
  * centavos; the final month absorbs rounding so the total equals the depreciable amount exactly. Whether
- * depreciation starts in the month the asset is placed in service or the month after is MIAA policy (C-30).
+ * depreciation starts in the month the asset is placed in service or the month after is AVTECH policy (C-30).
  */
 public final class DepreciationMath {
 

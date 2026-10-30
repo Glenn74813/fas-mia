@@ -3,7 +3,7 @@ import type { ModuleHelp } from './types';
 export const PAYABLES_RECEIVABLES_HELP: Record<string, ModuleHelp> = {
   '/payables/suppliers': {
     title: 'Suppliers',
-    summary: 'The supplier master file: who MIAA buys from, their tax details and their bank accounts. Invoices and disbursement vouchers can only be raised against active suppliers.',
+    summary: 'The supplier master file: who AVTECH buys from, their tax details and their bank accounts. Invoices and disbursement vouchers can only be raised against active suppliers.',
     steps: [
       'Search by code, name or TIN to see whether the supplier already exists.',
       'Click New supplier and fill in Code, Registered name, TIN and Address.',
@@ -68,7 +68,7 @@ export const PAYABLES_RECEIVABLES_HELP: Record<string, ModuleHelp> = {
 
   '/payables/reports': {
     title: 'Payables reports',
-    summary: 'Read-only payables reports: aging of what MIAA owes, the expanded withholding schedule, supplier advances and a check that the AP sub-ledger agrees with the general ledger.',
+    summary: 'Read-only payables reports: aging of what AVTECH owes, the expanded withholding schedule, supplier advances and a check that the AP sub-ledger agrees with the general ledger.',
     steps: [
       'Change the As of date to see the Aging of payables by supplier, in Current, 1–30, 31–60, 61–90 and over 90 day columns.',
       'Pick a Year and Quarter to see the Expanded withholding schedule by payee and tax code, with monthly bases and tax withheld.',
@@ -206,21 +206,21 @@ export const PAYABLES_RECEIVABLES_HELP: Record<string, ModuleHelp> = {
 
   '/portal': {
     title: 'Concessionaire portal',
-    summary: 'Your self-service account with MIAA. See what you owe, your posted billings and payments, your statement of account, and send questions or payment references to MIAA Finance.',
+    summary: 'Your self-service account with AVTECH. See what you owe, your posted billings and payments, your statement of account, and send questions or payment references to AVTECH Finance.',
     steps: [
       'Read the summary at the top: Outstanding balance, Overdue and Unapplied payments, as of the date shown.',
       'Open Billings to see posted invoices and memos. Click a number to see its details.',
-      'Open Payments to see payments MIAA Finance has posted, with tax withheld and any unapplied amount.',
+      'Open Payments to see payments AVTECH Finance has posted, with tax withheld and any unapplied amount.',
       'Open Statement of account, choose From and To dates, and click Download PDF if you need a copy.',
       'Open Inquiries and click New inquiry. Choose a question or “I have made a payment”, add the billing if relevant, attach proof of payment (PDF or image) and click Send.',
-      'MIAA Finance replies in the same tab and by e-mail.',
+      'AVTECH Finance replies in the same tab and by e-mail.',
     ],
-    roles: 'For concessionaires only. You see only the customer your account is linked to, and only posted documents. If you see a message that your account is not linked, contact MIAA Finance.',
+    roles: 'For concessionaires only. You see only the customer your account is linked to, and only posted documents. If you see a message that your account is not linked, contact AVTECH Finance.',
     connections: [
-      { to: '/receivables/billings', how: 'The Billings tab shows documents that MIAA has approved and posted.' },
-      { to: '/receivables/receipts', how: 'A payment appears under Payments only after MIAA Finance has posted the receipt.' },
-      { to: '/receivables/inquiries', how: 'Your inquiries and payment references go to MIAA Finance there to be answered.' },
-      { to: '/receivables/portal-access', how: 'Your account is linked to your company only after a second MIAA staff member approves the request.' },
+      { to: '/receivables/billings', how: 'The Billings tab shows documents that AVTECH has approved and posted.' },
+      { to: '/receivables/receipts', how: 'A payment appears under Payments only after AVTECH Finance has posted the receipt.' },
+      { to: '/receivables/inquiries', how: 'Your inquiries and payment references go to AVTECH Finance there to be answered.' },
+      { to: '/receivables/portal-access', how: 'Your account is linked to your company only after a second AVTECH staff member approves the request.' },
     ],
   },
 };

@@ -25,7 +25,7 @@ import org.springframework.stereotype.Component;
 /**
  * DEVELOPMENT ONLY. Placeholder tax codes, the AP control-account mapping and a placeholder bank
  * account so payables can be exercised locally. Tax codes here are illustrative placeholders, not
- * validated BIR alphanumeric tax codes or rates; MIAA's tax team configures the real ones.
+ * validated BIR alphanumeric tax codes or rates; AVTECH's tax team configures the real ones.
  */
 @Component
 @Profile("dev")
@@ -76,7 +76,7 @@ public class DevPayablesSeeder {
             taxCodes.create(new TaxCodeRequest("PLC-VAT-OUT", "[PLACEHOLDER] Output VAT (verify rate)", "VAT_OUTPUT",
                     new BigDecimal("0.1200"), id("PLC-2202")), true, Actor.SYSTEM);
             mappings.set("AP_TRADE_PAYABLE", id("PLC-2101"), Actor.SYSTEM);
-            banks.create(new BankAccountRequest("PLC-BANK-01", "[PLACEHOLDER] Depository bank", "MIAA disbursement account",
+            banks.create(new BankAccountRequest("PLC-BANK-01", "[PLACEHOLDER] Depository bank", "AVTECH disbursement account",
                     "0000", id("PLC-1102")), Actor.SYSTEM);
             log.warn("DEV: seeded PLACEHOLDER tax codes, control-account mappings and a placeholder bank account");
         }
@@ -103,7 +103,7 @@ public class DevPayablesSeeder {
         // Inventory (Phase 3e).
         mapIfDifferent("INVENTORY_GRIR", "PLC-2104");
         mapIfDifferent("INVENTORY_VARIANCE", "PLC-5303");
-        // Placeholder only: the placeholder chart has no revaluation account (MIAA's chart decides, C-07).
+        // Placeholder only: the placeholder chart has no revaluation account (AVTECH's chart decides, C-07).
         mapIfDifferent("INVENTORY_REVALUATION", "PLC-5303");
         // Supplier advances carried over at cutover (Phase 5b); the placeholder chart has a supplier sub-ledger account for them.
         if (jdbc.queryForObject("SELECT count(*) FROM chart_of_accounts WHERE code = 'PLC-1206'", Integer.class) == 1) {
@@ -137,7 +137,7 @@ public class DevPayablesSeeder {
         }
     }
 
-    /** Illustrative layouts only; MIAA's approved statement formats replace them (C-07). */
+    /** Illustrative layouts only; AVTECH's approved statement formats replace them (C-07). */
     public static List<TemplateRequest> placeholderTemplates() {
         return List.of(
                 new TemplateRequest("PLC-SFP", "[PLACEHOLDER] Statement of Financial Position", "SFP", "TA=TLE", List.of(

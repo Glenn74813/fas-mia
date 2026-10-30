@@ -97,7 +97,7 @@ function Contracts({ customerId, canManage }: { customerId: string; canManage: b
                 {activeCostCenters(costCenters.data).map((cc) => <option key={cc.id} value={cc.id}>{cc.code}</option>)}</Select></div>
           </div>
           <p className="text-xs text-slate-500">Contract billing charges the full monthly amount for every month the contract covers.
-            Proration, escalation and percentage rent await MIAA's billing rules (clarification C-28).</p>
+            Proration, escalation and percentage rent await AVTECH's billing rules (clarification C-28).</p>
           <div className="flex gap-2"><Button busy={create.isPending} disabled={!valid} onClick={() => create.mutate()}>Save contract</Button>
             <Button variant="secondary" onClick={() => setOpen(false)}>Cancel</Button></div>
         </div>

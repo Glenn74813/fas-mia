@@ -129,7 +129,7 @@ export const dataExportApi = {
   request: (purpose: string, fiscalYearId?: string) => api.post<DataExport>('/data-exports', { purpose, fiscalYearId }),
   decide: (id: string, body: { approve: boolean; note?: string; version: number }) =>
     api.post<DataExport>(`/data-exports/${id}/decision`, body),
-  download: (e: DataExport) => downloadFile(`/data-exports/${e.id}/download`, e.fileName ?? 'miaa-cas-export.zip'),
+  download: (e: DataExport) => downloadFile(`/data-exports/${e.id}/download`, e.fileName ?? 'avtech-cas-export.zip'),
 };
 
 export const retentionApi = {

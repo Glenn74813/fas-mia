@@ -285,7 +285,7 @@ public class ReportJobService {
             notes.add("PLACEHOLDER: placeholder accounts are in use; this is not an official trial balance.");
         }
         notes.add("Generated " + at + " by " + by + ".");
-        return new ReportTable("Trial balance", List.of("Manila International Airport Authority", "Period " + tb.period().name()),
+        return new ReportTable("Trial balance", List.of("Avtech Information Technology Solutions, Inc.", "Period " + tb.period().name()),
                 "Account", List.of("Opening debit", "Opening credit", "Period debit", "Period credit", "Closing debit", "Closing credit"), rows, notes);
     }
 

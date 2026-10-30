@@ -171,7 +171,7 @@ public class BillingService implements DocumentOwnerPolicy {
     /**
      * Creates DRAFT invoices for every active contract covering the month that has not been billed for
      * it yet. Re-running the same month creates nothing new. Amounts are the full contract monthly
-     * amount; proration of partial months awaits MIAA's billing policy (C-28).
+     * amount; proration of partial months awaits AVTECH's billing policy (C-28).
      */
     @Transactional
     public BillingRunResult runContractBilling(String billingPeriod, LocalDate documentDate) {

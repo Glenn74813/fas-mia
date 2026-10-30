@@ -5,7 +5,7 @@ import { Button } from './Button';
 /** A freshly issued set of recovery codes, shown once, with copy and download. Never stored by the app. */
 export function RecoveryCodes({ codes, username }: { codes: string[]; username?: string }) {
   const [copied, setCopied] = useState(false);
-  const text = `MIAA CAS recovery codes${username ? ` for ${username}` : ''}\n`
+  const text = `AVTECH CAS recovery codes${username ? ` for ${username}` : ''}\n`
     + `Each code works once, in place of the authenticator code.\n\n${codes.join('\n')}\n`;
 
   const copy = async () => {
@@ -20,7 +20,7 @@ export function RecoveryCodes({ codes, username }: { codes: string[]; username?:
     const url = URL.createObjectURL(new Blob([text], { type: 'text/plain' }));
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'miaa-cas-recovery-codes.txt';
+    a.download = 'avtech-cas-recovery-codes.txt';
     a.click();
     URL.revokeObjectURL(url);
   };

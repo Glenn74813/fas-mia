@@ -179,7 +179,7 @@ export const ASSETS_TREASURY_HELP: Record<string, ModuleHelp> = {
     title: 'Asset setup',
     summary: 'Maintains asset categories with their default life, residual rate and ledger accounts, and assets under construction (AUC) projects.',
     steps: [
-      'Review the Asset categories table; rows marked PLACEHOLDER need to be confirmed against MIAA’s accounting policy.',
+      'Review the Asset categories table; rows marked PLACEHOLDER need to be confirmed against AVTECH’s accounting policy.',
       'To add a category, enter the Category code, name, Default life (months) and Default residual rate, choose the asset, accumulated depreciation and expense accounts, and click Add category.',
       'Set the accumulated impairment account of a category before impairing assets in it.',
       'To track construction, enter a Project code and name, choose the AUC account and click Open project.',
@@ -266,7 +266,7 @@ export const ASSETS_TREASURY_HELP: Record<string, ModuleHelp> = {
 
   '/inventory/nrv-reviews': {
     title: 'Cost vs market review',
-    summary: 'The year-end review of inventory at the lower of cost and net realisable value, with slow-moving flags. The basis and thresholds are proposals pending MIAA’s accounting policy.',
+    summary: 'The year-end review of inventory at the lower of cost and net realisable value, with slow-moving flags. The basis and thresholds are proposals pending AVTECH’s accounting policy.',
     steps: [
       'Choose the Review date and click Start review.',
       'Click Open on the review to see each item’s quantity, average cost, issues in the last twelve months and months of stock.',

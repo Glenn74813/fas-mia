@@ -26,7 +26,7 @@ public final class TestProperties {
                 new CasProperties.Lockout(5, Duration.ofMinutes(15)),
                 new CasProperties.Password(12, 128, Duration.ofMinutes(30)),
                 new CasProperties.RateLimit(rateLimitEnabled, authRequestsPerMinute, apiPerMinute, anonymousPerMinute),
-                new CasProperties.Mfa("MIAA CAS"),
+                new CasProperties.Mfa("AVTECH CAS"),
                 new CasProperties.Outbox(false, 8),
                 new CasProperties.Bootstrap(null, null, null),
                 null, List.of());

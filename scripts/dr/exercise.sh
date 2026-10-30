@@ -99,7 +99,7 @@ cat > "$run/report.md" <<EOF
 
 Development workstation (indicative only): source cluster port $SRC_PORT, restore into an isolated cluster on port
 $RESTORE_PORT and a second backend on port $API_PORT. The production exercise follows the same steps with Patroni and
-pgBackRest on MIAA's infrastructure (docs/07-infrastructure-dr.md).
+pgBackRest on AVTECH's infrastructure (docs/07-infrastructure-dr.md).
 
 | Check | Result | Detail |
 |---|---|---|

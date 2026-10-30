@@ -50,7 +50,7 @@ import org.springframework.stereotype.Component;
  * touched; they stay on the placeholder accounts. Idempotent, so it runs on every dev start.
  *
  * <p>The account codes and titles are COA's. The statement-line groupings, the cost-centre and budget flags and the
- * statement layouts are proposals MIAA's Accounting Department confirms (C-07, C-22).
+ * statement layouts are proposals AVTECH's Accounting Department confirms (C-07, C-22).
  */
 @Component
 @Profile("dev")
@@ -136,7 +136,7 @@ public class DevOfficialChart {
     /**
      * Impairment and revaluation settings on the official chart, where still unset: each category's accumulated impairment
      * account (the asset account's code + 2, beside accumulated depreciation at + 1), and the impairment loss, reversal
-     * and revaluation surplus mappings. Proposals for MIAA to confirm, like the other settings (C-22).
+     * and revaluation surplus mappings. Proposals for AVTECH to confirm, like the other settings (C-22).
      */
     private void fillAssetImpairmentSettings() {
         int categories = jdbc.update("""
@@ -434,7 +434,7 @@ public class DevOfficialChart {
         }
     }
 
-    /** Statement layouts over the official chart's line codes. Proposed groupings until MIAA approves its formats (C-07). */
+    /** Statement layouts over the official chart's line codes. Proposed groupings until AVTECH approves its formats (C-07). */
     public static List<TemplateRequest> officialTemplates() {
         return List.of(
                 new TemplateRequest("RCA-SFP", "Statement of Financial Position", "SFP", "TA=TLE", List.of(

@@ -101,5 +101,5 @@ jobs:
             echo "Images (signed with cosign, keyless; verify with \`cosign verify\`):"
             echo '```'; cat digests.txt; echo '```'
           } > notes.md
-          gh release create "v$VERSION" --target "$GITHUB_SHA" --title "MIAA CAS $VERSION" --generate-notes --notes-file notes.md $pre \
+          gh release create "v$VERSION" --target "$GITHUB_SHA" --title "AVTECH CAS $VERSION" --generate-notes --notes-file notes.md $pre \
             "cas-backend-$VERSION.cdx.json" "cas-frontend-$VERSION.cdx.json" digests.txt

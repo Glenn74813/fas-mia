@@ -34,7 +34,7 @@ import org.springframework.transaction.annotation.Transactional;
  * Derecognition of an asset (sale, scrap, donation, transfer out, loss). Prepared by one person, posted by
  * another once depreciation is posted through the month before disposal:
  * Dr accumulated depreciation + Dr proceeds / Cr asset cost, with the difference to gain or loss on disposal.
- * Whether depreciation is charged for the month of disposal is MIAA policy (C-30); none is charged here.
+ * Whether depreciation is charged for the month of disposal is AVTECH policy (C-30); none is charged here.
  */
 @Service
 public class DisposalService {

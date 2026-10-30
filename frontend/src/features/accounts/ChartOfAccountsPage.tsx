@@ -52,7 +52,7 @@ export function ChartOfAccountsPage() {
         )} />
       {chart.data.activePlaceholderAccounts > 0 && (
         <p className="mb-4 rounded-md border border-amber-300 bg-amber-50 p-3 text-sm">
-          The accounts marked <Badge tone="amber">PLACEHOLDER</Badge> are a generic development structure, not MIAA's approved
+          The accounts marked <Badge tone="amber">PLACEHOLDER</Badge> are a generic development structure, not AVTECH's approved
           chart. Import the approved chart (all-or-nothing CSV) before user acceptance testing; production configuration rejects
           postings to placeholder accounts.
         </p>

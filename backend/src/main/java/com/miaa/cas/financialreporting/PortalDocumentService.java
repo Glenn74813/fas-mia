@@ -33,7 +33,7 @@ public class PortalDocumentService {
     public record PortalPdf(String fileName, byte[] content) {
     }
 
-    private static final String ORG = "Manila International Airport Authority";
+    private static final String ORG = "Avtech Information Technology Solutions, Inc.";
     private static final String NOT_OFFICIAL = "Copy for the concessionaire's reference. It is not an official invoice or receipt: "
             + "the BIR-registered format and series are pending (C-06, C-29).";
     private static final DateTimeFormatter STAMP = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm 'PHT'").withZone(ZoneId.of("Asia/Manila"));

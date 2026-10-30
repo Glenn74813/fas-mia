@@ -104,7 +104,7 @@ public class PortalService {
                 + "AND customer_id IS NOT NULL", UUID.class, CurrentActor.userId());
         if (ids.isEmpty()) {
             throw new ApiException(ErrorCode.ACCESS_DENIED, "Your portal account is not yet linked to a customer account. "
-                    + "Please contact MIAA Finance.");
+                    + "Please contact AVTECH Finance.");
         }
         return customers.load(ids.get(0));
     }

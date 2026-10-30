@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/v1/data-exports")
-@Tag(name = "Data export", description = "Full exports of the system's data for MIAA (TOR §3.6), requested and approved by two people")
+@Tag(name = "Data export", description = "Full exports of the system's data for AVTECH (TOR §3.6), requested and approved by two people")
 public class DataExportController {
 
     public record ExportRequest(@NotBlank @Size(max = 500) String purpose, UUID fiscalYearId) {
