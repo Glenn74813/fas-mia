@@ -138,6 +138,17 @@ public class TreasuryController {
         return reports.dailyCollections(date, collector);
     }
 
+    @GetMapping("/treasury/daily-collection-report.xlsx")
+    @PreAuthorize("hasAnyAuthority('PERM_TREASURY_VIEW', 'PERM_COLLECTION_RECORD')")
+    public org.springframework.http.ResponseEntity<byte[]> dailyCollectionsWorkbook(
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date, @RequestParam(required = false) String collector) {
+        return org.springframework.http.ResponseEntity.ok()
+                .contentType(org.springframework.http.MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
+                .header(org.springframework.http.HttpHeaders.CONTENT_DISPOSITION, org.springframework.http.ContentDisposition.attachment()
+                        .filename("DCR-" + date + ".xlsx").build().toString())
+                .body(reports.dailyCollectionsWorkbook(date, collector));
+    }
+
     @GetMapping("/treasury/cash-position")
     @PreAuthorize("hasAuthority('PERM_TREASURY_VIEW')")
     public CashPosition cashPosition(@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate asOf) {

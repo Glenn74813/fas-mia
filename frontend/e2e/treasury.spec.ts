@@ -63,7 +63,11 @@ test('collections are deposited, the statement is imported, reconciled and appro
   await page.getByRole('link', { name: 'New deposit' }).click();
   await select(page.getByLabel('Bank account'), { label: `${bank.code} — E2E Bank ****4321` });
   await page.getByLabel('Deposit slip number').fill(`SLIP-${tag}`);
+  await page.getByLabel('Receipts to deposit').click();
+  await page.getByLabel('Search receipts').fill(rc.receiptNumber);
   await page.getByLabel(`Include ${rc.receiptNumber}`).check();
+  await page.getByRole('button', { name: 'Done' }).click();
+  await expect(page.getByRole('list', { name: 'Selected receipts' })).toContainText(rc.receiptNumber);
   await page.getByRole('button', { name: 'Save deposit' }).click();
   await expect(page.getByRole('heading', { name: /^Deposit DEP-\d{4}-\d{6}$/ })).toBeVisible();
   await expect(page.getByRole('main').getByRole('button', { name: 'Post' })).toHaveCount(0);

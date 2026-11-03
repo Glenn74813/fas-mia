@@ -77,6 +77,16 @@ public class TreasuryReportService {
                         + "receipt series (C-29); the official DCR form layout awaits AVTECH's template.");
     }
 
+    /** The daily collection report as an Excel DCR form, under the name of the active organisation. */
+    @Transactional(readOnly = true)
+    public byte[] dailyCollectionsWorkbook(LocalDate date, String collector) {
+        String organization = jdbc.query("SELECT name FROM organizations WHERE status = 'ACTIVE' ORDER BY code LIMIT 1",
+                (rs, i) -> rs.getString(1)).stream().findFirst().orElse(null);
+        String at = java.time.ZonedDateTime.now(java.time.ZoneId.of("Asia/Manila"))
+                .format(java.time.format.DateTimeFormatter.ofPattern("MMM d, yyyy h:mm a", java.util.Locale.ENGLISH));
+        return DcrWorkbook.render(dailyCollections(date, collector), organization, com.miaa.cas.security.CurrentActor.username(), at);
+    }
+
     /** Ledger balances of cash accounts as of a date, plus collections not yet deposited. */
     @Transactional(readOnly = true)
     public CashPosition cashPosition(LocalDate asOf) {

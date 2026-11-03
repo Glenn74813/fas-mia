@@ -22,6 +22,12 @@ public class Supplier {
     private String tin;
     @Column(length = 500)
     private String address;
+    @Column(name = "zip_code", length = 4)
+    private String zipCode;
+    @Column(name = "foreign_address", length = 500)
+    private String foreignAddress;
+    @Column(name = "payee_type", length = 12)
+    private String payeeType;
     @Column(name = "vat_registered", nullable = false)
     private boolean vatRegistered;
     @Column(name = "default_ewt_code_id")
@@ -56,11 +62,14 @@ public class Supplier {
         this.updatedBy = actor;
     }
 
-    public void update(String name, String tin, String address, boolean vatRegistered, UUID defaultEwtCodeId, String status,
-            Instant now, String actor) {
+    public void update(String name, String tin, String address, String zipCode, String foreignAddress, String payeeType, boolean vatRegistered,
+            UUID defaultEwtCodeId, String status, Instant now, String actor) {
         this.name = name;
         this.tin = tin;
         this.address = address;
+        this.zipCode = zipCode;
+        this.foreignAddress = foreignAddress;
+        this.payeeType = payeeType;
         this.vatRegistered = vatRegistered;
         this.defaultEwtCodeId = defaultEwtCodeId;
         this.status = status;
@@ -74,6 +83,9 @@ public class Supplier {
     public String getName() { return name; }
     public String getTin() { return tin; }
     public String getAddress() { return address; }
+    public String getZipCode() { return zipCode; }
+    public String getForeignAddress() { return foreignAddress; }
+    public String getPayeeType() { return payeeType; }
     public boolean isVatRegistered() { return vatRegistered; }
     public UUID getDefaultEwtCodeId() { return defaultEwtCodeId; }
     public UUID getSubsidiaryAccountId() { return subsidiaryAccountId; }

@@ -21,6 +21,7 @@ import com.miaa.cas.accountspayable.ApDtos.WithholdingSchedule;
 import com.miaa.cas.accountspayable.ApInvoiceService;
 import com.miaa.cas.accountspayable.ApReportService;
 import com.miaa.cas.accountspayable.DisbursementService;
+import com.miaa.cas.accountspayable.Form2307Service;
 import com.miaa.cas.accountspayable.SupplierService;
 import com.miaa.cas.common.error.ApiException;
 import com.miaa.cas.common.error.ErrorCode;
@@ -37,6 +38,9 @@ import java.util.UUID;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ContentDisposition;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -56,6 +60,7 @@ import org.springframework.web.multipart.MultipartFile;
 @Tag(name = "Accounts payable", description = "Suppliers, supplier invoices, disbursement vouchers and payables reports")
 public class PayablesController {
 
+    private final Form2307Service form2307;
     private final SupplierService suppliers;
     private final ApInvoiceService invoices;
     private final DisbursementService disbursements;
@@ -64,11 +69,12 @@ public class PayablesController {
     private final com.miaa.cas.accountspayable.SupplierBankService supplierBanks;
     private final IdempotencyService idempotency;
 
-    public PayablesController(SupplierService suppliers, ApInvoiceService invoices, DisbursementService disbursements,
+    public PayablesController(Form2307Service form2307, SupplierService suppliers, ApInvoiceService invoices, DisbursementService disbursements,
             ApReportService reports, DocumentService documents, com.miaa.cas.accountspayable.SupplierBankService supplierBanks,
             IdempotencyService idempotency) {
         this.supplierBanks = supplierBanks;
         this.idempotency = idempotency;
+        this.form2307 = form2307;
         this.suppliers = suppliers;
         this.invoices = invoices;
         this.disbursements = disbursements;
@@ -278,6 +284,26 @@ public class PayablesController {
     @Operation(summary = "Expanded withholding per supplier and tax code for a quarter (data for BIR Form 2307)")
     public WithholdingSchedule withholding(@RequestParam int year, @RequestParam int quarter) {
         return reports.withholding(year, quarter);
+    }
+
+    @GetMapping("/accounts-payable/suppliers/{id}/form-2307")
+    @PreAuthorize("hasAuthority('PERM_AP_VIEW')")
+    @Operation(summary = "BIR Form 2307 for one supplier and quarter, as a PDF")
+    public ResponseEntity<byte[]> form2307(@PathVariable UUID id, @RequestParam int year, @RequestParam int quarter) {
+        return download(form2307.supplier(id, year, quarter), MediaType.APPLICATION_PDF);
+    }
+
+    @GetMapping("/accounts-payable/form-2307")
+    @PreAuthorize("hasAuthority('PERM_AP_VIEW')")
+    @Operation(summary = "BIR Form 2307 for every supplier with withholding in the quarter, as a ZIP of PDFs")
+    public ResponseEntity<byte[]> form2307All(@RequestParam int year, @RequestParam int quarter) {
+        return download(form2307.quarter(year, quarter), MediaType.parseMediaType("application/zip"));
+    }
+
+    private static ResponseEntity<byte[]> download(Form2307Service.Download d, MediaType type) {
+        return ResponseEntity.ok().contentType(type)
+                .header(HttpHeaders.CONTENT_DISPOSITION, ContentDisposition.attachment().filename(d.fileName()).build().toString())
+                .body(d.content());
     }
 
     private static byte[] bytes(MultipartFile file) throws IOException {

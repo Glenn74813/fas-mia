@@ -122,7 +122,7 @@ public abstract class AbstractIntegrationTest {
 
     protected TestUser createUser(String prefix, boolean withTotp, String... roleCodes) {
         String username = unique(prefix);
-        String email = username + "@test.miaa.local";
+        String email = username + "@test.avtech.local";
         byte[] secret = Totp.newSecret();
         return tx.execute(s -> {
             User user = users.saveAndFlush(new User(UUID.randomUUID(), username, email, "Test " + prefix,

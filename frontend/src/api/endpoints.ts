@@ -1,5 +1,5 @@
 import { api, downloadFile } from './client';
-import type {
+import type { BirAtc,
   TicketCategory,
   Clearing, ClearingProposal, CloseCalendarChecklist, CloseFrequency, CloseScheduleItem, CloseTask, GlOpenItem, OpenItemAccount,
   AccountLedger, ChainVerification, ChartSummary, CloseChecklist, CostCenter, CurrentUser, DocumentInfo, EntryDetail,
@@ -311,11 +311,16 @@ export const recurringApi = {
 
 type Act = 'submit' | 'approve' | 'return' | 'reject' | 'cancel' | 'post';
 
+interface SupplierDetails {
+  name: string; tin: string | null; address: string | null; zipCode: string | null; foreignAddress: string | null; payeeType: string | null;
+  vatRegistered: boolean; defaultEwtCodeId: string | null;
+}
+
 export const supplierApi = {
   list: (q?: string, page = 0, size = 25, sort?: string) => api.get<Page<Supplier>>(`/suppliers${qs({ q: q || undefined, page, size, sort })}`),
   get: (id: string) => api.get<Supplier>(`/suppliers/${id}`),
-  create: (body: { code: string; name: string; tin: string | null; address: string | null; vatRegistered: boolean;
-    defaultEwtCodeId: string | null }) => api.post<Supplier>('/suppliers', body),
+  create: (body: SupplierDetails & { code: string }) => api.post<Supplier>('/suppliers', body),
+  update: (id: string, body: SupplierDetails & { version: number; status: string }) => api.put<Supplier>(`/suppliers/${id}`, body),
 };
 
 export const invoiceApi = {
@@ -353,7 +358,12 @@ export const apReportApi = {
     difference: string; reconciled: boolean }>('/accounts-payable/reconciliation'),
   withholding: (year: number, quarter: number) => api.get<{ year: number; quarter: number; note: string; rows: {
     supplierTin: string | null; supplierName: string; taxCode: string; month1Base: string; month2Base: string;
-    month3Base: string; totalBase: string; taxWithheld: string }[] }>(`/accounts-payable/withholding-schedule?year=${year}&quarter=${quarter}`),
+    month3Base: string; totalBase: string; taxWithheld: string; supplierId: string; atc: string | null; missing: string[] }[];
+    payorMissing: string[] }>(`/accounts-payable/withholding-schedule?year=${year}&quarter=${quarter}`),
+  form2307: (supplierId: string, year: number, quarter: number) =>
+    downloadFile(`/accounts-payable/suppliers/${supplierId}/form-2307?year=${year}&quarter=${quarter}`, `BIR2307-${year}Q${quarter}.pdf`),
+  form2307All: (year: number, quarter: number) =>
+    downloadFile(`/accounts-payable/form-2307?year=${year}&quarter=${quarter}`, `BIR2307-${year}Q${quarter}.zip`),
   advances: () => api.get<{ note: string; totalOutstanding: string; rows: { id: string; supplierCode: string; supplierName: string; reference: string;
     advanceDate: string; description: string; amount: string; outstandingAmount: string; status: string; openingEntryNumber: string }[];
     reconciliation: { controlAccountCode: string; subledgerOpenBalance: string; generalLedgerBalance: string; difference: string;
@@ -379,6 +389,8 @@ export const settingsApi = {
   mappings: () => api.get<AccountMapping[]>('/account-mappings'),
   setMapping: (key: string, accountId: string) => api.put<AccountMapping>(`/account-mappings/${key}`, { accountId }),
   taxCodes: () => api.get<TaxCode[]>('/tax-codes'),
+  atcCatalogue: () => api.get<BirAtc[]>('/tax-codes/atc-catalogue'),
+  setTaxCodeAtc: (id: string, atc: string) => api.put<TaxCode>(`/tax-codes/${id}/atc`, { atc }),
   createTaxCode: (body: { code: string; description: string; taxType: string; rate: string; accountId: string }) =>
     api.post<TaxCode>('/tax-codes', body),
   bankAccounts: () => api.get<BankAccount[]>('/bank-accounts'),
@@ -472,6 +484,7 @@ export const treasuryApi = {
   cancelDeposit: (id: string, version: number, reason: string) => api.post<DepositView>(`/deposits/${id}/cancel`, { version, reason }),
   uploadDeposit: (id: string, file: File) => api.upload<DocumentInfo>(`/deposits/${id}/documents`, file),
   dcr: (date: string, collector?: string) => api.get<DailyCollectionReport>(`/treasury/daily-collection-report${qs({ date, collector })}`),
+  dcrExcel: (date: string, collector?: string) => downloadFile(`/treasury/daily-collection-report.xlsx${qs({ date, collector })}`, `DCR-${date}.xlsx`),
   cashPosition: (asOf: string) => api.get<CashPosition>(`/treasury/cash-position?asOf=${asOf}`),
   cashForecast: (q: { from?: string; granularity: 'WEEK' | 'MONTH'; periods: number; includeBudget: boolean }) =>
     api.get<CashForecast>(`/treasury/cash-forecast${qs({ ...q, includeBudget: String(q.includeBudget) })}`),
@@ -714,6 +727,8 @@ export const governanceApi = {
 
 export const orgApi = {
   tree: () => api.get<Organization[]>('/organizations'),
+  updateOrganization: (o: Organization, details: { tin: string; address: string; zipCode: string }) =>
+    api.put<Organization[]>(`/organizations/${o.id}`, { version: o.version, name: o.name, status: o.status, ...details }),
   createOffice: (orgId: string, code: string, name: string) => api.post<{ id: string }>(`/organizations/${orgId}/offices`, { code, name }),
   updateOffice: (o: { id: string; version: number }, name: string, status: string) =>
     api.put<Organization[]>(`/offices/${o.id}`, { version: o.version, name, status }),

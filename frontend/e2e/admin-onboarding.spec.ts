@@ -46,7 +46,7 @@ test('administrator onboards a user who enrols MFA and sets a password', async (
   // Segregation of duties is enforced by the API and explained in the form.
   await page.goto('/admin/users/new');
   await page.getByLabel('Username').fill(username);
-  await page.getByLabel('E-mail').fill(`${username}@miaa.local`);
+  await page.getByLabel('E-mail').fill(`${username}@avtech.local`);
   await page.getByLabel('Display name').fill('E2E Accountant');
   await page.getByLabel('Temporary password').fill(temporary);
   await page.getByRole('checkbox', { name: 'Accountant', exact: true }).check();

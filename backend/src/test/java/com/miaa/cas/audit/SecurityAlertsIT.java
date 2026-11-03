@@ -33,7 +33,7 @@ class SecurityAlertsIT extends AbstractIntegrationTest {
         assertThat(jdbc.queryForObject("SELECT suppressed FROM alert_throttle WHERE alert_key = ?", Integer.class, "security:" + action))
                 .isEqualTo(1);
         assertThat(jdbc.queryForObject("SELECT count(*) FROM notification_outbox WHERE template = 'operational-alert' AND recipient = ?",
-                Integer.class, reviewer.username() + "@test.miaa.local")).isGreaterThanOrEqualTo(1);
+                Integer.class, reviewer.username() + "@test.avtech.local")).isGreaterThanOrEqualTo(1);
     }
 
     @Test

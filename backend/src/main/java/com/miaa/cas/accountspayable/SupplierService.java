@@ -74,8 +74,8 @@ public class SupplierService {
         SubsidiaryAccount sl = subsidiaries.saveAndFlush(new SubsidiaryAccount(UUID.randomUUID(), "SUPPLIER", req.code(),
                 req.name().trim(), now, CurrentActor.username()));
         Supplier s = new Supplier(UUID.randomUUID(), req.code(), sl.getId(), now, CurrentActor.username());
-        s.update(req.name().trim(), blank(req.tin()), blank(req.address()), req.vatRegistered(), req.defaultEwtCodeId(),
-                "ACTIVE", now, CurrentActor.username());
+        s.update(req.name().trim(), blank(req.tin()), blank(req.address()), blank(req.zipCode()), blank(req.foreignAddress()), blank(req.payeeType()),
+                req.vatRegistered(), req.defaultEwtCodeId(), "ACTIVE", now, CurrentActor.username());
         suppliers.saveAndFlush(s);
         audit.record("SUPPLIER_CREATED", "SUPPLIER", s.getCode(), Map.of("name", s.getName(), "vatRegistered", s.isVatRegistered()));
         return view(s);
@@ -90,8 +90,8 @@ public class SupplierService {
         checkEwt(req.defaultEwtCodeId());
         Map<String, Object> before = Map.of("name", s.getName(), "tin", String.valueOf(s.getTin()), "status", s.getStatus(),
                 "vatRegistered", s.isVatRegistered());
-        s.update(req.name().trim(), blank(req.tin()), blank(req.address()), req.vatRegistered(), req.defaultEwtCodeId(),
-                req.status(), Instant.now(clock), CurrentActor.username());
+        s.update(req.name().trim(), blank(req.tin()), blank(req.address()), blank(req.zipCode()), blank(req.foreignAddress()), blank(req.payeeType()),
+                req.vatRegistered(), req.defaultEwtCodeId(), req.status(), Instant.now(clock), CurrentActor.username());
         subsidiaries.findById(s.getSubsidiaryAccountId()).ifPresent(sl -> sl.update(s.getName(), s.getStatus()));
         suppliers.flush();
         audit.record("SUPPLIER_UPDATED", "SUPPLIER", s.getCode(), Map.of("before", before, "after", Map.of("name", s.getName(),
@@ -115,7 +115,7 @@ public class SupplierService {
         String ewt = s.getDefaultEwtCodeId() == null ? null
                 : jdbc.queryForObject("SELECT code FROM tax_codes WHERE id = ?", String.class, s.getDefaultEwtCodeId());
         return new SupplierView(s.getId(), s.getCode(), s.getName(), s.getTin(), s.getAddress(), s.isVatRegistered(),
-                s.getDefaultEwtCodeId(), ewt, s.getSubsidiaryAccountId(), s.getStatus(), open, s.getVersion());
+                s.getDefaultEwtCodeId(), ewt, s.getSubsidiaryAccountId(), s.getStatus(), open, s.getVersion(), s.getZipCode(), s.getForeignAddress(), s.getPayeeType());
     }
 
     static String blank(String s) {

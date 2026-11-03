@@ -3,6 +3,7 @@ import { Select } from '../../components/Select';
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router';
 import { settingsApi, supplierApi } from '../../api/endpoints';
+import type { Supplier } from '../../api/types';
 import { useAuth } from '../../auth/AuthContext';
 import { Button } from '../../components/Button';
 import { ErrorAlert } from '../../components/ErrorAlert';
@@ -13,6 +14,8 @@ import { Pagination } from '../../components/Pagination';
 import { SortHeader } from '../../components/SortHeader';
 import { Spinner } from '../../components/Spinner';
 import { StatusBadge } from '../../components/StatusBadge';
+
+const EMPTY_FORM = { code: '', name: '', tin: '', address: '', zipCode: '', foreignAddress: '', payeeType: '', vatRegistered: false, defaultEwtCodeId: '' };
 
 export function SuppliersPage() {
   const { hasPermission } = useAuth();
@@ -27,31 +30,55 @@ export function SuppliersPage() {
   const onSort = (next: string) => { setSort(next); setPage(0); };
   const list = useQuery({ queryKey: ['suppliers', search, page, sort], queryFn: () => supplierApi.list(search, page, 25, sort || undefined),
     placeholderData: keepPreviousData });
-  const [form, setForm] = useState({ code: '', name: '', tin: '', address: '', vatRegistered: false, defaultEwtCodeId: '' });
-  const create = useMutation({
-    mutationFn: () => supplierApi.create({ ...form, tin: form.tin || null, address: form.address || null,
-      defaultEwtCodeId: form.defaultEwtCodeId || null }),
+  const [form, setForm] = useState(EMPTY_FORM);
+  const [editing, setEditing] = useState<Supplier | null>(null);
+  const openNew = () => { setEditing(null); setForm(EMPTY_FORM); setOpen(true); };
+  const openEdit = (s: Supplier) => {
+    setEditing(s);
+    setForm({ code: s.code, name: s.name, tin: s.tin ?? '', address: s.address ?? '', zipCode: s.zipCode ?? '', foreignAddress: s.foreignAddress ?? '',
+      payeeType: s.payeeType ?? '', vatRegistered: s.vatRegistered, defaultEwtCodeId: s.defaultEwtCodeId ?? '' });
+    setOpen(true);
+  };
+  const save = useMutation({
+    mutationFn: () => {
+      const details = { name: form.name, tin: form.tin || null, address: form.address || null, zipCode: form.zipCode || null,
+        foreignAddress: form.foreignAddress || null, payeeType: form.payeeType || null, vatRegistered: form.vatRegistered, defaultEwtCodeId: form.defaultEwtCodeId || null };
+      return editing ? supplierApi.update(editing.id, { ...details, version: editing.version, status: editing.status })
+        : supplierApi.create({ ...details, code: form.code });
+    },
     onSuccess: () => { setOpen(false); qc.invalidateQueries({ queryKey: ['suppliers'] }); },
   });
   const rows = list.data?.items ?? [];
   return (
     <>
       <PageHeader title="Suppliers" crumbs={[{ label: 'Payables' }, { label: 'Suppliers' }]}
-        actions={hasPermission('SUPPLIER_MANAGE') && <Button onClick={() => setOpen(true)}>New supplier</Button>} />
+        actions={hasPermission('SUPPLIER_MANAGE') && <Button onClick={openNew}>New supplier</Button>} />
       {open && (
         <section className="mb-4 space-y-3 rounded-xl border border-slate-200/80 bg-white shadow-xs p-5">
-          <ErrorAlert error={create.error} />
+          {editing && <h2 className="font-semibold">Edit {editing.code}</h2>}
+          <ErrorAlert error={save.error} />
           <div className="grid gap-3 md:grid-cols-3">
-            <Field label="Code" value={form.code} onChange={(e) => setForm({ ...form, code: e.target.value })} />
+            <Field label="Code" disabled={!!editing} value={form.code} onChange={(e) => setForm({ ...form, code: e.target.value })} />
             <Field label="Registered name" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
             <Field label="TIN" hint="000-000-000-00000" value={form.tin} onChange={(e) => setForm({ ...form, tin: e.target.value })} />
-            <Field label="Address" value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} />
+            <Field label="Registered address" value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} />
+            <Field label="ZIP code" hint="4 digits; printed on BIR Form 2307" maxLength={4} value={form.zipCode} onChange={(e) => setForm({ ...form, zipCode: e.target.value })} />
+            <Field label="Foreign address, if any" value={form.foreignAddress} onChange={(e) => setForm({ ...form, foreignAddress: e.target.value })} />
+            <div className="space-y-1.5">
+              <label htmlFor="payee-type" className="block text-sm font-medium text-slate-700">Supplier type</label>
+              <Select id="payee-type" value={form.payeeType} onChange={(e) => setForm({ ...form, payeeType: e.target.value })}
+                className="block w-full rounded-lg border border-slate-300 px-3 py-2 shadow-xs text-sm">
+                <option value="">Not set</option>
+                <option value="INDIVIDUAL">Individual (WI tax codes)</option>
+                <option value="CORPORATION">Corporation (WC tax codes)</option>
+              </Select>
+            </div>
             <div className="space-y-1.5">
               <label htmlFor="ewt" className="block text-sm font-medium text-slate-700">Default withholding tax</label>
               <Select id="ewt" value={form.defaultEwtCodeId} onChange={(e) => setForm({ ...form, defaultEwtCodeId: e.target.value })}
                 className="block w-full rounded-lg border border-slate-300 px-3 py-2 shadow-xs text-sm">
                 <option value="">None</option>
-                {(taxCodes.data ?? []).filter((t) => t.taxType === 'EWT' && t.status === 'ACTIVE').map((t) => <option key={t.id} value={t.id}>{t.code} ({t.rate})</option>)}
+                {(taxCodes.data ?? []).filter((t) => t.taxType === 'EWT' && t.status === 'ACTIVE').map((t) => <option key={t.id} value={t.id}>{t.code} ({t.rate}){t.atc ? ` ${t.atc}` : ''}</option>)}
               </Select>
             </div>
             <label className="flex items-center gap-2 self-end pb-2 text-sm">
@@ -60,7 +87,7 @@ export function SuppliersPage() {
             </label>
           </div>
           <div className="flex gap-2">
-            <Button busy={create.isPending} disabled={!form.code || !form.name} onClick={() => create.mutate()}>Save supplier</Button>
+            <Button busy={save.isPending} disabled={!form.code || !form.name} onClick={() => save.mutate()}>Save supplier</Button>
             <Button variant="secondary" onClick={() => setOpen(false)}>Cancel</Button>
           </div>
         </section>
@@ -83,7 +110,7 @@ export function SuppliersPage() {
                   <td className="px-3 py-2">{s.tin ?? '—'}</td><td className="px-3 py-2">{s.vatRegistered ? 'Yes' : 'No'}</td>
                   <td className="px-3 py-2">{s.defaultEwtCode ?? '—'}</td><td className="px-3 py-2"><StatusBadge status={s.status} /></td>
                   <td className="px-3 py-2 text-right"><Money value={s.openBalance} blankZero /></td>
-                  <td className="px-3 py-2 text-right"><Link className="text-xs text-brand-700 hover:underline" to={`/payables/suppliers/${s.id}/bank`}>Bank details</Link></td>
+                  <td className="whitespace-nowrap px-3 py-2 text-right">{hasPermission('SUPPLIER_MANAGE') && <button type="button" className="mr-3 text-xs text-brand-700 hover:underline" onClick={() => openEdit(s)}>Edit</button>}<Link className="text-xs text-brand-700 hover:underline" to={`/payables/suppliers/${s.id}/bank`}>Bank details</Link></td>
                 </tr>
               ))}
               {rows.length === 0 && <tr><td colSpan={8} className="px-4 py-6 text-center text-slate-500">No suppliers.</td></tr>}

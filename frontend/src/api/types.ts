@@ -490,6 +490,19 @@ export interface Supplier {
   status: string;
   openBalance: string;
   version: number;
+  zipCode: string | null;
+  foreignAddress: string | null;
+  payeeType: 'INDIVIDUAL' | 'CORPORATION' | null;
+}
+
+/** One line of the schedule of alphanumeric tax codes on BIR Form 2307. */
+export interface BirAtc {
+  atc: string;
+  section: 'A' | 'B' | 'C';
+  payeeType: 'INDIVIDUAL' | 'CORPORATION' | null;
+  description: string;
+  condition: string | null;
+  printedRate: string | null;
 }
 
 export interface TaxCode {
@@ -502,6 +515,7 @@ export interface TaxCode {
   accountCode: string;
   status: string;
   placeholder: boolean;
+  atc: string | null;
 }
 
 export interface BankAccount {
@@ -1238,7 +1252,8 @@ export interface OrgDepartment { id: string; officeId: string; code: string; nam
   costCenterCode: string | null; currentUsers: number; version: number }
 export interface OrgOffice { id: string; organizationId: string; code: string; name: string; status: string; departments: OrgDepartment[];
   currentUsers: number; version: number }
-export interface Organization { id: string; code: string; name: string; tin: string | null; status: string; offices: OrgOffice[]; version: number }
+export interface Organization { id: string; code: string; name: string; tin: string | null; status: string; offices: OrgOffice[]; version: number;
+  address: string | null; zipCode: string | null }
 export interface OfficeAssignment { id: string; userId: string; username: string; officeId: string; officeCode: string; officeName: string;
   departmentId: string | null; departmentCode: string | null; departmentName: string | null; effectiveFrom: string; effectiveTo: string | null;
   createdBy: string; endedBy: string | null }

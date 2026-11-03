@@ -30,7 +30,7 @@ class AccessGovernanceIT extends AbstractReceivablesIT {
         // Creating a user with a financial role: the non-financial role applies, the financial one waits.
         String username = unique("ag.new");
         JsonNode created = body(mvc.perform(post("/api/v1/users").header("Authorization", admin.bearer())
-                .contentType(MediaType.APPLICATION_JSON).content(toJson(Map.of("username", username, "email", username + "@test.miaa.local",
+                .contentType(MediaType.APPLICATION_JSON).content(toJson(Map.of("username", username, "email", username + "@test.avtech.local",
                         "displayName", "Grant Test", "userType", "INTERNAL", "temporaryPassword", "Initial-Passw0rd-1",
                         "roleCodes", List.of("ACCOUNTANT", "SUPPORT_AGENT"))))).andExpect(status().isCreated()).andReturn());
         String userId = created.at("/user/id").asText();

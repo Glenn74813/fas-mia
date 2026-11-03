@@ -2,7 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Select } from '../../components/Select';
 import { useState } from 'react';
 import { orgApi } from '../../api/endpoints';
-import type { OfficeAssignment, OrgDepartment, OrgOffice } from '../../api/types';
+import type { OfficeAssignment, Organization, OrgDepartment, OrgOffice } from '../../api/types';
 import { useAuth } from '../../auth/AuthContext';
 import { Badge } from '../../components/Badge';
 import { Button } from '../../components/Button';
@@ -13,6 +13,28 @@ import { Spinner } from '../../components/Spinner';
 import { activeCostCenters, useCostCenters } from '../../hooks/useAccounting';
 
 const sel = 'rounded-md border border-slate-300 px-2 py-1 text-sm';
+
+/** The organisation's own details as printed on BIR Form 2307 (Part II, Payor). */
+function OrganizationDetails({ org, admin }: { org: Organization; admin: boolean }) {
+  const qc = useQueryClient();
+  const [form, setForm] = useState({ tin: org.tin ?? '', address: org.address ?? '', zipCode: org.zipCode ?? '' });
+  const save = useMutation({ mutationFn: () => orgApi.updateOrganization(org, form),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['organizations'] }) });
+  if (!admin) {
+    return <p className="mt-1 text-sm text-slate-600">TIN {org.tin ?? '—'} · {org.address ?? 'No address'} {org.zipCode ?? ''}</p>;
+  }
+  return (
+    <div className="mt-3 space-y-2">
+      <ErrorAlert error={save.error} />
+      <div className="grid gap-3 md:grid-cols-[1fr_2fr_auto_auto] md:items-end">
+        <Field label="TIN" hint="000-000-000-00000" value={form.tin} onChange={(e) => setForm({ ...form, tin: e.target.value })} />
+        <Field label="Registered address" value={form.address} maxLength={500} onChange={(e) => setForm({ ...form, address: e.target.value })} />
+        <Field label="ZIP code" value={form.zipCode} maxLength={4} onChange={(e) => setForm({ ...form, zipCode: e.target.value })} />
+        <Button variant="secondary" busy={save.isPending} onClick={() => save.mutate()}>Save details</Button>
+      </div>
+    </div>
+  );
+}
 
 /** Organisations, offices and departments (FR-ORG-01). AVTECH's structure is entered here; none is seeded. */
 export function OrganizationPage() {
@@ -44,6 +66,7 @@ export function OrganizationPage() {
       {tree.isPending ? <Spinner /> : (tree.data ?? []).map((org) => (
         <section key={org.id} className="mb-6 rounded-xl border border-slate-200/80 bg-white shadow-xs p-5" aria-label={org.name}>
           <h2 className="font-semibold">{org.name} <span className="font-mono text-sm text-slate-500">{org.code}</span></h2>
+          <OrganizationDetails key={org.version} org={org} admin={admin} />
           <ul className="mt-3 space-y-3">
             {org.offices.map((o) => (
               <li key={o.id} className="rounded-md border border-slate-200 p-3">

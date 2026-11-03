@@ -32,7 +32,11 @@ import org.springframework.transaction.annotation.Transactional;
 public class TaxCodeService {
 
     public record TaxCode(UUID id, String code, String description, String taxType, BigDecimal rate, UUID accountId,
-            String accountCode, String status, boolean placeholder) {
+            String accountCode, String status, boolean placeholder, String atc) {
+    }
+
+    /** One line of the schedule of alphanumeric tax codes on BIR Form 2307. */
+    public record Atc(String atc, String section, String payeeType, String description, String condition, BigDecimal printedRate) {
     }
 
     public record TaxCodeRequest(
@@ -59,7 +63,7 @@ public class TaxCodeService {
                 + "ORDER BY t.tax_type, t.code", (rs, i) -> new TaxCode(rs.getObject("id", UUID.class), rs.getString("code"),
                 rs.getString("description"), rs.getString("tax_type"), rs.getBigDecimal("rate"),
                 rs.getObject("account_id", UUID.class), rs.getString("account_code"), rs.getString("status"),
-                rs.getBoolean("placeholder")));
+                rs.getBoolean("placeholder"), rs.getString("atc")));
     }
 
     @Transactional(readOnly = true)
@@ -80,6 +84,26 @@ public class TaxCodeService {
                 req.rate(), req.accountId(), placeholder, Timestamp.from(Instant.now(clock)), actor.username());
         audit.record(actor, "TAX_CODE_CREATED", "TAX_CODE", req.code(), Map.of("type", req.taxType(),
                 "rate", req.rate().toPlainString(), "placeholder", placeholder));
+        return get(id);
+    }
+
+    @Transactional(readOnly = true)
+    public List<Atc> atcCatalogue() {
+        return jdbc.query("SELECT * FROM bir_atc_codes ORDER BY section, atc", (rs, i) -> new Atc(rs.getString("atc"), rs.getString("section"),
+                rs.getString("payee_type"), rs.getString("description"), rs.getString("condition"), rs.getBigDecimal("printed_rate")));
+    }
+
+    /** The BIR alphanumeric tax code printed on Form 2307; AVTECH's tax team assigns it to each withholding code. */
+    @Transactional
+    public TaxCode setAtc(UUID id, String atc, Actor actor) {
+        TaxCode t = get(id);
+        String value = atc == null || atc.isBlank() ? null : atc.trim().toUpperCase(java.util.Locale.ROOT);
+        if (value != null && !Boolean.TRUE.equals(jdbc.queryForObject("SELECT EXISTS (SELECT 1 FROM bir_atc_codes WHERE atc = ?)", Boolean.class, value))) {
+            throw new ApiException(ErrorCode.ACCOUNTING_RULE_VIOLATION, value + " is not on the schedule of alphanumeric tax codes.",
+                    Map.of("violations", List.of(value + " is not on the schedule of BIR Form 2307.")));
+        }
+        jdbc.update("UPDATE tax_codes SET atc = ? WHERE id = ?", value, id);
+        audit.record(actor, "TAX_CODE_ATC_SET", "TAX_CODE", t.code(), Map.of("before", String.valueOf(t.atc()), "after", String.valueOf(value)));
         return get(id);
     }
 

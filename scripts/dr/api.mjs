@@ -34,7 +34,7 @@ async function signIn(user) {
 
 if (command === 'create-user') {
   const s = await signIn(settings().admin);
-  await s.must('dr.create-user', 'dr', 'POST', '/users', { username: arg, email: `${arg}@dr.miaa.local`, displayName: `DR marker ${arg}`,
+  await s.must('dr.create-user', 'dr', 'POST', '/users', { username: arg, email: `${arg}@dr.avtech.local`, displayName: `DR marker ${arg}`,
     userType: 'INTERNAL', temporaryPassword: `Dr-${crypto.randomUUID().slice(0, 12)}-Aa1!`, roleCodes: ['MANAGEMENT_VIEWER'] });
   console.log('created');
 } else if (command === 'user-exists') {

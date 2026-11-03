@@ -51,6 +51,23 @@ public class FinanceSettingsController {
         return mappings.set(key, request.accountId(), Actor.current());
     }
 
+    public record TaxCodeAtcRequest(@jakarta.validation.constraints.Pattern(regexp = "^$|^[A-Za-z]{2}[0-9]{3}$",
+            message = "ATC is two letters and three digits, e.g. from the schedule on BIR Form 2307") String atc) {
+    }
+
+    @org.springframework.web.bind.annotation.PutMapping("/tax-codes/{id}/atc")
+    @PreAuthorize("hasAuthority('PERM_ACCOUNT_ADMINISTER')")
+    public TaxCodeService.TaxCode setTaxCodeAtc(@org.springframework.web.bind.annotation.PathVariable java.util.UUID id,
+            @jakarta.validation.Valid @org.springframework.web.bind.annotation.RequestBody TaxCodeAtcRequest request) {
+        return taxCodes.setAtc(id, request.atc(), Actor.current());
+    }
+
+    @GetMapping("/tax-codes/atc-catalogue")
+    @PreAuthorize("hasAnyAuthority('PERM_AP_VIEW', 'PERM_AR_VIEW', 'PERM_LEDGER_VIEW', 'PERM_ACCOUNT_ADMINISTER')")
+    public List<TaxCodeService.Atc> atcCatalogue() {
+        return taxCodes.atcCatalogue();
+    }
+
     @GetMapping("/tax-codes")
     @PreAuthorize("hasAnyAuthority('PERM_AP_VIEW', 'PERM_AR_VIEW', 'PERM_LEDGER_VIEW', 'PERM_ACCOUNT_ADMINISTER')")
     public List<TaxCodeService.TaxCode> taxCodes() {

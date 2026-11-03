@@ -27,18 +27,22 @@ public final class ApDtos {
             @Pattern(regexp = "^[0-9]{3}-?[0-9]{3}-?[0-9]{3}(-?[0-9]{3,5})?$", message = "TIN format 000-000-000[-00000]") String tin,
             @Size(max = 500) String address,
             boolean vatRegistered,
-            UUID defaultEwtCodeId) {
+            UUID defaultEwtCodeId,
+            @Pattern(regexp = "^[0-9]{4}$", message = "ZIP code must be 4 digits") String zipCode, @Size(max = 500) String foreignAddress,
+            @Pattern(regexp = "INDIVIDUAL|CORPORATION") String payeeType) {
     }
 
     public record SupplierUpdateRequest(@NotNull Long version, @NotBlank @Size(max = 200) String name,
             @Pattern(regexp = "^[0-9]{3}-?[0-9]{3}-?[0-9]{3}(-?[0-9]{3,5})?$", message = "TIN format 000-000-000[-00000]") String tin,
             @Size(max = 500) String address, boolean vatRegistered, UUID defaultEwtCodeId,
-            @NotNull @Pattern(regexp = "ACTIVE|INACTIVE") String status) {
+            @NotNull @Pattern(regexp = "ACTIVE|INACTIVE") String status,
+            @Pattern(regexp = "^[0-9]{4}$", message = "ZIP code must be 4 digits") String zipCode, @Size(max = 500) String foreignAddress,
+            @Pattern(regexp = "INDIVIDUAL|CORPORATION") String payeeType) {
     }
 
     public record SupplierView(UUID id, String code, String name, String tin, String address, boolean vatRegistered,
             UUID defaultEwtCodeId, String defaultEwtCode, UUID subsidiaryAccountId, String status, BigDecimal openBalance,
-            long version) {
+            long version, String zipCode, String foreignAddress, String payeeType) {
     }
 
     public record InvoiceLineRequest(@NotNull UUID accountId, UUID costCenterId, @Size(max = 500) String description,
@@ -154,10 +158,12 @@ public final class ApDtos {
     public record AdvanceRegister(List<AdvanceRow> rows, BigDecimal totalOutstanding, ApReconciliation reconciliation, String note) {
     }
 
+    /** {@code missing} names what the supplier's BIR Form 2307 still needs; the form is a draft until it is empty. */
     public record WithholdingRow(String supplierTin, String supplierName, String taxCode, BigDecimal month1Base,
-            BigDecimal month2Base, BigDecimal month3Base, BigDecimal totalBase, BigDecimal taxWithheld) {
+            BigDecimal month2Base, BigDecimal month3Base, BigDecimal totalBase, BigDecimal taxWithheld, UUID supplierId, String atc,
+            List<String> missing) {
     }
 
-    public record WithholdingSchedule(int year, int quarter, String note, List<WithholdingRow> rows) {
+    public record WithholdingSchedule(int year, int quarter, String note, List<WithholdingRow> rows, List<String> payorMissing) {
     }
 }

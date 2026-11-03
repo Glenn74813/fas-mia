@@ -63,6 +63,18 @@ class TreasuryIT extends AbstractReceivablesIT {
             }
         }
         assertThat(line).isNotNull();
+
+        // The same report as an Excel DCR form, with this deposit's receipt in it.
+        org.springframework.mock.web.MockHttpServletResponse xlsx = mvc.perform(get("/api/v1/treasury/daily-collection-report.xlsx")
+                .param("date", day.toString()).header("Authorization", cashier.bearer())).andExpect(status().isOk()).andReturn().getResponse();
+        assertThat(xlsx.getHeader("Content-Disposition")).contains("DCR-" + day + ".xlsx");
+        try (org.apache.poi.xssf.usermodel.XSSFWorkbook wb = new org.apache.poi.xssf.usermodel.XSSFWorkbook(
+                new java.io.ByteArrayInputStream(xlsx.getContentAsByteArray()))) {
+            StringBuilder all = new StringBuilder();
+            wb.getSheetAt(0).forEach(r -> r.forEach(c -> all.append(c.toString()).append('|')));
+            assertThat(all).contains("DAILY COLLECTION REPORT", "Receipt|Customer|Method|Collector|Status|Deposit|Amount|Tax withheld",
+                    line.get("receiptNumber").asText(), dep.get("depositNumber").asText(), "Total collected", "Prepared by (collecting officer)");
+        }
         assertThat(line.get("amount").asText()).isEqualTo("8000.00");
         assertThat(dcr.get("totals").toString()).contains("CHECK");
     }

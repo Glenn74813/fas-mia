@@ -89,7 +89,7 @@ class IntegrationsIT extends AbstractReceivablesIT {
         // Integration managers are alerted in the app and by e-mail.
         assertThat(jdbc.queryForObject(alerts, Integer.class, manager.id())).isEqualTo(1);
         assertThat(jdbc.queryForObject("SELECT count(*) FROM notification_outbox WHERE template = 'operational-alert' AND recipient = ?",
-                Integer.class, manager.username() + "@test.miaa.local")).isEqualTo(1);
+                Integer.class, manager.username() + "@test.avtech.local")).isEqualTo(1);
         mvc.perform(post("/api/v1/integrations/transmissions/" + d.id() + "/retry").header("Authorization", preparer.bearer()))
                 .andExpect(status().isForbidden());
         ok(mvc.perform(post("/api/v1/integrations/transmissions/" + d.id() + "/retry").header("Authorization", approver.bearer())));

@@ -247,6 +247,7 @@ export const ACCOUNTING_HELP: Record<string, ModuleHelp> = {
     steps: [
       'Under Control-account mappings, choose the ledger account for each key; a NOT CONFIGURED badge means no account is set.',
       'Under Tax codes, enter the code, type, rate, account and description, then click Add.',
+      'For each withholding code, choose its ATC. Open BIR alphanumeric tax codes to search the full schedule from BIR Form 2307. WI codes are for individuals and WC codes for corporations, so a payment made to both needs two tax codes.',
       'Under Bank accounts, enter the code, bank, account name, last four digits and the cash GL account, then click Add.',
       'Check that no PLACEHOLDER tax codes remain before go-live.',
     ],
@@ -254,6 +255,7 @@ export const ACCOUNTING_HELP: Record<string, ModuleHelp> = {
     connections: [
       { to: '/chart-of-accounts', how: 'Every mapping, tax code and bank account points to an account in the chart.' },
       { to: '/payables/invoices', how: 'Invoice postings use the mapped control accounts and tax codes.' },
+      { to: '/payables/reports', how: 'BIR Form 2307 prints the ATC chosen for each withholding code.' },
       { to: '/receivables/billings', how: 'Billing and receipt postings use the mapped receivable and revenue accounts.' },
       { to: '/treasury/statements', how: 'Bank accounts defined here are the ones statements and reconciliations are kept against.' },
     ],

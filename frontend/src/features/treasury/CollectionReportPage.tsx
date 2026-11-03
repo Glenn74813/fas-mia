@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { Fragment, useState } from 'react';
 import { treasuryApi } from '../../api/endpoints';
 import { Button } from '../../components/Button';
@@ -11,16 +11,19 @@ import { StatusBadge } from '../../components/StatusBadge';
 export function CollectionReportPage() {
   const [date, setDate] = useState(new Date().toISOString().slice(0, 10));
   const [collector, setCollector] = useState('');
+  const excel = useMutation({ mutationFn: () => treasuryApi.dcrExcel(date, collector || undefined) });
   const dcr = useQuery({ queryKey: ['dcr', date, collector], queryFn: () => treasuryApi.dcr(date, collector || undefined), enabled: !!date });
   return (
     <>
       <PageHeader title="Daily collection report" crumbs={[{ label: 'Treasury' }, { label: 'Daily collections' }]}
-        actions={<Button variant="secondary" onClick={() => window.print()}>Print</Button>} />
+        actions={<>
+          <Button variant="secondary" busy={excel.isPending} disabled={!date} onClick={() => excel.mutate()}>Excel (DCR form)</Button>
+          <Button variant="secondary" onClick={() => window.print()}>Print</Button></>} />
       <div className="mb-4 flex flex-wrap gap-3 text-sm print:hidden">
         <label>Date <input type="date" value={date} onChange={(e) => setDate(e.target.value)} className="ml-1 rounded-md border border-slate-300 px-2 py-1" /></label>
         <label>Collector <input value={collector} placeholder="all" onChange={(e) => setCollector(e.target.value)} className="ml-1 w-40 rounded-md border border-slate-300 px-2 py-1" /></label>
       </div>
-      <ErrorAlert error={dcr.error} />
+      <ErrorAlert error={dcr.error ?? excel.error} />
       {dcr.isPending ? <Spinner /> : dcr.data && (
         <div className="space-y-4">
           <section className="rounded-xl border border-slate-200/80 bg-white shadow-xs p-5 text-sm">

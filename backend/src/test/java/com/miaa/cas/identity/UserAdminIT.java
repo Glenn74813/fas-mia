@@ -34,7 +34,7 @@ class UserAdminIT extends AbstractIntegrationTest {
         String username = unique("newuser");
         JsonNode created = body(mvc.perform(post("/api/v1/users").header("Authorization", admin.bearer())
                 .contentType(MediaType.APPLICATION_JSON).content(toJson(Map.of("username", username,
-                        "email", username + "@test.miaa.local", "displayName", "New User", "userType", "INTERNAL",
+                        "email", username + "@test.avtech.local", "displayName", "New User", "userType", "INTERNAL",
                         "temporaryPassword", "Initial-Passw0rd-1", "roleCodes", List.of("ACCOUNTANT")))))
                 .andExpect(status().isCreated()).andReturn());
         assertThat(created.at("/user/mustChangePassword").asBoolean()).isTrue();

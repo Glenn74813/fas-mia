@@ -75,7 +75,7 @@ export async function onboard(admin: string, prefix: string, roles: string[], us
   const username = `${prefix}.${Date.now().toString(36)}`;
   const temporary = `Temp-${crypto.randomUUID().slice(0, 8)}-Aa1!`;
   const password = `Final-${crypto.randomUUID().slice(0, 8)}-Aa1!`;
-  await json(ctx, '/users', { username, email: `${username}@e2e.miaa.local`, displayName: `E2E ${prefix}`,
+  await json(ctx, '/users', { username, email: `${username}@e2e.avtech.local`, displayName: `E2E ${prefix}`,
     userType, temporaryPassword: temporary, roleCodes: roles }, admin);
   const step = await json<{ mfaToken: string }>(ctx, '/auth/login', { identifier: username, password: temporary });
   const enrol = await json<{ secret: string }>(ctx, '/auth/mfa/totp/enroll', { mfaToken: step.mfaToken });

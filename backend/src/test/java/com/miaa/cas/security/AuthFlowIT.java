@@ -209,7 +209,7 @@ class AuthFlowIT extends AbstractIntegrationTest {
         Session admin = login(createUser("tmpadm", "SYSTEM_ADMINISTRATOR"));
         String username = unique("tmpuser");
         mvc.perform(post("/api/v1/users").header("Authorization", admin.bearer()).contentType(MediaType.APPLICATION_JSON)
-                .content(toJson(Map.of("username", username, "email", username + "@test.miaa.local",
+                .content(toJson(Map.of("username", username, "email", username + "@test.avtech.local",
                         "displayName", "Temp User", "userType", "INTERNAL", "temporaryPassword", "Temp-Passw0rd-2026",
                         "roleCodes", java.util.List.of("INTERNAL_AUDITOR")))))
                 .andExpect(status().isCreated()).andExpect(jsonPath("$.user.mustChangePassword").value(true));

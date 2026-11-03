@@ -51,7 +51,9 @@ Role assignments follow the proposed matrix (C-08); tax codes and rates are plac
 |---|---|---|
 | 1 | Payables reports: aging as of today | Open invoices by supplier in age buckets; totals match the open invoices |
 | 2 | AP sub-ledger to general ledger | Open invoices equal the AP control account, or the difference is shown |
-| 3 | Expanded withholding schedule for the quarter | Base and tax withheld per supplier and tax code, by month (the BIR 2307 printable layout awaits C-06) |
+| 3 | Expanded withholding schedule for the quarter | Base and tax withheld per supplier and tax code, by month, with what each supplier's BIR Form 2307 still needs |
+| 3a | Download a supplier's BIR Form 2307, with details missing and then complete | The official form with period, payee, payor, ATC and amounts in their boxes; a DRAFT watermark and -DRAFT file name until complete; signature blocks blank; an audit event for each |
+| 3b | Set an ATC on a withholding code from Finance settings, then set a supplier of the other type on the same code | Only codes on the BIR schedule can be chosen; the schedule reports the mismatch and the certificate stays a draft |
 
 - Result: ☐ Pass ☐ Fail ☐ Blocked · Tester: ______ · Date: ______ · Defect: ______
 

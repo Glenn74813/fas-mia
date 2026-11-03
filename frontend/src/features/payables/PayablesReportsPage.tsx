@@ -1,9 +1,10 @@
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { Select } from '../../components/Select';
 import { useState } from 'react';
 import { apReportApi } from '../../api/endpoints';
 import { useAuth } from '../../auth/AuthContext';
 import { Badge } from '../../components/Badge';
+import { Button } from '../../components/Button';
 import { ErrorAlert } from '../../components/ErrorAlert';
 import { Money } from '../../components/Money';
 import { PageHeader } from '../../components/PageHeader';
@@ -18,6 +19,8 @@ export function PayablesReportsPage() {
   const aging = useQuery({ queryKey: ['ap-aging', asOf], queryFn: () => apReportApi.aging(asOf) });
   const recon = useQuery({ queryKey: ['ap-recon'], queryFn: apReportApi.reconciliation, enabled: hasPermission('LEDGER_VIEW') });
   const wht = useQuery({ queryKey: ['ap-wht', year, quarter], queryFn: () => apReportApi.withholding(year, quarter) });
+  const download = useMutation({ mutationFn: (supplierId: string | null) =>
+    supplierId ? apReportApi.form2307(supplierId, year, quarter) : apReportApi.form2307All(year, quarter) });
   const advances = useQuery({ queryKey: ['ap-advances'], queryFn: apReportApi.advances });
   const cols = ['current', 'days1to30', 'days31to60', 'days61to90', 'over90', 'total'] as const;
   return (
@@ -52,19 +55,27 @@ export function PayablesReportsPage() {
           <span className="flex gap-2 text-sm">
             <input aria-label="Year" value={year} onChange={(e) => setYear(Number(e.target.value.replace(/\D/g, '')) || year)} className="w-20 rounded-md border border-slate-300 px-2 py-1" />
             <Select aria-label="Quarter" value={quarter} onChange={(e) => setQuarter(Number(e.target.value))} className="rounded-md border border-slate-300 px-2 py-1">
-              {[1, 2, 3, 4].map((q) => <option key={q} value={q}>Q{q}</option>)}</Select></span></div>
+              {[1, 2, 3, 4].map((q) => <option key={q} value={q}>Q{q}</option>)}</Select>
+            <Button variant="secondary" disabled={!wht.data?.rows.length} busy={download.isPending && download.variables === null}
+              onClick={() => download.mutate(null)}>All BIR 2307 (ZIP)</Button></span></div>
         {wht.data && <p className="mb-2 text-xs text-amber-800">{wht.data.note}</p>}
-        <ErrorAlert error={wht.error} />
+        {wht.data && wht.data.payorMissing.length > 0 && <p className="mb-2 text-xs text-amber-800">Every BIR 2307 prints as a draft until
+          Administration › Organisation has the {wht.data.payorMissing.join(', ')}.</p>}
+        <ErrorAlert error={wht.error ?? download.error} />
         {wht.data && <div className="overflow-x-auto"><table className="min-w-full text-sm">
           <thead className="border-b border-slate-200 text-left text-[11px] font-semibold uppercase tracking-wider text-slate-500"><tr><th className="py-1 pr-3">TIN</th><th className="py-1 pr-3">Payee</th><th className="py-1 pr-3">Tax code</th>
             <th className="py-1 text-right">Month 1</th><th className="py-1 text-right">Month 2</th><th className="py-1 text-right">Month 3</th><th className="py-1 text-right">Base</th>
-            <th className="py-1 text-right">Withheld</th></tr></thead>
+            <th className="py-1 text-right">Withheld</th><th className="py-1 pl-3">BIR 2307</th></tr></thead>
           <tbody>{wht.data.rows.map((r, i) => (
             <tr key={i} className="border-t border-slate-100"><td className="py-1.5 pr-3">{r.supplierTin ?? '—'}</td><td className="py-1.5 pr-3">{r.supplierName}</td>
               <td className="py-1.5 pr-3">{r.taxCode}</td><td className="py-1.5 text-right"><Money value={r.month1Base} blankZero /></td>
               <td className="py-1.5 text-right"><Money value={r.month2Base} blankZero /></td><td className="py-1.5 text-right"><Money value={r.month3Base} blankZero /></td>
-              <td className="py-1.5 text-right"><Money value={r.totalBase} /></td><td className="py-1.5 text-right"><Money value={r.taxWithheld} /></td></tr>))}
-            {wht.data.rows.length === 0 && <tr><td colSpan={8} className="py-4 text-center text-slate-500">No withholding in this quarter.</td></tr>}</tbody>
+              <td className="py-1.5 text-right"><Money value={r.totalBase} /></td><td className="py-1.5 text-right"><Money value={r.taxWithheld} /></td>
+              <td className="py-1.5 pl-3">
+                {wht.data?.rows.findIndex((x) => x.supplierId === r.supplierId) === i && <button type="button" className="text-xs text-brand-700 hover:underline"
+                  disabled={download.isPending} onClick={() => download.mutate(r.supplierId)}>Download</button>}
+                {r.missing.length > 0 && <p className="text-xs text-amber-800">Draft: needs {r.missing.join(', ')}</p>}</td></tr>))}
+            {wht.data.rows.length === 0 && <tr><td colSpan={9} className="py-4 text-center text-slate-500">No withholding in this quarter.</td></tr>}</tbody>
         </table></div>}
       </section>
       {advances.data && advances.data.rows.length > 0 && (

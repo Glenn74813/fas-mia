@@ -34,7 +34,7 @@ async function onboard(prefix, roles, userType = 'INTERNAL') {
   const username = `pf.${prefix}.${tag}`.toLowerCase();
   const temporary = `Temp-${crypto.randomUUID().slice(0, 8)}-Aa1!`;
   const password = `Perf-${crypto.randomUUID().slice(0, 12)}-Aa1!`;
-  await admin.must('seed.user', 'seed', 'POST', '/users', { username, email: `${username}@perf.miaa.local`, displayName: `Perf ${prefix}`,
+  await admin.must('seed.user', 'seed', 'POST', '/users', { username, email: `${username}@perf.avtech.local`, displayName: `Perf ${prefix}`,
     userType, temporaryPassword: temporary, roleCodes: roles });
   const s = new Session(cfg.api, { username });
   const auth = async (path, body, token) => {

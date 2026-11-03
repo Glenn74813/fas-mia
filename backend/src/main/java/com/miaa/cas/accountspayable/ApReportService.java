@@ -24,10 +24,12 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class ApReportService {
 
+    private final Form2307Service form2307;
     private final JdbcTemplate jdbc;
     private final AccountMappingService mappings;
 
-    public ApReportService(JdbcTemplate jdbc, AccountMappingService mappings) {
+    public ApReportService(JdbcTemplate jdbc, AccountMappingService mappings, Form2307Service form2307) {
+        this.form2307 = form2307;
         this.jdbc = jdbc;
         this.mappings = mappings;
     }
@@ -109,8 +111,7 @@ public class ApReportService {
 
     /**
      * Expanded-withholding schedule per supplier and tax code for a quarter, by the month the invoice was
-     * recognised. This is the data behind BIR Form 2307; the printable form layout awaits the approved
-     * template (clarification C-06).
+     * recognised. {@link Form2307Service} prints this data on BIR Form 2307.
      */
     @Transactional(readOnly = true)
     public WithholdingSchedule withholding(int year, int quarter) {
@@ -121,20 +122,23 @@ public class ApReportService {
         LocalDate end = start.plusMonths(3).minusDays(1);
         int m1 = start.getMonthValue();
         List<WithholdingRow> rows = jdbc.query("""
-                SELECT s.tin, s.name, t.code,
+                SELECT s.id, s.tin, s.name, s.address, s.zip_code, s.payee_type, t.code, t.atc, a.payee_type AS atc_payee_type,
                        sum(CASE WHEN extract(month FROM i.accounting_date) = ? THEN l.net_amount ELSE 0 END) AS m1,
                        sum(CASE WHEN extract(month FROM i.accounting_date) = ? THEN l.net_amount ELSE 0 END) AS m2,
                        sum(CASE WHEN extract(month FROM i.accounting_date) = ? THEN l.net_amount ELSE 0 END) AS m3,
                        sum(l.net_amount) AS base, sum(l.ewt_amount) AS tax
                 FROM supplier_invoice_lines l JOIN supplier_invoices i ON i.id = l.invoice_id
                 JOIN suppliers s ON s.id = i.supplier_id JOIN tax_codes t ON t.id = l.ewt_code_id
+                LEFT JOIN bir_atc_codes a ON a.atc = t.atc
                 WHERE i.status = 'POSTED' AND i.accounting_date BETWEEN ? AND ? AND l.ewt_amount > 0
-                GROUP BY s.tin, s.name, t.code ORDER BY s.name, t.code""", (rs, i) -> new WithholdingRow(rs.getString("tin"),
+                GROUP BY s.id, s.tin, s.name, s.address, s.zip_code, s.payee_type, t.code, t.atc, a.payee_type ORDER BY s.name, t.code""", (rs, i) -> new WithholdingRow(rs.getString("tin"),
                 rs.getString("name"), rs.getString("code"), Money.of(rs.getBigDecimal("m1")), Money.of(rs.getBigDecimal("m2")),
-                Money.of(rs.getBigDecimal("m3")), Money.of(rs.getBigDecimal("base")), Money.of(rs.getBigDecimal("tax"))),
+                Money.of(rs.getBigDecimal("m3")), Money.of(rs.getBigDecimal("base")), Money.of(rs.getBigDecimal("tax")), rs.getObject("id", java.util.UUID.class), rs.getString("atc"),
+                Form2307Service.missing(rs.getString("tin"), rs.getString("address"), rs.getString("zip_code"), rs.getString("payee_type"),
+                        rs.getString("atc"), rs.getString("atc_payee_type"))),
                 m1, m1 + 1, m1 + 2, Date.valueOf(start), Date.valueOf(end));
-        return new WithholdingSchedule(year, quarter, "Data for BIR Form 2307. Print layout pending the approved template; "
-                + "tax codes and rates are AVTECH configuration and must be validated by the tax team.", rows);
+        return new WithholdingSchedule(year, quarter, "Amounts follow the month each invoice was recognised. Tax codes, rates and ATCs "
+                + "are AVTECH configuration and must be validated by the tax team.", rows, form2307.payorMissing());
     }
 
     private static BigDecimal sum(List<AgingRow> rows, int col) {
