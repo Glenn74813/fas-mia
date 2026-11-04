@@ -15,7 +15,8 @@ import { SortHeader } from '../../components/SortHeader';
 import { Spinner } from '../../components/Spinner';
 import { StatusBadge } from '../../components/StatusBadge';
 
-const EMPTY_FORM = { code: '', name: '', tin: '', address: '', zipCode: '', foreignAddress: '', payeeType: '', vatRegistered: false, defaultEwtCodeId: '' };
+const EMPTY_FORM = { code: '', name: '', tin: '', address: '', zipCode: '', foreignAddress: '', payeeType: '', vatRegistered: false, defaultEwtCodeId: '',
+  lastName: '', firstName: '', middleName: '' };
 
 export function SuppliersPage() {
   const { hasPermission } = useAuth();
@@ -36,13 +37,15 @@ export function SuppliersPage() {
   const openEdit = (s: Supplier) => {
     setEditing(s);
     setForm({ code: s.code, name: s.name, tin: s.tin ?? '', address: s.address ?? '', zipCode: s.zipCode ?? '', foreignAddress: s.foreignAddress ?? '',
-      payeeType: s.payeeType ?? '', vatRegistered: s.vatRegistered, defaultEwtCodeId: s.defaultEwtCodeId ?? '' });
+      payeeType: s.payeeType ?? '', vatRegistered: s.vatRegistered, defaultEwtCodeId: s.defaultEwtCodeId ?? '',
+      lastName: s.lastName ?? '', firstName: s.firstName ?? '', middleName: s.middleName ?? '' });
     setOpen(true);
   };
   const save = useMutation({
     mutationFn: () => {
       const details = { name: form.name, tin: form.tin || null, address: form.address || null, zipCode: form.zipCode || null,
-        foreignAddress: form.foreignAddress || null, payeeType: form.payeeType || null, vatRegistered: form.vatRegistered, defaultEwtCodeId: form.defaultEwtCodeId || null };
+        foreignAddress: form.foreignAddress || null, payeeType: form.payeeType || null, vatRegistered: form.vatRegistered, defaultEwtCodeId: form.defaultEwtCodeId || null,
+        lastName: form.lastName || null, firstName: form.firstName || null, middleName: form.middleName || null };
       return editing ? supplierApi.update(editing.id, { ...details, version: editing.version, status: editing.status })
         : supplierApi.create({ ...details, code: form.code });
     },
@@ -73,6 +76,12 @@ export function SuppliersPage() {
                 <option value="CORPORATION">Corporation (WC tax codes)</option>
               </Select>
             </div>
+            {form.payeeType === 'INDIVIDUAL' && <>
+              <Field label="Last name" hint="BIR alphalists list individuals by name" maxLength={30} value={form.lastName}
+                onChange={(e) => setForm({ ...form, lastName: e.target.value })} />
+              <Field label="First name" maxLength={30} value={form.firstName} onChange={(e) => setForm({ ...form, firstName: e.target.value })} />
+              <Field label="Middle name" maxLength={30} value={form.middleName} onChange={(e) => setForm({ ...form, middleName: e.target.value })} />
+            </>}
             <div className="space-y-1.5">
               <label htmlFor="ewt" className="block text-sm font-medium text-slate-700">Default withholding tax</label>
               <Select id="ewt" value={form.defaultEwtCodeId} onChange={(e) => setForm({ ...form, defaultEwtCodeId: e.target.value })}

@@ -321,6 +321,28 @@ export const ACCOUNTING_HELP: Record<string, ModuleHelp> = {
     ],
   },
 
+  '/reports/bir': {
+    title: 'BIR reports',
+    summary: 'The BIR lists of withholding tax and VAT: the Quarterly Alphalist of Payees (QAP) for BIR Form 1601-EQ and the annual alphalist for 1604-E as BIR DAT files, the SAWT of tax customers withheld, and the summary lists of sales and purchases.',
+    steps: [
+      'Choose a tab: QAP (1601-EQ), Alphalist (1604-E), SAWT, Sales (SLS) or Purchases (SLP).',
+      'Enter the Year and, except for the 1604-E, the Quarter.',
+      'On the QAP and 1604-E, check the status: READY TO FILE, or DETAILS MISSING with what each payee still needs under Still needed.',
+      'Complete missing details: the supplier\u2019s TIN, type and, for an individual, last and first name under Payables › Suppliers; the ATC of the tax code under Finance settings; the RDO code under Administration › Organisation.',
+      'Click Download DAT file, validate the file with BIR\u2019s Alphalist Data Entry and Validation Module, and submit it as BIR instructs.',
+      'For the SAWT, record each customer\u2019s BIR Form 2307 on its receipt (Record certificate); receipts still without one are listed under the table.',
+      'Click Excel on any tab for a listing to check or keep.',
+    ],
+    roles: 'Payables access shows the QAP, 1604-E and purchases; receivables access shows the SAWT and sales. Cashiers and accounting staff record customers\u2019 certificates on receipts.',
+    connections: [
+      { to: '/payables/reports', how: 'The QAP and 1604-E come from the same posted invoice lines as the BIR 2307 certificates printed there.' },
+      { to: '/payables/suppliers', how: 'Supplier TIN, type and names are what the alphalists list.' },
+      { to: '/finance-settings', how: 'Each withholding tax code needs its ATC for the alphalists.' },
+      { to: '/receivables/receipts', how: 'Certificates customers give for tax they withheld are recorded on receipts and listed on the SAWT.' },
+      { to: '/admin/organization', how: 'The organisation\u2019s TIN and RDO code head every DAT file.' },
+    ],
+  },
+
   '/reports/jobs': {
     title: 'My reports',
     summary: 'Your report requests and schedules. Exports and management reports are prepared in the background and downloaded from here.',

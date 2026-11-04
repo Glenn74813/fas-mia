@@ -19,7 +19,7 @@ waits on the answers below.
 
 | Office | Items | Earliest need |
 |---|---|---|
-| Chief Accountant (with COA, Internal Audit, Commercial, Tax, Procurement, Treasury) | C-06, C-07, C-08, C-12, C-19, C-22, C-23, C-28, C-29, C-30, C-31, C-32, C-33, C-35, C-36 | Before UAT |
+| Chief Accountant (with COA, Internal Audit, Commercial, Tax, Procurement, Treasury) | C-06, C-07, C-08, C-12, C-19, C-22, C-23, C-28, C-29, C-30, C-31, C-32, C-33, C-35, C-36, C-39 | Before UAT |
 | MIAA management, Chief Accountant and PMO | C-38 | Before UAT scripts |
 | Finance Manager | C-24, C-27 | Before UAT |
 | Budget Division | C-10 | Before UAT |
@@ -63,6 +63,7 @@ These unblock the most work. Each is described in its item below.
 | C-12 | Legacy data, with MISD: source systems, years of history to migrate versus keep read-only, record counts. | Opening balances (GL, AR, AP, assets, stock) load through CAS templates with two-person approval. | Migration week 1 |
 | C-35 | Confirm that Annex B.8 work-in-progress and production cost variances, and B.5 "company code" filtering, can be dropped: MIAA is a single GOCC with no production. | Not built. | UAT |
 | C-36 | Confirm whether a machine-learning component is required for remittance extraction and cash application (B.6, B.11). | Rule-based matching covers the outcome. | UAT |
+| C-39 | BIR, with the tax team and BIR liaison: BIR's DAT layouts for the SAWT and the Summary List of Sales and Purchases (RELIEF), and confirmation that the QAP and 1604-E files pass BIR's Alphalist Data Entry and Validation Module. Whether MIAA files the SLSP, and how purchases split into services, capital goods and other goods. | QAP and 1604-E are DAT files in the RMC 7-2021 structures; SAWT and SLSP are listings on screen and in Excel. | UAT |
 
 ## MIAA management, Chief Accountant and PMO
 

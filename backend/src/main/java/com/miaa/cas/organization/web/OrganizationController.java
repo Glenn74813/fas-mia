@@ -30,7 +30,8 @@ public class OrganizationController {
 
     public record OrganizationUpdate(@NotNull Long version, @NotBlank @Size(max = 200) String name, @Size(max = 20) String tin,
             @NotBlank String status, @Size(max = 500) String address,
-            @jakarta.validation.constraints.Pattern(regexp = "^$|^[0-9]{4}$", message = "ZIP code must be 4 digits") String zipCode) {
+            @jakarta.validation.constraints.Pattern(regexp = "^$|^[0-9]{4}$", message = "ZIP code must be 4 digits") String zipCode,
+            @jakarta.validation.constraints.Pattern(regexp = "^$|^[0-9]{3}$", message = "RDO code must be 3 digits") String rdoCode) {
     }
 
     public record UnitCreate(@NotBlank @Size(max = 20) String code, @NotBlank @Size(max = 200) String name, UUID costCenterId) {
@@ -60,7 +61,7 @@ public class OrganizationController {
     @PutMapping("/organizations/{id}")
     @PreAuthorize("hasAuthority('PERM_ORGANIZATION_ADMINISTER')")
     public List<OrganizationService.Organization> updateOrganization(@PathVariable UUID id, @Valid @RequestBody OrganizationUpdate r) {
-        organization.updateOrganization(id, r.version(), r.name(), r.tin(), r.status(), r.address(), r.zipCode());
+        organization.updateOrganization(id, r.version(), r.name(), r.tin(), r.status(), r.address(), r.zipCode(), r.rdoCode());
         return organization.tree();
     }
 

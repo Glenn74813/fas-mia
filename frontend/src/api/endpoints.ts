@@ -1,5 +1,5 @@
 import { api, downloadFile } from './client';
-import type { BirAtc,
+import type { BirAlphalist, BirAtc, Sawt, VatListing, WithholdingCertificate,
   TicketCategory,
   Clearing, ClearingProposal, CloseCalendarChecklist, CloseFrequency, CloseScheduleItem, CloseTask, GlOpenItem, OpenItemAccount,
   AccountLedger, ChainVerification, ChartSummary, CloseChecklist, CostCenter, CurrentUser, DocumentInfo, EntryDetail,
@@ -313,7 +313,7 @@ type Act = 'submit' | 'approve' | 'return' | 'reject' | 'cancel' | 'post';
 
 interface SupplierDetails {
   name: string; tin: string | null; address: string | null; zipCode: string | null; foreignAddress: string | null; payeeType: string | null;
-  vatRegistered: boolean; defaultEwtCodeId: string | null;
+  vatRegistered: boolean; defaultEwtCodeId: string | null; lastName: string | null; firstName: string | null; middleName: string | null;
 }
 
 export const supplierApi = {
@@ -442,6 +442,8 @@ export const receiptApi = {
   apply: (id: string, version: number, accountingDate: string, allocations: { documentId: string; amount: string }[], idempotencyKey: string) =>
     api.post<ReceiptView>(`/receipts/${id}/applications`, { version, accountingDate, allocations }, { headers: { 'Idempotency-Key': idempotencyKey } }),
   upload: (id: string, file: File) => api.upload<DocumentInfo>(`/receipts/${id}/documents`, file),
+  recordCertificate: (id: string, body: Pick<WithholdingCertificate, 'atc' | 'incomePayment' | 'receivedOn'>) =>
+    api.put<ReceiptView>(`/receipts/${id}/withholding-certificate`, body),
 };
 
 export const arReportApi = {
@@ -727,7 +729,7 @@ export const governanceApi = {
 
 export const orgApi = {
   tree: () => api.get<Organization[]>('/organizations'),
-  updateOrganization: (o: Organization, details: { tin: string; address: string; zipCode: string }) =>
+  updateOrganization: (o: Organization, details: { tin: string; address: string; zipCode: string; rdoCode: string }) =>
     api.put<Organization[]>(`/organizations/${o.id}`, { version: o.version, name: o.name, status: o.status, ...details }),
   createOffice: (orgId: string, code: string, name: string) => api.post<{ id: string }>(`/organizations/${orgId}/offices`, { code, name }),
   updateOffice: (o: { id: string; version: number }, name: string, status: string) =>
@@ -740,4 +742,16 @@ export const orgApi = {
   assign: (userId: string, officeId: string, departmentId: string | null, effectiveFrom: string) =>
     api.post<OfficeAssignment[]>(`/users/${userId}/office-assignments`, { officeId, departmentId, effectiveFrom }),
   end: (assignmentId: string, effectiveTo: string) => api.post<OfficeAssignment[]>(`/office-assignments/${assignmentId}/end`, { effectiveTo }),
+};
+
+/** BIR lists: QAP (1601-EQ) and the 1604-E alphalist as DAT files, SAWT and SLSP as listings. */
+export const birApi = {
+  qap: (year: number, quarter: number) => api.get<BirAlphalist>(`/bir/qap${qs({ year, quarter })}`),
+  annual: (year: number) => api.get<BirAlphalist>(`/bir/1604e${qs({ year })}`),
+  sawt: (year: number, quarter: number) => api.get<Sawt>(`/bir/sawt${qs({ year, quarter })}`),
+  sales: (year: number, quarter: number) => api.get<VatListing>(`/bir/sls${qs({ year, quarter })}`),
+  purchases: (year: number, quarter: number) => api.get<VatListing>(`/bir/slp${qs({ year, quarter })}`),
+  /** path: qap.dat, qap.xlsx, 1604e.dat, sawt.xlsx, ... */
+  file: (path: string, year: number, quarter: number | null, fallbackName: string) =>
+    downloadFile(`/bir/${path}${qs({ year, quarter: quarter ?? undefined })}`, fallbackName),
 };

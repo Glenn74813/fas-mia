@@ -39,6 +39,7 @@ export const NAV_ITEMS: NavItem[] = [
   { label: 'Budgets', to: '/budgets', anyOf: ['BUDGET_VIEW', 'BUDGET_PREPARE', 'BUDGET_APPROVE'], section: 'Budget' },
   { label: 'Financial statements', to: '/reports/financial-statements', anyOf: ['FINANCIAL_REPORT_VIEW'], section: 'Reports' },
   { label: 'Ad hoc reports', to: '/reports/ad-hoc', anyOf: ['LEDGER_VIEW', 'AP_VIEW', 'AR_VIEW'], section: 'Reports' },
+  { label: 'BIR reports', to: '/reports/bir', anyOf: ['AP_VIEW', 'AR_VIEW'], section: 'Reports' },
   { label: 'My reports', to: '/reports/jobs', anyOf: ['FINANCIAL_REPORT_VIEW', 'FINANCIAL_REPORT_EXPORT', 'BUDGET_VIEW', 'AP_VIEW', 'AR_VIEW',
     'FA_VIEW', 'INVENTORY_VIEW', 'AUDIT_LOG_VIEW', 'SECURITY_EVENT_VIEW'], section: 'Reports' },
   { label: 'Trial balance', to: '/general-ledger/trial-balance', anyOf: ['LEDGER_VIEW'], section: 'General ledger' },

@@ -35,7 +35,7 @@ public class OrganizationService {
     }
 
     public record Organization(UUID id, String code, String name, String tin, String status, List<Office> offices, long version, String address,
-            String zipCode) {
+            String zipCode, String rdoCode) {
     }
 
     public record Assignment(UUID id, UUID userId, String username, UUID officeId, String officeCode, String officeName, UUID departmentId,
@@ -70,19 +70,22 @@ public class OrganizationService {
                         (UUID) o.get("organization_id"), (String) o.get("code"), (String) o.get("name"), (String) o.get("status"),
                         depts.stream().filter(d -> d.get("office_id").equals(o.get("id"))).map(OrganizationService::department).toList(),
                         ((Number) o.get("current_users")).longValue(), ((Number) o.get("version")).longValue())).toList(),
-                ((Number) org.get("version")).longValue(), (String) org.get("address"), (String) org.get("zip_code"))).toList();
+                ((Number) org.get("version")).longValue(), (String) org.get("address"), (String) org.get("zip_code"),
+                (String) org.get("rdo_code"))).toList();
     }
 
     @Transactional
-    public void updateOrganization(UUID id, long version, String name, String tin, String status, String address, String zipCode) {
+    public void updateOrganization(UUID id, long version, String name, String tin, String status, String address, String zipCode,
+            String rdoCode) {
         requireAdmin();
         Map<String, Object> before = lock("organizations", id, version, "Organisation");
         if ("INACTIVE".equals(status) && count("SELECT count(*) FROM offices WHERE organization_id = ? AND status = 'ACTIVE'", id) > 0) {
             throw state("Deactivate the organisation's offices first.");
         }
-        jdbc.update("UPDATE organizations SET name = ?, tin = ?, status = ?, address = ?, zip_code = ?, version = version + 1, updated_at = ?, updated_by = ? WHERE id = ?",
+        jdbc.update("UPDATE organizations SET name = ?, tin = ?, status = ?, address = ?, zip_code = ?, rdo_code = ?, version = version + 1, updated_at = ?, updated_by = ? WHERE id = ?",
                 name.trim(), tin == null || tin.isBlank() ? null : tin.trim(), status(status), address == null || address.isBlank() ? null : address.trim(),
-                zipCode == null || zipCode.isBlank() ? null : zipCode.trim(), now(), CurrentActor.username(), id);
+                zipCode == null || zipCode.isBlank() ? null : zipCode.trim(), rdoCode == null || rdoCode.isBlank() ? null : rdoCode.trim(),
+                now(), CurrentActor.username(), id);
         audit.record("ORGANIZATION_UPDATED", "ORGANIZATION", id, Map.of("before", Map.of("name", before.get("name"), "status", before.get("status")),
                 "after", Map.of("name", name.trim(), "status", status(status))));
     }

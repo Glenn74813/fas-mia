@@ -108,7 +108,8 @@ All open items are sent to MIAA, grouped by office, in [25-miaa-decision-request
 | Item | TOR reference | Decision needed |
 |---|---|---|
 | BIR CAS registration, PTU, e-receipts/e-invoices, EIS transmission (RR 9-2009, 8-2022, 11-2025), 2307 | §2.2.1, §3.10, A, B.10 | C-06: EIS schema and Permit to Transmit; registration with BIR. The sandbox adapter and transmission log are ready |
-| BIR monthly VAT, withholding and income tax reports; quarterly COA, annual DBM, GCG reports | §4.5, A, B.5 | C-06, C-07: official formats |
+| BIR withholding and VAT lists | §3.5.1, A, B.5 | **Built** (V64, 4 Nov 2026): **Reports → BIR reports**. The QAP for BIR Form 1601-EQ and the 1604-E annual alphalist (Schedule 3) as DAT files in the file structures and names of RMC 7-2021 Annexes A and B, from the posted invoice lines behind BIR Form 2307, refused until every payee and the organisation are complete; the SAWT from the BIR 2307s customers give, recorded on receipts; and the summary lists of sales and purchases. SAWT and SLSP are listings until BIR's DAT layouts are supplied, and BIR's validation module must accept the DAT files (C-39). `BirAlphalistIT`, `BirDatTest` |
+| BIR monthly VAT and income tax returns; quarterly COA, annual DBM, GCG reports | §4.5, A, B.5 | C-06, C-07: official formats |
 | MIAA's sub-accounts and confirmation of the proposed account flags | §2.2.1 | C-22, C-07. The framework is settled (PFRS) and COA's Revised Chart of Accounts for Government Corporations (2019) is loaded in development (§8) |
 | PPE lapsing schedule format; whether MIAA uses the revaluation model (impairment and revaluation are built, 29 Oct 2026; revaluation is off until decided) | A, B.2 | C-07, C-30 |
 | Bank file formats and payment channels | B.3, D | C-11 |

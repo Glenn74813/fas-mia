@@ -22,6 +22,7 @@ import com.miaa.cas.accountsreceivable.ArDtos.ReceiptRequest;
 import com.miaa.cas.accountsreceivable.ArDtos.ReceiptSummary;
 import com.miaa.cas.accountsreceivable.ArDtos.ReceiptView;
 import com.miaa.cas.accountsreceivable.ArDtos.Statement;
+import com.miaa.cas.accountsreceivable.ArDtos.WithholdingCertificateRequest;
 import com.miaa.cas.accountsreceivable.ArReportService;
 import com.miaa.cas.accountsreceivable.BillingService;
 import com.miaa.cas.accountsreceivable.CustomerService;
@@ -318,6 +319,13 @@ public class ReceivablesController {
     @PreAuthorize("hasAuthority('PERM_JOURNAL_POST')")
     public ReceiptView postReceipt(@PathVariable UUID id, @Valid @RequestBody ActionRequest request) {
         return receipts.post(id, request.version());
+    }
+
+    @PutMapping("/receipts/{id}/withholding-certificate")
+    @PreAuthorize("hasAnyAuthority('PERM_COLLECTION_RECORD', 'PERM_JOURNAL_POST')")
+    @Operation(summary = "Record the BIR Form 2307 the customer gave for the tax it withheld from a receipt (listed on the SAWT)")
+    public ReceiptView receiptCertificate(@PathVariable UUID id, @Valid @RequestBody WithholdingCertificateRequest request) {
+        return receipts.recordCertificate(id, request);
     }
 
     @PostMapping("/receipts/{id}/cancel")

@@ -14,22 +14,23 @@ import { activeCostCenters, useCostCenters } from '../../hooks/useAccounting';
 
 const sel = 'rounded-md border border-slate-300 px-2 py-1 text-sm';
 
-/** The organisation's own details as printed on BIR Form 2307 (Part II, Payor). */
+/** The organisation's own details as printed on BIR Form 2307 (Part II, Payor) and in the header of the BIR alphalists. */
 function OrganizationDetails({ org, admin }: { org: Organization; admin: boolean }) {
   const qc = useQueryClient();
-  const [form, setForm] = useState({ tin: org.tin ?? '', address: org.address ?? '', zipCode: org.zipCode ?? '' });
+  const [form, setForm] = useState({ tin: org.tin ?? '', address: org.address ?? '', zipCode: org.zipCode ?? '', rdoCode: org.rdoCode ?? '' });
   const save = useMutation({ mutationFn: () => orgApi.updateOrganization(org, form),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['organizations'] }) });
   if (!admin) {
-    return <p className="mt-1 text-sm text-slate-600">TIN {org.tin ?? '—'} · {org.address ?? 'No address'} {org.zipCode ?? ''}</p>;
+    return <p className="mt-1 text-sm text-slate-600">TIN {org.tin ?? '—'} · {org.address ?? 'No address'} {org.zipCode ?? ''} · RDO {org.rdoCode ?? '—'}</p>;
   }
   return (
     <div className="mt-3 space-y-2">
       <ErrorAlert error={save.error} />
-      <div className="grid gap-3 md:grid-cols-[1fr_2fr_auto_auto] md:items-end">
+      <div className="grid gap-3 md:grid-cols-[1fr_2fr_auto_auto_auto] md:items-end">
         <Field label="TIN" hint="000-000-000-00000" value={form.tin} onChange={(e) => setForm({ ...form, tin: e.target.value })} />
         <Field label="Registered address" value={form.address} maxLength={500} onChange={(e) => setForm({ ...form, address: e.target.value })} />
         <Field label="ZIP code" value={form.zipCode} maxLength={4} onChange={(e) => setForm({ ...form, zipCode: e.target.value })} />
+        <Field label="RDO code" hint="3 digits" value={form.rdoCode} maxLength={3} onChange={(e) => setForm({ ...form, rdoCode: e.target.value })} />
         <Button variant="secondary" busy={save.isPending} onClick={() => save.mutate()}>Save details</Button>
       </div>
     </div>

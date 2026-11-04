@@ -28,6 +28,12 @@ public class Supplier {
     private String foreignAddress;
     @Column(name = "payee_type", length = 12)
     private String payeeType;
+    @Column(name = "last_name", length = 30)
+    private String lastName;
+    @Column(name = "first_name", length = 30)
+    private String firstName;
+    @Column(name = "middle_name", length = 30)
+    private String middleName;
     @Column(name = "vat_registered", nullable = false)
     private boolean vatRegistered;
     @Column(name = "default_ewt_code_id")
@@ -77,6 +83,13 @@ public class Supplier {
         this.updatedBy = actor;
     }
 
+    /** The name parts the BIR alphalists use for an individual payee. */
+    public void names(String lastName, String firstName, String middleName) {
+        this.lastName = lastName;
+        this.firstName = firstName;
+        this.middleName = middleName;
+    }
+
     public boolean isActive() { return "ACTIVE".equals(status); }
     public UUID getId() { return id; }
     public String getCode() { return code; }
@@ -86,6 +99,9 @@ public class Supplier {
     public String getZipCode() { return zipCode; }
     public String getForeignAddress() { return foreignAddress; }
     public String getPayeeType() { return payeeType; }
+    public String getLastName() { return lastName; }
+    public String getFirstName() { return firstName; }
+    public String getMiddleName() { return middleName; }
     public boolean isVatRegistered() { return vatRegistered; }
     public UUID getDefaultEwtCodeId() { return defaultEwtCodeId; }
     public UUID getSubsidiaryAccountId() { return subsidiaryAccountId; }

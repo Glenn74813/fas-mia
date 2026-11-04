@@ -493,6 +493,9 @@ export interface Supplier {
   zipCode: string | null;
   foreignAddress: string | null;
   payeeType: 'INDIVIDUAL' | 'CORPORATION' | null;
+  lastName: string | null;
+  firstName: string | null;
+  middleName: string | null;
 }
 
 /** One line of the schedule of alphanumeric tax codes on BIR Form 2307. */
@@ -814,7 +817,12 @@ export interface ReceiptView {
   paymentMethod: string; paymentReference: string | null; amount: string; taxWithheld: string; allocatedAmount: string;
   unappliedAmount: string; status: string; remarks: string | null; recordedBy: string; cancelReason: string | null;
   postedEntryId: string | null; postedEntryNumber: string | null; allocations: ReceiptAllocation[];
-  documents: DocumentInfo[]; availableActions: string[]; version: number;
+  documents: DocumentInfo[]; availableActions: string[]; version: number; certificate: WithholdingCertificate | null;
+}
+
+/** The BIR Form 2307 a customer gave for the tax it withheld from a receipt, as listed on the SAWT. */
+export interface WithholdingCertificate {
+  atc: string; atcDescription: string; incomePayment: string; receivedOn: string; recordedBy: string; recordedAt: string;
 }
 
 export interface ReceiptInput {
@@ -1253,7 +1261,7 @@ export interface OrgDepartment { id: string; officeId: string; code: string; nam
 export interface OrgOffice { id: string; organizationId: string; code: string; name: string; status: string; departments: OrgDepartment[];
   currentUsers: number; version: number }
 export interface Organization { id: string; code: string; name: string; tin: string | null; status: string; offices: OrgOffice[]; version: number;
-  address: string | null; zipCode: string | null }
+  address: string | null; zipCode: string | null; rdoCode: string | null }
 export interface OfficeAssignment { id: string; userId: string; username: string; officeId: string; officeCode: string; officeName: string;
   departmentId: string | null; departmentCode: string | null; departmentName: string | null; effectiveFrom: string; effectiveTo: string | null;
   createdBy: string; endedBy: string | null }
@@ -1433,3 +1441,37 @@ export interface AdHocFilter { column: string; op: string; value: string; value2
 export interface AdHocDefinition { columns: string[]; filters: AdHocFilter[]; groupBy: string[]; sort: { column: string; descending: boolean }[]; limit?: number }
 export interface AdHocResult { columns: AdHocColumn[]; rows: (string | number | null)[][]; totals: (string | number | null)[]; truncated: boolean }
 export interface AdHocSaved { id: string; name: string; dataset: string; definition: AdHocDefinition; shared: boolean; owner: string; mine: boolean; updatedAt: string; version: number }
+
+// ---------------------------------------------------------------- BIR lists (QAP, 1604-E, SAWT, SLSP)
+
+export interface BirPayeeRow {
+  sequence: number; supplierId: string; supplierCode: string; tin: string | null; payeeType: string | null; registeredName: string;
+  lastName: string | null; firstName: string | null; middleName: string | null; atc: string | null; nature: string | null; taxRate: string;
+  incomePayment: string; taxWithheld: string; missing: string[];
+}
+
+export interface BirAlphalist {
+  form: '1601EQ' | '1604E'; period: string; returnPeriod: string; fileName: string | null; payorMissing: string[]; rows: BirPayeeRow[];
+  totalIncomePayment: string; totalTaxWithheld: string; ready: boolean; basis: string;
+}
+
+export interface SawtRow {
+  sequence: number; customerId: string; customerCode: string; tin: string | null; name: string; atc: string; nature: string; taxRate: string;
+  incomePayment: string; taxWithheld: string; receipts: number; missing: string[];
+}
+
+export interface Sawt {
+  year: number; quarter: number; rows: SawtRow[];
+  uncertified: { receiptId: string; receiptNumber: string; receiptDate: string; customerName: string; taxWithheld: string }[];
+  totalIncomePayment: string; totalTaxWithheld: string; basis: string;
+}
+
+export interface VatListingRow {
+  partyId: string; code: string; tin: string | null; name: string; address: string | null; exempt: string; zeroRated: string; taxable: string;
+  vat: string; gross: string; documents: number; missing: string[];
+}
+
+export interface VatListing {
+  list: 'SALES' | 'PURCHASES'; year: number; quarter: number; rows: VatListingRow[]; exempt: string; zeroRated: string; taxable: string;
+  vat: string; gross: string; basis: string;
+}

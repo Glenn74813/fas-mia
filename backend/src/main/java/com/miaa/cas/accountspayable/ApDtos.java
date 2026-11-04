@@ -29,7 +29,8 @@ public final class ApDtos {
             boolean vatRegistered,
             UUID defaultEwtCodeId,
             @Pattern(regexp = "^[0-9]{4}$", message = "ZIP code must be 4 digits") String zipCode, @Size(max = 500) String foreignAddress,
-            @Pattern(regexp = "INDIVIDUAL|CORPORATION") String payeeType) {
+            @Pattern(regexp = "INDIVIDUAL|CORPORATION") String payeeType,
+            @Size(max = 30) String lastName, @Size(max = 30) String firstName, @Size(max = 30) String middleName) {
     }
 
     public record SupplierUpdateRequest(@NotNull Long version, @NotBlank @Size(max = 200) String name,
@@ -37,12 +38,13 @@ public final class ApDtos {
             @Size(max = 500) String address, boolean vatRegistered, UUID defaultEwtCodeId,
             @NotNull @Pattern(regexp = "ACTIVE|INACTIVE") String status,
             @Pattern(regexp = "^[0-9]{4}$", message = "ZIP code must be 4 digits") String zipCode, @Size(max = 500) String foreignAddress,
-            @Pattern(regexp = "INDIVIDUAL|CORPORATION") String payeeType) {
+            @Pattern(regexp = "INDIVIDUAL|CORPORATION") String payeeType,
+            @Size(max = 30) String lastName, @Size(max = 30) String firstName, @Size(max = 30) String middleName) {
     }
 
     public record SupplierView(UUID id, String code, String name, String tin, String address, boolean vatRegistered,
             UUID defaultEwtCodeId, String defaultEwtCode, UUID subsidiaryAccountId, String status, BigDecimal openBalance,
-            long version, String zipCode, String foreignAddress, String payeeType) {
+            long version, String zipCode, String foreignAddress, String payeeType, String lastName, String firstName, String middleName) {
     }
 
     public record InvoiceLineRequest(@NotNull UUID accountId, UUID costCenterId, @Size(max = 500) String description,

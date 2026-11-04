@@ -6,6 +6,8 @@ import com.miaa.cas.accountsreceivable.ArDtos.ReceiptAllocationRequest;
 import com.miaa.cas.accountsreceivable.ArDtos.ReceiptRequest;
 import com.miaa.cas.accountsreceivable.ArDtos.ReceiptSummary;
 import com.miaa.cas.accountsreceivable.ArDtos.ReceiptView;
+import com.miaa.cas.accountsreceivable.ArDtos.WithholdingCertificate;
+import com.miaa.cas.accountsreceivable.ArDtos.WithholdingCertificateRequest;
 import com.miaa.cas.accountsreceivable.domain.BillingDocument;
 import com.miaa.cas.accountsreceivable.domain.BillingDocumentRepository;
 import com.miaa.cas.accountsreceivable.domain.Customer;
@@ -160,6 +162,40 @@ public class ReceiptService implements DocumentOwnerPolicy {
         insertAllocations(id, req.allocations(), false, null, now);
         audit.record("RECEIPT_RECORDED", OWNER, id, Map.of("receiptNumber", r.getReceiptNumber(), "customer", c.getCode(),
                 "amount", amount.toPlainString(), "taxWithheld", tax.toPlainString(), "allocated", allocated.toPlainString()));
+        return view(r);
+    }
+
+    /**
+     * Records the BIR Form 2307 the customer gave for the tax it withheld, for the SAWT. The certificate often arrives after
+     * the receipt is posted, so it is kept beside the receipt, which is not changed; recording it again replaces it.
+     */
+    @Transactional
+    public ReceiptView recordCertificate(UUID id, WithholdingCertificateRequest req) {
+        if (!CurrentActor.hasPermission("COLLECTION_RECORD") && !CurrentActor.hasPermission("JOURNAL_POST")) {
+            throw new ApiException(ErrorCode.ACCESS_DENIED, "Only collection or accounting staff can record a certificate.");
+        }
+        Receipt r = receipts.findById(id).orElseThrow(() -> ApiException.notFound("Receipt"));
+        if ("CANCELLED".equals(r.getStatus()) || r.getTaxWithheld().signum() <= 0) {
+            throw BillingService.state("Only receipts with tax withheld, not cancelled, take a certificate.");
+        }
+        Integer known = jdbc.queryForObject("SELECT count(*) FROM bir_atc_codes WHERE atc = ?", Integer.class, req.atc());
+        if (known == null || known == 0) {
+            throw new ApiException(ErrorCode.VALIDATION_FAILED, req.atc() + " is not on the schedule of alphanumeric tax codes.");
+        }
+        BigDecimal income = Money.of(req.incomePayment());
+        if (income.compareTo(r.getTaxWithheld()) <= 0) {
+            throw new ApiException(ErrorCode.VALIDATION_FAILED, "The income payment must be more than the tax withheld.");
+        }
+        WithholdingCertificate before = certificate(id);
+        jdbc.update("""
+                INSERT INTO receipt_withholding_certificates (receipt_id, atc, income_payment, received_on, recorded_by, recorded_at)
+                VALUES (?, ?, ?, ?, ?, ?) ON CONFLICT (receipt_id) DO UPDATE SET atc = EXCLUDED.atc, income_payment = EXCLUDED.income_payment,
+                received_on = EXCLUDED.received_on, recorded_by = EXCLUDED.recorded_by, recorded_at = EXCLUDED.recorded_at""",
+                id, req.atc(), income, java.sql.Date.valueOf(req.receivedOn()), CurrentActor.username(), Timestamp.from(Instant.now(clock)));
+        Map<String, Object> after = Map.of("atc", req.atc(), "incomePayment", income.toPlainString(), "receivedOn", req.receivedOn().toString());
+        audit.record("RECEIPT_2307_RECORDED", OWNER, id, before == null ? Map.of("receiptNumber", r.getReceiptNumber(), "after", after)
+                : Map.of("receiptNumber", r.getReceiptNumber(), "after", after, "before", Map.of("atc", before.atc(),
+                        "incomePayment", before.incomePayment().toPlainString(), "receivedOn", before.receivedOn().toString())));
         return view(r);
     }
 
@@ -421,9 +457,21 @@ public class ReceiptService implements DocumentOwnerPolicy {
                 && CurrentActor.hasPermission("JOURNAL_POST")) {
             actions.add("APPLY");
         }
+        if (!"CANCELLED".equals(r.getStatus()) && r.getTaxWithheld().signum() > 0
+                && (CurrentActor.hasPermission("COLLECTION_RECORD") || CurrentActor.hasPermission("JOURNAL_POST"))) {
+            actions.add("CERTIFICATE");
+        }
         return new ReceiptView(r.getId(), r.getReceiptNumber(), c.getId(), c.getCode(), c.getName(), r.getReceiptDate(),
                 r.getPaymentMethod(), r.getPaymentReference(), r.getAmount(), r.getTaxWithheld(), allocated,
                 r.getUnappliedAmount(), r.getStatus(), r.getRemarks(), r.getRecordedBy(), r.getCancelReason(),
-                r.getPostedEntryId(), entryNumber, allocs, documents.list(OWNER, r.getId()), actions, r.getVersion());
+                r.getPostedEntryId(), entryNumber, allocs, documents.list(OWNER, r.getId()), actions, r.getVersion(), certificate(r.getId()));
+    }
+
+    private WithholdingCertificate certificate(UUID receiptId) {
+        return jdbc.query("""
+                SELECT c.atc, a.description, c.income_payment, c.received_on, c.recorded_by, c.recorded_at
+                FROM receipt_withholding_certificates c JOIN bir_atc_codes a ON a.atc = c.atc WHERE c.receipt_id = ?""",
+                (rs, i) -> new WithholdingCertificate(rs.getString(1), rs.getString(2), rs.getBigDecimal(3), rs.getDate(4).toLocalDate(),
+                        rs.getString(5), rs.getTimestamp(6).toInstant()), receiptId).stream().findFirst().orElse(null);
     }
 }

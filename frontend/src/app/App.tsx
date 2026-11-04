@@ -68,6 +68,7 @@ import { ApiAccessPage } from '../features/integrations/ApiAccessPage';
 import { NrvReviewPage } from '../features/inventory/NrvReviewPage';
 import { AllocationCyclesPage } from '../features/general-ledger/AllocationCyclesPage';
 import { AdHocReportsPage } from '../features/reporting/AdHocReportsPage';
+import { BirReportsPage } from '../features/reporting/BirReportsPage';
 import { InboundFilesPage } from '../features/integrations/InboundFilesPage';
 import { IntegrationsPage } from '../features/integrations/IntegrationsPage';
 import { SupplierBankPage } from '../features/payables/SupplierBankPage';
@@ -172,6 +173,7 @@ export const routes: RouteObject[] = [
       { path: 'inventory/nrv-reviews', element: <RequireAuth anyOf={['INVENTORY_VIEW', 'INVENTORY_MANAGE']}><NrvReviewPage /></RequireAuth> },
       { path: 'inventory/reports', element: <RequireAuth anyOf={['INVENTORY_VIEW', 'AP_VIEW']}><InventoryReportsPage /></RequireAuth> },
       { path: 'reports/ad-hoc', element: <RequireAuth anyOf={['LEDGER_VIEW', 'AP_VIEW', 'AR_VIEW']}><AdHocReportsPage /></RequireAuth> },
+      { path: 'reports/bir', element: <RequireAuth anyOf={['AP_VIEW', 'AR_VIEW']}><BirReportsPage /></RequireAuth> },
       { path: 'reports/financial-statements', element: <RequireAuth anyOf={['FINANCIAL_REPORT_VIEW']}><FinancialStatementsPage /></RequireAuth> },
       { path: 'reports/jobs', element: <RequireAuth anyOf={['FINANCIAL_REPORT_VIEW', 'FINANCIAL_REPORT_EXPORT', 'BUDGET_VIEW', 'AP_VIEW', 'AR_VIEW',
         'FA_VIEW', 'INVENTORY_VIEW', 'AUDIT_LOG_VIEW', 'SECURITY_EVENT_VIEW']}><ReportJobsPage /></RequireAuth> },

@@ -1,10 +1,11 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useRef, useState } from 'react';
 import { Link, useParams } from 'react-router';
-import { customerApi, receiptApi } from '../../api/endpoints';
+import { customerApi, receiptApi, settingsApi } from '../../api/endpoints';
 import type { ReceiptView } from '../../api/types';
 import { ActionDialog, type ActionSpec } from '../../components/ActionDialog';
 import { Button } from '../../components/Button';
+import { Combobox } from '../../components/Combobox';
 import { DocumentsPanel } from '../../components/DocumentsPanel';
 import { ErrorAlert } from '../../components/ErrorAlert';
 import { Field } from '../../components/Field';
@@ -24,6 +25,59 @@ const SPECS: Record<Kind, ActionSpec> = {
     commentRequired: true, commentLabel: 'Reason', danger: true },
   apply: { title: 'Apply unapplied amount', text: 'Posts Dr unapplied collections / Cr accounts receivable for the amounts below.', confirm: 'Apply and post' },
 };
+
+/**
+ * The BIR Form 2307 the customer gave for the tax it withheld. It is listed on the SAWT, and often arrives after the receipt
+ * is posted, so it can be recorded or corrected at any time without changing the receipt.
+ */
+function WithholdingCertificatePanel({ rc }: { rc: ReceiptView }) {
+  const qc = useQueryClient();
+  const c = rc.certificate;
+  const editable = rc.availableActions.includes('CERTIFICATE');
+  const [editing, setEditing] = useState(false);
+  const [form, setForm] = useState({ atc: c?.atc ?? '', incomePayment: c?.incomePayment ?? '', receivedOn: c?.receivedOn ?? new Date().toISOString().slice(0, 10) });
+  const catalogue = useQuery({ queryKey: ['atc-catalogue'], queryFn: settingsApi.atcCatalogue, enabled: editing, staleTime: Infinity });
+  const save = useMutation({ mutationFn: () => receiptApi.recordCertificate(rc.id, form),
+    onSuccess: (x) => { qc.setQueryData(['receipt', rc.id], x); setEditing(false); } });
+  if (Number(rc.taxWithheld) <= 0) return null;
+  return (
+    <section className="rounded-xl border border-slate-200/80 bg-white shadow-xs p-5" aria-label="Customer's BIR Form 2307">
+      <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
+        <h2 className="font-semibold">Customer's BIR Form 2307</h2>
+        {editable && !editing && <Button variant="secondary" onClick={() => { save.reset(); setEditing(true); }}>{c ? 'Change' : 'Record certificate'}</Button>}
+      </div>
+      {!editing && (c ? (
+        <dl className="grid gap-2 text-sm sm:grid-cols-4">
+          <dt className="text-slate-500">ATC</dt><dd><span className="font-mono">{c.atc}</span> <span className="text-slate-600">{c.atcDescription}</span></dd>
+          <dt className="text-slate-500">Income payment</dt><dd><Money value={c.incomePayment} /></dd>
+          <dt className="text-slate-500">Received</dt><dd>{c.receivedOn}</dd>
+          <dt className="text-slate-500">Recorded by</dt><dd>{c.recordedBy}, {formatDateTime(c.recordedAt)}</dd>
+        </dl>
+      ) : <p className="text-sm text-amber-700">Not recorded yet. Until it is, this receipt's tax withheld is left off the SAWT.</p>)}
+      {editing && (
+        <div className="space-y-3">
+          <ErrorAlert error={save.error ?? catalogue.error} />
+          <div className="grid gap-3 md:grid-cols-[2fr_1fr_1fr] md:items-end">
+            <div className="space-y-1.5">
+              <label htmlFor="cert-atc" className="block text-sm font-medium text-slate-700">ATC on the certificate</label>
+              <Combobox id="cert-atc" value={form.atc} onChange={(v) => setForm({ ...form, atc: v })} placeholder="Search code or payment"
+                className="block w-full rounded-lg border border-slate-300 px-3 py-2 shadow-xs text-sm"
+                options={(catalogue.data ?? []).map((a) => ({ value: a.atc, label: `${a.atc} — ${a.description}` }))} />
+            </div>
+            <Field label="Income payment" hint="Total on the certificate" inputMode="decimal" value={form.incomePayment}
+              onChange={(e) => setForm({ ...form, incomePayment: e.target.value.replace(/[^\d.]/g, '') })} />
+            <Field label="Date received" type="date" value={form.receivedOn} onChange={(e) => setForm({ ...form, receivedOn: e.target.value })} />
+          </div>
+          <div className="flex gap-2">
+            <Button busy={save.isPending} disabled={!form.atc || !isValidAmount(form.incomePayment) || !form.receivedOn} onClick={() => save.mutate()}>
+              Save certificate</Button>
+            <Button variant="secondary" onClick={() => setEditing(false)}>Cancel</Button>
+          </div>
+        </div>
+      )}
+    </section>
+  );
+}
 
 export function ReceiptDetailPage() {
   const { id = '' } = useParams();
@@ -100,6 +154,7 @@ export function ReceiptDetailPage() {
               {rc.allocations.length === 0 && <tr><td colSpan={4} className="py-3 text-center text-slate-500">Not applied to any document.</td></tr>}</tbody>
           </table>
         </section>
+        <WithholdingCertificatePanel key={rc.certificate?.recordedAt ?? 'none'} rc={rc} />
         <DocumentsPanel documents={rc.documents} canUpload={can('UPLOAD')} onUpload={(f) => upload.mutate(f)} uploading={upload.isPending}
           error={upload.error} requiredNote="e.g. deposit slip, check image or withholding certificate" />
       </div>

@@ -145,7 +145,16 @@ public final class ArDtos {
             LocalDate receiptDate, String paymentMethod, String paymentReference, BigDecimal amount, BigDecimal taxWithheld,
             BigDecimal allocatedAmount, BigDecimal unappliedAmount, String status, String remarks, String recordedBy,
             String cancelReason, UUID postedEntryId, String postedEntryNumber, List<AllocationView> allocations,
-            List<DocumentInfo> documents, List<String> availableActions, long version) {
+            List<DocumentInfo> documents, List<String> availableActions, long version, WithholdingCertificate certificate) {
+    }
+
+    /** The BIR Form 2307 a customer gave for the tax it withheld from a receipt, as listed on the SAWT. */
+    public record WithholdingCertificate(String atc, String atcDescription, BigDecimal incomePayment, LocalDate receivedOn,
+            String recordedBy, Instant recordedAt) {
+    }
+
+    public record WithholdingCertificateRequest(@NotBlank @Pattern(regexp = "^[A-Z]{2}[0-9]{3}$") String atc,
+            @NotNull @Positive @Digits(integer = 17, fraction = 2) BigDecimal incomePayment, @NotNull LocalDate receivedOn) {
     }
 
     public record OpenItem(UUID id, String kind, String documentNumber, LocalDate documentDate, LocalDate dueDate,

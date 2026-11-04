@@ -122,6 +122,7 @@ export const ADMINISTRATION_HELP: Record<string, ModuleHelp> = {
     title: 'Organisation',
     summary: 'Maintains the organisation’s offices and departments, and the cost centre a department’s work is usually charged to. It also records which office each user belongs to.',
     steps: [
+      'Under the organisation name, fill in its TIN, Registered address, ZIP code and RDO code and click Save details; BIR Form 2307 and the BIR alphalists print them.',
       'Under an organisation, enter an Office code and Office name and click Add office.',
       'For an office, enter a department Code and Department name, optionally choose a Cost centre, and add it.',
       'Use Deactivate or Reactivate on an office or department when it opens or closes.',

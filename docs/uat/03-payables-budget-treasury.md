@@ -54,6 +54,10 @@ Role assignments follow the proposed matrix (C-08); tax codes and rates are plac
 | 3 | Expanded withholding schedule for the quarter | Base and tax withheld per supplier and tax code, by month, with what each supplier's BIR Form 2307 still needs |
 | 3a | Download a supplier's BIR Form 2307, with details missing and then complete | The official form with period, payee, payor, ATC and amounts in their boxes; a DRAFT watermark and -DRAFT file name until complete; signature blocks blank; an audit event for each |
 | 3b | Set an ATC on a withholding code from Finance settings, then set a supplier of the other type on the same code | Only codes on the BIR schedule can be chosen; the schedule reports the mismatch and the certificate stays a draft |
+| 3c | Reports › BIR reports, QAP (1601-EQ) for the quarter, with a supplier missing its TIN or type, then complete; set an individual supplier's last and first name and the organisation's TIN and RDO code | DETAILS MISSING with what each payee still needs and no DAT file; once complete, READY TO FILE and **Download DAT file** gives `<TIN><branch><MMYYYY>1601EQ.DAT` with the HQAP, D1 and C1 records of RMC 7-2021 Annex A; the file passes BIR's Alphalist Data Entry and Validation Module (C-39) |
+| 3d | Alphalist (1604-E) for the year | The year's payees by ATC; `<TIN><branch>1231<YYYY>1604E.DAT` with the H1604E, D3 and C3 records |
+| 3e | On a posted receipt with tax withheld, click Record certificate and enter the customer's BIR 2307 (ATC, income payment, date received); then BIR reports › SAWT | Before: the receipt is listed as without a certificate. After: the customer is on the SAWT with the ATC, income payment, rate and tax withheld; the receipt itself is unchanged; changing the certificate is in the audit trail |
+| 3f | BIR reports › Sales (SLS) and Purchases (SLP), then Excel | Per customer and supplier: exempt, zero-rated and taxable amounts with output or input VAT, matching the posted billings and supplier invoices of the quarter |
 
 - Result: ☐ Pass ☐ Fail ☐ Blocked · Tester: ______ · Date: ______ · Defect: ______
 

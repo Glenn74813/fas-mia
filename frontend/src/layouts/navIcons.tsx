@@ -38,6 +38,7 @@ export const NAV_ICONS: Record<string, LucideIcon> = {
   '/budgets': ChartPie,
   '/reports/financial-statements': Scale,
   '/reports/ad-hoc': TableProperties,
+  '/reports/bir': Landmark,
   '/reports/jobs': ScrollText,
   '/general-ledger/trial-balance': Scale,
   '/general-ledger/account-ledger': BookText,
