@@ -1,6 +1,6 @@
 // Typed mirrors of the backend DTOs (backend is the source of truth; see /v3/api-docs).
 
-/** DEV_MFA_BYPASS is returned only by a development server, for users configured to skip the authenticator code. */
+/** DEV_MFA_BYPASS is returned for users configured to skip the authenticator code: dev-bypass users on a development server, and demo accounts. */
 export type LoginStatus = 'MFA_REQUIRED' | 'MFA_ENROLLMENT_REQUIRED' | 'DEV_MFA_BYPASS';
 
 export interface LoginResponse {

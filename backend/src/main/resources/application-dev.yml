@@ -28,6 +28,8 @@ cas:
   # Everyone else, including the browser tests and the performance kit's users, still uses two-step verification.
   mfa:
     dev-bypass-users: admin.dev
+    # The demo accounts, as on the public demo (scripts/run-backend-demo.sh).
+    demo-exempt-users: ${CAS_MFA_DEMO_EXEMPT_USERS:demo.*,superadmin.demo,accountant.demo1,tenant.demo1}
     # The development e-mail sender writes messages, codes included, to the backend log.
     email-otp:
       enabled: true

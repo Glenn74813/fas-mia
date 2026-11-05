@@ -152,6 +152,9 @@ cas:
     anonymous-requests-per-minute: ${CAS_ANONYMOUS_REQUESTS_PER_MINUTE:120}
   mfa:
     issuer-label: AVTECH CAS
+    # DEMONSTRATION ONLY: demo accounts that sign in without the authenticator code (see DevMfaBypass). Empty, so a
+    # production server never skips it; scripts/run-backend-demo.sh sets it for the public demo.
+    demo-exempt-users: ${CAS_MFA_DEMO_EXEMPT_USERS:}
     # Codes by e-mail as an alternative second factor (TOR §4.2). Needs the SMTP relay (cas.mail), so it is off unless set.
     email-otp:
       enabled: ${CAS_MFA_EMAIL_OTP_ENABLED:false}

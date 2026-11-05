@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Runs the packaged backend in PRODUCTION mode for a public demo behind the Cloudflare Worker (docs/21):
-# MFA for everyone (no dev bypass), secure cookies, API docs off, /api only through the Worker (shared secret),
+# MFA for everyone except the demo accounts (no dev bypass), secure cookies, API docs off, /api only through the Worker (shared secret),
 # and listening on 127.0.0.1 only, so the tunnel is the one way in. Reads .env like run-backend-dev.sh.
 set -euo pipefail
 cd "$(dirname "$0")/.."
@@ -13,6 +13,9 @@ fi
 export CAS_JWT_PRIVATE_KEY_PATH="$PWD/.secrets/jwt_private.pem" CAS_JWT_PUBLIC_KEY_PATH="$PWD/.secrets/jwt_public.pem"
 export SPRING_PROFILES_ACTIVE=prod CAS_OPENAPI_ENABLED=false
 export SERVER_ADDRESS=127.0.0.1 MANAGEMENT_SERVER_ADDRESS=127.0.0.1
+# The demo accounts sign in without the authenticator code (the user asked, 5 Nov 2026); every other account, admin.dev
+# included, still needs it. Each such sign-in is recorded as a MFA_BYPASSED_DEMO security event.
+export CAS_MFA_DEMO_EXEMPT_USERS="${CAS_MFA_DEMO_EXEMPT_USERS:-demo.*,superadmin.demo,accountant.demo1,tenant.demo1}"
 # The demo's approved budget was entered on the old placeholder accounts, so budget checks on the official chart
 # warn rather than block until a budget is approved on the official accounts. Production keeps BLOCK.
 export CAS_BUDGET_ENFORCEMENT="${CAS_BUDGET_ENFORCEMENT:-WARN}"

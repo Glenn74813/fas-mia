@@ -296,7 +296,7 @@ public class AuthService {
         return completeSignIn(user, actor, client, now);
     }
 
-    /** Development only: completes the sign-in of a user named in cas.mfa.dev-bypass-users without a code. */
+    /** Completes without a code the sign-in of a user named in cas.mfa.dev-bypass-users or cas.mfa.demo-exempt-users. */
     @Transactional(noRollbackFor = ApiException.class)
     public IssuedTokens devBypass(String mfaToken, ClientInfo client) {
         UUID userId = tokens.parseMfaToken(mfaToken, MfaPurpose.VERIFY).userId();
@@ -305,7 +305,9 @@ public class AuthService {
             throw new ApiException(ErrorCode.AUTH_TOKEN_INVALID, "The sign-in step is not valid. Start again.");
         }
         Actor actor = new Actor(user.getId(), user.getUsername());
-        securityEvents.record(actor, "MFA_BYPASSED_DEV", "SUCCESS", Severity.MEDIUM, Map.of("setting", "cas.mfa.dev-bypass-users"));
+        String setting = devMfaBypass.setting(user.getUsername());
+        securityEvents.record(actor, setting.startsWith("cas.mfa.demo") ? "MFA_BYPASSED_DEMO" : "MFA_BYPASSED_DEV", "SUCCESS", Severity.MEDIUM,
+                Map.of("setting", setting));
         return completeSignIn(user, actor, client, Instant.now(clock));
     }
 
