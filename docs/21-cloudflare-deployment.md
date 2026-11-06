@@ -23,7 +23,7 @@ Browser ──HTTPS──► Cloudflare Worker "fas-mia"
 |---|---|
 | Someone finds the tunnel URL and calls the API directly | The backend refuses every `/api` request without the shared secret (`ProxyGatewayFilter`, `cas.proxy.shared-secret`). Only the Worker knows it, and it is a Cloudflare *secret* |
 | A browser forges the secret or its own IP | The Worker deletes `X-CAS-*` and `X-Forwarded-*` headers from incoming requests before adding its own |
-| Signing in without the authenticator | Demo mode is the `prod` profile: the dev MFA bypass is off. The demo accounts (`demo.*`, `superadmin.demo`, `accountant.demo1`, `tenant.demo1`) sign in with their password alone (`CAS_MFA_DEMO_EXEMPT_USERS`, set by `scripts/run-backend-demo.sh`), each sign-in a `MFA_BYPASSED_DEMO` security event; every other account, `admin.dev` included, needs its 6-digit code |
+| Signing in without the authenticator | Demo mode is the `prod` profile: the dev MFA bypass is off. The demo accounts (`superadmin.demo`, one named user per role such as `maria.santos`, and any `demo.*`) sign in with their password alone (`CAS_MFA_DEMO_EXEMPT_USERS`, set by `scripts/run-backend-demo.sh`), each sign-in a `MFA_BYPASSED_DEMO` security event; every other account needs its 6-digit code |
 | Machines on your network reaching the backend | `run-backend-demo.sh` binds the API and management ports to `127.0.0.1`; only the tunnel connects |
 | API documentation exposed | Off in demo mode (`CAS_OPENAPI_ENABLED=false`) |
 | Rate limits and audit trail seeing only the tunnel | The backend takes the real visitor address from the Worker, and only when the secret matches |

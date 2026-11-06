@@ -524,7 +524,8 @@ public class DisbursementService implements DocumentOwnerPolicy {
             }
         }
         if (awaitingCheckApproval && "PAYMENT_INSTRUCTED".equals(dv.getStatus()) && otherPreparer
-                && CurrentActor.hasPermission("CHECK_APPROVE") && !CurrentActor.username().equals(check.preparedBy())) {
+                && CurrentActor.hasPermission("CHECK_APPROVE")
+                && (CurrentActor.overridesControls() || !CurrentActor.username().equals(check.preparedBy()))) {
             actions.add("APPROVE_CHECK");
         }
         if ("PAID".equals(dv.getStatus()) && otherPreparer && CurrentActor.hasPermission("JOURNAL_POST")) {
