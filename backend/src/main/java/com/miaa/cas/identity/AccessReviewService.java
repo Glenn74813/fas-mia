@@ -103,7 +103,7 @@ public class AccessReviewService {
         CurrentActor.requirePermission("ACCESS_REVIEW_PERFORM");
         Map<String, Object> a = lock(reviewId, version);
         requireOpen(a);
-        if (CurrentActor.userId().equals(a.get("user_id"))) {
+        if (CurrentActor.isSameAs(a.get("user_id"))) {
             throw new ApiException(ErrorCode.SEGREGATION_OF_DUTIES, "You cannot review your own access.");
         }
         if (a.get("outcome") != null) {
@@ -203,7 +203,7 @@ public class AccessReviewService {
         String outcome = (String) a.get("outcome");
         List<String> actions = new ArrayList<>();
         if ("OPEN".equals(cycleStatus)) {
-            if (outcome == null && CurrentActor.hasPermission("ACCESS_REVIEW_PERFORM") && !CurrentActor.userId().equals(userId)) {
+            if (outcome == null && CurrentActor.hasPermission("ACCESS_REVIEW_PERFORM") && !CurrentActor.isSameAs(userId)) {
                 actions.add("REVIEW");
             }
             if (("MODIFY".equals(outcome) || "REVOKE".equals(outcome)) && a.get("actioned_at") == null

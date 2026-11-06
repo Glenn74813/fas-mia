@@ -172,7 +172,7 @@ public class PortalInquiryService implements DocumentOwnerPolicy {
     @Override
     public void assertCanModify(UUID ownerId) {
         Map<String, Object> r = row(ownerId);
-        if (!CurrentActor.userId().equals(r.get("submitted_by_id")) || !"OPEN".equals(r.get("status"))) {
+        if (!CurrentActor.isOrActsAs(r.get("submitted_by_id")) || !"OPEN".equals(r.get("status"))) {
             throw new ApiException(ErrorCode.ACCESS_DENIED, "Only the sender can attach files while the inquiry is open.");
         }
     }
@@ -235,7 +235,7 @@ public class PortalInquiryService implements DocumentOwnerPolicy {
         if (staff && "ANSWERED".equals(status)) {
             actions.add("CLOSE");
         }
-        if (CurrentActor.userId().equals(r.get("submitted_by_id")) && "OPEN".equals(status)) {
+        if (CurrentActor.isSameAs(r.get("submitted_by_id")) && "OPEN".equals(status)) {
             actions.add("UPLOAD");
         }
         Timestamp responded = (Timestamp) r.get("responded_at");

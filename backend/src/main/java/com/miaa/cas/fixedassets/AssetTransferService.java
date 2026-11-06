@@ -113,7 +113,7 @@ public class AssetTransferService {
     public TransferView post(UUID id, long version) {
         CurrentActor.requirePermission("JOURNAL_POST");
         Map<String, Object> t = lock(id, version);
-        if (CurrentActor.userId().equals(t.get("prepared_by_id"))) {
+        if (CurrentActor.isSameAs(t.get("prepared_by_id"))) {
             throw new ApiException(ErrorCode.SEGREGATION_OF_DUTIES, "You prepared this transfer and cannot post it.");
         }
         UUID assetId = (UUID) t.get("asset_id");
@@ -208,7 +208,7 @@ public class AssetTransferService {
         String status = (String) t.get("status");
         List<String> actions = new ArrayList<>();
         if ("DRAFT".equals(status)) {
-            if (!CurrentActor.userId().equals(t.get("prepared_by_id")) && CurrentActor.hasPermission("JOURNAL_POST")) {
+            if (!CurrentActor.isSameAs(t.get("prepared_by_id")) && CurrentActor.hasPermission("JOURNAL_POST")) {
                 actions.add("POST");
             }
             if (CurrentActor.hasPermission("FA_MANAGE") || CurrentActor.hasPermission("JOURNAL_POST")) {

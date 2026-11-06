@@ -127,7 +127,7 @@ public class DisposalService {
         if (!"DRAFT".equals(d.get("status"))) {
             throw FixedAssetService.state("Only draft disposals can be posted.");
         }
-        if (CurrentActor.userId().equals(d.get("prepared_by_id"))) {
+        if (CurrentActor.isSameAs(d.get("prepared_by_id"))) {
             throw new ApiException(ErrorCode.SEGREGATION_OF_DUTIES, "You prepared this disposal and cannot post it.");
         }
         UUID assetId = (UUID) d.get("asset_id");
@@ -249,10 +249,10 @@ public class DisposalService {
                 : (BigDecimal) d.get("asset_impairment");
         BigDecimal nbv = Money.of(cost.subtract(acc).subtract(impairment));
         BigDecimal gl = d.get("gain_loss") != null ? (BigDecimal) d.get("gain_loss") : Money.of(((BigDecimal) d.get("proceeds")).subtract(nbv));
-        boolean preparer = CurrentActor.userId().equals(d.get("prepared_by_id"));
+        boolean otherPreparer = !CurrentActor.isSameAs(d.get("prepared_by_id"));
         List<String> actions = new ArrayList<>();
         if ("DRAFT".equals(status)) {
-            if (!preparer && CurrentActor.hasPermission("JOURNAL_POST")) {
+            if (otherPreparer && CurrentActor.hasPermission("JOURNAL_POST")) {
                 actions.add("POST");
             }
             if (CurrentActor.hasPermission("FA_MANAGE") || CurrentActor.hasPermission("JOURNAL_POST")) {

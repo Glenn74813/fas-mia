@@ -60,7 +60,7 @@ public class StatementTemplateService {
                         strings(rs.getArray("counterpart_codes"))), id);
         List<String> actions = new ArrayList<>();
         boolean admin = hasActor() && CurrentActor.hasPermission("ACCOUNT_ADMINISTER");
-        if ("DRAFT".equals(t.get("status")) && admin && !CurrentActor.userId().equals(t.get("created_by_id"))) {
+        if ("DRAFT".equals(t.get("status")) && admin && !CurrentActor.isSameAs(t.get("created_by_id"))) {
             actions.add("ACTIVATE");
         }
         Timestamp act = (Timestamp) t.get("activated_at");
@@ -112,7 +112,7 @@ public class StatementTemplateService {
         if (!"DRAFT".equals(t.get("status"))) {
             throw new ApiException(ErrorCode.INVALID_STATE, "Only draft templates can be activated.");
         }
-        if (actor.userId() != null && actor.userId().equals(t.get("created_by_id"))) {
+        if (actor.userId() != null && actor.userId().equals(t.get("created_by_id")) && !CurrentActor.overridesControls()) {
             throw new ApiException(ErrorCode.SEGREGATION_OF_DUTIES, "A second administrator must activate the template you defined.");
         }
         Timestamp now = Timestamp.from(Instant.now(clock));

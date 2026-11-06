@@ -205,7 +205,7 @@ public class ReceiptService implements DocumentOwnerPolicy {
         if (!"RECORDED".equals(r.getStatus())) {
             throw BillingService.state("Only receipts not yet posted can be cancelled; posted receipts are corrected by reversal.");
         }
-        boolean recorder = CurrentActor.userId().equals(r.getRecordedById()) && CurrentActor.hasPermission("COLLECTION_RECORD");
+        boolean recorder = CurrentActor.isOrActsAs(r.getRecordedById()) && CurrentActor.hasPermission("COLLECTION_RECORD");
         if (!recorder && !CurrentActor.hasPermission("JOURNAL_POST")) {
             throw new ApiException(ErrorCode.ACCESS_DENIED, "Only the recorder or accounting can cancel this receipt.");
         }
@@ -319,7 +319,7 @@ public class ReceiptService implements DocumentOwnerPolicy {
     public void assertCanModify(UUID ownerId) {
         Receipt r = load(ownerId);
         CurrentActor.requirePermission("DOCUMENT_UPLOAD");
-        if (!CurrentActor.userId().equals(r.getRecordedById())) {
+        if (!CurrentActor.isOrActsAs(r.getRecordedById())) {
             throw new ApiException(ErrorCode.ACCESS_DENIED, "Only the recorder can change this receipt's attachments.");
         }
         if (!"RECORDED".equals(r.getStatus())) {
@@ -441,9 +441,10 @@ public class ReceiptService implements DocumentOwnerPolicy {
         String entryNumber = r.getPostedEntryId() == null ? null : jdbc.queryForObject(
                 "SELECT entry_number FROM journal_entries WHERE id = ?", String.class, r.getPostedEntryId());
         List<String> actions = new ArrayList<>();
-        boolean recorder = CurrentActor.userId().equals(r.getRecordedById());
+        boolean recorder = CurrentActor.isOrActsAs(r.getRecordedById());
+        boolean otherRecorder = !CurrentActor.isSameAs(r.getRecordedById());
         if ("RECORDED".equals(r.getStatus())) {
-            if (!recorder && CurrentActor.hasPermission("JOURNAL_POST")) {
+            if (otherRecorder && CurrentActor.hasPermission("JOURNAL_POST")) {
                 actions.add("POST");
             }
             if ((recorder && CurrentActor.hasPermission("COLLECTION_RECORD")) || CurrentActor.hasPermission("JOURNAL_POST")) {
@@ -453,7 +454,7 @@ public class ReceiptService implements DocumentOwnerPolicy {
                 actions.add("UPLOAD");
             }
         }
-        if ("POSTED".equals(r.getStatus()) && r.getUnappliedAmount().signum() > 0 && !recorder
+        if ("POSTED".equals(r.getStatus()) && r.getUnappliedAmount().signum() > 0 && otherRecorder
                 && CurrentActor.hasPermission("JOURNAL_POST")) {
             actions.add("APPLY");
         }

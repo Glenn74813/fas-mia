@@ -16,6 +16,8 @@ export SERVER_ADDRESS=127.0.0.1 MANAGEMENT_SERVER_ADDRESS=127.0.0.1
 # The demo accounts sign in without the authenticator code (the user asked, 5 Nov 2026); every other account, admin.dev
 # included, still needs it. Each such sign-in is recorded as a MFA_BYPASSED_DEMO security event.
 export CAS_MFA_DEMO_EXEMPT_USERS="${CAS_MFA_DEMO_EXEMPT_USERS:-demo.*,superadmin.demo,accountant.demo1,tenant.demo1}"
+# The demo super administrator approves, posts and edits anything, its own work included (the user asked, 6 Nov 2026).
+export CAS_DEMO_SUPERADMIN_OVERRIDES_CONTROLS="${CAS_DEMO_SUPERADMIN_OVERRIDES_CONTROLS:-true}"
 # The demo's approved budget was entered on the old placeholder accounts, so budget checks on the official chart
 # warn rather than block until a budget is approved on the official accounts. Production keeps BLOCK.
 export CAS_BUDGET_ENFORCEMENT="${CAS_BUDGET_ENFORCEMENT:-WARN}"

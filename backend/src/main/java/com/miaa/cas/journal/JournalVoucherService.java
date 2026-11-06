@@ -134,10 +134,10 @@ public class JournalVoucherService {
         WorkflowConfig.Step step = currentStep(v);
         CurrentActor.requirePermission(step.permission());
         UUID actor = CurrentActor.userId();
-        if (actor.equals(v.getPreparedById())) {
+        if (CurrentActor.isSameAs(v.getPreparedById())) {
             throw sod("You prepared this voucher and cannot " + step.code().toLowerCase() + " it.");
         }
-        if (decisions.approversInCurrentCycle(id).contains(actor)) {
+        if (!CurrentActor.overridesControls() && decisions.approversInCurrentCycle(id).contains(actor)) {
             throw sod("You already acted on an earlier step of this voucher; another person must complete this step.");
         }
         limits.require(DecisionLog.JOURNAL_VOUCHER, v.getTotalDebit());
@@ -178,7 +178,7 @@ public class JournalVoucherService {
             throw state("Only vouchers awaiting approval or posting can be " + (reject ? "rejected." : "returned."));
         }
         CurrentActor.requirePermission(permission);
-        if (CurrentActor.userId().equals(v.getPreparedById())) {
+        if (CurrentActor.isSameAs(v.getPreparedById())) {
             throw sod("The preparer cannot " + (reject ? "reject" : "return") + " their own voucher; cancel it instead.");
         }
         decisions.record(id, reject ? "REJECT" : "RETURN", stepOrder, stepCode, CurrentActor.userId(),
@@ -333,7 +333,7 @@ public class JournalVoucherService {
 
     private static void requirePreparer(JournalVoucher v, String action) {
         CurrentActor.requirePermission("JOURNAL_CREATE");
-        if (!CurrentActor.userId().equals(v.getPreparedById())) {
+        if (!CurrentActor.isOrActsAs(v.getPreparedById())) {
             throw new ApiException(ErrorCode.ACCESS_DENIED, "Only the preparer can " + action + " this voucher.");
         }
     }

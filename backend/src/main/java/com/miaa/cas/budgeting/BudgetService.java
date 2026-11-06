@@ -214,7 +214,7 @@ public class BudgetService {
         if (!"PENDING".equals(adj.get("status"))) {
             throw new ApiException(ErrorCode.INVALID_STATE, "The adjustment has already been decided.");
         }
-        if (CurrentActor.userId().equals(adj.get("requested_by_id"))) {
+        if (CurrentActor.isSameAs(adj.get("requested_by_id"))) {
             throw new ApiException(ErrorCode.SEGREGATION_OF_DUTIES, "Adjustments must be decided by someone other than the requester.");
         }
         UUID budgetId = (UUID) adj.get("budget_id");
@@ -282,7 +282,7 @@ public class BudgetService {
         BigDecimal act = sum(lines, AllocationLine::actual);
         BigDecimal avail = sum(lines, AllocationLine::available);
         List<String> actions = new ArrayList<>();
-        boolean preparer = CurrentActor.userId().equals(b.getPreparedById());
+        boolean preparer = CurrentActor.isOrActsAs(b.getPreparedById());
         if (b.isEditable() && preparer && CurrentActor.hasPermission("BUDGET_PREPARE")) {
             actions.add("EDIT");
             actions.add("SUBMIT");
@@ -334,7 +334,7 @@ public class BudgetService {
 
     private static void requirePreparer(Budget b) {
         CurrentActor.requirePermission("BUDGET_PREPARE");
-        if (!CurrentActor.userId().equals(b.getPreparedById())) {
+        if (!CurrentActor.isOrActsAs(b.getPreparedById())) {
             throw new ApiException(ErrorCode.ACCESS_DENIED, "Only the preparer can change this budget.");
         }
     }

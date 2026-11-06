@@ -112,7 +112,7 @@ public class PostingService {
                     ? "This voucher has already been posted as " + v.getVoucherNumber() + "."
                     : "Only approved vouchers can be posted.");
         }
-        if (actorId.equals(v.getPreparedById())) {
+        if (CurrentActor.isSameAs(v.getPreparedById())) {
             throw JournalVoucherService.sod("The preparer of a voucher cannot post it.");
         }
         postCore(v, false);
@@ -131,7 +131,7 @@ public class PostingService {
             throw new IllegalArgumentException("Sub-ledger source types must start with SL_");
         }
         CurrentActor.requirePermission("JOURNAL_POST");
-        if (CurrentActor.userId().equals(e.preparedById())) {
+        if (CurrentActor.isSameAs(e.preparedById())) {
             throw JournalVoucherService.sod("The preparer of a document cannot post it to the ledger.");
         }
         AccountingPeriod period = calendar.resolve(e.accountingDate(), false);

@@ -178,7 +178,7 @@ public class DataExportService {
         if (!"REQUESTED".equals(e.get("status"))) {
             throw new ApiException(ErrorCode.INVALID_STATE, "The export has already been " + e.get("status").toString().toLowerCase() + ".");
         }
-        if (CurrentActor.userId().equals(e.get("requested_by_id"))) {
+        if (CurrentActor.isSameAs(e.get("requested_by_id"))) {
             throw new ApiException(ErrorCode.SEGREGATION_OF_DUTIES, "Another person must approve your export request.");
         }
         String n = note == null || note.isBlank() ? null : note.trim();
@@ -211,7 +211,7 @@ public class DataExportService {
     public Download prepareDownload(UUID id) {
         CurrentActor.requirePermission(PERMISSION);
         Map<String, Object> e = row(id, false);
-        if (!CurrentActor.userId().equals(e.get("requested_by_id"))) {
+        if (!CurrentActor.isOrActsAs(e.get("requested_by_id"))) {
             throw ApiException.notFound("Data export");
         }
         if (!"DONE".equals(e.get("status"))) {

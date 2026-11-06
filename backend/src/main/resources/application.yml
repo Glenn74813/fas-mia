@@ -99,6 +99,10 @@ springdoc:
   default-produces-media-type: application/json
 
 cas:
+  # DEMONSTRATION ONLY: the demo super administrator passes the four-eyes controls (CurrentActor.overridesControls).
+  # Off unless the demo start script or the dev profile turns it on.
+  demo:
+    superadmin-overrides-controls: ${CAS_DEMO_SUPERADMIN_OVERRIDES_CONTROLS:false}
   # Outbound TLS (TlsPolicy): TLSv1.3 only. TLSv1.2 may be added ("TLSv1.3 TLSv1.2") only for a listed legacy
   # integration, with the reason in CAS_TLS_LEGACY_JUSTIFICATION; the prod profile refuses it otherwise.
   tls:

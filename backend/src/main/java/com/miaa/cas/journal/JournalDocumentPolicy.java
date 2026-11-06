@@ -28,7 +28,7 @@ public class JournalDocumentPolicy implements DocumentOwnerPolicy {
     public void assertCanModify(UUID ownerId) {
         JournalVoucher v = vouchers.findById(ownerId).orElseThrow(() -> ApiException.notFound("Journal voucher"));
         CurrentActor.requirePermission("DOCUMENT_UPLOAD");
-        if (!CurrentActor.userId().equals(v.getPreparedById())) {
+        if (!CurrentActor.isOrActsAs(v.getPreparedById())) {
             throw new ApiException(ErrorCode.ACCESS_DENIED, "Only the preparer can change this voucher's documents.");
         }
         if (!v.getStatus().isEditable()) {
@@ -39,7 +39,7 @@ public class JournalDocumentPolicy implements DocumentOwnerPolicy {
     @Override
     public void assertCanView(UUID ownerId) {
         JournalVoucher v = vouchers.findById(ownerId).orElseThrow(() -> ApiException.notFound("Journal voucher"));
-        if (!CurrentActor.hasPermission("LEDGER_VIEW") && !CurrentActor.userId().equals(v.getPreparedById())) {
+        if (!CurrentActor.hasPermission("LEDGER_VIEW") && !CurrentActor.isSameAs(v.getPreparedById())) {
             throw new ApiException(ErrorCode.ACCESS_DENIED, "You do not have permission to view this voucher.");
         }
     }

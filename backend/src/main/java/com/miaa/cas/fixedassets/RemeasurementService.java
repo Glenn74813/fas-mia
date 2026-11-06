@@ -132,7 +132,7 @@ public class RemeasurementService {
         if (!"DRAFT".equals(r.get("status"))) {
             throw FixedAssetService.state("Only drafts can be posted.");
         }
-        if (CurrentActor.userId().equals(r.get("prepared_by_id"))) {
+        if (CurrentActor.isSameAs(r.get("prepared_by_id"))) {
             throw new ApiException(ErrorCode.SEGREGATION_OF_DUTIES, "You prepared this " + kindText(r) + " and cannot post it.");
         }
         String kind = (String) r.get("kind");
@@ -364,7 +364,7 @@ public class RemeasurementService {
         }
         List<String> actions = new ArrayList<>();
         if ("DRAFT".equals(status)) {
-            if (CurrentActor.isPresent() && !CurrentActor.userId().equals(r.get("prepared_by_id")) && CurrentActor.hasPermission("JOURNAL_POST")) {
+            if (CurrentActor.isPresent() && !CurrentActor.isSameAs(r.get("prepared_by_id")) && CurrentActor.hasPermission("JOURNAL_POST")) {
                 actions.add("POST");
             }
             if (CurrentActor.hasPermission("FA_MANAGE") || CurrentActor.hasPermission("JOURNAL_POST")) {

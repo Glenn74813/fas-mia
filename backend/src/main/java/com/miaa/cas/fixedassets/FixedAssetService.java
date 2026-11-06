@@ -171,7 +171,7 @@ public class FixedAssetService {
         if (!"DRAFT".equals(a.get("status"))) {
             throw state("Only draft assets can be activated.");
         }
-        if (CurrentActor.userId().equals(a.get("prepared_by_id"))) {
+        if (CurrentActor.isSameAs(a.get("prepared_by_id"))) {
             throw new ApiException(ErrorCode.SEGREGATION_OF_DUTIES, "You registered this asset and cannot activate it.");
         }
         CategoryView cat = setup.category((UUID) a.get("category_id"));
@@ -320,10 +320,10 @@ public class FixedAssetService {
         List<UUID> disposalIds = jdbc.queryForList("SELECT id FROM asset_disposals WHERE asset_id = ? AND status <> 'CANCELLED'",
                 UUID.class, id);
         String status = (String) a.get("status");
-        boolean preparer = CurrentActor.userId().equals(a.get("prepared_by_id"));
+        boolean otherPreparer = !CurrentActor.isSameAs(a.get("prepared_by_id"));
         List<String> actions = new ArrayList<>();
         if ("DRAFT".equals(status)) {
-            if (!preparer && CurrentActor.hasPermission("JOURNAL_POST")) {
+            if (otherPreparer && CurrentActor.hasPermission("JOURNAL_POST")) {
                 actions.add("ACTIVATE");
             }
             if (CurrentActor.hasPermission("FA_MANAGE")) {

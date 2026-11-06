@@ -82,7 +82,7 @@ public class AnomalyReviewService {
         if (!"OPEN".equals(f.status())) {
             throw new ApiException(ErrorCode.INVALID_STATE, "The finding has already been reviewed.");
         }
-        if (f.involvedUsers().contains(CurrentActor.username())) {
+        if (f.involvedUsers().contains(CurrentActor.username()) && !CurrentActor.overridesControls()) {
             throw new ApiException(ErrorCode.SEGREGATION_OF_DUTIES, "You are involved in this document; another reviewer must review it.");
         }
         Instant now = Instant.now(clock);

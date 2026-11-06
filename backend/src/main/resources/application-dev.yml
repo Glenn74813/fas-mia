@@ -36,6 +36,8 @@ cas:
   # DEMONSTRATION ONLY: one account with every internal permission (DemoSuperAdministrator). Created when the
   # username is set and does not exist yet; it still needs its authenticator code.
   demo:
+    # The demo super administrator approves, posts and edits anything, its own work included (CurrentActor).
+    superadmin-overrides-controls: ${CAS_DEMO_SUPERADMIN_OVERRIDES_CONTROLS:true}
     superadmin:
       username: ${CAS_DEMO_SUPERADMIN_USERNAME:}
       email: ${CAS_DEMO_SUPERADMIN_EMAIL:}

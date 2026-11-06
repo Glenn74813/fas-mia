@@ -186,7 +186,7 @@ public class DepositService implements DocumentOwnerPolicy {
         if (!"RECORDED".equals(d.get("status"))) {
             throw new ApiException(ErrorCode.INVALID_STATE, "Only deposits not yet posted can be cancelled.");
         }
-        boolean preparer = CurrentActor.userId().equals(d.get("prepared_by_id")) && CurrentActor.hasPermission("DEPOSIT_PREPARE");
+        boolean preparer = CurrentActor.isOrActsAs(d.get("prepared_by_id")) && CurrentActor.hasPermission("DEPOSIT_PREPARE");
         if (!preparer && !CurrentActor.hasPermission("JOURNAL_POST")) {
             throw new ApiException(ErrorCode.ACCESS_DENIED, "Only the preparer or accounting can cancel this deposit.");
         }
@@ -206,7 +206,7 @@ public class DepositService implements DocumentOwnerPolicy {
     public void assertCanModify(UUID ownerId) {
         Map<String, Object> d = row(ownerId);
         CurrentActor.requirePermission("DOCUMENT_UPLOAD");
-        if (!CurrentActor.userId().equals(d.get("prepared_by_id"))) {
+        if (!CurrentActor.isOrActsAs(d.get("prepared_by_id"))) {
             throw new ApiException(ErrorCode.ACCESS_DENIED, "Only the preparer can change this deposit's attachments.");
         }
         if (!"RECORDED".equals(d.get("status"))) {
@@ -254,10 +254,11 @@ public class DepositService implements DocumentOwnerPolicy {
         String entryNumber = entryId == null ? null
                 : jdbc.queryForObject("SELECT entry_number FROM journal_entries WHERE id = ?", String.class, entryId);
         String status = (String) d.get("status");
-        boolean preparer = CurrentActor.userId().equals(d.get("prepared_by_id"));
+        boolean preparer = CurrentActor.isOrActsAs(d.get("prepared_by_id"));
+        boolean otherPreparer = !CurrentActor.isSameAs(d.get("prepared_by_id"));
         List<String> actions = new ArrayList<>();
         if ("RECORDED".equals(status)) {
-            if (!preparer && CurrentActor.hasPermission("JOURNAL_POST")) {
+            if (otherPreparer && CurrentActor.hasPermission("JOURNAL_POST")) {
                 actions.add("POST");
             }
             if ((preparer && CurrentActor.hasPermission("DEPOSIT_PREPARE")) || CurrentActor.hasPermission("JOURNAL_POST")) {

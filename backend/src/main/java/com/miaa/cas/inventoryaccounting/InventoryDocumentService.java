@@ -282,7 +282,7 @@ public class InventoryDocumentService {
         if (!"DRAFT".equals(d.get("status"))) {
             throw state("Only draft documents can be posted.");
         }
-        if (CurrentActor.userId().equals(d.get("prepared_by_id"))) {
+        if (CurrentActor.isSameAs(d.get("prepared_by_id"))) {
             throw new ApiException(ErrorCode.SEGREGATION_OF_DUTIES, "You prepared this document and cannot post it.");
         }
         String kind = (String) d.get("kind");
@@ -511,10 +511,10 @@ public class InventoryDocumentService {
                         rs.getBigDecimal("quantity"), rs.getBigDecimal("unit_cost"), rs.getBigDecimal("system_quantity"),
                         rs.getBigDecimal("value")), id);
         String status = (String) d.get("status");
-        boolean preparer = CurrentActor.userId().equals(d.get("prepared_by_id"));
+        boolean otherPreparer = !CurrentActor.isSameAs(d.get("prepared_by_id"));
         List<String> actions = new ArrayList<>();
         if ("DRAFT".equals(status)) {
-            if (!preparer && CurrentActor.hasPermission("JOURNAL_POST")) {
+            if (otherPreparer && CurrentActor.hasPermission("JOURNAL_POST")) {
                 actions.add("POST");
             }
             if (CurrentActor.hasPermission("INVENTORY_MANAGE") || CurrentActor.hasPermission("JOURNAL_POST")) {

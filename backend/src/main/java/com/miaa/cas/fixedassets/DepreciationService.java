@@ -183,7 +183,7 @@ public class DepreciationService {
         if (!"DRAFT".equals(r.get("status"))) {
             throw FixedAssetService.state("Only draft runs can be cancelled; posted depreciation is corrected by a later run or a reversal voucher.");
         }
-        boolean preparer = CurrentActor.userId().equals(r.get("prepared_by_id")) && CurrentActor.hasPermission("FA_MANAGE");
+        boolean preparer = CurrentActor.isOrActsAs(r.get("prepared_by_id")) && CurrentActor.hasPermission("FA_MANAGE");
         if (!preparer && !CurrentActor.hasPermission("JOURNAL_POST")) {
             throw new ApiException(ErrorCode.ACCESS_DENIED, "Only the preparer or accounting can cancel this run.");
         }
@@ -273,10 +273,11 @@ public class DepreciationService {
                 WHERE dl.run_id = ? ORDER BY a.asset_number""", (rs, i) -> new RunLine(rs.getObject(1, UUID.class), rs.getString(2),
                 rs.getString(3), rs.getString(4), rs.getBigDecimal(5), Money.of(rs.getBigDecimal("acc_after")),
                 Money.of(rs.getBigDecimal("cost").subtract(rs.getBigDecimal("acc_after")))), Date.valueOf(end), id);
-        boolean preparer = CurrentActor.userId().equals(r.get("prepared_by_id"));
+        boolean preparer = CurrentActor.isOrActsAs(r.get("prepared_by_id"));
+        boolean otherPreparer = !CurrentActor.isSameAs(r.get("prepared_by_id"));
         List<String> actions = new ArrayList<>();
         if ("DRAFT".equals(status)) {
-            if (!preparer && CurrentActor.hasPermission("JOURNAL_POST")) {
+            if (otherPreparer && CurrentActor.hasPermission("JOURNAL_POST")) {
                 actions.add("POST");
             }
             if ((preparer && CurrentActor.hasPermission("FA_MANAGE")) || CurrentActor.hasPermission("JOURNAL_POST")) {

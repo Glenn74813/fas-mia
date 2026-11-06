@@ -59,11 +59,11 @@ public class DocumentWorkflow {
         Step step = current(documentType, total, currentStep);
         CurrentActor.requirePermission(step.permission());
         UUID actor = CurrentActor.userId();
-        if (actor.equals(preparerId)) {
+        if (CurrentActor.isSameAs(preparerId)) {
             throw new ApiException(ErrorCode.SEGREGATION_OF_DUTIES,
                     "You prepared this document and cannot " + step.code().toLowerCase() + " it.");
         }
-        if (decisions.approversInCurrentCycle(documentType, documentId).contains(actor)) {
+        if (!CurrentActor.overridesControls() && decisions.approversInCurrentCycle(documentType, documentId).contains(actor)) {
             throw new ApiException(ErrorCode.SEGREGATION_OF_DUTIES,
                     "You already acted on an earlier step of this document; another person must complete this step.");
         }
@@ -81,7 +81,7 @@ public class DocumentWorkflow {
         }
         Step step = current(documentType, total, currentStep);
         CurrentActor.requirePermission(step.permission());
-        if (CurrentActor.userId().equals(preparerId)) {
+        if (CurrentActor.isSameAs(preparerId)) {
             throw new ApiException(ErrorCode.SEGREGATION_OF_DUTIES, "The preparer cannot " + (reject ? "reject" : "return")
                     + " their own document; cancel it instead.");
         }
@@ -108,12 +108,13 @@ public class DocumentWorkflow {
 
     /** True when the current user could take the current step (UI hint). */
     public boolean canAct(String documentType, UUID documentId, BigDecimal total, Integer currentStep, UUID preparerId) {
-        if (currentStep == null || CurrentActor.userId().equals(preparerId)) {
+        if (currentStep == null || CurrentActor.isSameAs(preparerId)) {
             return false;
         }
         return steps(documentType, total).stream().filter(s -> s.order() == currentStep).findFirst()
                 .map(s -> CurrentActor.hasPermission(s.permission()) && limits.allows(documentType, total)
-                        && !decisions.approversInCurrentCycle(documentType, documentId).contains(CurrentActor.userId()))
+                        && (CurrentActor.overridesControls()
+                                || !decisions.approversInCurrentCycle(documentType, documentId).contains(CurrentActor.userId())))
                 .orElse(false);
     }
 

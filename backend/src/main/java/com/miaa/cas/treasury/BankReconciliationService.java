@@ -453,7 +453,7 @@ public class BankReconciliationService {
                         + "must be identified (Phase 5 migration) or matched.");
             }
         }
-        boolean preparer = CurrentActor.userId().equals(r.get("prepared_by_id"));
+        boolean preparer = CurrentActor.isOrActsAs(r.get("prepared_by_id"));
         boolean editable = "DRAFT".equals(status) || "RETURNED".equals(status);
         List<String> actions = new ArrayList<>();
         if (editable && preparer && CurrentActor.hasPermission("BANK_RECONCILIATION_PREPARE")) {
@@ -498,7 +498,7 @@ public class BankReconciliationService {
     private Map<String, Object> editable(UUID id, long version) {
         CurrentActor.requirePermission("BANK_RECONCILIATION_PREPARE");
         Map<String, Object> r = lockVersioned(id, version);
-        if (!CurrentActor.userId().equals(r.get("prepared_by_id"))) {
+        if (!CurrentActor.isOrActsAs(r.get("prepared_by_id"))) {
             throw new ApiException(ErrorCode.ACCESS_DENIED, "Only the preparer can change this reconciliation.");
         }
         String status = (String) r.get("status");

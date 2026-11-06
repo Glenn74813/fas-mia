@@ -282,7 +282,7 @@ public class DisbursementService implements DocumentOwnerPolicy {
             throw ApInvoiceService.state("There is no prepared check awaiting approval on this voucher.");
         }
         Map<String, Object> check = rows.get(0);
-        if (CurrentActor.userId().equals(check.get("prepared_by_id")) || CurrentActor.userId().equals(dv.getPreparedById())) {
+        if (CurrentActor.isSameAs(check.get("prepared_by_id")) || CurrentActor.isSameAs(dv.getPreparedById())) {
             throw new ApiException(ErrorCode.SEGREGATION_OF_DUTIES,
                     "You prepared this check or its voucher; another person must approve the check.");
         }
@@ -370,7 +370,7 @@ public class DisbursementService implements DocumentOwnerPolicy {
     @Override
     public void assertCanModify(UUID ownerId) {
         DisbursementVoucher dv = load(ownerId);
-        if (!CurrentActor.userId().equals(dv.getPreparedById()) || !CurrentActor.hasPermission("DISBURSEMENT_PREPARE")) {
+        if (!CurrentActor.isOrActsAs(dv.getPreparedById()) || !CurrentActor.hasPermission("DISBURSEMENT_PREPARE")) {
             throw new ApiException(ErrorCode.ACCESS_DENIED, "Only the preparer can change this voucher's documents.");
         }
         if (!dv.isEditable()) {
@@ -457,7 +457,7 @@ public class DisbursementService implements DocumentOwnerPolicy {
     }
 
     private static void sod(DisbursementVoucher dv, String action) {
-        if (CurrentActor.userId().equals(dv.getPreparedById())) {
+        if (CurrentActor.isSameAs(dv.getPreparedById())) {
             throw new ApiException(ErrorCode.SEGREGATION_OF_DUTIES, "The preparer of a voucher cannot " + action + " it.");
         }
     }
@@ -476,7 +476,7 @@ public class DisbursementService implements DocumentOwnerPolicy {
 
     private static void requirePreparer(DisbursementVoucher dv) {
         CurrentActor.requirePermission("DISBURSEMENT_PREPARE");
-        if (!CurrentActor.userId().equals(dv.getPreparedById())) {
+        if (!CurrentActor.isOrActsAs(dv.getPreparedById())) {
             throw new ApiException(ErrorCode.ACCESS_DENIED, "Only the preparer can change this voucher.");
         }
     }
@@ -497,7 +497,8 @@ public class DisbursementService implements DocumentOwnerPolicy {
                 : jdbc.queryForObject("SELECT code FROM bank_accounts WHERE id = ?", String.class, dv.getBankAccountId());
         String entryNumber = dv.getPostedEntryId() == null ? null
                 : jdbc.queryForObject("SELECT entry_number FROM journal_entries WHERE id = ?", String.class, dv.getPostedEntryId());
-        boolean preparer = CurrentActor.userId().equals(dv.getPreparedById());
+        boolean preparer = CurrentActor.isOrActsAs(dv.getPreparedById());
+        boolean otherPreparer = !CurrentActor.isSameAs(dv.getPreparedById());
         List<String> actions = new ArrayList<>();
         if (dv.isEditable() && preparer && CurrentActor.hasPermission("DISBURSEMENT_PREPARE")) {
             actions.addAll(List.of("EDIT", "SUBMIT", "CANCEL"));
@@ -511,7 +512,7 @@ public class DisbursementService implements DocumentOwnerPolicy {
         }
         DvCheck check = check(dv.getId());
         boolean awaitingCheckApproval = check != null && "PREPARED".equals(check.status());
-        if (!preparer && CurrentActor.hasPermission("PAYMENT_RELEASE")) {
+        if (otherPreparer && CurrentActor.hasPermission("PAYMENT_RELEASE")) {
             if ("APPROVED".equals(dv.getStatus())) {
                 actions.add("INSTRUCT");
             }
@@ -522,11 +523,11 @@ public class DisbursementService implements DocumentOwnerPolicy {
                 actions.add("VOID");
             }
         }
-        if (awaitingCheckApproval && "PAYMENT_INSTRUCTED".equals(dv.getStatus()) && !preparer
+        if (awaitingCheckApproval && "PAYMENT_INSTRUCTED".equals(dv.getStatus()) && otherPreparer
                 && CurrentActor.hasPermission("CHECK_APPROVE") && !CurrentActor.username().equals(check.preparedBy())) {
             actions.add("APPROVE_CHECK");
         }
-        if ("PAID".equals(dv.getStatus()) && !preparer && CurrentActor.hasPermission("JOURNAL_POST")) {
+        if ("PAID".equals(dv.getStatus()) && otherPreparer && CurrentActor.hasPermission("JOURNAL_POST")) {
             actions.add("POST");
         }
         return new DvView(dv.getId(), dv.getDvNumber(), s.getId(), s.getCode(), s.getName(), dv.getParticulars(), dv.getRfpReference(), dv.getStatus(),

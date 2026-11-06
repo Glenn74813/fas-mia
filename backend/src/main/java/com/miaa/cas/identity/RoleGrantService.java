@@ -177,7 +177,7 @@ public class RoleGrantService {
     @Transactional
     public GrantView cancel(UUID id, long version) {
         Map<String, Object> r = lockPending(id, version);
-        if (!CurrentActor.userId().equals(r.get("requested_by_id")) && !CurrentActor.hasPermission("USER_ADMINISTER")) {
+        if (!CurrentActor.isOrActsAs(r.get("requested_by_id")) && !CurrentActor.hasPermission("USER_ADMINISTER")) {
             throw new ApiException(ErrorCode.ACCESS_DENIED, "Only the requester or a user administrator can withdraw this request.");
         }
         jdbc.update("UPDATE role_grant_requests SET status = 'CANCELLED', version = version + 1 WHERE id = ?", id);
@@ -222,11 +222,10 @@ public class RoleGrantService {
     }
 
     private void requireSecondPerson(Map<String, Object> r) {
-        UUID me = CurrentActor.userId();
-        if (me.equals(r.get("requested_by_id"))) {
+        if (CurrentActor.isSameAs(r.get("requested_by_id"))) {
             throw new ApiException(ErrorCode.SEGREGATION_OF_DUTIES, "You requested this grant; another person must decide it.");
         }
-        if (me.equals(r.get("user_id"))) {
+        if (CurrentActor.isSameAs(r.get("user_id"))) {
             throw new ApiException(ErrorCode.SEGREGATION_OF_DUTIES, "You cannot decide a grant of your own access.");
         }
     }
@@ -263,11 +262,10 @@ public class RoleGrantService {
         String status = (String) r.get("status");
         List<String> actions = new ArrayList<>();
         if ("PENDING".equals(status)) {
-            UUID me = CurrentActor.userId();
-            if (CurrentActor.hasPermission("ACCESS_GRANT_APPROVE") && !me.equals(r.get("requested_by_id")) && !me.equals(r.get("user_id"))) {
+            if (CurrentActor.hasPermission("ACCESS_GRANT_APPROVE") && !CurrentActor.isSameAs(r.get("requested_by_id")) && !CurrentActor.isSameAs(r.get("user_id"))) {
                 actions.addAll(List.of("APPROVE", "REJECT"));
             }
-            if (me.equals(r.get("requested_by_id")) || CurrentActor.hasPermission("USER_ADMINISTER")) {
+            if (CurrentActor.isOrActsAs(r.get("requested_by_id")) || CurrentActor.hasPermission("USER_ADMINISTER")) {
                 actions.add("CANCEL");
             }
         }

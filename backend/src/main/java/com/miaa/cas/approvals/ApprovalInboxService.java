@@ -83,6 +83,8 @@ public class ApprovalInboxService {
         String q = search == null || search.isBlank() ? "" : search.trim();
         List<InboxItem> items = new ArrayList<>();
         boolean truncated = false;
+        // The sources leave out what the caller prepared or requested; the demo super administrator sees those too.
+        UUID excluded = CurrentActor.overridesControls() ? new UUID(0, 0) : CurrentActor.userId();
         if (CurrentActor.hasPermission("JOURNAL_REVIEW") || CurrentActor.hasPermission("JOURNAL_APPROVE")
                 || CurrentActor.hasPermission("JOURNAL_POST")) {
             List<VoucherSummary> jvs = vouchers.awaitingMyAction(q);
@@ -109,7 +111,7 @@ public class ApprovalInboxService {
             }
             List<Map<String, Object>> rows = jdbc.queryForList("SELECT * FROM (" + s.sql() + ") s WHERE ? = '' OR concat_ws(' ', s.number, "
                     + "s.description, s.counterparty, s.prepared_by) ILIKE ? ESCAPE '\\' ORDER BY s.since LIMIT " + SOURCE_LIMIT,
-                    CurrentActor.userId(), q, "%" + q.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_") + "%");
+                    excluded, q, "%" + q.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_") + "%");
             truncated |= rows.size() >= SOURCE_LIMIT;
             for (Map<String, Object> r : rows) {
                 String task = s.task();

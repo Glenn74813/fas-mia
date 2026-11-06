@@ -19,6 +19,7 @@ import com.miaa.cas.generalledger.web.LedgerDtos.CloseChecklist;
 import com.miaa.cas.generalledger.web.LedgerDtos.PeriodChangeResponse;
 import com.miaa.cas.generalledger.web.LedgerDtos.PeriodResponse;
 import com.miaa.cas.notifications.NotificationService;
+import com.miaa.cas.security.CurrentActor;
 import java.math.BigDecimal;
 import java.time.Clock;
 import java.time.Instant;
@@ -131,7 +132,7 @@ public class PeriodCloseService {
         if (!"PENDING".equals(c.getRequestStatus()) || !"REOPEN".equals(c.getChangeType())) {
             throw new ApiException(ErrorCode.INVALID_STATE, "This request has already been decided.");
         }
-        if (c.getRequestedById() != null && c.getRequestedById().equals(actor.userId())) {
+        if (c.getRequestedById() != null && c.getRequestedById().equals(actor.userId()) && !CurrentActor.overridesControls()) {
             throw new ApiException(ErrorCode.SEGREGATION_OF_DUTIES,
                     "A reopen request must be decided by someone other than the requester.");
         }

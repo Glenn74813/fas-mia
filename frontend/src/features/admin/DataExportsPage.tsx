@@ -81,7 +81,8 @@ export function DataExportsPage() {
             </thead>
             <tbody>
               {exports.data.items.map((e) => {
-                const mine = e.requestedBy === user?.username;
+                // The demo super administrator may decide its own request (the server allows it on a demo only).
+                const mine = e.requestedBy === user?.username && !user?.roles.includes('DEMO_SUPERADMIN');
                 return (
                   <tr key={e.id} className="border-t border-slate-100 align-top">
                     <td className="whitespace-nowrap px-3 py-2">{formatDateTime(e.requestedAt)}<span className="block text-xs text-slate-500">{e.requestedBy}</span></td>

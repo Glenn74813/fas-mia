@@ -212,7 +212,7 @@ public class TicketService implements DocumentOwnerPolicy {
         }
         String status = (String) t.get("status");
         String type = (String) t.get("ticket_type");
-        boolean reporter = CurrentActor.userId().equals(t.get("reporter_id"));
+        boolean reporter = CurrentActor.isOrActsAs(t.get("reporter_id"));
         boolean worker = CurrentActor.hasPermission("TICKET_WORK");
         String comment = req.comment() == null ? null : req.comment().trim();
         Instant now = Instant.now(clock);
@@ -262,7 +262,7 @@ public class TicketService implements DocumentOwnerPolicy {
             case "APPROVE", "REJECT" -> {
                 CurrentActor.requirePermission("TICKET_APPROVE");
                 expect(status, "PENDING_APPROVAL");
-                if (reporter || CurrentActor.userId().equals(t.get("assignee_id"))) {
+                if (CurrentActor.isSameAs(t.get("reporter_id")) || CurrentActor.isSameAs(t.get("assignee_id"))) {
                     throw new ApiException(ErrorCode.SEGREGATION_OF_DUTIES, "The requester and the assignee cannot approve the change.");
                 }
                 unpause(t, now);
@@ -301,7 +301,7 @@ public class TicketService implements DocumentOwnerPolicy {
             case "VALIDATE_STAGING" -> {
                 need(CHANGE_TYPES.contains(type), "Only change requests and enhancements are validated on staging.");
                 need(reporter || CurrentActor.hasPermission("TICKET_APPROVE"), "Only the requester or a change approver validates on staging.");
-                if (CurrentActor.userId().equals(t.get("assignee_id"))) {
+                if (CurrentActor.isSameAs(t.get("assignee_id"))) {
                     throw new ApiException(ErrorCode.SEGREGATION_OF_DUTIES, "The assignee cannot validate their own change.");
                 }
                 expect(status, "IN_PROGRESS");
@@ -415,7 +415,7 @@ public class TicketService implements DocumentOwnerPolicy {
     @Override
     public void assertCanModify(UUID ownerId) {
         Map<String, Object> t = visible(ownerId);
-        if (!CurrentActor.userId().equals(t.get("reporter_id")) && !CurrentActor.hasPermission("TICKET_WORK")) {
+        if (!CurrentActor.isOrActsAs(t.get("reporter_id")) && !CurrentActor.hasPermission("TICKET_WORK")) {
             throw new ApiException(ErrorCode.ACCESS_DENIED, "Only the requester and support can change a ticket's attachments.");
         }
         if (Set.of("CLOSED", "REJECTED", "CANCELLED").contains(t.get("status"))) {
@@ -537,7 +537,7 @@ public class TicketService implements DocumentOwnerPolicy {
     /** The ticket, if the caller may see it; others' tickets answer 404 to users without the all-tickets view. */
     private Map<String, Object> visible(UUID id) {
         Map<String, Object> t = row(id);
-        if (!CurrentActor.userId().equals(t.get("reporter_id")) && !CurrentActor.hasPermission("TICKET_VIEW_ALL")
+        if (!CurrentActor.isOrActsAs(t.get("reporter_id")) && !CurrentActor.hasPermission("TICKET_VIEW_ALL")
                 && !CurrentActor.hasPermission("TICKET_WORK")) {
             throw ApiException.notFound("Ticket");
         }
@@ -593,7 +593,7 @@ public class TicketService implements DocumentOwnerPolicy {
     private List<String> actions(Map<String, Object> t) {
         String status = (String) t.get("status");
         String type = (String) t.get("ticket_type");
-        boolean reporter = CurrentActor.userId().equals(t.get("reporter_id"));
+        boolean reporter = CurrentActor.isOrActsAs(t.get("reporter_id"));
         boolean worker = CurrentActor.hasPermission("TICKET_WORK");
         boolean change = CHANGE_TYPES.contains(type);
         List<String> a = new ArrayList<>();
@@ -622,12 +622,12 @@ public class TicketService implements DocumentOwnerPolicy {
                 a.add("RESOLVE");
             }
         }
-        if ("PENDING_APPROVAL".equals(status) && CurrentActor.hasPermission("TICKET_APPROVE") && !reporter
-                && !CurrentActor.userId().equals(t.get("assignee_id"))) {
+        if ("PENDING_APPROVAL".equals(status) && CurrentActor.hasPermission("TICKET_APPROVE") && !CurrentActor.isSameAs(t.get("reporter_id"))
+                && !CurrentActor.isSameAs(t.get("assignee_id"))) {
             a.addAll(List.of("APPROVE", "REJECT"));
         }
         if ("IN_PROGRESS".equals(status) && change && t.get("staging_validated_at") == null
-                && (reporter || CurrentActor.hasPermission("TICKET_APPROVE")) && !CurrentActor.userId().equals(t.get("assignee_id"))) {
+                && (reporter || CurrentActor.hasPermission("TICKET_APPROVE")) && !CurrentActor.isSameAs(t.get("assignee_id"))) {
             a.add("VALIDATE_STAGING");
         }
         if ("ON_HOLD".equals(status) && (worker || reporter)) {

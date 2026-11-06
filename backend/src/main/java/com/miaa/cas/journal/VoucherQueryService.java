@@ -105,14 +105,15 @@ public class VoucherQueryService {
     @Transactional(readOnly = true)
     public List<VoucherSummary> awaitingMyAction(String search) {
         UUID me = CurrentActor.userId();
-        BigDecimal limit = limits.limitOf(DecisionLog.JOURNAL_VOUCHER).orElse(null);
+        boolean override = CurrentActor.overridesControls();
+        BigDecimal limit = override ? null : limits.limitOf(DecisionLog.JOURNAL_VOUCHER).orElse(null);
         String q = search == null || search.isBlank() ? null : search.trim().toLowerCase(Locale.ROOT);
         List<JournalVoucher> candidates = vouchers.findByStatusIn(List.of(VoucherStatus.SUBMITTED, VoucherStatus.APPROVED)).stream()
                 .filter(v -> q == null || contains(v.getVoucherNumber(), q) || contains(v.getDescription(), q) || contains(v.getPreparedBy(), q))
                 .sorted(Comparator.comparing(JournalVoucher::getUpdatedAt)).toList();
         List<JournalVoucher> mine = new ArrayList<>();
         for (JournalVoucher v : candidates) {
-            if (me.equals(v.getPreparedById())) {
+            if (!override && me.equals(v.getPreparedById())) {
                 continue;
             }
             if (v.getStatus() == VoucherStatus.APPROVED && CurrentActor.hasPermission("JOURNAL_POST")) {
@@ -121,7 +122,7 @@ public class VoucherQueryService {
                 WorkflowConfig.Step step = workflow.steps(v.getVoucherType(), v.getTotalDebit()).stream()
                         .filter(s -> s.order() == v.getCurrentStepOrder()).findFirst().orElse(null);
                 if (step != null && CurrentActor.hasPermission(step.permission()) && (limit == null || v.getTotalDebit().compareTo(limit) <= 0)
-                        && !decisions.approversInCurrentCycle(v.getId()).contains(me)) {
+                        && (override || !decisions.approversInCurrentCycle(v.getId()).contains(me))) {
                     mine.add(v);
                 }
             }
@@ -191,8 +192,8 @@ public class VoucherQueryService {
     private List<String> actions(JournalVoucher v, List<WorkflowConfig.Step> steps) {
         List<String> a = new ArrayList<>();
         UUID me = CurrentActor.userId();
-        boolean preparer = me.equals(v.getPreparedById());
-        if (v.getStatus().isEditable() && preparer && CurrentActor.hasPermission("JOURNAL_CREATE")) {
+        boolean preparer = CurrentActor.isSameAs(v.getPreparedById());
+        if (v.getStatus().isEditable() && CurrentActor.isOrActsAs(v.getPreparedById()) && CurrentActor.hasPermission("JOURNAL_CREATE")) {
             if (v.getVoucherType().isManuallyCreatable()) {
                 a.add("EDIT");
             }
@@ -207,7 +208,7 @@ public class VoucherQueryService {
         if (v.getStatus() == VoucherStatus.SUBMITTED && !preparer && v.getCurrentStepOrder() != null) {
             steps.stream().filter(s -> s.order() == v.getCurrentStepOrder()).findFirst().ifPresent(s -> {
                 if (CurrentActor.hasPermission(s.permission())) {
-                    if (!decisions.approversInCurrentCycle(v.getId()).contains(me) && limits.allows(DecisionLog.JOURNAL_VOUCHER, v.getTotalDebit())) {
+                    if ((CurrentActor.overridesControls() || !decisions.approversInCurrentCycle(v.getId()).contains(me)) && limits.allows(DecisionLog.JOURNAL_VOUCHER, v.getTotalDebit())) {
                         a.add("APPROVE");
                     }
                     a.add("RETURN");

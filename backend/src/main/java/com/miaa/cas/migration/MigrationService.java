@@ -203,7 +203,7 @@ public class MigrationService implements DocumentOwnerPolicy {
         }
         Kind kind = Kind.valueOf((String) b.get("kind"));
         KindRules rule = rules.get(kind);
-        boolean uploader = CurrentActor.userId().equals(b.get("uploaded_by_id"));
+        boolean uploader = CurrentActor.isOrActsAs(b.get("uploaded_by_id"));
         List<MigrationCsv.Row> rows = storedRows(id);
         LocalDate cutover = ((Date) b.get("cutover_date")).toLocalDate();
         Timestamp now = Timestamp.from(Instant.now(clock));
@@ -226,7 +226,7 @@ public class MigrationService implements DocumentOwnerPolicy {
             return detail(id);
         }
         CurrentActor.requirePermission("MIGRATION_APPROVE");
-        if (uploader) {
+        if (CurrentActor.isSameAs(b.get("uploaded_by_id"))) {
             throw new ApiException(ErrorCode.SEGREGATION_OF_DUTIES, "You uploaded this batch; another person must apply it.");
         }
         Entry entry = entry((UUID) b.get("opening_entry_id"));
@@ -256,7 +256,7 @@ public class MigrationService implements DocumentOwnerPolicy {
         if (!"VALIDATED".equals(b.get("status")) && !"INVALID".equals(b.get("status"))) {
             throw new ApiException(ErrorCode.INVALID_STATE, "Only a batch that has not been applied can be cancelled.");
         }
-        boolean uploader = CurrentActor.userId().equals(b.get("uploaded_by_id"));
+        boolean uploader = CurrentActor.isOrActsAs(b.get("uploaded_by_id"));
         if (!uploader && !CurrentActor.hasPermission("MIGRATION_APPROVE")) {
             throw new ApiException(ErrorCode.ACCESS_DENIED, "Only the uploader or an approver can cancel this batch.");
         }
@@ -281,7 +281,7 @@ public class MigrationService implements DocumentOwnerPolicy {
         Map<String, Object> b = row(ownerId);
         CurrentActor.requirePermission("MIGRATION_PREPARE");
         String status = (String) b.get("status");
-        if (!CurrentActor.userId().equals(b.get("uploaded_by_id")) || "APPLIED".equals(status) || "CANCELLED".equals(status)) {
+        if (!CurrentActor.isOrActsAs(b.get("uploaded_by_id")) || "APPLIED".equals(status) || "CANCELLED".equals(status)) {
             throw new ApiException(ErrorCode.ACCESS_DENIED, "Only the uploader can attach files while the batch is open.");
         }
     }
@@ -437,14 +437,15 @@ public class MigrationService implements DocumentOwnerPolicy {
                 rec = reconcile(rule, entry((UUID) b.get("opening_entry_id")), checked);
             }
         }
-        boolean uploader = CurrentActor.userId().equals(b.get("uploaded_by_id"));
+        boolean uploader = CurrentActor.isOrActsAs(b.get("uploaded_by_id"));
+        boolean otherUploader = !CurrentActor.isSameAs(b.get("uploaded_by_id"));
         boolean open = "VALIDATED".equals(s.status()) || "INVALID".equals(s.status());
         List<String> actions = new ArrayList<>();
         if ("VALIDATED".equals(s.status())) {
             if (kind == Kind.GL_OPENING && uploader && CurrentActor.hasPermission("JOURNAL_CREATE")) {
                 actions.add("CREATE_VOUCHER");
             }
-            if (kind != Kind.GL_OPENING && !uploader && CurrentActor.hasPermission("MIGRATION_APPROVE") && rec != null && rec.reconciled()) {
+            if (kind != Kind.GL_OPENING && otherUploader && CurrentActor.hasPermission("MIGRATION_APPROVE") && rec != null && rec.reconciled()) {
                 actions.add("APPLY");
             }
         }

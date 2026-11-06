@@ -99,7 +99,7 @@ public class SupplierBankService {
         if (!"PENDING".equals(b.get("status"))) {
             throw new ApiException(ErrorCode.INVALID_STATE, "Only pending bank details can be verified.");
         }
-        if (CurrentActor.userId().equals(b.get("entered_by_id"))) {
+        if (CurrentActor.isSameAs(b.get("entered_by_id"))) {
             throw new ApiException(ErrorCode.SEGREGATION_OF_DUTIES, "You entered these bank details; another person must verify them.");
         }
         jdbc.update("UPDATE supplier_bank_accounts SET status = ?, verified_by = ?, verified_at = ?, verification_note = ?, version = version + 1 "
@@ -125,7 +125,7 @@ public class SupplierBankService {
     private SupplierBankView view(UUID id) {
         Map<String, Object> b = jdbc.queryForMap("SELECT * FROM supplier_bank_accounts WHERE id = ?", id);
         boolean pending = "PENDING".equals(b.get("status"));
-        List<String> actions = pending && CurrentActor.hasPermission("SUPPLIER_BANK_VERIFY") && !CurrentActor.userId().equals(b.get("entered_by_id"))
+        List<String> actions = pending && CurrentActor.hasPermission("SUPPLIER_BANK_VERIFY") && !CurrentActor.isSameAs(b.get("entered_by_id"))
                 ? List.of("VERIFY", "REJECT") : List.of();
         Timestamp va = (Timestamp) b.get("verified_at");
         return new SupplierBankView(id, (UUID) b.get("supplier_id"), (String) b.get("bank_name"), (String) b.get("branch"),

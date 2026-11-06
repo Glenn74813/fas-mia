@@ -96,11 +96,17 @@ public class ApprovalLimitService {
     }
 
     public boolean allows(String documentType, BigDecimal amount) {
+        if (CurrentActor.overridesControls()) {
+            return true;
+        }
         return limitOf(documentType).map(l -> amount.abs().compareTo(l) <= 0).orElse(true);
     }
 
     /** Refuses an approval above the current user's limit for the type. */
     public void require(String documentType, BigDecimal amount) {
+        if (CurrentActor.overridesControls()) {
+            return;
+        }
         Optional<BigDecimal> limit = limitOf(documentType);
         if (limit.isPresent() && amount.abs().compareTo(limit.get()) > 0) {
             throw new ApiException(ErrorCode.ACCESS_DENIED, "The amount " + Money.of(amount.abs()).toPlainString()
@@ -113,7 +119,7 @@ public class ApprovalLimitService {
     public Map<String, BigDecimal> limitsByType() {
         List<String> roles = currentRoles();
         Map<String, BigDecimal> out = new HashMap<>();
-        if (!roles.isEmpty()) {
+        if (!roles.isEmpty() && !CurrentActor.overridesControls()) {
             jdbc.query("SELECT document_type, max(max_amount) FROM approval_limits WHERE role_code = ANY (?) GROUP BY document_type",
                     rs -> { out.put(rs.getString(1), rs.getBigDecimal(2)); }, (Object) roles.toArray(String[]::new));
         }

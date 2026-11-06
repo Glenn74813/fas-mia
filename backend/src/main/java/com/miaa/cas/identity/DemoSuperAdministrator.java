@@ -29,8 +29,9 @@ import org.springframework.transaction.annotation.Transactional;
  *
  * <p>The role deliberately breaks the segregation-of-duties rules, so it is written directly here: role and user
  * administration would refuse to create it, change its permissions or grant it to anyone, for the same reason.
- * Record-level controls still apply to this account: it cannot approve or post what it prepared itself, and it still
- * signs in with an authenticator code. PORTAL_SELF_VIEW is left out because it marks a concessionaire, which would
+ * Where {@code cas.demo.superadmin-overrides-controls} is on (dev and the demo start script), it also passes the
+ * record-level controls: it approves, posts and decides its own work and every step of a chain, above any approval
+ * limit ({@link com.miaa.cas.security.CurrentActor#overridesControls()}). PORTAL_SELF_VIEW is left out because it marks a concessionaire, which would
  * hide the internal dashboard and inbox.
  */
 @Component

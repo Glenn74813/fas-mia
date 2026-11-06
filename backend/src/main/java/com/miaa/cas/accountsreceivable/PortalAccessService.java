@@ -105,7 +105,7 @@ public class PortalAccessService implements DocumentOwnerPolicy {
     public RequestView decide(UUID id, boolean approve, String note) {
         CurrentActor.requirePermission("PORTAL_ACCESS_APPROVE");
         Map<String, Object> r = lockPending(id);
-        if (CurrentActor.userId().equals(r.get("requested_by_id"))) {
+        if (CurrentActor.isSameAs(r.get("requested_by_id"))) {
             throw new ApiException(ErrorCode.SEGREGATION_OF_DUTIES, "You requested this link; another person must decide it.");
         }
         UUID customerId = (UUID) r.get("customer_id");
@@ -137,7 +137,7 @@ public class PortalAccessService implements DocumentOwnerPolicy {
     @Transactional
     public RequestView cancel(UUID id) {
         Map<String, Object> r = lockPending(id);
-        if (!CurrentActor.userId().equals(r.get("requested_by_id"))) {
+        if (!CurrentActor.isOrActsAs(r.get("requested_by_id"))) {
             throw new ApiException(ErrorCode.ACCESS_DENIED, "Only the requester can withdraw the request.");
         }
         jdbc.update("UPDATE portal_link_requests SET status = 'CANCELLED', version = version + 1 WHERE id = ?", id);
@@ -156,7 +156,7 @@ public class PortalAccessService implements DocumentOwnerPolicy {
     public void assertCanModify(UUID ownerId) {
         Map<String, Object> r = row(ownerId);
         CurrentActor.requirePermission("DOCUMENT_UPLOAD");
-        if (!CurrentActor.userId().equals(r.get("requested_by_id")) || !"PENDING".equals(r.get("status"))) {
+        if (!CurrentActor.isOrActsAs(r.get("requested_by_id")) || !"PENDING".equals(r.get("status"))) {
             throw new ApiException(ErrorCode.ACCESS_DENIED, "Only the requester can attach evidence while the request is pending.");
         }
     }
@@ -218,9 +218,10 @@ public class PortalAccessService implements DocumentOwnerPolicy {
                 SELECT p.*, c.code AS c_code, c.name AS c_name, u.username, u.display_name, u.email FROM portal_link_requests p
                 JOIN customers c ON c.id = p.customer_id JOIN users u ON u.id = p.user_id WHERE p.id = ?""", id);
         boolean pending = "PENDING".equals(r.get("status"));
-        boolean requester = CurrentActor.userId().equals(r.get("requested_by_id"));
+        boolean requester = CurrentActor.isOrActsAs(r.get("requested_by_id"));
+        boolean otherRequester = !CurrentActor.isSameAs(r.get("requested_by_id"));
         List<String> actions = new ArrayList<>();
-        if (pending && !requester && CurrentActor.hasPermission("PORTAL_ACCESS_APPROVE")) {
+        if (pending && otherRequester && CurrentActor.hasPermission("PORTAL_ACCESS_APPROVE")) {
             actions.addAll(List.of("APPROVE", "REJECT"));
         }
         if (pending && requester) {

@@ -172,7 +172,7 @@ public class ParallelRunService implements DocumentOwnerPolicy {
     public RunDetail signOff(UUID id, long version, String note) {
         CurrentActor.requirePermission("MIGRATION_APPROVE");
         Map<String, Object> r = lockOpen(id, version);
-        if (CurrentActor.userId().equals(r.get("uploaded_by_id"))) {
+        if (CurrentActor.isSameAs(r.get("uploaded_by_id"))) {
             throw new ApiException(ErrorCode.SEGREGATION_OF_DUTIES, "You uploaded this comparison; another person must sign it off.");
         }
         int unexplained = unexplained(id);
@@ -195,7 +195,7 @@ public class ParallelRunService implements DocumentOwnerPolicy {
     @Transactional
     public RunDetail cancel(UUID id, long version, String reason) {
         Map<String, Object> r = lockOpen(id, version);
-        if (!CurrentActor.userId().equals(r.get("uploaded_by_id")) && !CurrentActor.hasPermission("MIGRATION_APPROVE")) {
+        if (!CurrentActor.isOrActsAs(r.get("uploaded_by_id")) && !CurrentActor.hasPermission("MIGRATION_APPROVE")) {
             throw new ApiException(ErrorCode.ACCESS_DENIED, "Only the uploader or an approver can cancel this comparison.");
         }
         if (reason == null || reason.trim().length() < 5 || reason.trim().length() > 500) {

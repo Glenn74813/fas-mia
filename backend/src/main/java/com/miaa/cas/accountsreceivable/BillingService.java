@@ -317,7 +317,7 @@ public class BillingService implements DocumentOwnerPolicy {
     public void assertCanModify(UUID ownerId) {
         BillingDocument d = load(ownerId);
         CurrentActor.requirePermission("DOCUMENT_UPLOAD");
-        if (!CurrentActor.userId().equals(d.getPreparedById())) {
+        if (!CurrentActor.isOrActsAs(d.getPreparedById())) {
             throw new ApiException(ErrorCode.ACCESS_DENIED, "Only the preparer can change this document's attachments.");
         }
         if (!d.isEditable()) {
@@ -494,7 +494,7 @@ public class BillingService implements DocumentOwnerPolicy {
 
     private static void requirePreparer(BillingDocument d) {
         CurrentActor.requirePermission("AR_BILLING_PREPARE");
-        if (!CurrentActor.userId().equals(d.getPreparedById())) {
+        if (!CurrentActor.isOrActsAs(d.getPreparedById())) {
             throw new ApiException(ErrorCode.ACCESS_DENIED, "Only the preparer can change this document.");
         }
     }
@@ -522,7 +522,8 @@ public class BillingService implements DocumentOwnerPolicy {
         String contractNumber = d.getContractId() == null ? null : customers.contract(d.getContractId()).contractNumber();
         String relatedNumber = d.getRelatedInvoiceId() == null ? null : load(d.getRelatedInvoiceId()).getDocumentNumber();
         List<String> actions = new ArrayList<>();
-        boolean preparer = CurrentActor.userId().equals(d.getPreparedById());
+        boolean preparer = CurrentActor.isOrActsAs(d.getPreparedById());
+        boolean otherPreparer = !CurrentActor.isSameAs(d.getPreparedById());
         String wf = workflowType(d);
         if (d.isEditable() && preparer && CurrentActor.hasPermission("AR_BILLING_PREPARE")) {
             if (d.getContractId() == null) {
@@ -537,7 +538,7 @@ public class BillingService implements DocumentOwnerPolicy {
                 toInt(d.getCurrentStepOrder()), d.getPreparedById())) {
             actions.addAll(List.of("APPROVE", "RETURN", "REJECT"));
         }
-        if ("APPROVED".equals(d.getStatus()) && !preparer && CurrentActor.hasPermission("JOURNAL_POST")) {
+        if ("APPROVED".equals(d.getStatus()) && otherPreparer && CurrentActor.hasPermission("JOURNAL_POST")) {
             actions.addAll(List.of("POST", "RETURN"));
         }
         String vatCode = d.getVatCodeId() == null ? null : taxCodes.get(d.getVatCodeId()).code();
