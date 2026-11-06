@@ -12,6 +12,7 @@ import { PageHeader } from '../../components/PageHeader';
 import { StatusBadge } from '../../components/StatusBadge';
 import type { Account } from '../../api/types';
 import { activeCostCenters, accountsFor, useChart, useCostCenters } from '../../hooks/useAccounting';
+import { AssetPolicySection } from './AssetPolicySection';
 
 export function AssetSetupPage() {
   const { hasPermission } = useAuth();
@@ -75,6 +76,7 @@ export function AssetSetupPage() {
           </div>
         )}
       </section>
+      <AssetPolicySection categories={categories.data ?? []} manage={manage} />
       <section className="rounded-xl border border-slate-200/80 bg-white shadow-xs p-5">
         <h2 className="mb-1 font-semibold">Assets under construction</h2>
         <p className="mb-3 text-xs text-slate-500">Post project costs (invoices or journal vouchers) to the AUC account with the project's subsidiary account; register the finished asset from the project to capitalise it.</p>

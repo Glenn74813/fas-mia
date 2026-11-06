@@ -36,7 +36,15 @@ public final class FaDtos {
     public record CategoryView(UUID id, String code, String name, UUID assetAccountId, String assetAccountCode,
             UUID accumulatedAccountId, String accumulatedAccountCode, UUID expenseAccountId, String expenseAccountCode,
             int defaultUsefulLifeMonths, BigDecimal defaultResidualRate, String status, boolean placeholder,
-            UUID accumulatedImpairmentAccountId, String accumulatedImpairmentAccountCode) {
+            UUID accumulatedImpairmentAccountId, String accumulatedImpairmentAccountCode, String depreciationStart,
+            boolean chargeDisposalMonth, String measurementModel, Integer revaluationIntervalYears, long version) {
+    }
+
+    /** The class's depreciation and measurement policy (C-30, C-07). Life and residual rate are defaults for new assets. */
+    public record CategoryPolicyRequest(@NotNull Long version, @NotNull @Min(1) @Max(1200) Integer defaultUsefulLifeMonths,
+            @DecimalMin("0") @DecimalMax("1") @Digits(integer = 1, fraction = 4) BigDecimal defaultResidualRate,
+            @NotNull @Pattern(regexp = "SAME_MONTH|NEXT_MONTH") String depreciationStart, boolean chargeDisposalMonth,
+            @NotNull @Pattern(regexp = "COST|REVALUATION") String measurementModel, @Min(1) @Max(10) Integer revaluationIntervalYears) {
     }
 
     public record ProjectRequest(@NotBlank @Pattern(regexp = "^[A-Za-z0-9][A-Za-z0-9.-]{0,39}$") String code,

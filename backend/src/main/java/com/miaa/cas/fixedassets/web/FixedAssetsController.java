@@ -89,6 +89,14 @@ public class FixedAssetsController {
         return setup.setImpairmentAccount(id, request.accountId(), Actor.current());
     }
 
+    @PutMapping("/asset-categories/{id}/policy")
+    @PreAuthorize("hasAuthority('PERM_FA_MANAGE')")
+    @Operation(summary = "Set the class's depreciation and measurement policy: default life and residual rate, start month, "
+            + "disposal-month charge, cost or revaluation model")
+    public CategoryView setPolicy(@PathVariable UUID id, @Valid @RequestBody com.miaa.cas.fixedassets.FaDtos.CategoryPolicyRequest request) {
+        return setup.setPolicy(id, request, Actor.current());
+    }
+
     @GetMapping("/auc-projects")
     @PreAuthorize("hasAuthority('PERM_FA_VIEW')")
     public List<ProjectView> projects() {

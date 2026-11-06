@@ -89,6 +89,12 @@ class FixedAssetsIT extends AbstractPayablesIT {
                 .contentType(MediaType.APPLICATION_JSON).content(toJson(sale))).andExpect(status().isCreated()).andReturn());
         assertThat(d.get("gainLoss").asText()).isEqualTo("-3000.00");
         act(preparer, "asset-disposals", d.get("id").asText(), "post", d).andExpect(status().isForbidden());
+        // A class that charges the disposal month needs May's depreciation posted first; this one does not, as by default.
+        setDisposalMonthCharge(category, true);
+        act(poster, "asset-disposals", d.get("id").asText(), "post", d).andExpect(status().isUnprocessableEntity())
+                .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath("$.detail")
+                        .value(org.hamcrest.Matchers.containsString("Post depreciation through " + year + "-05")));
+        setDisposalMonthCharge(category, false);
         d = ok(act(poster, "asset-disposals", d.get("id").asText(), "post", d));
         Map<String, BigDecimal> disposal = new HashMap<>();
         for (JsonNode l : entry(d.get("postedEntryId").asText()).get("lines")) {
@@ -238,6 +244,20 @@ class FixedAssetsIT extends AbstractPayablesIT {
     private ResultActions act(Session who, String path, String id, String action, JsonNode current) throws Exception {
         return mvc.perform(post("/api/v1/" + path + "/" + id + "/" + action).header("Authorization", who.bearer())
                 .contentType(MediaType.APPLICATION_JSON).content(toJson(Map.of("version", current.get("version").asLong()))));
+    }
+
+    private void setDisposalMonthCharge(UUID category, boolean charge) throws Exception {
+        var c = setup.category(category);
+        Map<String, Object> p = new HashMap<>();
+        p.put("version", c.version());
+        p.put("defaultUsefulLifeMonths", c.defaultUsefulLifeMonths());
+        p.put("defaultResidualRate", c.defaultResidualRate());
+        p.put("depreciationStart", c.depreciationStart());
+        p.put("chargeDisposalMonth", charge);
+        p.put("measurementModel", c.measurementModel());
+        p.put("revaluationIntervalYears", c.revaluationIntervalYears());
+        ok(mvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put("/api/v1/asset-categories/" + category + "/policy")
+                .header("Authorization", preparer.bearer()).contentType(MediaType.APPLICATION_JSON).content(toJson(p))));
     }
 
     private JsonNode postRun(int year, int month) throws Exception {

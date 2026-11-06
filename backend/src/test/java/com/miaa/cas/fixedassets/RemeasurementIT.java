@@ -105,6 +105,20 @@ class RemeasurementIT extends AbstractPayablesIT {
                 .andExpect(status().isUnprocessableEntity()).andExpect(jsonPath("$.detail").value(Matchers.containsString("already includes")));
         ok(act(preparer, "asset-remeasurements", late.get("id").asText(), "cancel", late));
 
+        // The class is carried at cost, so revaluation is refused until its policy says otherwise; the start month can no
+        // longer change because depreciation has been posted.
+        remeasure(assetId, "REVALUATION", year + "-06-15", "3300.00", null).andExpect(status().isUnprocessableEntity());
+        mvc.perform(put("/api/v1/asset-categories/" + category + "/policy").header("Authorization", preparer.bearer())
+                .contentType(MediaType.APPLICATION_JSON).content(toJson(policy(category, "SAME_MONTH", "COST", null))))
+                .andExpect(status().isUnprocessableEntity());
+        mvc.perform(put("/api/v1/asset-categories/" + category + "/policy").header("Authorization", preparer.bearer())
+                .contentType(MediaType.APPLICATION_JSON).content(toJson(policy(category, "NEXT_MONTH", "REVALUATION", null))))
+                .andExpect(status().isUnprocessableEntity());
+        JsonNode revaluedClass = ok(mvc.perform(put("/api/v1/asset-categories/" + category + "/policy").header("Authorization", preparer.bearer())
+                .contentType(MediaType.APPLICATION_JSON).content(toJson(policy(category, "NEXT_MONTH", "REVALUATION", 3)))));
+        assertThat(revaluedClass.get("measurementModel").asText()).isEqualTo("REVALUATION");
+        assertThat(revaluedClass.get("revaluationIntervalYears").asInt()).isEqualTo(3);
+
         // June: revalued to 3,300. Accumulated depreciation (360.61) and impairment (1,300) are eliminated; the increase of
         // 1,360.61 first reverses the 1,300 charged to profit or loss, the rest goes to revaluation surplus.
         JsonNode reval = body(remeasure(assetId, "REVALUATION", year + "-06-15", "3300.00", null).andExpect(status().isCreated()).andReturn());
@@ -225,5 +239,18 @@ class RemeasurementIT extends AbstractPayablesIT {
             }
         }
         return t;
+    }
+
+    private Map<String, Object> policy(UUID category, String start, String model, Integer intervalYears) {
+        var c = setup.category(category);
+        Map<String, Object> p = new HashMap<>();
+        p.put("version", c.version());
+        p.put("defaultUsefulLifeMonths", c.defaultUsefulLifeMonths());
+        p.put("defaultResidualRate", c.defaultResidualRate());
+        p.put("depreciationStart", start);
+        p.put("chargeDisposalMonth", false);
+        p.put("measurementModel", model);
+        p.put("revaluationIntervalYears", intervalYears);
+        return p;
     }
 }

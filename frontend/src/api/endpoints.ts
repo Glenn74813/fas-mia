@@ -1,5 +1,5 @@
 import { api, downloadFile } from './client';
-import type { BirAlphalist, BirAtc, Sawt, VatListing, WithholdingCertificate,
+import type { AssetCategoryPolicy, BirAlphalist, BirAtc, Sawt, VatListing, WithholdingCertificate,
   TicketCategory,
   Clearing, ClearingProposal, CloseCalendarChecklist, CloseFrequency, CloseScheduleItem, CloseTask, GlOpenItem, OpenItemAccount,
   AccountLedger, ChainVerification, ChartSummary, CloseChecklist, CostCenter, CurrentUser, DocumentInfo, EntryDetail,
@@ -549,6 +549,8 @@ export const assetApi = {
     api.post<DisposalView>(`/asset-disposals/${id}/${action}`, { version }),
   setImpairmentAccount: (categoryId: string, accountId: string) =>
     api.put<AssetCategory>(`/asset-categories/${categoryId}/impairment-account`, { accountId }),
+  setCategoryPolicy: (c: AssetCategory, policy: AssetCategoryPolicy) =>
+    api.put<AssetCategory>(`/asset-categories/${c.id}/policy`, { version: c.version, ...policy }),
   prepareRemeasurement: (body: { assetId: string; kind: 'IMPAIRMENT' | 'REVALUATION'; remeasuredOn: string; newCarryingAmount: string;
     remainingLifeMonths: number | null; basisReference: string | null; reason: string }) => api.post<Remeasurement>('/asset-remeasurements', body),
   remeasurementAction: (r: Remeasurement, action: 'post' | 'cancel') =>

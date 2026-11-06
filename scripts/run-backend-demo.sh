@@ -21,8 +21,6 @@ export CAS_DEMO_SUPERADMIN_OVERRIDES_CONTROLS="${CAS_DEMO_SUPERADMIN_OVERRIDES_C
 # The demo's approved budget was entered on the old placeholder accounts, so budget checks on the official chart
 # warn rather than block until a budget is approved on the official accounts. Production keeps BLOCK.
 export CAS_BUDGET_ENFORCEMENT="${CAS_BUDGET_ENFORCEMENT:-WARN}"
-# The demo shows asset revaluation; production keeps it off until AVTECH adopts the revaluation model (C-07, C-30).
-export CAS_FA_REVALUATION_ENABLED="${CAS_FA_REVALUATION_ENABLED:-true}"
 # Run from a copy, so rebuilding backend/target while the demo is up cannot pull the jar from under it.
 mkdir -p .devdata
 # Copy then rename: a demo still shutting down keeps reading the old file instead of a half-written one.

@@ -93,6 +93,74 @@ public class AssetSetupService {
         return category(id);
     }
 
+    /**
+     * Sets the class's depreciation and measurement policy. The life and residual rate are defaults for assets registered
+     * afterwards; each asset keeps its own. The start convention cannot change once the class has posted depreciation, and
+     * a class with posted revaluations cannot go back to the cost model: either would rewrite amounts already in the ledger.
+     */
+    @Transactional
+    public CategoryView setPolicy(UUID id, FaDtos.CategoryPolicyRequest req, Actor actor) {
+        CategoryView c = category(id);
+        if (c.version() != req.version()) {
+            throw ApiException.staleVersion();
+        }
+        boolean revaluation = "REVALUATION".equals(req.measurementModel());
+        if (revaluation != (req.revaluationIntervalYears() != null)) {
+            throw FixedAssetService.rule(revaluation ? "Give how often the class is revalued (1 to 10 years)."
+                    : "Leave the revaluation interval empty for a class carried at cost.");
+        }
+        if (!req.depreciationStart().equals(c.depreciationStart()) && Boolean.TRUE.equals(jdbc.queryForObject("""
+                SELECT EXISTS (SELECT 1 FROM depreciation_lines dl JOIN depreciation_runs r ON r.id = dl.run_id
+                JOIN fixed_assets a ON a.id = dl.asset_id WHERE a.category_id = ? AND r.status = 'POSTED')""", Boolean.class, id))) {
+            throw FixedAssetService.rule("Depreciation has been posted for this class, so when it starts can no longer change.");
+        }
+        if (!revaluation && "REVALUATION".equals(c.measurementModel()) && Boolean.TRUE.equals(jdbc.queryForObject("""
+                SELECT EXISTS (SELECT 1 FROM asset_remeasurements m JOIN fixed_assets a ON a.id = m.asset_id
+                WHERE a.category_id = ? AND m.kind = 'REVALUATION' AND m.status = 'POSTED')""", Boolean.class, id))) {
+            throw FixedAssetService.rule("Assets of this class have been revalued, so it cannot go back to the cost model.");
+        }
+        jdbc.update("""
+                UPDATE asset_categories SET default_useful_life_months = ?, default_residual_rate = ?, depreciation_start = ?,
+                    charge_disposal_month = ?, measurement_model = ?, revaluation_interval_years = ?, version = version + 1 WHERE id = ?""",
+                req.defaultUsefulLifeMonths(), req.defaultResidualRate(), req.depreciationStart(), req.chargeDisposalMonth(),
+                req.measurementModel(), req.revaluationIntervalYears(), id);
+        CategoryView after = category(id);
+        audit.record(actor, "ASSET_CATEGORY_POLICY_SET", "ASSET_CATEGORY", c.code(), Map.of("before", policy(c), "after", policy(after)));
+        return after;
+    }
+
+    private static Map<String, Object> policy(CategoryView c) {
+        Map<String, Object> m = new java.util.LinkedHashMap<>();
+        m.put("lifeMonths", c.defaultUsefulLifeMonths());
+        m.put("residualRate", c.defaultResidualRate() == null ? "none" : c.defaultResidualRate().toPlainString());
+        m.put("depreciationStart", c.depreciationStart());
+        m.put("chargeDisposalMonth", c.chargeDisposalMonth());
+        m.put("measurementModel", c.measurementModel());
+        m.put("revaluationIntervalYears", c.revaluationIntervalYears() == null ? "none" : c.revaluationIntervalYears());
+        return m;
+    }
+
+    /** The class's depreciation start convention. */
+    @Transactional(readOnly = true)
+    public DepreciationMath.Start depreciationStart(UUID categoryId) {
+        return DepreciationMath.Start.valueOf(jdbc.queryForObject("SELECT depreciation_start FROM asset_categories WHERE id = ?",
+                String.class, categoryId));
+    }
+
+    /** Whether the class's assets may be revalued: only when the class is carried at revalued amounts. */
+    @Transactional(readOnly = true)
+    public boolean revaluationAllowed(UUID categoryId) {
+        return "REVALUATION".equals(jdbc.queryForObject("SELECT measurement_model FROM asset_categories WHERE id = ?", String.class,
+                categoryId));
+    }
+
+    /** Whether the class charges depreciation for the month an asset is disposed of. */
+    @Transactional(readOnly = true)
+    public boolean chargesDisposalMonth(UUID categoryId) {
+        return Boolean.TRUE.equals(jdbc.queryForObject("SELECT charge_disposal_month FROM asset_categories WHERE id = ?", Boolean.class,
+                categoryId));
+    }
+
     private void requireImpairmentAccount(UUID accountId, UUID accumulatedDepreciationAccountId) {
         AccountPurpose.require(jdbc, accountId, AccountPurpose.ASSET_ACCUMULATED, "Accumulated impairment account");
         if (accountId.equals(accumulatedDepreciationAccountId)) {
@@ -175,7 +243,9 @@ public class AssetSetupService {
                 rs.getObject("asset_account_id", UUID.class), rs.getString("a_code"), rs.getObject("accumulated_account_id", UUID.class),
                 rs.getString("d_code"), rs.getObject("expense_account_id", UUID.class), rs.getString("e_code"),
                 rs.getInt("default_useful_life_months"), rs.getBigDecimal("default_residual_rate"), rs.getString("status"),
-                rs.getBoolean("placeholder"), rs.getObject("accumulated_impairment_account_id", UUID.class), rs.getString("i_code"));
+                rs.getBoolean("placeholder"), rs.getObject("accumulated_impairment_account_id", UUID.class), rs.getString("i_code"),
+                rs.getString("depreciation_start"), rs.getBoolean("charge_disposal_month"), rs.getString("measurement_model"),
+                (Integer) rs.getObject("revaluation_interval_years", Integer.class), rs.getLong("version"));
     }
 
     private static final String PROJECT_SQL = """

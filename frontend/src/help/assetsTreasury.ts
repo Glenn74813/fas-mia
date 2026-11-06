@@ -177,11 +177,13 @@ export const ASSETS_TREASURY_HELP: Record<string, ModuleHelp> = {
 
   '/fixed-assets/setup': {
     title: 'Asset setup',
-    summary: 'Maintains asset categories with their default life, residual rate and ledger accounts, and assets under construction (AUC) projects.',
+    summary: 'Maintains asset categories with their ledger accounts and depreciation and measurement policy, and assets under construction (AUC) projects.',
     steps: [
       'Review the Asset categories table; rows marked PLACEHOLDER need to be confirmed against AVTECH’s accounting policy.',
       'To add a category, enter the Category code, name, Default life (months) and Default residual rate, choose the asset, accumulated depreciation and expense accounts, and click Add category.',
       'Set the accumulated impairment account of a category before impairing assets in it.',
+      'Under Depreciation and measurement policy, click Edit on a class to set its rules: default life and residual rate for new assets, whether depreciation starts in the month an asset is placed in service or the month after, whether the disposal month is charged, and whether the class is carried at cost or revalued (and how often). Click Save policy.',
+      'The start month cannot change once the class has posted depreciation, and a class with posted revaluations cannot go back to cost. Revaluation is offered only for classes on the revaluation model.',
       'To track construction, enter a Project code and name, choose the AUC account and click Open project.',
       'Post project costs to the AUC account with the project’s subsidiary account, then register the finished asset from the project. Click Close when the project is complete.',
     ],

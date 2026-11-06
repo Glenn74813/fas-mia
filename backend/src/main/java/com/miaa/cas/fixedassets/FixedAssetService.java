@@ -28,7 +28,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -55,12 +54,11 @@ public class FixedAssetService {
     private final NotificationService notifications;
     private final JdbcTemplate jdbc;
     private final Clock clock;
-    private final DepreciationMath.Start start;
     private final org.springframework.beans.factory.ObjectProvider<DisposalService> disposals;
     private final org.springframework.beans.factory.ObjectProvider<RemeasurementService> remeasurements;
 
     public FixedAssetService(AssetSetupService setup, NumberingService numbering, PostingService posting, AuditService audit, NotificationService notifications,
-            JdbcTemplate jdbc, Clock clock, @Value("${cas.fixed-assets.depreciation-start:NEXT_MONTH}") DepreciationMath.Start start,
+            JdbcTemplate jdbc, Clock clock,
             org.springframework.beans.factory.ObjectProvider<DisposalService> disposals,
             org.springframework.beans.factory.ObjectProvider<RemeasurementService> remeasurements) {
         this.disposals = disposals;
@@ -72,7 +70,6 @@ public class FixedAssetService {
         this.notifications = notifications;
         this.jdbc = jdbc;
         this.clock = clock;
-        this.start = start;
     }
 
     // ------------------------------------------------------------------ queries
@@ -337,7 +334,7 @@ public class FixedAssetService {
             if (!pendingRemeasurement) {
                 actions.add("DISPOSE");
                 actions.add("IMPAIR");
-                if (remeasurements.getObject().revaluationEnabled()) {
+                if (setup.revaluationAllowed((UUID) a.get("category_id"))) {
                     actions.add("REVALUE");
                 }
             }
@@ -357,9 +354,9 @@ public class FixedAssetService {
                 ((Number) a.get("version")).longValue());
     }
 
-    /** The configured depreciation start convention (C-30). */
-    public DepreciationMath.Start depreciationStart() {
-        return start;
+    /** The depreciation start convention of the asset class (C-30). */
+    public DepreciationMath.Start depreciationStart(UUID categoryId) {
+        return setup.depreciationStart(categoryId);
     }
 
     private static UUID require(UUID v, String what) {

@@ -25,7 +25,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -42,8 +41,8 @@ import org.springframework.transaction.annotation.Transactional;
  * rest goes to revaluation surplus; a decrease first reduces this asset's surplus, the rest is a loss.</li>
  * </ul>
  *
- * Whether AVTECH uses the revaluation model is its policy (C-07, C-30): revaluation is refused unless
- * {@code cas.fixed-assets.revaluation-enabled} is on. Impairment applies under either model. Reversing an impairment
+ * Whether a class is carried at cost or at revalued amounts is set per asset class (C-07, C-30): revaluation is refused
+ * unless the asset's class uses the revaluation model. Impairment applies under either model. Reversing an impairment
  * of an asset carried at cost is not supported.
  */
 @Service
@@ -60,11 +59,9 @@ public class RemeasurementService {
     private final NotificationService notifications;
     private final JdbcTemplate jdbc;
     private final Clock clock;
-    private final boolean revaluationEnabled;
 
     public RemeasurementService(FixedAssetService assets, AssetSetupService setup, DepreciationService depreciation, PostingService posting,
-            AccountMappingService mappings, AuditService audit, NotificationService notifications, JdbcTemplate jdbc, Clock clock,
-            @Value("${cas.fixed-assets.revaluation-enabled:false}") boolean revaluationEnabled) {
+            AccountMappingService mappings, AuditService audit, NotificationService notifications, JdbcTemplate jdbc, Clock clock) {
         this.assets = assets;
         this.setup = setup;
         this.depreciation = depreciation;
@@ -74,11 +71,6 @@ public class RemeasurementService {
         this.notifications = notifications;
         this.jdbc = jdbc;
         this.clock = clock;
-        this.revaluationEnabled = revaluationEnabled;
-    }
-
-    public boolean revaluationEnabled() {
-        return revaluationEnabled;
     }
 
     @Transactional(readOnly = true)
@@ -96,10 +88,10 @@ public class RemeasurementService {
     @Transactional
     public RemeasurementView prepare(RemeasurementRequest req) {
         CurrentActor.requirePermission("FA_MANAGE");
-        if ("REVALUATION".equals(req.kind()) && !revaluationEnabled) {
-            throw FixedAssetService.rule("Revaluation is turned off until AVTECH confirms it carries assets at revalued amounts (C-07, C-30).");
-        }
         Map<String, Object> a = lockAsset(req.assetId());
+        if ("REVALUATION".equals(req.kind()) && !setup.revaluationAllowed((UUID) a.get("category_id"))) {
+            throw FixedAssetService.rule("This asset's class is carried at cost. Set it to the revaluation model on the Asset setup page to revalue its assets.");
+        }
         requireInService(a);
         if (req.remeasuredOn().isBefore(((Date) a.get("in_service_date")).toLocalDate())) {
             throw new ApiException(ErrorCode.VALIDATION_FAILED, "The date cannot precede the in-service date.");
@@ -136,8 +128,9 @@ public class RemeasurementService {
             throw new ApiException(ErrorCode.SEGREGATION_OF_DUTIES, "You prepared this " + kindText(r) + " and cannot post it.");
         }
         String kind = (String) r.get("kind");
-        if ("REVALUATION".equals(kind) && !revaluationEnabled) {
-            throw FixedAssetService.rule("Revaluation is turned off until AVTECH confirms it carries assets at revalued amounts (C-07, C-30).");
+        if ("REVALUATION".equals(kind) && !setup.revaluationAllowed(jdbc.queryForObject(
+                "SELECT category_id FROM fixed_assets WHERE id = ?", UUID.class, r.get("asset_id")))) {
+            throw FixedAssetService.rule("This asset's class is carried at cost. Set it to the revaluation model on the Asset setup page to revalue its assets.");
         }
         UUID assetId = (UUID) r.get("asset_id");
         Map<String, Object> a = lockAsset(assetId);
@@ -294,7 +287,7 @@ public class RemeasurementService {
         Date migration = (Date) a.get("depreciation_basis_date");
         Date remeasured = (Date) a.get("basis_month");
         YearMonth last = DepreciationMath.lastMonth(((Date) a.get("in_service_date")).toLocalDate(),
-                ((Number) a.get("useful_life_months")).intValue(), assets.depreciationStart(),
+                ((Number) a.get("useful_life_months")).intValue(), assets.depreciationStart((UUID) a.get("category_id")),
                 migration == null ? null : migration.toLocalDate(), a.get("remaining_life_months") == null ? null
                         : ((Number) a.get("remaining_life_months")).intValue(),
                 remeasured == null ? null : remeasured.toLocalDate(), a.get("basis_remaining_months") == null ? null

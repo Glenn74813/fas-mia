@@ -34,7 +34,7 @@ import org.springframework.transaction.annotation.Transactional;
  * Derecognition of an asset (sale, scrap, donation, transfer out, loss). Prepared by one person, posted by
  * another once depreciation is posted through the month before disposal:
  * Dr accumulated depreciation + Dr proceeds / Cr asset cost, with the difference to gain or loss on disposal.
- * Whether depreciation is charged for the month of disposal is AVTECH policy (C-30); none is charged here.
+ * Whether depreciation is charged for the month of disposal is set per asset class (C-30).
  */
 @Service
 public class DisposalService {
@@ -133,7 +133,8 @@ public class DisposalService {
         UUID assetId = (UUID) d.get("asset_id");
         Map<String, Object> a = lockAsset(assetId);
         LocalDate date = ((Date) d.get("disposal_date")).toLocalDate();
-        YearMonth before = YearMonth.from(date).minusMonths(1);
+        // The class decides whether the disposal month is charged (C-30): if it is, that month's depreciation must be posted first.
+        YearMonth before = setup.chargesDisposalMonth((UUID) a.get("category_id")) ? YearMonth.from(date) : YearMonth.from(date).minusMonths(1);
         BigDecimal acc = assets.accumulated(assetId);
         if (acc.compareTo(depreciation.expected(a, before)) < 0) {
             throw FixedAssetService.rule("Post depreciation through " + before + " before disposing of this asset.");

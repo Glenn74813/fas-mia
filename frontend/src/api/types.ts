@@ -946,6 +946,14 @@ export interface AssetCategory {
   accumulatedAccountCode: string; expenseAccountId: string; expenseAccountCode: string; defaultUsefulLifeMonths: number;
   defaultResidualRate: string | null; status: string; placeholder: boolean;
   accumulatedImpairmentAccountId: string | null; accumulatedImpairmentAccountCode: string | null;
+  /** Policy per class (C-30, C-07): when depreciation starts, whether the disposal month is charged, cost or revaluation model. */
+  depreciationStart: 'SAME_MONTH' | 'NEXT_MONTH'; chargeDisposalMonth: boolean; measurementModel: 'COST' | 'REVALUATION';
+  revaluationIntervalYears: number | null; version: number;
+}
+
+export interface AssetCategoryPolicy {
+  defaultUsefulLifeMonths: number; defaultResidualRate: string | null; depreciationStart: AssetCategory['depreciationStart'];
+  chargeDisposalMonth: boolean; measurementModel: AssetCategory['measurementModel']; revaluationIntervalYears: number | null;
 }
 
 export interface AucProject {

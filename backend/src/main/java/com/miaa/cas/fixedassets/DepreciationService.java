@@ -212,7 +212,7 @@ public class DepreciationService {
         }
         return DepreciationMath.expectedAccumulated((BigDecimal) asset.get("cost"), (BigDecimal) asset.get("residual_value"),
                 ((Number) asset.get("useful_life_months")).intValue(), ((Date) asset.get("in_service_date")).toLocalDate(), month,
-                assets.depreciationStart());
+                assets.depreciationStart((UUID) asset.get("category_id")));
     }
 
     private List<LineData> ledgerLines(UUID runId) {

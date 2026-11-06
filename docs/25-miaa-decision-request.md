@@ -69,7 +69,7 @@ These unblock the most work. Each is described in its item below.
 
 | ID | Decision or file needed | What CAS does until then | Needed before |
 |---|---|---|---|
-| C-38 | Since 14 September 2024 New NAIA Infra Corp. operates NAIA under a concession, with MIAA as regulator. Confirm whether the TOR predates the concession, and restate which billing, receivables, concessionaire portal and FMIS functions remain MIAA's. Confirm whether the concession receipts (upfront, annual fixed, revenue share) are billed and received in CAS. | Billing, receivables and the portal as the TOR describes them. | UAT scripts |
+| C-38 | Since 14 September 2024 New NAIA Infra Corp. operates NAIA under a concession, with MIAA as regulator. ~~Confirm whether the TOR predates the concession~~ (it does not: the TOR was written after it, confirmed 7 Nov 2026, so its billing, receivables, concessionaire portal and FMIS scope stands as written). Still to confirm: whether the concession receipts (upfront, annual fixed, revenue share) are billed and received in CAS. | Billing, receivables and the portal as the TOR describes them. | UAT scripts |
 
 ## Finance Manager
 
