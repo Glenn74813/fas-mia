@@ -20,6 +20,10 @@ interface RuleForm { description: string; senderAccountId: string; senderCostCen
 const blankRule = (): RuleForm => ({ description: '', senderAccountId: '', senderCostCenterId: '', receiverAccountId: '', keyType: 'PERCENT',
   receivers: [{ costCenterId: '', weight: '' }] });
 
+function isBlank(r: RuleForm) {
+  return !r.senderAccountId && !r.senderCostCenterId && r.receivers.every((x) => !x.costCenterId && !x.weight.trim());
+}
+
 export function AllocationCyclesPage() {
   const { hasPermission } = useAuth();
   const canManage = hasPermission('ALLOCATION_MANAGE');
@@ -38,7 +42,8 @@ export function AllocationCyclesPage() {
   const [name, setName] = useState('');
   const [rules, setRules] = useState<RuleForm[]>([blankRule()]);
   const create = useMutation({
-    mutationFn: () => allocationApi.create({ code, name, rules: rules.map((r) => ({ ...r, receiverAccountId: r.receiverAccountId || null,
+    // A rule left completely blank is not sent, so an extra empty rule does not block saving.
+    mutationFn: () => allocationApi.create({ code, name, rules: rules.filter((r) => !isBlank(r)).map((r) => ({ ...r, receiverAccountId: r.receiverAccountId || null,
       receivers: r.receivers.filter((x) => x.costCenterId).map((x) => ({ costCenterId: x.costCenterId, weight: x.weight })) })) }),
     onSuccess: () => { setCode(''); setName(''); setRules([blankRule()]); refresh(); },
   });
@@ -121,7 +126,9 @@ export function AllocationCyclesPage() {
           </div>
           {rules.map((r, i) => (
             <fieldset key={i} className="space-y-2 rounded-lg border border-slate-200 p-3">
-              <legend className="px-1 text-sm font-medium">Rule {i + 1}</legend>
+              <legend className="px-1 text-sm font-medium">Rule {i + 1}
+                {rules.length > 1 && <button type="button" className="ml-3 text-xs font-normal text-red-700 hover:underline"
+                  onClick={() => setRules(rules.filter((_, j) => j !== i))}>Remove rule</button>}</legend>
               <div className="grid gap-2 sm:grid-cols-3">
                 <label className="text-sm">Sender account<Combobox value={r.senderAccountId} onChange={(v) => setRule(i, { senderAccountId: v })} className={`mt-1.5 block w-full ${select}`} placeholder="Choose…"
               options={accounts.map((a) => ({ value: a.id, label: `${a.code} — ${a.name}` }))} /></label>
@@ -132,11 +139,13 @@ export function AllocationCyclesPage() {
               </div>
               {r.receivers.map((x, k) => (
                 <div key={k} className="flex flex-wrap items-end gap-2">
-                  <label className="text-sm">Receiver<Combobox value={x.costCenterId} onChange={(v) => setRule(i, { receivers: r.receivers.map((y, m) => (m === k ? { ...y, costCenterId: v } : y)) })}
-                    className={`mt-1.5 block ${select}`} placeholder="Choose…"
+                  <label className="w-72 text-sm">Receiver<Combobox value={x.costCenterId} onChange={(v) => setRule(i, { receivers: r.receivers.map((y, m) => (m === k ? { ...y, costCenterId: v } : y)) })}
+                    className={`mt-1.5 block w-full ${select}`} placeholder="Choose…"
               options={activeCostCenters(costCenters.data).map((c) => ({ value: c.id, label: `${c.code} — ${c.name}` }))} /></label>
                   <label className="text-sm">{r.keyType === 'PERCENT' ? 'Percent' : 'Quantity'}<input inputMode="decimal" value={x.weight}
                     onChange={(e) => setRule(i, { receivers: r.receivers.map((y, m) => (m === k ? { ...y, weight: e.target.value } : y)) })} className={`mt-1.5 block w-28 ${select}`} /></label>
+                  {r.receivers.length > 1 && <button type="button" className="h-9 text-sm text-red-700 hover:underline"
+                    onClick={() => setRule(i, { receivers: r.receivers.filter((_, m) => m !== k) })}>Remove</button>}
                 </div>
               ))}
               <button type="button" className="text-sm text-brand-700 hover:underline" onClick={() => setRule(i, { receivers: [...r.receivers, { costCenterId: '', weight: '' }] })}>
