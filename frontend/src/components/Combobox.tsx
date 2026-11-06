@@ -58,12 +58,23 @@ export function Combobox({ value, onChange, options, placeholder = 'Select…', 
   }, [active, open]);
 
   // The list is placed against the window, so a table's scroll box (overflow) cannot clip it; it opens upwards when
-  // there is more room above the field than below. Inside a modal dialog it stays under the field instead: the dialog
-  // is its own layer, where window-fixed placement would move with the dialog's scrolling and never settle.
+  // there is more room above the field than below. Inside a modal dialog it stays next to the field instead: the dialog
+  // is its own layer, where window-fixed placement would move with the dialog's scrolling and never settle. There it is
+  // kept within the dialog (long options wrap, and it opens upwards when that has more room), so opening it never gives
+  // the dialog a scrollbar or shifts its contents.
   useLayoutEffect(() => {
     if (!open) return;
-    if (inputRef.current?.closest('dialog')) {
-      setPlace({ position: 'absolute', left: 0, top: '100%', marginTop: 4, minWidth: '100%', maxHeight: 288 });
+    const dialog = inputRef.current?.closest('dialog');
+    if (dialog && inputRef.current) {
+      const d = dialog.getBoundingClientRect();
+      const r = inputRef.current.getBoundingClientRect();
+      // Room inside the dialog's border, less the list's 4px gap and its own border, with a little air.
+      const below = d.bottom - r.bottom - 28;
+      const above = r.top - d.top - 28;
+      const up = below < 160 && above > below;
+      setPlace({ position: 'absolute', left: 0, minWidth: '100%', maxWidth: Math.max(r.width, d.right - r.left - 16),
+        maxHeight: Math.max(120, Math.min(288, up ? above : below)),
+        ...(up ? { bottom: '100%', marginBottom: 4 } : { top: '100%', marginTop: 4 }) });
       return;
     }
     const update = () => {
@@ -139,7 +150,7 @@ export function Combobox({ value, onChange, options, placeholder = 'Select…', 
           {rows.map((o, i) => (
             <li key={o.value || '__empty'} id={`${listId}-${i}`} data-index={i} data-value={o.value} role="option" aria-selected={o.value === value}
               aria-disabled={o.disabled || undefined}
-              className={`cursor-pointer whitespace-nowrap px-3 py-1.5 ${i === active ? 'bg-brand-50 text-brand-900' : ''} ${o.value && !o.disabled ? '' : 'text-slate-500'} ${o.value === value ? 'font-medium' : ''}`}
+              className={`cursor-pointer px-3 py-1.5 ${place.position === 'absolute' ? 'whitespace-normal' : 'whitespace-nowrap'} ${i === active ? 'bg-brand-50 text-brand-900' : ''} ${o.value && !o.disabled ? '' : 'text-slate-500'} ${o.value === value ? 'font-medium' : ''}`}
               onMouseDown={(e) => { e.preventDefault(); choose(o); }} onMouseEnter={() => setActive(i)}>
               {o.label}
             </li>
