@@ -284,31 +284,44 @@ public class OperationalReportService {
                 LEDGER_COLUMNS, rows, notes), "general_ledger_" + from + "_" + to);
     }
 
-    /** The same per subsidiary account (customer, supplier, employee or other), within its control accounts. */
+    /**
+     * One ledger card per control account and subsidiary account (customer, supplier, employee or other), as in the GAM
+     * subsidiary ledger: the card is headed by the control account's code and title and the subsidiary, opens with its
+     * balance before the period and runs in the control account's normal-balance sign. Cards are in control-account order.
+     */
     private Rendered subsidiaryLedger(LocalDate from, LocalDate to, UUID subsidiaryAccountId, String slType, String by, String at) {
         List<ReportTable.Row> rows = new ArrayList<>();
         int[] lines = {0};
-        for (Map<String, Object> s : jdbc.queryForList("""
-                SELECT s.id, s.code, s.name, s.sl_type FROM subsidiary_ledger_accounts s
+        int cards = 0;
+        for (Map<String, Object> c : jdbc.queryForList("""
+                SELECT a.id AS account_id, a.code AS account_code, a.name AS account_name, a.normal_balance,
+                       s.id AS sl_id, s.code AS sl_code, s.name AS sl_name, s.sl_type
+                FROM subsidiary_ledger_accounts s JOIN chart_of_accounts a
+                  ON EXISTS (SELECT 1 FROM journal_entry_lines l WHERE l.subsidiary_account_id = s.id AND l.account_id = a.id
+                             AND l.accounting_date <= ?)
                 WHERE (?::uuid IS NULL OR s.id = ?::uuid) AND (?::text IS NULL OR s.sl_type = ?::text)
-                  AND EXISTS (SELECT 1 FROM journal_entry_lines l WHERE l.subsidiary_account_id = s.id AND l.accounting_date <= ?)
-                ORDER BY s.sl_type, s.code""", subsidiaryAccountId, subsidiaryAccountId, slType, slType, Date.valueOf(to))) {
+                ORDER BY a.code, s.sl_type, s.code""", Date.valueOf(to), subsidiaryAccountId, subsidiaryAccountId, slType, slType)) {
             if (lines[0] >= rowLimit) {
                 break;
             }
-            // Suppliers' balances are credits; customers', employees' and others' are debits.
-            boolean debitNormal = !"SUPPLIER".equals(s.get("sl_type"));
-            ledgerSection(rows, lines, s.get("sl_type") + " " + s.get("code") + " " + s.get("name"), debitNormal, "l.subsidiary_account_id = ?",
-                    new Object[] {s.get("id")}, from, to);
+            cards++;
+            String heading = c.get("account_code") + " " + c.get("account_name") + " | " + SL_LABEL.getOrDefault((String) c.get("sl_type"),
+                    (String) c.get("sl_type")) + " " + c.get("sl_code") + " " + c.get("sl_name");
+            ledgerSection(rows, lines, heading, "DEBIT".equals(c.get("normal_balance")), "l.account_id = ? AND l.subsidiary_account_id = ?",
+                    new Object[] {c.get("account_id"), c.get("sl_id")}, from, to);
         }
-        List<String> notes = new ArrayList<>(List.of("Supplier balances are shown as credits, other subsidiary balances as debits."));
+        List<String> notes = new ArrayList<>(List.of("One ledger card per control account and subsidiary account; balances in the control "
+                + "account's normal-balance sign (debit or credit).", cards + " ledger card" + (cards == 1 ? "" : "s") + "."));
         if (lines[0] >= rowLimit) {
-            notes.add("Stopped at " + rowLimit + " lines (cas.reports.ledger-row-limit); narrow the date range or choose an account.");
+            notes.add("Stopped at " + rowLimit + " lines (cas.reports.ledger-row-limit); narrow the date range or choose a subsidiary account.");
         }
         notes.add(generated(by, at));
-        return new Rendered(new ReportTable("Subsidiary ledger", List.of(ORG, "From " + from + " to " + to), "Subsidiary account / date",
-                LEDGER_COLUMNS, rows, notes), "subsidiary_ledger_" + from + "_" + to);
+        return new Rendered(new ReportTable("Subsidiary ledger", List.of(ORG, "From " + from + " to " + to),
+                "Control account | subsidiary account / date", LEDGER_COLUMNS, rows, notes), "subsidiary_ledger_" + from + "_" + to);
     }
+
+    private static final Map<String, String> SL_LABEL = Map.of("SUPPLIER", "Supplier", "CUSTOMER", "Customer", "EMPLOYEE", "Employee",
+            "OTHER", "Other");
 
     private static final List<String> LEDGER_COLUMNS = List.of("JEV", "Description", "Cost centre", "Debit", "Credit", "Balance");
 

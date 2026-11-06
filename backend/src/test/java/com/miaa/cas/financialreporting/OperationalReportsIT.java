@@ -69,6 +69,11 @@ class OperationalReportsIT extends AbstractReceivablesIT {
         String slId = customer.get("subsidiaryAccountId").asText();
         String sl = csv(chief, "SUBSIDIARY_LEDGER", Map.of("from", from, "to", to, "subsidiaryAccountId", slId));
         assertThat(sl).contains("Subsidiary ledger", code);
+        // One card per control account and subsidiary, headed by the control account's code and title, as in the GAM form.
+        Map<String, Object> control = jdbc.queryForMap("SELECT DISTINCT a.code, a.name FROM journal_entry_lines l JOIN chart_of_accounts a "
+                + "ON a.id = l.account_id WHERE l.subsidiary_account_id = ?::uuid LIMIT 1", slId);
+        assertThat(sl).contains(control.get("code") + " " + control.get("name") + " | Customer " + code, "Opening balance", "Closing balance",
+                "One ledger card per control account and subsidiary account");
 
         String dcr = csv(cashier, "DAILY_COLLECTION_REPORT", Map.of("date", collected.toString()));
         assertThat(dcr).contains("Daily collection report", receiptNumber);
