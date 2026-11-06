@@ -48,6 +48,13 @@ public class UserController {
         return service.list(q, status, page, size, sort);
     }
 
+    @GetMapping("/roles")
+    @PreAuthorize("hasAuthority('PERM_USER_VIEW')")
+    @Operation(summary = "Every role with the users who hold it")
+    public java.util.List<IdentityDtos.RoleMembers> roleMembers() {
+        return service.roleMembers();
+    }
+
     @GetMapping("/{id}")
     @PreAuthorize("hasAuthority('PERM_USER_VIEW')")
     public UserDetail get(@PathVariable UUID id) {

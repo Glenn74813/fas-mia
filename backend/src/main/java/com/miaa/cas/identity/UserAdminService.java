@@ -82,6 +82,11 @@ public class UserAdminService {
     }
 
     @Transactional(readOnly = true)
+    public java.util.List<com.miaa.cas.identity.web.IdentityDtos.RoleMembers> roleMembers() {
+        return assignments.roleMembers();
+    }
+
+    @Transactional(readOnly = true)
     public PageResponse<UserSummary> list(String q, String status, int page, int size, String sort) {
         Pageable pageable = PageRequests.of(page, size, sort, SORTS, "username");
         UserStatus st = status == null || status.isBlank() ? null : parse(UserStatus.class, status, "status");

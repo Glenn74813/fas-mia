@@ -59,6 +59,12 @@ export interface UserSummary {
   version: number;
 }
 
+/** A role and the users who hold it (Users page, users-by-role table). */
+export interface RoleMembers {
+  roleCode: string; roleName: string;
+  members: { id: string; username: string; displayName: string; status: 'ACTIVE' | 'INACTIVE' }[];
+}
+
 export interface UserDetail extends Omit<UserSummary, 'lastLoginAt'> {
   lockedUntil: string | null;
   mustChangePassword: boolean;

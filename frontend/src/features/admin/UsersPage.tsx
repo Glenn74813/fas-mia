@@ -25,6 +25,7 @@ export function UsersPage() {
     queryFn: () => userApi.list({ q, status, sort, page, size: 25 }),
     placeholderData: keepPreviousData,
   });
+  const byRole = useQuery({ queryKey: ['users', 'by-role'], queryFn: userApi.roleMembers });
 
   return (
     <>
@@ -69,6 +70,38 @@ export function UsersPage() {
       )}
       {query.data && <Pagination page={query.data.page} totalPages={query.data.totalPages}
         totalItems={query.data.totalItems} onPage={setPage} />}
+      <section className="mt-8">
+        <h2 className="mb-1 text-base font-semibold text-slate-900">Users by role</h2>
+        <p className="mb-3 text-sm text-slate-600">Every role and the users who hold it. Open a user to change their roles.</p>
+        <ErrorAlert error={byRole.error} />
+        {byRole.isPending ? <Spinner /> : byRole.data && (
+          <div className="overflow-x-auto rounded-xl border border-slate-200/80 bg-white shadow-xs">
+            <table className="min-w-full text-left text-sm">
+              <thead className="border-b border-slate-200 bg-slate-50/80 text-[11px] font-semibold uppercase tracking-wider text-slate-500">
+                <tr><th className="px-4 py-2">Role</th><th className="px-4 py-2">Code</th><th className="px-4 py-2">Users</th>
+                  <th className="px-4 py-2 text-right">Active</th></tr>
+              </thead>
+              <tbody>
+                {byRole.data.map((r) => (
+                  <tr key={r.roleCode} className="border-t border-slate-100 align-top">
+                    <td className="px-4 py-2 font-medium text-slate-900">{r.roleName}</td>
+                    <td className="px-4 py-2 font-mono text-xs text-slate-500">{r.roleCode}</td>
+                    <td className="px-4 py-2">
+                      {r.members.length === 0 ? <span className="text-slate-400">No users</span> : (
+                        <ul className="flex flex-wrap gap-x-4 gap-y-1">{r.members.map((m) => (
+                          <li key={m.id}><Link className="text-brand-700 hover:underline" to={`/admin/users/${m.id}`}>{m.displayName}</Link>
+                            <span className="ml-1 text-xs text-slate-500">{m.username}</span>
+                            {m.status !== 'ACTIVE' && <span className="ml-1"><Badge tone="slate">{m.status}</Badge></span>}</li>))}</ul>
+                      )}
+                    </td>
+                    <td className="px-4 py-2 text-right tabular-nums">{r.members.filter((m) => m.status === 'ACTIVE').length}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </section>
     </>
   );
 }

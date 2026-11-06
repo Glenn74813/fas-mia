@@ -6,7 +6,7 @@ import type { BirAlphalist, BirAtc, Sawt, VatListing, WithholdingCertificate,
   AdHocDataset, AdHocDefinition, AdHocResult, AdHocSaved, AllocationCycle, AllocationPreview, AllocationRun, NrvReview,
   AnomalyFinding, AnomalySummary, ApiClient, InterfaceBatch, InterfaceType, DataExport, LegalHold, RetentionSchedule, WebhookDelivery, WebhookSubscription, EventRecord, FiscalYear, LineInput, LoginResponse, Page, Period, PeriodChange, Permission, RecurringJournal, Role,
   RoleAssignmentResult, RoleChangeResult, SodConflict, SubsidiaryAccount, TokenResponse, TotpEnrollment, TrialBalance,
-  UserDetail, UserSummary, VoucherDetail, VoucherInput, VoucherSummary,
+  RoleMembers, UserDetail, UserSummary, VoucherDetail, VoucherInput, VoucherSummary,
   AccountMapping, AgingRow, BankAccount, BudgetAdjustment, BudgetView, DvSummary, DvView, InvoiceInput, InvoiceSummary,
   InvoiceView, Supplier, TaxCode,
   ArAgingRow, BillingInput, BillingSummary, BillingView, Contract, ControlReconciliation, Customer, CustomerInput, OpenItem,
@@ -69,6 +69,7 @@ function qs(params: Record<string, string | number | undefined>): string {
 }
 
 export const userApi = {
+  roleMembers: () => api.get<RoleMembers[]>('/users/roles'),
   list: (q: UserQuery) => api.get<Page<UserSummary>>(`/users${qs({ ...q })}`),
   get: (id: string) => api.get<UserDetail>(`/users/${id}`),
   create: (body: {

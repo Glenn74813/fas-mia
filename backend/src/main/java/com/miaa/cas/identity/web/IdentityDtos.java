@@ -50,6 +50,13 @@ public final class IdentityDtos {
             String status, boolean locked, Instant lastLoginAt, long version) {
     }
 
+    /** A role and the users who hold it, for the users-by-role table. */
+    public record RoleMembers(String roleCode, String roleName, List<RoleMember> members) {
+    }
+
+    public record RoleMember(UUID id, String username, String displayName, String status) {
+    }
+
     public record UserDetail(UUID id, String username, String displayName, String email, String userType,
             String status, boolean locked, Instant lockedUntil, boolean mustChangePassword, boolean mfaEnrolled,
             Instant accessExpiresAt, Instant lastLoginAt, Instant passwordChangedAt, Instant createdAt, String createdBy,

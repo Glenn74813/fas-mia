@@ -40,6 +40,24 @@ public class RoleAssignments {
         return result;
     }
 
+    /** Every role, ordered by name, with the users holding it (active users first, then by name). */
+    public List<com.miaa.cas.identity.web.IdentityDtos.RoleMembers> roleMembers() {
+        java.util.Map<String, com.miaa.cas.identity.web.IdentityDtos.RoleMembers> out = new java.util.LinkedHashMap<>();
+        jdbc.query("""
+                SELECT r.code, r.name, u.id, u.username, u.display_name, u.status
+                FROM roles r LEFT JOIN user_roles ur ON ur.role_id = r.id LEFT JOIN users u ON u.id = ur.user_id
+                ORDER BY r.name, u.status, u.display_name""", rs -> {
+            String code = rs.getString(1);
+            String name = rs.getString(2);
+            var role = out.computeIfAbsent(code, c -> new com.miaa.cas.identity.web.IdentityDtos.RoleMembers(c, name, new java.util.ArrayList<>()));
+            if (rs.getObject(3) != null) {
+                role.members().add(new com.miaa.cas.identity.web.IdentityDtos.RoleMember(rs.getObject(3, UUID.class), rs.getString(4),
+                        rs.getString(5), rs.getString(6)));
+            }
+        });
+        return List.copyOf(out.values());
+    }
+
     public List<UUID> usersWithRole(UUID roleId) {
         return jdbc.queryForList("SELECT user_id FROM user_roles WHERE role_id = ?", UUID.class, roleId);
     }

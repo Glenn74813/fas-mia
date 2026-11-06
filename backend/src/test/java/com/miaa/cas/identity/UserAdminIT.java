@@ -30,6 +30,23 @@ class UserAdminIT extends AbstractIntegrationTest {
     }
 
     @Test
+    void usersByRoleListsEveryRoleWithItsHolders() throws Exception {
+        TestUser cashier = createUser("cashier", "CASHIER");
+        JsonNode roles = body(mvc.perform(get("/api/v1/users/roles").header("Authorization", admin.bearer())).andExpect(status().isOk()).andReturn());
+        JsonNode cashiers = null;
+        for (JsonNode r : roles) {
+            if ("CASHIER".equals(r.get("roleCode").asText())) {
+                cashiers = r;
+            }
+        }
+        assertThat(cashiers).isNotNull();
+        assertThat(cashiers.get("roleName").asText()).isNotBlank();
+        assertThat(cashiers.get("members").findValuesAsText("username")).contains(cashier.username());
+        assertThat(roles.findValuesAsText("roleCode")).contains("SYSTEM_ADMINISTRATOR", "ACCOUNTANT");
+        mvc.perform(get("/api/v1/users/roles").header("Authorization", login(cashier).bearer())).andExpect(status().isForbidden());
+    }
+
+    @Test
     void createUserAuditsAndRequiresPasswordChange() throws Exception {
         String username = unique("newuser");
         JsonNode created = body(mvc.perform(post("/api/v1/users").header("Authorization", admin.bearer())
