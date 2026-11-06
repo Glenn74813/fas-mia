@@ -103,9 +103,17 @@ public class AccountService {
             throw rule("The selected parent would create a cycle in the hierarchy.");
         }
         validateSubsidiaryType(req.subsidiaryType());
+        String subsidiaryType = blankToNull(req.subsidiaryType());
+        if (subsidiaryType != null && !req.postable()) {
+            throw rule("Only postable accounts can require a subsidiary ledger.");
+        }
+        if (!java.util.Objects.equals(subsidiaryType, account.getSubsidiaryType()) && isUsed(id)) {
+            throw rule("The subsidiary ledger cannot change after the account has been used: its earlier lines would not match. "
+                    + "Create a new account and reclassify through a journal entry.");
+        }
         account.setStructure(type, normal, parentId, req.postable());
         account.setAttributes(req.name().trim(), req.description(), req.fsLineCode(), req.requiresCostCenter(),
-                blankToNull(req.subsidiaryType()), req.budgetControlled(), req.taxCode(), req.effectiveTo());
+                subsidiaryType, req.budgetControlled(), req.taxCode(), req.effectiveTo());
         account.touch(Instant.now(clock), Actor.current().username());
         accounts.flush();
         audit.record("ACCOUNT_UPDATED", "ACCOUNT", account.getCode(), Map.of("before", before, "after", snapshot(account)));

@@ -1,5 +1,5 @@
 import { api, downloadFile } from './client';
-import type { BirAlphalist, BirAtc, Sawt, VatListing, WithholdingCertificate,
+import type { Account, BirAlphalist, BirAtc, Sawt, VatListing, WithholdingCertificate,
   TicketCategory,
   Clearing, ClearingProposal, CloseCalendarChecklist, CloseFrequency, CloseScheduleItem, CloseTask, GlOpenItem, OpenItemAccount,
   AccountLedger, ChainVerification, ChartSummary, CloseChecklist, CostCenter, CurrentUser, DocumentInfo, EntryDetail,
@@ -201,6 +201,11 @@ export const accountApi = {
   importCsv: (file: File, placeholder: boolean) =>
     api.upload<{ created: number }>(`/accounts/import?placeholder=${placeholder}`, file),
   costCenters: () => api.get<CostCenter[]>('/cost-centers'),
+  /** Changes which subsidiary ledger an account keeps, leaving its other settings as they are. */
+  setSubsidiaryType: (a: Account, subsidiaryType: string | null) => api.put<Account>(`/accounts/${a.id}`, {
+    version: a.version, name: a.name, description: a.description, accountType: a.accountType, normalBalance: a.normalBalance,
+    parentCode: a.parentCode, postable: a.postable, effectiveTo: a.effectiveTo, fsLineCode: a.fsLineCode,
+    requiresCostCenter: a.requiresCostCenter, subsidiaryType, budgetControlled: a.budgetControlled, taxCode: a.taxCode }),
   subsidiaryAccounts: (slType?: string, q?: string, page = 0, size = 50) =>
     api.get<Page<SubsidiaryAccount>>(`/subsidiary-accounts${qs({ slType, q: q || undefined, page, size })}`),
   subsidiaryAccount: (id: string) => api.get<SubsidiaryAccount>(`/subsidiary-accounts/${id}`),
