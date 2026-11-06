@@ -282,7 +282,8 @@ public class DisbursementService implements DocumentOwnerPolicy {
             throw ApInvoiceService.state("There is no prepared check awaiting approval on this voucher.");
         }
         Map<String, Object> check = rows.get(0);
-        if (CurrentActor.isSameAs(check.get("prepared_by_id")) || CurrentActor.isSameAs(dv.getPreparedById())) {
+        // The check's own preparer is refused even under the demo override: the database enforces it too.
+        if (CurrentActor.userId().equals(check.get("prepared_by_id")) || CurrentActor.isSameAs(dv.getPreparedById())) {
             throw new ApiException(ErrorCode.SEGREGATION_OF_DUTIES,
                     "You prepared this check or its voucher; another person must approve the check.");
         }
@@ -524,8 +525,8 @@ public class DisbursementService implements DocumentOwnerPolicy {
             }
         }
         if (awaitingCheckApproval && "PAYMENT_INSTRUCTED".equals(dv.getStatus()) && otherPreparer
-                && CurrentActor.hasPermission("CHECK_APPROVE")
-                && (CurrentActor.overridesControls() || !CurrentActor.username().equals(check.preparedBy()))) {
+                // The database requires a check to be approved by someone other than its preparer, for every account.
+                && CurrentActor.hasPermission("CHECK_APPROVE") && !CurrentActor.username().equals(check.preparedBy())) {
             actions.add("APPROVE_CHECK");
         }
         if ("PAID".equals(dv.getStatus()) && otherPreparer && CurrentActor.hasPermission("JOURNAL_POST")) {
