@@ -1,5 +1,5 @@
 import {
-  BadgeCheck, Banknote, BookOpen, BookText, Boxes, Building2, CalendarCheck, CalendarDays, ChartColumn, ChartPie, ClipboardCheck, DatabaseBackup, Archive, Webhook, FileInput, Split, TableProperties, Tags,
+  BadgeCheck, Banknote, Contact, BookOpen, BookText, Boxes, Building2, CalendarCheck, CalendarDays, ChartColumn, ChartPie, ClipboardCheck, DatabaseBackup, Archive, Webhook, FileInput, Split, TableProperties, Tags,
   FileSpreadsheet, FileText, Gauge, GitCompare, HandCoins, Inbox, KeyRound, Landmark, LayoutDashboard, LifeBuoy, Link2, ListTree,
   MessageSquare, Network, PackageOpen, PiggyBank, Plug, Receipt, Repeat, Scale, ScrollText, Send, Settings2, ShieldAlert, ShieldCheck,
   SlidersHorizontal, TrendingDown, TrendingUp, Truck, UserCheck, Users, Wallet, type LucideIcon,
@@ -43,6 +43,7 @@ export const NAV_ICONS: Record<string, LucideIcon> = {
   '/general-ledger/trial-balance': Scale,
   '/general-ledger/account-ledger': BookText,
   '/chart-of-accounts': ListTree,
+  '/subsidiary-accounts': Contact,
   '/general-ledger/open-items': Link2,
   '/general-ledger/allocations': Split,
   '/fiscal-periods': CalendarCheck,

@@ -45,6 +45,7 @@ export const NAV_ITEMS: NavItem[] = [
   { label: 'Trial balance', to: '/general-ledger/trial-balance', anyOf: ['LEDGER_VIEW'], section: 'General ledger' },
   { label: 'Account ledger', to: '/general-ledger/account-ledger', anyOf: ['LEDGER_VIEW'], section: 'General ledger' },
   { label: 'Chart of accounts', to: '/chart-of-accounts', anyOf: ['LEDGER_VIEW', 'ACCOUNT_ADMINISTER'], section: 'General ledger' },
+  { label: 'Subsidiary accounts', to: '/subsidiary-accounts', anyOf: ['LEDGER_VIEW', 'ACCOUNT_ADMINISTER'], section: 'General ledger' },
   { label: 'Open items', to: '/general-ledger/open-items', anyOf: ['LEDGER_VIEW'], section: 'General ledger' },
   { label: 'Overhead allocation', to: '/general-ledger/allocations', anyOf: ['LEDGER_VIEW', 'ALLOCATION_MANAGE'], section: 'General ledger' },
   { label: 'Fiscal periods', to: '/fiscal-periods', anyOf: ['LEDGER_VIEW'], section: 'General ledger' },

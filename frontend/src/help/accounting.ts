@@ -141,6 +141,25 @@ export const ACCOUNTING_HELP: Record<string, ModuleHelp> = {
     ],
   },
 
+  '/subsidiary-accounts': {
+    title: 'Subsidiary accounts',
+    summary: 'The individual employees, suppliers, customers and other parties that a control account is broken down into, such as each employee under Advances to Officers and Employees.',
+    steps: [
+      'Use the search box or the type filter to find a subsidiary account.',
+      'To add an employee or another party, choose the Type, enter a Code (for example the employee number) and the Name, and click Add.',
+      'Click Rename to correct a name, or Deactivate when the person or party should no longer be used on new vouchers. Posted history stays.',
+      'Supplier and customer subsidiaries are created with the supplier or customer and are changed on those pages.',
+      'On a journal voucher, an account marked SL in the chart of accounts opens the Subsidiary box with the matching type.',
+    ],
+    roles: 'Everyone with ledger access can read the list. Adding, renaming and deactivating needs account administration (Chief Accountant).',
+    connections: [
+      { to: '/chart-of-accounts', how: 'The SL mark on an account says which type of subsidiary its lines need: employee, supplier, customer or other.' },
+      { to: '/journal-vouchers', how: 'Voucher lines on those accounts must name an active subsidiary account of that type.' },
+      { to: '/payables/suppliers', how: 'Each supplier gets its own supplier subsidiary account automatically.' },
+      { to: '/receivables/customers', how: 'Each customer gets its own customer subsidiary account automatically.' },
+    ],
+  },
+
   '/chart-of-accounts': {
     title: 'Chart of accounts',
     summary: 'The list of accounts that vouchers can post to, with type, normal balance, required dimensions and statement line.',
@@ -154,6 +173,7 @@ export const ACCOUNTING_HELP: Record<string, ModuleHelp> = {
     roles: 'Everyone with ledger access can read it. Chief Accountant maintains it. The role that maintains accounts is not normally the one that prepares vouchers.',
     connections: [
       { to: '/journal-vouchers', how: 'Voucher lines can only use active, postable accounts and must supply the required cost centre or subsidiary account.' },
+      { to: '/subsidiary-accounts', how: 'An account marked SL needs a subsidiary account on each line; employee and other subsidiaries are added there.' },
       { to: '/finance-settings', how: 'Control-account mappings, tax codes and bank accounts point to accounts in this chart.' },
       { to: '/reports/financial-statements', how: 'The FS line code on each account decides where its balance appears on the statements.' },
       { to: '/general-ledger/open-items', how: 'Accounts can be flagged for open-item management and then cleared there.' },

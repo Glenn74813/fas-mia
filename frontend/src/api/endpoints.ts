@@ -204,6 +204,10 @@ export const accountApi = {
   subsidiaryAccounts: (slType?: string, q?: string, page = 0, size = 50) =>
     api.get<Page<SubsidiaryAccount>>(`/subsidiary-accounts${qs({ slType, q: q || undefined, page, size })}`),
   subsidiaryAccount: (id: string) => api.get<SubsidiaryAccount>(`/subsidiary-accounts/${id}`),
+  createSubsidiaryAccount: (body: { slType: string; code: string; name: string }) =>
+    api.post<SubsidiaryAccount>('/subsidiary-accounts', body),
+  updateSubsidiaryAccount: (s: SubsidiaryAccount, name: string, status: string) =>
+    api.put<SubsidiaryAccount>(`/subsidiary-accounts/${s.id}`, { version: s.version, name, status }),
 };
 
 export const periodApi = {

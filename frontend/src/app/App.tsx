@@ -9,6 +9,7 @@ import { RolesPage } from '../features/admin/RolesPage';
 import { UserDetailPage } from '../features/admin/UserDetailPage';
 import { UsersPage } from '../features/admin/UsersPage';
 import { ChartOfAccountsPage } from '../features/accounts/ChartOfAccountsPage';
+import { SubsidiaryAccountsPage } from '../features/accounts/SubsidiaryAccountsPage';
 import { DataExportsPage } from '../features/admin/DataExportsPage';
 import { RecordsRetentionPage } from '../features/admin/RecordsRetentionPage';
 import { AnomaliesPage } from '../features/audit/AnomaliesPage';
@@ -127,6 +128,7 @@ export const routes: RouteObject[] = [
       { path: 'general-ledger/account-ledger', element: <RequireAuth anyOf={['LEDGER_VIEW']}><AccountLedgerPage /></RequireAuth> },
       { path: 'general-ledger/entries/:id', element: <RequireAuth anyOf={['LEDGER_VIEW']}><EntryDetailPage /></RequireAuth> },
       { path: 'chart-of-accounts', element: <RequireAuth anyOf={['LEDGER_VIEW', 'ACCOUNT_ADMINISTER']}><ChartOfAccountsPage /></RequireAuth> },
+      { path: 'subsidiary-accounts', element: <RequireAuth anyOf={['LEDGER_VIEW', 'ACCOUNT_ADMINISTER']}><SubsidiaryAccountsPage /></RequireAuth> },
       { path: 'fiscal-periods', element: <RequireAuth anyOf={['LEDGER_VIEW']}><FiscalPeriodsPage /></RequireAuth> },
       { path: 'close', element: <RequireAuth anyOf={['LEDGER_VIEW']}><CloseCalendarPage /></RequireAuth> },
       { path: 'general-ledger/allocations', element: <RequireAuth anyOf={['LEDGER_VIEW', 'ALLOCATION_MANAGE']}><AllocationCyclesPage /></RequireAuth> },
