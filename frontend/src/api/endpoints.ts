@@ -589,6 +589,7 @@ export const reportingApi = {
   requestJob: (reportType: string, format: string, parameters: Record<string, string>) =>
     api.post<ReportJob>('/report-jobs', { reportType, format, parameters }),
   jobs: (page = 0) => api.get<Page<ReportJob>>(`/report-jobs${qs({ page, size: 25 })}`),
+  job: (id: string) => api.get<ReportJob>(`/report-jobs/${id}`),
   download: (job: ReportJob) => downloadFile(`/report-jobs/${job.id}/file`, job.fileName ?? 'report'),
   schedules: () => api.get<ReportSchedule[]>('/report-schedules'),
   createSchedule: (body: { name: string; reportType: string; format: string; parameters: Record<string, string>; frequency: string;

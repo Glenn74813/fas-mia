@@ -70,11 +70,13 @@ public class ReportJobService {
     private final ObjectMapper json;
     private final Clock clock;
     private final Duration retention;
+    private final ReportLetterhead letterhead;
 
     public ReportJobService(FinancialStatementService statements, ManagementReportService management, StatementTemplateService templates, LedgerInquiryService ledger,
             FiscalCalendarService calendar, AuditService audit, ContentCipher cipher, NotificationService notifications, JdbcTemplate jdbc, TransactionTemplate tx, ObjectMapper json, Clock clock,
-            @Value("${cas.reports.retention:P30D}") Duration retention, OutboxService outbox) {
+            @Value("${cas.reports.retention:P30D}") Duration retention, OutboxService outbox, ReportLetterhead letterhead) {
         this.outbox = outbox;
+        this.letterhead = letterhead;
         this.statements = statements;
         this.management = management;
         this.templates = templates;
@@ -218,7 +220,7 @@ public class ReportJobService {
                 table = rendered.table();
                 base = rendered.baseName();
             }
-            byte[] content = ReportExporters.export(table, format);
+            byte[] content = ReportExporters.export(table, format, letterhead.current());
             String sha = HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256").digest(content));
             String fileName = base.replaceAll("[^A-Za-z0-9._-]", "_") + "." + format.toLowerCase();
             Instant done = Instant.now(clock);

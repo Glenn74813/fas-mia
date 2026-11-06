@@ -72,6 +72,7 @@ export const PAYABLES_RECEIVABLES_HELP: Record<string, ModuleHelp> = {
     summary: 'Read-only payables reports: aging of what AVTECH owes, the expanded withholding schedule, supplier advances and a check that the AP sub-ledger agrees with the general ledger.',
     steps: [
       'Change the As of date to see the Aging of payables by supplier, in Current, 1–30, 31–60, 61–90 and over 90 day columns.',
+      'Click PDF, Excel or CSV beside the date to download the aging on the AVTECH letterhead. The file is also kept under Reports › My report files.',
       'Pick a Year and Quarter to see the Expanded withholding schedule by payee and tax code, with monthly bases and tax withheld.',
       'Read the note shown above the schedule; it states the limits of the figures.',
       'Click Download on a supplier for its BIR Form 2307 for the quarter, or All BIR 2307 (ZIP) for every supplier. The certificate is filled in on the official form, ready to sign.',

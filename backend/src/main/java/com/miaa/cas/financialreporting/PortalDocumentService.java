@@ -41,8 +41,10 @@ public class PortalDocumentService {
     private final PortalService portal;
     private final AuditService audit;
     private final Clock clock;
+    private final ReportLetterhead letterhead;
 
-    public PortalDocumentService(PortalService portal, AuditService audit, Clock clock) {
+    public PortalDocumentService(PortalService portal, AuditService audit, Clock clock, ReportLetterhead letterhead) {
+        this.letterhead = letterhead;
         this.portal = portal;
         this.audit = audit;
         this.clock = clock;
@@ -69,7 +71,7 @@ public class PortalDocumentService {
             subtitles.add("Relates to " + b.relatedInvoiceNumber());
         }
         byte[] pdf = ReportExporters.export(new ReportTable(kind(b.kind()), subtitles, "Description", List.of("Amount"), rows,
-                List.of(b.description(), NOT_OFFICIAL, generated())), "PDF");
+                List.of(b.description(), NOT_OFFICIAL, generated())), "PDF", letterhead.current());
         audit.record("PORTAL_DOCUMENT_DOWNLOADED", "BILLING_DOCUMENT", id, Map.of("document", b.documentNumber(), "user", CurrentActor.username()));
         return new PortalPdf(b.documentNumber().replaceAll("[^A-Za-z0-9._-]", "_") + ".pdf", pdf);
     }
@@ -87,7 +89,7 @@ public class PortalDocumentService {
         byte[] pdf = ReportExporters.export(new ReportTable("Statement of account", List.of(ORG, s.customerName() + " (" + s.customerCode() + ")",
                 "From " + from + " to " + to), "Date", List.of("Type", "Reference", "Charges", "Credits", "Balance"), rows,
                 List.of("Unapplied collections (credits on account) as of " + to + ": " + s.unappliedCollections().toPlainString() + ".",
-                        "Posted records only. " + NOT_OFFICIAL, generated())), "PDF");
+                        "Posted records only. " + NOT_OFFICIAL, generated())), "PDF", letterhead.current());
         audit.record("PORTAL_DOCUMENT_DOWNLOADED", "CUSTOMER", s.customerCode(), Map.of("document", "STATEMENT " + from + " " + to,
                 "user", CurrentActor.username()));
         return new PortalPdf("statement_" + s.customerCode() + "_" + from + "_" + to + ".pdf", pdf);

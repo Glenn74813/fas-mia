@@ -9,6 +9,7 @@ import { ErrorAlert } from '../../components/ErrorAlert';
 import { Money } from '../../components/Money';
 import { PageHeader } from '../../components/PageHeader';
 import { Spinner } from '../../components/Spinner';
+import { ReportDownloadButtons } from '../reporting/ReportDownloadButtons';
 
 export function PayablesReportsPage() {
   const { hasPermission } = useAuth();
@@ -35,8 +36,10 @@ export function PayablesReportsPage() {
       )}
       <ErrorAlert error={recon.error} />
       <section className="mb-4 rounded-xl border border-slate-200/80 bg-white shadow-xs p-5">
-        <div className="mb-3 flex items-center justify-between"><h2 className="font-semibold">Aging of payables</h2>
-          <label className="text-sm">As of <input type="date" value={asOf} onChange={(e) => setAsOf(e.target.value)} className="ml-2 rounded-md border border-slate-300 px-2 py-1" /></label></div>
+        <div className="mb-3 flex flex-wrap items-start justify-between gap-3"><h2 className="font-semibold">Aging of payables</h2>
+          <div className="flex flex-wrap items-start gap-3">
+            <label className="text-sm">As of <input type="date" value={asOf} onChange={(e) => setAsOf(e.target.value)} className="ml-2 rounded-md border border-slate-300 px-2 py-1" /></label>
+            {asOf && <ReportDownloadButtons reportType="AP_AGING" parameters={{ asOf }} />}</div></div>
         <ErrorAlert error={aging.error} />
         {aging.isPending ? <Spinner /> : aging.data && (
           <div className="overflow-x-auto"><table className="min-w-full text-sm">
