@@ -97,40 +97,4 @@ class ChartOfAccountsIT extends AbstractAccountingIT {
                 .contentType(MediaType.APPLICATION_JSON).content(toJson(update)))
                 .andExpect(status().isUnprocessableEntity());
     }
-
-    @Test
-    void subsidiaryLedgerCanBeSetOnlyBeforeTheAccountIsUsed() throws Exception {
-        Map<String, Object> req = new HashMap<>();
-        req.put("code", "Y" + (System.nanoTime() % 100000));
-        req.put("name", "Petty cash fund");
-        req.put("accountType", "ASSET");
-        req.put("parentCode", "PLC-11");
-        req.put("postable", true);
-        JsonNode fresh = body(mvc.perform(post("/api/v1/accounts").header("Authorization", approver.bearer())
-                .contentType(MediaType.APPLICATION_JSON).content(toJson(req))).andExpect(status().isCreated()).andReturn());
-        JsonNode updated = body(mvc.perform(put("/api/v1/accounts/" + fresh.get("id").asText()).header("Authorization", approver.bearer())
-                .contentType(MediaType.APPLICATION_JSON).content(toJson(slUpdate(fresh, "EMPLOYEE")))).andExpect(status().isOk()).andReturn());
-        assertThat(updated.get("subsidiaryType").asText()).isEqualTo("EMPLOYEE");
-
-        int year = newOpenYear();
-        createVoucher(preparer, voucher("STANDARD", LocalDate.of(year, 1, 5), utilitiesLines("1.00")));
-        JsonNode cash = body(mvc.perform(get("/api/v1/accounts/" + account("PLC-1102")).header("Authorization", approver.bearer()))
-                .andReturn());
-        mvc.perform(put("/api/v1/accounts/" + account("PLC-1102")).header("Authorization", approver.bearer())
-                .contentType(MediaType.APPLICATION_JSON).content(toJson(slUpdate(cash, "EMPLOYEE"))))
-                .andExpect(status().isUnprocessableEntity());
-    }
-
-    private static Map<String, Object> slUpdate(JsonNode a, String subsidiaryType) {
-        Map<String, Object> update = new HashMap<>();
-        update.put("version", a.get("version").asLong());
-        update.put("name", a.get("name").asText());
-        update.put("accountType", a.get("accountType").asText());
-        update.put("normalBalance", a.get("normalBalance").asText());
-        update.put("parentCode", a.get("parentCode").isNull() ? null : a.get("parentCode").asText());
-        update.put("postable", a.get("postable").asBoolean());
-        update.put("requiresCostCenter", a.get("requiresCostCenter").asBoolean());
-        update.put("subsidiaryType", subsidiaryType);
-        return update;
-    }
 }

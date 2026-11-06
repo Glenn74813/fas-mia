@@ -7,7 +7,6 @@ import { Badge } from '../../components/Badge';
 import { Button } from '../../components/Button';
 import { ErrorAlert } from '../../components/ErrorAlert';
 import { PageHeader } from '../../components/PageHeader';
-import { Select } from '../../components/Select';
 import { Spinner } from '../../components/Spinner';
 import { StatusBadge } from '../../components/StatusBadge';
 import { useChart } from '../../hooks/useAccounting';
@@ -22,8 +21,6 @@ function depth(a: Account, byId: Map<string, Account>): number {
   return d;
 }
 
-const SL_TYPES: Record<string, string> = { SUPPLIER: 'Supplier', CUSTOMER: 'Customer', EMPLOYEE: 'Employee', OTHER: 'Other' };
-
 export function ChartOfAccountsPage() {
   const { hasPermission } = useAuth();
   const qc = useQueryClient();
@@ -31,12 +28,6 @@ export function ChartOfAccountsPage() {
   const [q, setQ] = useState('');
   const [showInactive, setShowInactive] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
-  const canAdminister = hasPermission('ACCOUNT_ADMINISTER');
-  const [slEdit, setSlEdit] = useState<{ id: string; type: string } | null>(null);
-  const setSl = useMutation({
-    mutationFn: (v: { a: Account; type: string }) => accountApi.setSubsidiaryType(v.a, v.type || null),
-    onSuccess: () => { setSlEdit(null); qc.invalidateQueries({ queryKey: ['chart'] }); },
-  });
   const importCsv = useMutation({
     mutationFn: (file: File) => accountApi.importCsv(file, false),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['chart'] }),
@@ -66,7 +57,7 @@ export function ChartOfAccountsPage() {
           postings to placeholder accounts.
         </p>
       )}
-      <ErrorAlert error={importCsv.error ?? setSl.error} />
+      <ErrorAlert error={importCsv.error} />
       {importCsv.data && <p role="status" className="mb-3 text-sm text-emerald-700">{importCsv.data.created} accounts imported.</p>}
       <input aria-label="Filter accounts" placeholder="Filter by code or name" value={q} onChange={(e) => setQ(e.target.value)}
         className="mb-3 w-72 rounded-lg border border-slate-300 px-3 py-2 shadow-xs text-sm" />
@@ -80,8 +71,7 @@ export function ChartOfAccountsPage() {
         <table className="min-w-full text-sm">
           <thead className="border-b border-slate-200 bg-slate-50/80 text-left text-[11px] font-semibold uppercase tracking-wider text-slate-500">
             <tr><th className="px-3 py-2">Code</th><th className="px-3 py-2">Name</th><th className="px-3 py-2">Type</th><th className="px-3 py-2">Normal</th>
-              <th className="px-3 py-2">Dimensions</th><th className="px-3 py-2">FS line</th><th className="px-3 py-2">Status</th>
-              {canAdminister && <th className="px-3 py-2"><span className="sr-only">Subsidiary ledger</span></th>}</tr>
+              <th className="px-3 py-2">Dimensions</th><th className="px-3 py-2">FS line</th><th className="px-3 py-2">Status</th></tr>
           </thead>
           <tbody>
             {rows.map((a) => (
@@ -98,24 +88,6 @@ export function ChartOfAccountsPage() {
                 </td>
                 <td className="whitespace-nowrap px-3 py-1.5 text-xs">{a.fsLineCode ?? '—'}</td>
                 <td className="px-3 py-1.5"><StatusBadge status={a.status} /></td>
-                {canAdminister && (
-                  <td className="whitespace-nowrap px-3 py-1.5 text-right">
-                    {a.postable && slEdit?.id !== a.id && (
-                      <button type="button" className="text-xs text-brand-700 hover:underline"
-                        onClick={() => { setSl.reset(); setSlEdit({ id: a.id, type: a.subsidiaryType ?? '' }); }}>Subsidiary</button>)}
-                    {slEdit?.id === a.id && (
-                      <span className="inline-flex items-center gap-2">
-                        <Select aria-label={`Subsidiary ledger of ${a.code}`} value={slEdit.type} onChange={(e) => setSlEdit({ ...slEdit, type: e.target.value })}
-                          className="w-36 rounded-lg border border-slate-300 px-2 py-1 text-sm shadow-xs">
-                          <option value="">None</option>
-                          {Object.entries(SL_TYPES).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
-                        </Select>
-                        <button type="button" className="text-xs text-brand-700 hover:underline" disabled={setSl.isPending}
-                          onClick={() => setSl.mutate({ a, type: slEdit.type })}>Save</button>
-                        <button type="button" className="text-xs text-slate-600 hover:underline" onClick={() => setSlEdit(null)}>Cancel</button>
-                      </span>)}
-                  </td>
-                )}
               </tr>
             ))}
           </tbody>
