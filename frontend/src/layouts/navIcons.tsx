@@ -43,6 +43,7 @@ export const NAV_ICONS: Record<string, LucideIcon> = {
   '/general-ledger/trial-balance': Scale,
   '/general-ledger/account-ledger': BookText,
   '/chart-of-accounts': ListTree,
+  '/general-ledger/payroll': Wallet,
   '/subsidiary-accounts': Contact,
   '/general-ledger/open-items': Link2,
   '/general-ledger/allocations': Split,

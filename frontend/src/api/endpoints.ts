@@ -1,5 +1,5 @@
 import { api, downloadFile } from './client';
-import type { AssetCategoryPolicy, BirAlphalist, BirAtc, Sawt, VatListing, WithholdingCertificate,
+import type { PayrollColumnMapping, PayrollImport, PayrollImportResult, PayrollPreview, PayrollTreatment, AssetCategoryPolicy, BirAlphalist, BirAtc, Sawt, VatListing, WithholdingCertificate,
   TicketCategory,
   Clearing, ClearingProposal, CloseCalendarChecklist, CloseFrequency, CloseScheduleItem, CloseTask, GlOpenItem, OpenItemAccount,
   AccountLedger, ChainVerification, ChartSummary, CloseChecklist, CostCenter, CurrentUser, DocumentInfo, EntryDetail,
@@ -762,4 +762,13 @@ export const birApi = {
   /** path: qap.dat, qap.xlsx, 1604e.dat, sawt.xlsx, ... */
   file: (path: string, year: number, quarter: number | null, fallbackName: string) =>
     downloadFile(`/bir/${path}${qs({ year, quarter: quarter ?? undefined })}`, fallbackName),
+};
+
+export const payrollApi = {
+  mappings: () => api.get<PayrollColumnMapping[]>('/payroll/column-mappings'),
+  saveMapping: (body: { label: string; treatment: PayrollTreatment; accountId: string | null; version?: number }) =>
+    api.put<PayrollColumnMapping>('/payroll/column-mappings', body),
+  preview: (file: File, fields: Record<string, string>) => api.uploadWith<PayrollPreview>('/payroll/general-payroll/preview', file, fields),
+  importFile: (file: File, fields: Record<string, string>) => api.uploadWith<PayrollImportResult>('/payroll/general-payroll', file, fields),
+  imports: () => api.get<PayrollImport[]>('/payroll/general-payroll'),
 };

@@ -141,6 +141,26 @@ export const ACCOUNTING_HELP: Record<string, ModuleHelp> = {
     ],
   },
 
+  '/general-ledger/payroll': {
+    title: 'General payroll',
+    summary: 'Books the General Payroll exported by the HRIS (one row per employee, one column per earning or deduction) as one draft journal voucher, through a column-to-account mapping.',
+    steps: [
+      'Choose the General Payroll file (Excel .xlsx or CSV), the accounting date, the cost centre the salaries are charged to, and the payroll reference.',
+      'Click Preview. CAS totals every column and shows the voucher lines and any problem: a column not in the mapping, a column without an account, an employee without a subsidiary account, or debits and credits that differ. Nothing is saved.',
+      'When the preview says Ready to import, click Import as draft voucher. The file is attached to the voucher, which is then submitted, approved and posted like any other.',
+      'The same file cannot be imported twice. A row without an employee number is allowed only as a totals row.',
+      'Under Column mapping, the Chief Accountant sets how each column is booked: Debit (earnings), Credit (deductions and net pay), Ignore (subtotals and notes), or as the employee number or name. Use Add column for a heading the HRIS adds.',
+      'Net pay on Due to Officers and Employees is booked per employee against the employee subsidiary account whose code is the employee number; add those under Subsidiary accounts.',
+    ],
+    roles: 'Accountant previews and imports. Chief Accountant maintains the column mapping and approves and posts the voucher. Auditors can view.',
+    connections: [
+      { to: '/journal-vouchers', how: 'Each import becomes one draft journal voucher with the payroll file attached.' },
+      { to: '/subsidiary-accounts', how: 'Employees are matched to employee subsidiary accounts by employee number.' },
+      { to: '/chart-of-accounts', how: 'Each mapped column posts to an account in the chart.' },
+      { to: '/integrations/inbound', how: 'A ready-made payroll journal (account and amount lines) comes in through Inbound files instead.' },
+    ],
+  },
+
   '/subsidiary-accounts': {
     title: 'Subsidiary accounts',
     summary: 'The individual employees, suppliers, customers and other parties that a control account is broken down into, such as each employee under Advances to Officers and Employees.',

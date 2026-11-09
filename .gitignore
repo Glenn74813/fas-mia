@@ -19,3 +19,5 @@ __pycache__/
 docs/*.docx
 # LibreOffice lock files
 .~lock.*#
+# Payroll and other spreadsheets from the client hold personal data: never commit them.
+docs/*.xlsx

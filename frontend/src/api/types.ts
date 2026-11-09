@@ -1489,3 +1489,26 @@ export interface VatListing {
   list: 'SALES' | 'PURCHASES'; year: number; quarter: number; rows: VatListingRow[]; exempt: string; zeroRated: string; taxable: string;
   vat: string; gross: string; basis: string;
 }
+
+// ---------------------------------------------------------------- General Payroll import (C-37)
+
+export type PayrollTreatment = 'DEBIT' | 'CREDIT' | 'IGNORE' | 'EMPLOYEE_NUMBER' | 'EMPLOYEE_NAME';
+
+export interface PayrollColumnMapping {
+  columnKey: string; label: string; treatment: PayrollTreatment; accountId: string | null; accountCode: string | null;
+  accountName: string | null; subsidiaryType: string | null; version: number; updatedBy: string; updatedAt: string;
+}
+
+export interface PayrollPreview {
+  fileName: string; employees: number;
+  columns: { label: string; treatment: PayrollTreatment; accountCode: string | null; total: string }[];
+  lines: { accountCode: string; accountName: string; side: 'DEBIT' | 'CREDIT'; amount: string; employeeNumber: string | null; description: string }[];
+  totalDebit: string; totalCredit: string; problems: string[]; alreadyImported: string | null;
+}
+
+export interface PayrollImportResult { journalVoucherId: string; description: string; employees: number; total: string }
+
+export interface PayrollImport {
+  id: string; reference: string; fileName: string; employees: number; total: string; journalVoucherId: string;
+  voucherNumber: string | null; voucherStatus: string; importedBy: string; importedAt: string;
+}
