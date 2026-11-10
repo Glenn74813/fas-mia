@@ -2,7 +2,7 @@ package com.miaa.cas.security;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 import com.miaa.cas.security.ratelimit.AuthRateLimitFilter;
 import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockFilterChain;

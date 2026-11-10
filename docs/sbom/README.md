@@ -1,11 +1,11 @@
 # Software bill of materials and third-party licences
 
-Generated 2026-10-26 from the working tree; backend files regenerated 2026-10-27 after adding webauthn4j (passkeys) and ArchUnit (tests) (no repository or release tag yet). Format: CycloneDX 1.6 JSON.
+Generated 2026-10-26 from the working tree; backend files regenerated 2026-11-10 after the upgrade to Spring Boot 4.1.2 and Java 25 (no repository or release tag yet). Format: CycloneDX 1.6 JSON.
 
 | File | Scope | Components | Tool |
 |---|---|---|---|
-| `sbom-backend.json` | Backend runtime (compile + runtime scopes) | 139 | cyclonedx-maven-plugin 2.9.3 |
-| `sbom-backend-incl-test.json` | Backend including test scope | 180 | cyclonedx-maven-plugin 2.9.3 |
+| `sbom-backend.json` | Backend runtime (compile + runtime scopes) | 166 | cyclonedx-maven-plugin 2.9.3 |
+| `sbom-backend-incl-test.json` | Backend including test scope | 211 | cyclonedx-maven-plugin 2.9.3 |
 | `sbom-frontend.json` | Frontend production dependencies (shipped in the bundle) | 37 | @cyclonedx/cyclonedx-npm 6.0.1 (npm 11.19.1) |
 | `sbom-frontend-incl-dev.json` | Frontend including build and test tooling | 264 | @cyclonedx/cyclonedx-npm 6.0.1 |
 

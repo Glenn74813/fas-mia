@@ -1,7 +1,7 @@
 package com.miaa.cas.integrations;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
 import com.miaa.cas.audit.Actor;
 import com.miaa.cas.audit.AuditService;
 import com.miaa.cas.common.error.ApiException;
@@ -319,7 +319,7 @@ public class TransmissionService {
         Object payload;
         try {
             payload = withAttempts ? json.readTree((String) t.get("payload_text")) : null;
-        } catch (JsonProcessingException e) {
+        } catch (JacksonException e) {
             payload = null;
         }
         return new TransmissionView(id, (String) t.get("channel"), (String) t.get("document_type"), (UUID) t.get("document_id"),
@@ -332,7 +332,7 @@ public class TransmissionService {
     private String toJson(Map<String, Object> payload) {
         try {
             return json.writeValueAsString(payload);
-        } catch (JsonProcessingException e) {
+        } catch (JacksonException e) {
             throw new IllegalStateException(e);
         }
     }

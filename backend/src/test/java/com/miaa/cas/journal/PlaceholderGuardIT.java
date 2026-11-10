@@ -3,7 +3,7 @@ package com.miaa.cas.journal;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import tools.jackson.databind.JsonNode;
 import com.miaa.cas.support.AbstractAccountingIT;
 import java.time.LocalDate;
 import org.junit.jupiter.api.Test;

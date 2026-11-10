@@ -1,8 +1,8 @@
 package com.miaa.cas.integrations.inbound;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.ObjectMapper;
 import com.miaa.cas.audit.AuditService;
 import com.miaa.cas.budgeting.BudgetDtos.AllocationRequest;
 import com.miaa.cas.budgeting.BudgetDtos.BudgetView;
@@ -446,7 +446,7 @@ public class InterfaceService {
         List<String> errors;
         try {
             errors = json.readValue(rs.getString("errors"), new TypeReference<>() { });
-        } catch (JsonProcessingException e) {
+        } catch (JacksonException e) {
             errors = List.of();
         }
         java.sql.Array ids = rs.getArray("result_ids");
@@ -461,7 +461,7 @@ public class InterfaceService {
     private Map<String, Object> read(String s) {
         try {
             return json.readValue(s, new TypeReference<>() { });
-        } catch (JsonProcessingException e) {
+        } catch (JacksonException e) {
             throw new IllegalStateException(e);
         }
     }
@@ -469,7 +469,7 @@ public class InterfaceService {
     private String write(Object o) {
         try {
             return json.writeValueAsString(o);
-        } catch (JsonProcessingException e) {
+        } catch (JacksonException e) {
             throw new IllegalStateException(e);
         }
     }

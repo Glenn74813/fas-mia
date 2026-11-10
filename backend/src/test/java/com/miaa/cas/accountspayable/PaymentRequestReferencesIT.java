@@ -6,7 +6,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import tools.jackson.databind.JsonNode;
 import com.miaa.cas.support.AbstractPayablesIT;
 import java.time.LocalDate;
 import java.util.HashMap;
@@ -44,7 +44,7 @@ class PaymentRequestReferencesIT extends AbstractPayablesIT {
         // The invoice list finds the invoice by its Request for Payment number.
         JsonNode found = body(mvc.perform(get("/api/v1/accounts-payable/invoices").param("q", "rfp-2026-0102")
                 .header("Authorization", preparer.bearer())).andExpect(status().isOk()).andReturn());
-        assertThat(found.get("items").findValuesAsText("invoiceNumber")).contains(number);
+        assertThat(found.get("items").findValuesAsString("invoiceNumber")).contains(number);
 
         // A DV records the Request for Payment that asked for it.
         JsonNode posted = postedInvoice(supplierId, number + "-P", LocalDate.of(year, 4, 3), "500.00");

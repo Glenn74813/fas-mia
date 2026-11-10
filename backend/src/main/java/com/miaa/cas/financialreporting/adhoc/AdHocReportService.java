@@ -1,7 +1,7 @@
 package com.miaa.cas.financialreporting.adhoc;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
 import com.miaa.cas.audit.AuditService;
 import com.miaa.cas.common.error.ApiException;
 import com.miaa.cas.common.error.ErrorCode;
@@ -357,7 +357,7 @@ public class AdHocReportService {
     private Definition read(String s) {
         try {
             return json.readValue(s, Definition.class);
-        } catch (JsonProcessingException e) {
+        } catch (JacksonException e) {
             throw new IllegalStateException(e);
         }
     }
@@ -365,7 +365,7 @@ public class AdHocReportService {
     private String write(Definition d) {
         try {
             return json.writeValueAsString(d);
-        } catch (JsonProcessingException e) {
+        } catch (JacksonException e) {
             throw new IllegalStateException(e);
         }
     }

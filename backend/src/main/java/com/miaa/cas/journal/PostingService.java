@@ -1,6 +1,6 @@
 package com.miaa.cas.journal;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import tools.jackson.databind.JsonNode;
 import com.miaa.cas.audit.AuditService;
 import com.miaa.cas.common.error.ApiException;
 import com.miaa.cas.common.idempotency.IdempotencyService;

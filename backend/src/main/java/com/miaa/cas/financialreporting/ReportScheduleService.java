@@ -1,8 +1,8 @@
 package com.miaa.cas.financialreporting;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.ObjectMapper;
 import com.miaa.cas.audit.Actor;
 import com.miaa.cas.audit.AuditService;
 import com.miaa.cas.common.error.ApiException;
@@ -294,7 +294,7 @@ public class ReportScheduleService {
     private String write(Map<String, String> m) {
         try {
             return json.writeValueAsString(m);
-        } catch (JsonProcessingException e) {
+        } catch (JacksonException e) {
             throw new IllegalStateException(e);
         }
     }
@@ -302,7 +302,7 @@ public class ReportScheduleService {
     private Map<String, String> read(String s) {
         try {
             return json.readValue(s, new TypeReference<Map<String, String>>() { });
-        } catch (JsonProcessingException e) {
+        } catch (JacksonException e) {
             throw new IllegalStateException(e);
         }
     }

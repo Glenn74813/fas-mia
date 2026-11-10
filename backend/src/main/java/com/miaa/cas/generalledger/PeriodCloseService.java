@@ -1,8 +1,8 @@
 package com.miaa.cas.generalledger;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.ObjectMapper;
 import com.miaa.cas.audit.Actor;
 import com.miaa.cas.audit.AuditService;
 import com.miaa.cas.common.error.ApiException;
@@ -191,7 +191,7 @@ public class PeriodCloseService {
     private String json(List<String> values) {
         try {
             return mapper.writeValueAsString(values);
-        } catch (JsonProcessingException e) {
+        } catch (JacksonException e) {
             throw new IllegalStateException(e);
         }
     }
@@ -200,7 +200,7 @@ public class PeriodCloseService {
         List<String> waived;
         try {
             waived = mapper.readValue(c.getWaivedChecks(), new TypeReference<>() { });
-        } catch (JsonProcessingException e) {
+        } catch (JacksonException e) {
             waived = List.of();
         }
         return new PeriodChangeResponse(c.getId(), c.getPeriodId(), p.getName(), c.getChangeType(), c.getFromStatus(),

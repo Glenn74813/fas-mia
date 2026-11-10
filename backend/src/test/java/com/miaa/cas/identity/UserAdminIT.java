@@ -7,7 +7,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import tools.jackson.databind.JsonNode;
 import com.miaa.cas.support.AbstractIntegrationTest;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -41,8 +41,8 @@ class UserAdminIT extends AbstractIntegrationTest {
         }
         assertThat(cashiers).isNotNull();
         assertThat(cashiers.get("roleName").asText()).isNotBlank();
-        assertThat(cashiers.get("members").findValuesAsText("username")).contains(cashier.username());
-        assertThat(roles.findValuesAsText("roleCode")).contains("SYSTEM_ADMINISTRATOR", "ACCOUNTANT");
+        assertThat(cashiers.get("members").findValuesAsString("username")).contains(cashier.username());
+        assertThat(roles.findValuesAsString("roleCode")).contains("SYSTEM_ADMINISTRATOR", "ACCOUNTANT");
         mvc.perform(get("/api/v1/users/roles").header("Authorization", login(cashier).bearer())).andExpect(status().isForbidden());
     }
 

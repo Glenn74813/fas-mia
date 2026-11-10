@@ -1,7 +1,7 @@
 package com.miaa.cas.financialreporting;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.ObjectMapper;
 import com.miaa.cas.audit.Actor;
 import com.miaa.cas.audit.AuditService;
 import com.miaa.cas.common.crypto.ContentCipher;
@@ -128,7 +128,7 @@ public class ReportJobService {
             jdbc.update("INSERT INTO report_jobs (id, report_type, format, parameters, status, requested_by_id, requested_by, requested_at) "
                     + "VALUES (?, ?, ?, ?::jsonb, 'QUEUED', ?, ?, ?)", id, reportType, format, json.writeValueAsString(p), userId, username,
                     Timestamp.from(Instant.now(clock)));
-        } catch (com.fasterxml.jackson.core.JsonProcessingException e) {
+        } catch (tools.jackson.core.JacksonException e) {
             throw new IllegalStateException(e);
         }
         return id;
@@ -156,7 +156,7 @@ public class ReportJobService {
             // The requester must still hold the permission the report needs (it may have been revoked since).
             CurrentActor.requirePermission(ManagementReportService.permissionFor((String) r.get("report_type"),
                     json.readValue((String) r.get("parameters"), new TypeReference<Map<String, String>>() { })));
-        } catch (com.fasterxml.jackson.core.JsonProcessingException e) {
+        } catch (tools.jackson.core.JacksonException e) {
             throw new IllegalStateException(e);
         }
         if (!"DONE".equals(r.get("status"))) {
@@ -311,7 +311,7 @@ public class ReportJobService {
         Map<String, Object> params;
         try {
             params = json.readValue((String) r.get("parameters"), new TypeReference<>() { });
-        } catch (com.fasterxml.jackson.core.JsonProcessingException e) {
+        } catch (tools.jackson.core.JacksonException e) {
             params = Map.of();
         }
         return new JobView(id, (String) r.get("report_type"), (String) r.get("format"), params, (String) r.get("status"),

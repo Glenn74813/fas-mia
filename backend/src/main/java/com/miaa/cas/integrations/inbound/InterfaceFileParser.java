@@ -1,7 +1,8 @@
 package com.miaa.cas.integrations.inbound;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.StringReader;
@@ -9,7 +10,6 @@ import java.nio.charset.CharacterCodingException;
 import java.nio.charset.CodingErrorAction;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
@@ -171,7 +171,7 @@ final class InterfaceFileParser {
         JsonNode root;
         try {
             root = json.readTree(text);
-        } catch (IOException e) {
+        } catch (JacksonException e) {
             throw new ParseException("The file is not valid JSON.");
         }
         if (root == null || !root.isObject()) {
@@ -179,8 +179,7 @@ final class InterfaceFileParser {
         }
         Map<String, String> header = new LinkedHashMap<>();
         JsonNode array = null;
-        for (Iterator<Map.Entry<String, JsonNode>> it = root.fields(); it.hasNext(); ) {
-            Map.Entry<String, JsonNode> e = it.next();
+        for (Map.Entry<String, JsonNode> e : root.properties()) {
             if (e.getValue().isArray() && List.of("lines", "rows", "items").contains(key(e.getKey()))) {
                 array = e.getValue();
             } else if (e.getValue().isValueNode() && !e.getValue().isNull()) {
@@ -196,7 +195,7 @@ final class InterfaceFileParser {
                 throw new ParseException("Every line must be an object.");
             }
             Map<String, String> row = new LinkedHashMap<>();
-            item.fields().forEachRemaining(f -> {
+            item.properties().forEach(f -> {
                 if (f.getValue().isValueNode() && !f.getValue().isNull()) {
                     row.put(key(f.getKey()), f.getValue().asText().trim());
                 }

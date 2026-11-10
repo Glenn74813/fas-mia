@@ -1,6 +1,6 @@
 package com.miaa.cas.config;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 import com.miaa.cas.common.crypto.AesGcmEncryptor;
 import com.miaa.cas.security.CasJwtAuthenticationConverter;
 import com.miaa.cas.security.ProblemSecurityHandlers;
@@ -37,7 +37,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import static org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher;
+import static org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher.pathPattern;
 
 /**
  * Deny-by-default security baseline (docs/05-security-design.md). Stateless bearer-token API; the
@@ -61,7 +61,7 @@ public class SecurityConfig {
         CookieCsrfTokenRepository csrfRepository = CookieCsrfTokenRepository.withHttpOnlyFalse();
         csrfRepository.setCookieCustomizer(c -> c.secure(properties.session().cookieSecure()).sameSite("Strict").path("/"));
         RequestMatcher cookieEndpoints = new OrRequestMatcher(
-                antMatcher(HttpMethod.POST, "/api/v1/auth/refresh"), antMatcher(HttpMethod.POST, "/api/v1/auth/logout"));
+                pathPattern(HttpMethod.POST, "/api/v1/auth/refresh"), pathPattern(HttpMethod.POST, "/api/v1/auth/logout"));
 
         http
             .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

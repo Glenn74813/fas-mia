@@ -1,7 +1,7 @@
 package com.miaa.cas.notifications;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
 import java.sql.Timestamp;
 import java.time.Clock;
 import java.time.Instant;
@@ -35,7 +35,7 @@ public class OutboxService {
                     INSERT INTO notification_outbox (id, channel, recipient, template, payload, status, next_attempt_at, created_at)
                     VALUES (?, 'EMAIL', ?, ?, ?::jsonb, 'PENDING', ?, ?)""",
                     id, recipient, template, mapper.writeValueAsString(payload), now, now);
-        } catch (JsonProcessingException e) {
+        } catch (JacksonException e) {
             throw new IllegalArgumentException("Notification payload not serialisable", e);
         }
         return id;

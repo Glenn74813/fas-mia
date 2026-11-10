@@ -4,9 +4,9 @@
 
 | Tool | Version | Notes |
 |---|---|---|
-| JDK | 17 (Temurin recommended) | Build uses the Maven wrapper (`backend/mvnw`, Maven 3.9.16) |
+| JDK | 25 (Temurin recommended) | Build uses the Maven wrapper (`backend/mvnw`, Maven 3.9.16) |
 | Node.js | 24 LTS | `frontend/package-lock.json` pins exact versions |
-| PostgreSQL | 17 | Supported by Flyway 11.7. PostgreSQL 18 works but Flyway warns it is untested |
+| PostgreSQL | 17 | Supported by Flyway 12.4, which also supports PostgreSQL 18 |
 | Docker + Compose | current | Optional for the full stack; required for Testcontainers-based tests |
 | OpenSSL | any | Generates development keys |
 

@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 # Build stage: compile and package with the Maven wrapper (tests run in CI, not in the image build).
-FROM eclipse-temurin:17-jdk-jammy AS build
+FROM eclipse-temurin:25-jdk-noble AS build
 WORKDIR /src
 COPY .mvn .mvn
 COPY mvnw pom.xml ./
@@ -9,7 +9,7 @@ COPY src src
 RUN ./mvnw -B -q -DskipTests package && cp target/cas-backend-*.jar /app.jar
 
 # Runtime stage: JRE only, non-root, no build tools or sources.
-FROM eclipse-temurin:17-jre-jammy
+FROM eclipse-temurin:25-jre-noble
 RUN groupadd --system cas && useradd --system --gid cas --home /app --shell /usr/sbin/nologin cas
 WORKDIR /app
 COPY --from=build /app.jar /app/cas-backend.jar

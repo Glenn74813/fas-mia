@@ -1,6 +1,6 @@
 # AVTECH Computerized Accounting System (CAS)
 
-Independently deployable **Spring Boot 3.5 / Java 17** API and **React 19 + TypeScript** SPA backed by
+Independently deployable **Spring Boot 4.1 / Java 25** API and **React 19 + TypeScript** SPA backed by
 **PostgreSQL**, built in phases against the CAS development specification.
 
 **Current state: Phase 5 (migration and acceptance support) in progress — see

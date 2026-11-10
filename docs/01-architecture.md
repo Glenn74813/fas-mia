@@ -9,7 +9,7 @@
 
 ## 1. Architectural style
 
-A **modular monolith** backend (Spring Boot 3.5, Java 17) and an **independently deployed
+A **modular monolith** backend (Spring Boot 4.1, Java 25) and an **independently deployed
 SPA** (React 19 + TypeScript + Vite). The two share nothing but the versioned REST contract
 under `/api/v1`, documented with OpenAPI 3.
 

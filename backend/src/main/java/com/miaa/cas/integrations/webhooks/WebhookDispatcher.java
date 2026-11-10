@@ -1,6 +1,6 @@
 package com.miaa.cas.integrations.webhooks;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 import com.miaa.cas.audit.Actor;
 import com.miaa.cas.audit.AuditService;
 import com.miaa.cas.common.crypto.TlsPolicy;
@@ -236,7 +236,7 @@ public class WebhookDispatcher {
         p.put("resource", resource);
         try {
             return json.writeValueAsString(p);
-        } catch (com.fasterxml.jackson.core.JsonProcessingException e) {
+        } catch (tools.jackson.core.JacksonException e) {
             throw new IllegalStateException(e);
         }
     }

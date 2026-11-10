@@ -1,7 +1,7 @@
 package com.miaa.cas.audit;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
 import com.miaa.cas.common.web.ClientInfo;
 import com.miaa.cas.common.web.CorrelationIdFilter;
 import com.miaa.cas.security.CasPrincipal;
@@ -56,7 +56,7 @@ public class EventStore {
         String json;
         try {
             json = mapper.writeValueAsString(details == null ? Map.of() : details);
-        } catch (JsonProcessingException e) {
+        } catch (JacksonException e) {
             throw new IllegalArgumentException("Audit details are not serialisable", e);
         }
         Timestamp now = Timestamp.from(Instant.now(clock));
@@ -152,7 +152,7 @@ public class EventStore {
                     rs.getString("resource_id"), rs.getString("outcome"), rs.getString("severity"),
                     rs.getString("correlation_id"), rs.getString("client_ip"), mapper.readTree(rs.getString("details")),
                     rs.getString("row_hash"));
-        } catch (JsonProcessingException e) {
+        } catch (JacksonException e) {
             throw new SQLException("Invalid details JSON", e);
         }
     }

@@ -40,7 +40,8 @@ case "${1:-}" in
          CAS_JWT_PRIVATE_KEY_PATH="$PWD/.secrets/jwt_private.pem" CAS_JWT_PUBLIC_KEY_PATH="$PWD/.secrets/jwt_public.pem" \
          CAS_MFA_DEVBYPASSUSERS=
        # No MFA bypass here: the test administrator signs in with an authenticator code, as in production.
-       setsid -f java -jar .devdata/cas-backend-e2e.jar > .devdata/backend-e2e-tests.log 2>&1 < /dev/null)
+       source scripts/java.sh
+       setsid -f "$JAVA" -jar .devdata/cas-backend-e2e.jar > .devdata/backend-e2e-tests.log 2>&1 < /dev/null)
       for _ in $(seq 1 120); do
         grep -aq "Started CasApplication" .devdata/backend-e2e-tests.log && break
         grep -aq "Application run failed" .devdata/backend-e2e-tests.log && { echo "Backend failed; see .devdata/backend-e2e-tests.log" >&2; exit 1; }

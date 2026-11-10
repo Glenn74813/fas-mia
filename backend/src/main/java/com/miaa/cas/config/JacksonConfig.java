@@ -1,13 +1,13 @@
 package com.miaa.cas.config;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.JsonSerializer;
-import com.fasterxml.jackson.databind.SerializerProvider;
-import java.io.IOException;
 import java.math.BigDecimal;
-import org.springframework.boot.autoconfigure.jackson.Jackson2ObjectMapperBuilderCustomizer;
+import org.springframework.boot.jackson.autoconfigure.JsonMapperBuilderCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import tools.jackson.core.JsonGenerator;
+import tools.jackson.databind.SerializationContext;
+import tools.jackson.databind.ValueSerializer;
+import tools.jackson.databind.module.SimpleModule;
 
 @Configuration
 public class JacksonConfig {
@@ -17,12 +17,13 @@ public class JacksonConfig {
      * floating point. Inputs accept either a JSON string or number and are read exactly.
      */
     @Bean
-    public Jackson2ObjectMapperBuilderCustomizer decimalsAsStrings() {
-        return builder -> builder.serializerByType(BigDecimal.class, new JsonSerializer<BigDecimal>() {
-            @Override
-            public void serialize(BigDecimal value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
-                gen.writeString(value.toPlainString());
-            }
-        });
+    public JsonMapperBuilderCustomizer decimalsAsStrings() {
+        return builder -> builder.addModule(new SimpleModule("decimals-as-strings").addSerializer(BigDecimal.class,
+                new ValueSerializer<BigDecimal>() {
+                    @Override
+                    public void serialize(BigDecimal value, JsonGenerator gen, SerializationContext context) {
+                        gen.writeString(value.toPlainString());
+                    }
+                }));
     }
 }

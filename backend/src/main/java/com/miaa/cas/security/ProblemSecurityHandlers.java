@@ -1,6 +1,6 @@
 package com.miaa.cas.security;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 import com.miaa.cas.audit.SecurityEventService;
 import com.miaa.cas.common.error.ErrorCode;
 import com.miaa.cas.common.error.ProblemFactory;

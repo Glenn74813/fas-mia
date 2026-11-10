@@ -1,7 +1,7 @@
 package com.miaa.cas.dataexport;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.SerializationFeature;
 import com.miaa.cas.audit.Actor;
 import com.miaa.cas.audit.AuditService;
 import com.miaa.cas.audit.EventStore;
@@ -126,7 +126,7 @@ public class DataExportService {
         this.notifications = notifications;
         this.documents = documents;
         this.encryptor = encryptor;
-        this.json = json.copy().enable(SerializationFeature.INDENT_OUTPUT);
+        this.json = json.rebuild().enable(SerializationFeature.INDENT_OUTPUT).build();
         this.clock = clock;
         this.dir = Path.of(dir);
         this.retention = retention;

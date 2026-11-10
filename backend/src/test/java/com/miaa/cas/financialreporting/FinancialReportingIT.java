@@ -5,7 +5,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import tools.jackson.databind.JsonNode;
 import com.miaa.cas.config.dev.DevPayablesSeeder;
 import com.miaa.cas.financialreporting.ReportDtos.TemplateLineRequest;
 import com.miaa.cas.financialreporting.ReportDtos.TemplateRequest;

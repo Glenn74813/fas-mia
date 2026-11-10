@@ -27,4 +27,5 @@ mkdir -p .devdata
 cp backend/target/cas-backend-0.1.0-SNAPSHOT.jar .devdata/cas-backend-demo.jar.new
 mv -f .devdata/cas-backend-demo.jar.new .devdata/cas-backend-demo.jar
 # TLS 1.3 minimum for every outbound connection, the database driver included (TlsPolicy checks it).
-exec java -Djdk.tls.client.protocols=TLSv1.3 -jar .devdata/cas-backend-demo.jar
+source scripts/java.sh
+exec "$JAVA" -Djdk.tls.client.protocols=TLSv1.3 -jar .devdata/cas-backend-demo.jar

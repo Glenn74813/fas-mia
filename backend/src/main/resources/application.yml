@@ -45,9 +45,13 @@ spring:
         jdbc:
           time_zone: UTC
   jackson:
+    # Dates are written as ISO-8601 text, the Jackson 3 default (no write-dates-as-timestamps setting needed).
     default-property-inclusion: always
-    serialization:
-      write-dates-as-timestamps: false
+    deserialization:
+      # Keep the Jackson 2 behaviour the API was built on: an omitted true/false field means false, and fields the
+      # server does not know are ignored (Jackson 3 rejects both by default).
+      fail-on-null-for-primitives: false
+      fail-on-unknown-properties: false
   servlet:
     multipart:
       max-file-size: 10MB

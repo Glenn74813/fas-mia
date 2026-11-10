@@ -4,8 +4,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 import com.miaa.cas.common.crypto.AesGcmEncryptor;
 import com.miaa.cas.identity.RoleAssignments;
 import com.miaa.cas.identity.domain.MfaMethod;
@@ -24,8 +24,8 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.flyway.FlywayMigrationStrategy;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.flyway.autoconfigure.FlywayMigrationStrategy;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
@@ -39,7 +39,7 @@ import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.transaction.support.TransactionTemplate;
-import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.postgresql.PostgreSQLContainer;
 
 /**
  * Base for integration tests against real PostgreSQL (ADR-005): Testcontainers by default, or the
@@ -57,11 +57,11 @@ public abstract class AbstractIntegrationTest {
     private static final String ENCRYPTION_KEY = Base64.getEncoder().encodeToString(
             com.miaa.cas.common.crypto.SecureTokens.randomBytes(32));
     private static final AtomicInteger SEQ = new AtomicInteger();
-    private static PostgreSQLContainer<?> container;
+    private static PostgreSQLContainer container;
 
     static {
         if (EXTERNAL_URL == null || EXTERNAL_URL.isBlank()) {
-            container = new PostgreSQLContainer<>("postgres:17-alpine");
+            container = new PostgreSQLContainer("postgres:17-alpine");
             container.start();
         }
     }
